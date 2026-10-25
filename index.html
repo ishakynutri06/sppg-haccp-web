@@ -985,10 +985,11 @@
       localStorage.setItem('sppg_allergens_found', JSON.stringify(Array.from(allergens)));
     }
 
+    // PERBAIKAN: Menggunakan KELOMPOK_LIST_MENU agar benar-benar terisolasi dari MASTER
     function syncSiklusMenuData(weeks) {
-      let flatMatrix = { KARBO: [], PH: [], PN: [], SAYUR: [], SAYUR_2: [], BUAH: [], SUSU: [] };
+      let flatMatrix = { KARBO: [], PH: [], PN: [], SAYUR: [], BUAH: [], SUSU: [] };
       weeks.forEach(w => {
-        KELOMPOK_LIST_MASTER.forEach(k => {
+        KELOMPOK_LIST_MENU.forEach(k => {
           let colData = (w.items && w.items[k]) ? w.items[k] : ['', '', '', '', ''];
           flatMatrix[k] = flatMatrix[k].concat(colData);
         });
@@ -999,6 +1000,8 @@
     function processTextToWeekData(rawText, targetWeek, isMasterBahan = false) {
       const lines = rawText.trim().split('\n').map(l => l.split('\t').map(cell => cell.trim()));
       const storageKey = isMasterBahan ? 'sppg_master_bahan_weeks' : 'sppg_siklus_menu_weeks';
+      
+      // PERBAIKAN DEEP COPY
       let weeks = JSON.parse(localStorage.getItem(storageKey)) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
       if (!weeks[targetWeek]) {
@@ -1075,7 +1078,6 @@
       initAlergenModule();
     }
 
-    // ORIGINAL switchTab function body mapped to a new implementation below for mobile support
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
       const activeSec = document.getElementById('sec-' + tabId);
@@ -1121,7 +1123,9 @@
     function renderSiklusMenu20Table() {
       const wrapper = document.getElementById('siklus_menu_tables_wrapper');
       if (!wrapper) return;
-      const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+      // PERBAIKAN DEEP COPY
+      const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      
       let html = '';
       weeks.forEach((w, wIdx) => {
         let startDayNum = wIdx * 5 + 1;
@@ -1150,7 +1154,9 @@
     }
 
     function saveSiklusMenuManual() {
-      let weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+      // PERBAIKAN DEEP COPY
+      let weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      
       KELOMPOK_LIST_MENU.forEach(k => {
         for (let m = 0; m < 20; m++) {
           const cell = document.getElementById(`sm_cell_${k}_${m}`);
@@ -1172,7 +1178,9 @@
     function renderMasterBahan20Table() {
       const wrapper = document.getElementById('master_bahan_tables_wrapper');
       if (!wrapper) return;
-      const weeks = JSON.parse(localStorage.getItem('sppg_master_bahan_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+      // PERBAIKAN DEEP COPY
+      const weeks = JSON.parse(localStorage.getItem('sppg_master_bahan_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      
       let html = '';
       weeks.forEach((w, wIdx) => {
         let startDayNum = wIdx * 5 + 1;
@@ -1201,7 +1209,9 @@
     }
 
     function saveMasterBahanManual() {
-      let weeks = JSON.parse(localStorage.getItem('sppg_master_bahan_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+      // PERBAIKAN DEEP COPY
+      let weeks = JSON.parse(localStorage.getItem('sppg_master_bahan_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      
       KELOMPOK_LIST_MASTER.forEach(k => {
         for (let m = 0; m < 20; m++) {
           const cell = document.getElementById(`mb_cell_${k}_${m}`);
@@ -1283,7 +1293,9 @@
     function initPemorsianOptions() {
       const sel = document.getElementById('selectSiklusPemorsian');
       if (!sel) return;
-      const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+      // PERBAIKAN DEEP COPY
+      const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      
       let html = '';
       let dayCounter = 0;
       weeks.forEach(w => {
@@ -1373,7 +1385,9 @@
         totalBahanEl.innerText = `${totalBahanKeys.length} Jenis`;
       }
 
-      const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+      // PERBAIKAN DEEP COPY
+      const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      
       const menuMatrix = JSON.parse(localStorage.getItem('sppg_siklus_menu_matrix')) || {};
       
       const activeMenuEl = document.getElementById('dashActiveMenu');
@@ -1438,7 +1452,9 @@
 
       const siklusSelect = document.getElementById('suhu_siklus_active');
       if (siklusSelect) {
-        const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+        // PERBAIKAN DEEP COPY
+        const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+        
         let options = '';
         let dayCounter = 0;
         weeks.forEach(w => {
@@ -1714,7 +1730,9 @@
 
       const siklusSelect = document.getElementById('al_siklus_active');
       if (siklusSelect) {
-        const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || DEFAULT_SIKLUS_MENU_20_DAYS;
+        // PERBAIKAN DEEP COPY
+        const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+        
         let options = '';
         let dayCounter = 0;
         weeks.forEach(w => {
@@ -2064,13 +2082,14 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // PERBAIKAN DEEP COPY DI INITIAL LOAD
       if (!localStorage.getItem('sppg_master_bahan_weeks')) {
         localStorage.setItem('sppg_master_bahan_weeks', JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-        syncMasterBahanData(DEFAULT_SIKLUS_MENU_20_DAYS);
+        syncMasterBahanData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS)));
       }
       if (!localStorage.getItem('sppg_siklus_menu_weeks')) {
         localStorage.setItem('sppg_siklus_menu_weeks', JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-        syncSiklusMenuData(DEFAULT_SIKLUS_MENU_20_DAYS);
+        syncSiklusMenuData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS)));
       }
       
       initSuhuModule();
