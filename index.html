@@ -95,7 +95,7 @@
       </nav>
 
       <div class="text-[11px] text-slate-400 pt-4 border-t border-slate-700/80 font-medium flex items-center justify-between shrink-0">
-        <span>v5.1 PWA</span>
+        <span>v5.2 PWA / Offline</span>
         <span class="text-emerald-400 font-bold flex items-center gap-1"><span class="animate-pulse">●</span> Ready</span>
       </div>
     </div>
@@ -110,7 +110,7 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div class="space-y-2 relative z-10 w-full md:w-auto">
           <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 px-3 py-1.5 rounded-full text-blue-200 text-[10px] font-bold tracking-widest uppercase shadow-inner mb-2 md:mb-0">
-            <span class="text-blue-300">⚡ Real-Time Sync Active</span>
+            <span class="text-blue-300">⚡ Real-Time Offline Active</span>
           </div>
           <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100 leading-tight">Dashboard HACCP & Gizi SPPG</h2>
           <p class="text-xs text-blue-200/80 font-medium max-w-lg leading-relaxed">Pusat Kendali Mutu, Keamanan Pangan, dan Monitoring Gizi Makan Bergizi Gratis (MBG).</p>
@@ -345,16 +345,16 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
               <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Pemantauan</label>
-                <input type="date" id="suhu_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer" required>
+                <input type="date" id="suhu_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-base font-bold bg-slate-50 text-slate-800 cursor-pointer" required>
               </div>
               <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi)</label>
-                <select id="suhu_siklus_active" onchange="renderSuhuTable()" class="w-full border-2 border-blue-200 rounded-xl p-2.5 text-sm font-bold bg-blue-50 text-blue-900 cursor-pointer">
+                <select id="suhu_siklus_active" onchange="renderSuhuTable()" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[48px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
                 </select>
               </div>
               <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Petugas QC / Supervisor</label>
-                <input type="text" id="suhu_supervisor" placeholder="Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" required>
+                <input type="text" id="suhu_supervisor" placeholder="Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-base font-bold bg-slate-50 text-slate-800" required>
               </div>
             </div>
 
@@ -381,12 +381,12 @@
               <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50 space-y-4 text-center shadow-sm">
                 <p class="font-extrabold text-slate-700 uppercase tracking-widest text-[10px]">Petugas Pemantau / Penerima:</p>
                 <div class="h-10 flex items-center justify-center text-slate-300 italic text-sm">( Tanda Tangan Digital )</div>
-                <input type="text" id="suhu_pemeriksa" placeholder="Ketik Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-center font-bold bg-white text-sm">
+                <input type="text" id="suhu_pemeriksa" placeholder="Ketik Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-center font-bold bg-white text-base">
               </div>
               <div class="p-5 border border-slate-200 rounded-2xl bg-slate-50 space-y-4 text-center shadow-sm">
                 <p class="font-extrabold text-slate-700 uppercase tracking-widest text-[10px]">Diperiksa Oleh (Kepala Dapur):</p>
                 <div class="h-10 flex items-center justify-center text-slate-300 italic text-sm">( Tanda Tangan Digital )</div>
-                <input type="text" id="suhu_penyetuju" placeholder="Ketik Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-center font-bold bg-white text-sm">
+                <input type="text" id="suhu_penyetuju" placeholder="Ketik Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-center font-bold bg-white text-base">
               </div>
             </div>
 
@@ -600,10 +600,9 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT ENGINE -->
+  <!-- JAVASCRIPT ENGINE (DIPERBARUI) -->
   <script>
     // --- CUSTOM ALERT OVERRIDE ---
-    // Membungkus alert default agar tampil lebih estetis dan tidak mem-blok UI.
     window.alert = function(message) {
       const modal = document.getElementById('customAlert');
       const msgEl = document.getElementById('customAlertMessage');
@@ -624,7 +623,7 @@
       }, 300);
     }
 
-    // --- ORIGINAL LOGIC BELOW (UNTOUCHED CORE) ---
+    // --- ORIGINAL LOGIC BELOW (DENGAN PERBAIKAN BUG) ---
     function getCleanTableHtml(wrapperId) {
       const wrapper = document.getElementById(wrapperId);
       if (!wrapper) return '<p>Data kosong</p>';
@@ -985,7 +984,6 @@
       localStorage.setItem('sppg_allergens_found', JSON.stringify(Array.from(allergens)));
     }
 
-    // PERBAIKAN: Menggunakan KELOMPOK_LIST_MENU agar benar-benar terisolasi dari MASTER
     function syncSiklusMenuData(weeks) {
       let flatMatrix = { KARBO: [], PH: [], PN: [], SAYUR: [], BUAH: [], SUSU: [] };
       weeks.forEach(w => {
@@ -1001,7 +999,6 @@
       const lines = rawText.trim().split('\n').map(l => l.split('\t').map(cell => cell.trim()));
       const storageKey = isMasterBahan ? 'sppg_master_bahan_weeks' : 'sppg_siklus_menu_weeks';
       
-      // PERBAIKAN DEEP COPY
       let weeks = JSON.parse(localStorage.getItem(storageKey)) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
       if (!weeks[targetWeek]) {
@@ -1123,7 +1120,6 @@
     function renderSiklusMenu20Table() {
       const wrapper = document.getElementById('siklus_menu_tables_wrapper');
       if (!wrapper) return;
-      // PERBAIKAN DEEP COPY
       const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
       let html = '';
@@ -1154,7 +1150,6 @@
     }
 
     function saveSiklusMenuManual() {
-      // PERBAIKAN DEEP COPY
       let weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
       KELOMPOK_LIST_MENU.forEach(k => {
@@ -1178,7 +1173,6 @@
     function renderMasterBahan20Table() {
       const wrapper = document.getElementById('master_bahan_tables_wrapper');
       if (!wrapper) return;
-      // PERBAIKAN DEEP COPY
       const weeks = JSON.parse(localStorage.getItem('sppg_master_bahan_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
       let html = '';
@@ -1209,7 +1203,6 @@
     }
 
     function saveMasterBahanManual() {
-      // PERBAIKAN DEEP COPY
       let weeks = JSON.parse(localStorage.getItem('sppg_master_bahan_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
       KELOMPOK_LIST_MASTER.forEach(k => {
@@ -1293,7 +1286,6 @@
     function initPemorsianOptions() {
       const sel = document.getElementById('selectSiklusPemorsian');
       if (!sel) return;
-      // PERBAIKAN DEEP COPY
       const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
       let html = '';
@@ -1351,8 +1343,13 @@
       
       const dayIdx = sel.value;
       let savedData = JSON.parse(localStorage.getItem('sppg_pemorsian_data')) || {};
-      let dayData = [];
       
+      if (savedData[dayIdx] && savedData[dayIdx].length > 0) {
+          const confirmEdit = confirm("⚠️ PERHATIAN: Data pemorsian untuk Hari ke-" + (parseInt(dayIdx)+1) + " ini sudah pernah disimpan.\n\nApakah Anda yakin ingin memperbarui dan menimpa data yang lama?");
+          if (!confirmEdit) return; 
+      }
+
+      let dayData = [];
       const tbody = document.getElementById('tbody_pemorsian_b1');
       tbody.querySelectorAll('tr').forEach(tr => {
           const inputs = tr.querySelectorAll('input[type="number"]');
@@ -1368,7 +1365,7 @@
       
       savedData[dayIdx] = dayData;
       localStorage.setItem('sppg_pemorsian_data', JSON.stringify(savedData));
-      alert('Data Checklist Pemorsian berhasil disimpan!');
+      alert('Data Checklist Pemorsian berhasil disimpan secara permanen di perangkat Anda!');
     }
 
     function updateDashboardSummary() {
@@ -1385,9 +1382,7 @@
         totalBahanEl.innerText = `${totalBahanKeys.length} Jenis`;
       }
 
-      // PERBAIKAN DEEP COPY
       const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-      
       const menuMatrix = JSON.parse(localStorage.getItem('sppg_siklus_menu_matrix')) || {};
       
       const activeMenuEl = document.getElementById('dashActiveMenu');
@@ -1446,15 +1441,31 @@
       }
     }
 
+    function handleSuhuDateChange() {
+        const dateKey = document.getElementById('suhu_tanggal').value;
+        const allData = JSON.parse(localStorage.getItem('sppg_log_suhu')) || {};
+        const data = allData[dateKey];
+        if (data) {
+            suhuRuangColumns = data.suhuRuangColumns || 1;
+            suhuBatchCounters = data.suhuBatchCounters || { matang: 1, pemorsian: 1 };
+        } else {
+            suhuRuangColumns = 1;
+            suhuBatchCounters = { matang: 1, pemorsian: 1 };
+        }
+        renderSuhuTable();
+    }
+
     function initSuhuModule() {
       const tglElem = document.getElementById('suhu_tanggal');
-      if (tglElem && !tglElem.value) tglElem.value = new Date().toISOString().split('T')[0];
+      if (tglElem) {
+        if(!tglElem.value) tglElem.value = new Date().toISOString().split('T')[0];
+        tglElem.removeEventListener('change', handleSuhuDateChange);
+        tglElem.addEventListener('change', handleSuhuDateChange);
+      }
 
       const siklusSelect = document.getElementById('suhu_siklus_active');
       if (siklusSelect) {
-        // PERBAIKAN DEEP COPY
         const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-        
         let options = '';
         let dayCounter = 0;
         weeks.forEach(w => {
@@ -1465,7 +1476,7 @@
         });
         siklusSelect.innerHTML = options;
       }
-      renderSuhuTable();
+      handleSuhuDateChange();
     }
 
     function addSuhuBatch() {
@@ -1543,7 +1554,7 @@
             <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
             <th class="p-3 border-b border-slate-600 w-36">KETERANGAN</th>
-            <th class="p-3 border-b border-slate-600 w-36 hidden-print text-center">📸 FOTO</th>
+            <th class="p-3 border-b border-slate-600 w-44 hidden-print text-center">📸 UPLOAD GAMBAR</th>
           </tr>`;
 
         filteredConfigs.forEach(cfg => {
@@ -1555,8 +1566,8 @@
               let defVal = c === 1 ? cfg.defPagi : cfg.defMalam; 
               
               dynamicCells += `
-                <td class="p-2 text-center"><input type="time" id="suhu_waktu_${c}_${cfg.id}" value="${defTime}" class="w-full border-2 border-slate-200 rounded-lg p-2 text-center text-[11px] bg-white font-bold text-slate-600 shadow-sm"></td>
-                <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${c}_${cfg.id}" value="${defVal}" class="w-full border-2 border-slate-200 rounded-lg p-2 text-center font-black text-blue-600 text-sm shadow-sm" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})"></td>
+                <td class="p-2 text-center"><input type="time" id="suhu_waktu_${c}_${cfg.id}" value="${defTime}" class="w-full border-2 border-slate-200 rounded-lg p-2.5 min-h-[48px] text-center text-sm bg-white font-bold text-slate-600 shadow-sm"></td>
+                <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${c}_${cfg.id}" value="${defVal}" class="w-full border-2 border-slate-200 rounded-lg p-2.5 min-h-[48px] text-center font-black text-blue-600 text-base shadow-sm" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})"></td>
               `;
           }
 
@@ -1566,12 +1577,12 @@
               <td class="p-3 font-extrabold text-slate-800 bg-slate-50/50">${cfg.cat}</td>
               <td class="p-3 font-bold text-slate-600">${cfg.area}</td>
               ${dynamicCells}
-              <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 rounded-lg p-2 text-center font-extrabold text-xs bg-amber-50 text-amber-700" readonly></td>
-              <td class="p-3 text-center font-bold" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
-              <td class="p-2"><input type="text" id="suhu_cat_${cfg.id}" placeholder="Keterangan..." class="w-full border-2 border-slate-200 rounded-lg p-2 text-xs bg-white text-slate-600 shadow-sm"></td>
-              <td class="p-3 text-center hidden-print">
+              <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 rounded-lg p-2.5 min-h-[48px] text-center font-extrabold text-sm bg-amber-50 text-amber-700" readonly></td>
+              <td class="p-3 text-center font-bold text-sm" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
+              <td class="p-2"><input type="text" id="suhu_cat_${cfg.id}" placeholder="Keterangan..." class="w-full border-2 border-slate-200 rounded-lg p-2.5 min-h-[48px] text-sm bg-white text-slate-600 shadow-sm"></td>
+              <td class="p-3 text-center hidden-print align-middle">
                 <input type="file" id="input_foto_${cfg.id}" accept="image/*" multiple class="hidden" onchange="handleAreaPhotosUpload(event, '${cfg.id}')">
-                <button type="button" onclick="document.getElementById('input_foto_${cfg.id}').click()" class="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold px-3 py-2 rounded-lg text-[10px] flex items-center gap-1 shadow-md hover:-translate-y-0.5 transition-transform mx-auto"><span>📷</span> Upload (${suhuPhotosMap[cfg.id].length})</button>
+                <button type="button" onclick="document.getElementById('input_foto_${cfg.id}').click()" class="w-full bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold px-3 py-2 min-h-[48px] rounded-xl text-xs flex items-center justify-center gap-1 shadow-md hover:-translate-y-0.5 transition-transform mx-auto"><span>📷</span> Upload (${suhuPhotosMap[cfg.id].length})</button>
                 <div id="preview_container_${cfg.id}" class="flex flex-wrap justify-center gap-1.5 mt-2">${renderPhotosPreviewHTML(cfg.id)}</div>
               </td>
             </tr>`;
@@ -1581,7 +1592,7 @@
         htmlBody += `
           <tr class="hidden-print border-t border-slate-200">
             <td colspan="${totalCols}" class="p-5 text-center bg-slate-50/80">
-              <button type="button" onclick="addSuhuRuangColumn()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
+              <button type="button" onclick="addSuhuRuangColumn()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
                 <span>➕</span> Tambah Waktu Pengukuran (Ke-${suhuRuangColumns + 1})
               </button>
             </td>
@@ -1599,7 +1610,7 @@
             <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
             <th class="p-3 border-b border-slate-600 w-36">KETERANGAN</th>
-            <th class="p-3 border-b border-slate-600 w-36 hidden-print text-center">📸 FOTO</th>
+            <th class="p-3 border-b border-slate-600 w-44 hidden-print text-center">📸 UPLOAD GAMBAR</th>
           </tr>`;
 
         let rowCounter = 1;
@@ -1621,14 +1632,14 @@
                   <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
                   <td class="p-3 font-extrabold bg-slate-50/50 text-slate-800">${sub.labelName} <br/><span class="mt-1 inline-block text-[9px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span></td>
                   <td class="p-3 font-black text-blue-800 uppercase tracking-wide">${menuName}</td>
-                  <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full border-2 border-slate-200 rounded-lg p-2 text-center text-[11px] bg-white font-bold text-slate-600 shadow-sm"></td>
-                  <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full border-2 border-slate-200 rounded-lg p-2 text-center font-black text-indigo-600 text-sm shadow-sm" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
-                  <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" class="w-full border-2 border-amber-100 rounded-lg p-2 text-center font-extrabold text-xs bg-amber-50 text-amber-700" readonly></td>
-                  <td class="p-3 text-center font-bold" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
-                  <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" placeholder="Keterangan..." class="w-full border-2 border-slate-200 rounded-lg p-2 text-xs bg-white text-slate-600 shadow-sm"></td>
-                  <td class="p-3 text-center hidden-print">
+                  <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full border-2 border-slate-200 rounded-lg p-2.5 min-h-[48px] text-center text-sm bg-white font-bold text-slate-600 shadow-sm"></td>
+                  <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full border-2 border-slate-200 rounded-lg p-2.5 min-h-[48px] text-center font-black text-indigo-600 text-base shadow-sm" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
+                  <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" class="w-full border-2 border-amber-100 rounded-lg p-2.5 min-h-[48px] text-center font-extrabold text-sm bg-amber-50 text-amber-700" readonly></td>
+                  <td class="p-3 text-center font-bold text-sm" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
+                  <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" placeholder="Keterangan..." class="w-full border-2 border-slate-200 rounded-lg p-2.5 min-h-[48px] text-sm bg-white text-slate-600 shadow-sm"></td>
+                  <td class="p-3 text-center hidden-print align-middle">
                     <input type="file" id="input_foto_${uniqueId}" accept="image/*" multiple class="hidden" onchange="handleAreaPhotosUpload(event, '${uniqueId}')">
-                    <button type="button" onclick="document.getElementById('input_foto_${uniqueId}').click()" class="bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold px-3 py-2 rounded-lg text-[10px] flex items-center gap-1 shadow-md hover:-translate-y-0.5 transition-transform mx-auto"><span>📷</span> Upload (${suhuPhotosMap[uniqueId].length})</button>
+                    <button type="button" onclick="document.getElementById('input_foto_${uniqueId}').click()" class="w-full bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold px-3 py-2 min-h-[48px] rounded-xl text-xs flex items-center justify-center gap-1 shadow-md hover:-translate-y-0.5 transition-transform mx-auto"><span>📷</span> Upload (${suhuPhotosMap[uniqueId].length})</button>
                     <div id="preview_container_${uniqueId}" class="flex flex-wrap justify-center gap-1.5 mt-2">${renderPhotosPreviewHTML(uniqueId)}</div>
                   </td>
                 </tr>`;
@@ -1640,7 +1651,7 @@
         htmlBody += `
           <tr class="hidden-print border-t border-slate-200">
             <td colspan="9" class="p-5 text-center bg-slate-50/80">
-              <button type="button" onclick="addSuhuBatch()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
+              <button type="button" onclick="addSuhuBatch()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
                 <span>➕</span> Tambah Form Input Untuk Batch ${nextBatchNum}
               </button>
             </td>
@@ -1650,6 +1661,21 @@
 
       thead.innerHTML = htmlHead;
       tbody.innerHTML = htmlBody;
+
+      const dateKey = document.getElementById('suhu_tanggal')?.value;
+      if (dateKey) {
+          const allData = JSON.parse(localStorage.getItem('sppg_log_suhu')) || {};
+          const savedData = allData[dateKey];
+          if (savedData) {
+              Object.keys(savedData).forEach(id => {
+                  const el = document.getElementById(id);
+                  if (el && el.type !== 'file') el.value = savedData[id];
+              });
+              document.querySelectorAll('#tbody_suhu_monitoring input[type="number"]').forEach(inp => {
+                  inp.dispatchEvent(new Event('input'));
+              });
+          }
+      }
     }
 
     function handleAreaPhotosUpload(event, id) {
@@ -1710,6 +1736,19 @@
         `;
       });
       tbody.innerHTML = html;
+
+      const dateKey = document.getElementById('ks_tanggal')?.value;
+      if (dateKey) {
+          const allData = JSON.parse(localStorage.getItem('sppg_log_silang')) || {};
+          const savedData = allData[dateKey];
+          if (savedData) {
+              Object.keys(savedData).forEach(id => {
+                  const el = document.getElementById(id);
+                  if (el) el.value = savedData[id];
+              });
+          }
+      }
+      INSPEKSI_SILANG_ITEMS.forEach(item => evalInspeksiStatus(item.id));
     }
 
     function evalInspeksiStatus(id) {
@@ -1726,13 +1765,15 @@
 
     function initAlergenModule() {
       const tglElem = document.getElementById('al_tanggal');
-      if (tglElem && !tglElem.value) tglElem.value = new Date().toISOString().split('T')[0];
+      if (tglElem) {
+        if(!tglElem.value) tglElem.value = new Date().toISOString().split('T')[0];
+        tglElem.removeEventListener('change', renderAlergenMenuAndTable);
+        tglElem.addEventListener('change', renderAlergenMenuAndTable);
+      }
 
       const siklusSelect = document.getElementById('al_siklus_active');
       if (siklusSelect) {
-        // PERBAIKAN DEEP COPY
         const weeks = JSON.parse(localStorage.getItem('sppg_siklus_menu_weeks')) || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-        
         let options = '';
         let dayCounter = 0;
         weeks.forEach(w => {
@@ -1805,6 +1846,19 @@
         `;
       });
       tbody.innerHTML = html;
+
+      const dateKey = document.getElementById('al_tanggal')?.value;
+      if (dateKey) {
+          const allData = JSON.parse(localStorage.getItem('sppg_log_alergen')) || {};
+          const savedData = allData[dateKey];
+          if (savedData) {
+              Object.keys(savedData).forEach(id => {
+                  const el = document.getElementById(id);
+                  if (el) el.value = savedData[id];
+              });
+          }
+      }
+      INSPEKSI_ALERGEN_ITEMS.forEach(item => evalAlergenStatus(item.id));
     }
 
     function evalAlergenStatus(id) {
@@ -2072,17 +2126,36 @@
        if(!form) return;
        const inputs = form.querySelectorAll('input, select, textarea');
        let data = {};
-       inputs.forEach(inp => { if(inp.id) data[inp.id] = inp.value; });
+       
        let dateInput = Array.from(inputs).find(inp => inp.type === 'date');
        let dateKey = dateInput && dateInput.value ? dateInput.value : new Date().toISOString().split('T')[0];
+       
+       const todayStr = new Date().toISOString().split('T')[0];
+       if (dateKey < todayStr) {
+           const confirmEdit = confirm("⚠️ PERHATIAN: Anda akan menyimpan/mengubah data untuk hari kerja yang TELAH BERLALU (" + dateKey + ").\n\nApakah Anda yakin ingin melanjutkan perubahan data lampau ini?");
+           if (!confirmEdit) return; 
+       } else {
+           let checkData = JSON.parse(localStorage.getItem(storageKey)) || {};
+           if (checkData[dateKey]) {
+               const confirmRewrite = confirm("ℹ️ Data untuk tanggal ini sudah pernah diisi sebelumnya. Yakin ingin menimpa dengan perubahan yang baru?");
+               if (!confirmRewrite) return;
+           }
+       }
+
+       inputs.forEach(inp => { if(inp.id) data[inp.id] = inp.value; });
+       
+       if (formId === 'formSuhuDoc') {
+           data.suhuRuangColumns = suhuRuangColumns;
+           data.suhuBatchCounters = suhuBatchCounters;
+       }
+
        let allData = JSON.parse(localStorage.getItem(storageKey)) || {};
        allData[dateKey] = data;
        localStorage.setItem(storageKey, JSON.stringify(allData));
-       alert(alertMsg);
+       alert(alertMsg + " (Tersimpan Permanen Secara Offline)");
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // PERBAIKAN DEEP COPY DI INITIAL LOAD
       if (!localStorage.getItem('sppg_master_bahan_weeks')) {
         localStorage.setItem('sppg_master_bahan_weeks', JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
         syncMasterBahanData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS)));
@@ -2093,11 +2166,14 @@
       }
       
       initSuhuModule();
-      renderInspeksiSilangTable();
       
       const tglElemKS = document.getElementById('ks_tanggal');
-      if (tglElemKS && !tglElemKS.value) tglElemKS.value = new Date().toISOString().split('T')[0];
-
+      if (tglElemKS) {
+          if (!tglElemKS.value) tglElemKS.value = new Date().toISOString().split('T')[0];
+          tglElemKS.addEventListener('change', renderInspeksiSilangTable);
+      }
+      renderInspeksiSilangTable();
+      
       initAlergenModule();
       updateDashboardSummary();
     });
@@ -2137,7 +2213,6 @@
       if (isClosed) {
         sidebar.classList.remove('-translate-x-full');
         backdrop.classList.remove('hidden');
-        // Delay singkat agar transisi opacity bekerja
         setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
       } else {
         closeSidebar();
@@ -2153,7 +2228,6 @@
       setTimeout(() => backdrop.classList.add('hidden'), 300);
     }
 
-    // Intersepsi pemanggilan asli dari switchTab untuk otomatis menutup menu sidebar pada mobile
     const originalSwitchTab = switchTab;
     switchTab = function(tabId) {
       originalSwitchTab(tabId);
