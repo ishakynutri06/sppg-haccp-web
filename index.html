@@ -92,7 +92,7 @@
         <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md px-5 py-4 rounded-2xl border border-white/10 text-xs shadow-lg relative z-10 w-full md:w-auto mt-4 md:mt-0">
           <div class="bg-white/20 p-2 rounded-xl text-xl shrink-0">📅</div>
           <div>
-            <div class="text-blue-200 font-medium mb-0.5">Tanggal Sistem:</div>
+            <div class="text-blue-200 font-medium mb-0.5">Tanggal Sistem (Realtime):</div>
             <div id="dashCurrentDate" class="font-bold text-white text-sm tracking-wide">-</div>
           </div>
         </div>
@@ -108,8 +108,8 @@
 
         <div class="bg-white p-6 rounded-3xl border-0 shadow-lg shadow-slate-200/50 ring-1 ring-slate-100 border-t-4 border-t-blue-500 space-y-3 relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
           <div class="absolute -right-4 -bottom-4 text-7xl opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-500">🍱</div>
-          <div class="text-[11px] text-slate-400 font-extrabold uppercase tracking-widest">Siklus Menu Aktif</div>
-          <div id="dashActiveMenu" class="text-xl font-black text-blue-600 truncate">Hari ke-1 (-)</div>
+          <div class="text-[11px] text-slate-400 font-extrabold uppercase tracking-widest">Siklus Menu Hari Ini</div>
+          <div id="dashActiveMenu" class="text-lg font-black text-blue-600 truncate">Hari ke-1 (-)</div>
           <p id="dashMenuSummary" class="text-[11px] text-blue-600 font-bold flex items-center gap-1.5 bg-blue-50 w-fit px-2 py-1 rounded-md truncate">Menunggu data menu...</p>
         </div>
 
@@ -132,8 +132,8 @@
         <div class="lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 gap-4">
             <div>
-              <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2"><span class="text-xl">🍽️</span> Rincian Komponen Menu Hari Ini</h3>
-              <p class="text-[11px] text-slate-500 font-medium mt-1">Sinkronisasi otomatis dari Modul Siklus Menu 20 Hari (FM-01.04)</p>
+              <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2"><span class="text-xl">🍽️</span> Rincian Komponen Menu Tanggal Aktif Hari Ini</h3>
+              <p class="text-[11px] text-slate-500 font-medium mt-1">Disajikan berdasarkan sinkronisasi tanggal realtime & Siklus Menu 20 Hari (FM-01.04)</p>
             </div>
             <button onclick="switchTab('siklus-menu-20')" class="text-[11px] font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors w-full sm:w-auto">Kelola Menu →</button>
           </div>
@@ -152,6 +152,11 @@
 
     <!-- FREKUENSI BAHAN (FM-01.03) -->
     <section id="sec-frekuensi-bahan" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
@@ -185,6 +190,11 @@
 
     <!-- MASTER BAHAN 20 HARI -->
     <section id="sec-master-bahan-20" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
@@ -219,6 +229,11 @@
 
     <!-- SIKLUS MENU 20 HARI (FM-01.04) -->
     <section id="sec-siklus-menu-20" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
@@ -253,6 +268,11 @@
 
     <!-- PEMORSIAN (FM-06.01) -->
     <section id="sec-pemorsian" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
@@ -267,7 +287,7 @@
         </div>
         
         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
-            <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider">Pilih Hari Siklus Menu Aktif:</label>
+            <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider">Pilih Hari Siklus Menu Aktif (Otomatis Tanggal Realtime):</label>
             <select id="selectSiklusPemorsian" onchange="loadPemorsianFromMenu()" class="border-2 border-slate-200 p-3 rounded-xl text-sm font-bold w-full lg:w-1/2 bg-white text-slate-800 cursor-pointer shadow-sm"></select>
         </div>
 
@@ -294,6 +314,11 @@
 
     <!-- MODUL SUHU & FOTO (FM-03.05) -->
     <section id="sec-suhu-ruangan" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-8">
         <div class="border-b border-slate-100 pb-5 space-y-4">
           <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -316,7 +341,7 @@
                 <input type="date" id="suhu_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800 cursor-pointer" required>
               </div>
               <div>
-                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi)</label>
+                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime)</label>
                 <select id="suhu_siklus_active" onchange="renderSuhuTable()" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
                 </select>
               </div>
@@ -370,6 +395,11 @@
 
     <!-- KONTAMINASI SILANG (FM-21.01) -->
     <section id="sec-inspeksi-silang" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-8">
         <div class="border-b border-slate-100 pb-5 space-y-4">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -430,6 +460,11 @@
 
     <!-- MANAJEMEN ALERGEN (FM-22.01) -->
     <section id="sec-inspeksi-alergen" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-8">
         <div class="border-b border-slate-100 pb-5 space-y-4">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -447,7 +482,7 @@
               <input type="date" id="al_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" required>
             </div>
             <div>
-              <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi):</label>
+              <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime):</label>
               <select id="al_siklus_active" onchange="renderAlergenMenuAndTable()" class="w-full border-2 border-amber-200 rounded-xl p-2.5 text-sm font-bold bg-amber-50 text-amber-900 cursor-pointer">
               </select>
             </div>
@@ -490,6 +525,11 @@
 
     <!-- BACKUP DATA -->
     <section id="sec-backup-data" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
       <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6 text-center md:text-left max-w-2xl mx-auto md:mx-0">
         <div>
            <div class="text-[10px] font-extrabold text-blue-500 tracking-widest uppercase bg-blue-50 w-fit px-2 py-0.5 rounded mx-auto md:mx-0">Sistem Administrator</div>
@@ -514,20 +554,22 @@
     </div>
   </div>
 
-  <!-- IMAGE CONFIRMATION MODAL -->
+  <!-- IMAGE CONFIRMATION MODAL (POP-UP BERSAMAAN FOTO & SUHU) -->
   <div id="imageConfirmModal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-slate-900/80 backdrop-blur-sm opacity-0 transition-opacity duration-300 p-4">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md transform scale-95 transition-transform duration-300 overflow-hidden flex flex-col">
-        <div class="bg-indigo-600 p-4 text-white text-center font-bold text-lg">Konfirmasi Bukti Foto</div>
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-4 text-white text-center font-bold text-lg flex items-center justify-center gap-2">
+            <span>📸</span> Konfirmasi Bukti Foto & Suhu Aktual
+        </div>
         <div class="p-6 space-y-4 flex flex-col items-center">
-            <img id="imageConfirmPreview" class="max-h-48 rounded-xl object-contain border-2 border-slate-200 bg-slate-50" src="" alt="Preview">
+            <img id="imageConfirmPreview" class="max-h-48 rounded-2xl object-contain border-2 border-indigo-100 bg-slate-50 shadow-md" src="" alt="Preview">
             <div class="w-full">
-                <label class="block font-bold text-slate-700 mb-2 text-sm text-center">Masukkan Suhu Aktual (°C)</label>
-                <input type="number" step="0.1" id="imageConfirmTempInput" class="w-full border-2 border-indigo-200 rounded-xl p-3 text-center font-black text-indigo-700 text-xl shadow-sm focus:ring-2 focus:ring-indigo-400" placeholder="Contoh: 24.5">
+                <label class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider text-center">Masukkan Suhu Aktual (°C)</label>
+                <input type="number" step="0.1" id="imageConfirmTempInput" class="w-full border-2 border-indigo-200 rounded-xl p-3 text-center font-black text-indigo-700 text-2xl shadow-sm focus:ring-4 focus:ring-indigo-100" placeholder="Contoh: 24.5">
             </div>
         </div>
         <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-3">
             <button onclick="cancelImageConfirmation()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 rounded-xl transition-all">Batal</button>
-            <button onclick="confirmImageConfirmation()" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 font-bold py-3 rounded-xl transition-all">Lanjutkan</button>
+            <button onclick="confirmImageConfirmation()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all">Simpan & Lanjutkan</button>
         </div>
     </div>
   </div>
@@ -585,6 +627,52 @@
     window.suhuPhotosMap = {}; 
     window.currentSuhuDate = null; 
     window.currentActiveTab = 'overview';
+
+    // FUNGSI MENDAPATKAN JAM REALTIME DALAM FORMAT HH:mm
+    function getRealtimeTimeString() {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      return `${hrs}:${mins}`;
+    }
+
+    // FUNGSI PENCARIAAN INDEX SIKLUS HARI SESUAI TANGGAL REALTIME
+    function getTodayCycleIndex(weeks) {
+      if (!weeks || weeks.length === 0) return 0;
+      const today = new Date();
+      const d = today.getDate();
+      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      const currentMonthStr = monthNamesShort[today.getMonth()];
+      const searchTarget = `${d} ${currentMonthStr}`;
+
+      let matchedIndex = -1;
+      let dayCounter = 0;
+
+      weeks.forEach((w) => {
+        w.dates.forEach((dateStr) => {
+          if (matchedIndex === -1 && dateStr.toLowerCase().includes(searchTarget.toLowerCase())) {
+            matchedIndex = dayCounter;
+          }
+          dayCounter++;
+        });
+      });
+
+      if (matchedIndex !== -1) return matchedIndex;
+
+      // Secondary check: match day number if month string format differs slightly
+      dayCounter = 0;
+      const dayNumStr = String(d).padStart(2, '0');
+      weeks.forEach((w) => {
+        w.dates.forEach((dateStr) => {
+          if (matchedIndex === -1 && (dateStr.includes(` ${d} `) || dateStr.includes(` ${dayNumStr} `))) {
+            matchedIndex = dayCounter;
+          }
+          dayCounter++;
+        });
+      });
+
+      return matchedIndex !== -1 ? matchedIndex : 0;
+    }
 
     // ================= FUNGSI PREVIEW GAMBAR & INPUT SUHU =================
     let pendingFileInput = null;
@@ -681,7 +769,6 @@
         }, 300);
     }
 
-    // FUNGSI KHUSUS MEMBERIKAN THUMBNAIL FOTO DI KOLOM TABEL + FUNGSI HAPUS FOTO
     function deleteSuhuPhoto(fotoId) {
         if (confirm("Apakah Anda yakin ingin menghapus bukti foto ini?")) {
             if (window.suhuPhotosMap && window.suhuPhotosMap[fotoId]) {
@@ -1129,19 +1216,19 @@
     }
 
     const SUHU_ITEMS_CONFIG = [
-      { id: "1", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Gudang Basah", min: 18, max: 28, std: "≤ 28°C", defPagi: 24.0, defMalam: 23.5, timePagi: "08:00", timeMalam: "20:00" },
-      { id: "2", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Gudang Kering", min: 15, max: 25, std: "15°C – 25°C", defPagi: 22.5, defMalam: 21.0, timePagi: "08:05", timeMalam: "20:05" },
-      { id: "3", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Persiapan", min: 18, max: 28, std: "≤ 28°C", defPagi: 25.0, defMalam: 24.0, timePagi: "08:10", timeMalam: "20:10" },
-      { id: "4", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Pengolahan", min: 18, max: 28, std: "≤ 28°C", defPagi: 26.5, defMalam: 25.0, timePagi: "08:15", timeMalam: "20:15" },
-      { id: "5", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Pendinginan", min: 18, max: 28, std: "≤ 28°C", defPagi: 23.0, defMalam: 22.0, timePagi: "08:20", timeMalam: "20:20" },
-      { id: "6", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Pemorsian", min: 18, max: 28, std: "≤ 28°C", defPagi: 22.0, defMalam: 21.5, timePagi: "08:25", timeMalam: "20:25" },
+      { id: "1", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Gudang Basah", min: 18, max: 28, std: "≤ 28°C", defPagi: 24.0, defMalam: 23.5 },
+      { id: "2", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Gudang Kering", min: 15, max: 25, std: "15°C – 25°C", defPagi: 22.5, defMalam: 21.0 },
+      { id: "3", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Persiapan", min: 18, max: 28, std: "≤ 28°C", defPagi: 25.0, defMalam: 24.0 },
+      { id: "4", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Pengolahan", min: 18, max: 28, std: "≤ 28°C", defPagi: 26.5, defMalam: 25.0 },
+      { id: "5", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Pendinginan", min: 18, max: 28, std: "≤ 28°C", defPagi: 23.0, defMalam: 22.0 },
+      { id: "6", groupKey: "ruang", cat: "Suhu Ruang", area: "Suhu Ruang Pemorsian", min: 18, max: 28, std: "≤ 28°C", defPagi: 22.0, defMalam: 21.5 },
       
-      { id: "7", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Showcase 1 (Penyimpanan Sampel)", min: 1, max: 4, std: "1°C – 4°C", defPagi: 2.5, defMalam: 2.8, timePagi: "08:00", timeMalam: "20:00" },
-      { id: "8", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Showcase 2", min: 1, max: 4, std: "1°C – 4°C", defPagi: 3.0, defMalam: 3.2, timePagi: "08:05", timeMalam: "20:05" },
-      { id: "9", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Chiller", min: 1, max: 4, std: "1°C – 4°C", defPagi: 2.8, defMalam: 2.9, timePagi: "08:10", timeMalam: "20:10" },
-      { id: "10", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Modena", min: -30, max: -18, std: "≤ -18°C", defPagi: -21.0, defMalam: -21.5, timePagi: "08:15", timeMalam: "20:15" },
-      { id: "11", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Sharp", min: -30, max: -18, std: "≤ -18°C", defPagi: -20.0, defMalam: -20.5, timePagi: "08:20", timeMalam: "20:20" },
-      { id: "12", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Midea", min: -30, max: -18, std: "≤ -18°C", defPagi: -19.5, defMalam: -20.0, timePagi: "08:25", timeMalam: "20:25" },
+      { id: "7", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Showcase 1 (Penyimpanan Sampel)", min: 1, max: 4, std: "1°C – 4°C", defPagi: 2.5, defMalam: 2.8 },
+      { id: "8", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Showcase 2", min: 1, max: 4, std: "1°C – 4°C", defPagi: 3.0, defMalam: 3.2 },
+      { id: "9", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Chiller", min: 1, max: 4, std: "1°C – 4°C", defPagi: 2.8, defMalam: 2.9 },
+      { id: "10", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Modena", min: -30, max: -18, std: "≤ -18°C", defPagi: -21.0, defMalam: -21.5 },
+      { id: "11", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Sharp", min: -30, max: -18, std: "≤ -18°C", defPagi: -20.0, defMalam: -20.5 },
+      { id: "12", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Midea", min: -30, max: -18, std: "≤ -18°C", defPagi: -19.5, defMalam: -20.0 },
       
       { id: "13", groupKey: "matang", cat: "Suhu Makanan Matang", area: "Pengolahan Makanan Matang", template: createInitialCleanGiziSubmenus(false) },
       { id: "14", groupKey: "pemorsian", cat: "Suhu Pemorsian", area: "Holding Box / Meja Pemorsian", template: createInitialCleanGiziSubmenus(true) }
@@ -1558,6 +1645,11 @@
         });
       });
       sel.innerHTML = html;
+      
+      // AUTO SELECT DARI TANGGAL REALTIME HARI INI
+      const todayIdx = getTodayCycleIndex(weeks);
+      sel.value = todayIdx;
+
       loadPemorsianFromMenu();
     }
 
@@ -1650,14 +1742,19 @@
       const menuSummaryEl = document.getElementById('dashMenuSummary');
       const menuDetailContainer = document.getElementById('dashMenuDetailContainer');
 
-      let firstDateStr = weeks[0] && weeks[0].dates && weeks[0].dates[0] ? weeks[0].dates[0] : 'Hari Ke-1';
-      if (activeMenuEl) activeMenuEl.innerText = `Siklus: ${firstDateStr}`;
-      if (menuSummaryEl) menuSummaryEl.innerText = `Tersinkron dengan Modul FM-01.04`;
+      // HITUNG DENGAN ACCURATE BERDASARKAN TANGGAL HARI INI (REALTIME)
+      const activeDayIdx = getTodayCycleIndex(weeks);
+      const weekIdx = Math.floor(activeDayIdx / 5);
+      const dayInWeek = activeDayIdx % 5;
+      const activeDateStr = (weeks[weekIdx] && weeks[weekIdx].dates && weeks[weekIdx].dates[dayInWeek]) ? weeks[weekIdx].dates[dayInWeek] : `Hari ke-${activeDayIdx + 1}`;
+
+      if (activeMenuEl) activeMenuEl.innerText = `Hari Ke-${activeDayIdx + 1} (${activeDateStr})`;
+      if (menuSummaryEl) menuSummaryEl.innerText = `Menu Aktif Realtime Hari Ini`;
 
       if (menuDetailContainer) {
         let menuHtml = '';
         KELOMPOK_LIST_MENU.forEach(k => {
-          let itemVal = (menuMatrix[k] && menuMatrix[k][0]) ? menuMatrix[k][0] : '-';
+          let itemVal = (menuMatrix[k] && menuMatrix[k][activeDayIdx]) ? menuMatrix[k][activeDayIdx] : '-';
           menuHtml += `
             <div class="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
               <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">${KELOMPOK_LABELS_MENU[k]}</span>
@@ -1752,6 +1849,10 @@
           });
         });
         siklusSelect.innerHTML = options;
+        
+        // AUTO SELECT BERDASARKAN TANGGAL REALTIME
+        const todayIdx = getTodayCycleIndex(weeks);
+        siklusSelect.value = todayIdx;
       }
       handleSuhuDateChange();
     }
@@ -1838,6 +1939,7 @@
       let rowNo = 1;
 
       const filteredConfigs = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
+      const realtimeNowTime = getRealtimeTimeString();
 
       if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
         let dynamicHeaders = '';
@@ -1861,7 +1963,7 @@
         filteredConfigs.forEach(cfg => {
           let dynamicCells = '';
           for (let c = 1; c <= suhuRuangColumns; c++) {
-              let defTime = c === 1 ? cfg.timePagi : (c === 2 ? cfg.timeMalam : "12:00");
+              let defTime = realtimeNowTime; // WAKTU REFERENSI REALTIME (EDITABLE)
               let defVal = c === 1 ? cfg.defPagi : cfg.defMalam; 
               
               dynamicCells += `
@@ -1919,7 +2021,7 @@
               submenus.forEach((sub) => {
                 let menuName = (menuMatrix[sub.key.toUpperCase()] && menuMatrix[sub.key.toUpperCase()][activeDayIdx]) ? menuMatrix[sub.key.toUpperCase()][activeDayIdx] : '-';
                 let uniqueId = `${cfg.id}_${sub.key}_b${b}`;
-                let defTime = activeSuhuCategory === 'matang' ? "10:30" : "11:30";
+                let defTime = realtimeNowTime; // WAKTU REFERENSI REALTIME (EDITABLE)
                 let fotoHtml = getPhotoCellHtml(`suhu_foto_${uniqueId}`, `suhu_val_${uniqueId}`);
 
                 htmlBody += `
@@ -2055,6 +2157,10 @@
           });
         });
         siklusSelect.innerHTML = options;
+        
+        // AUTO SELECT BERDASARKAN TANGGAL REALTIME
+        const todayIdx = getTodayCycleIndex(weeks);
+        siklusSelect.value = todayIdx;
       }
       const tglElem = document.getElementById('al_tanggal');
       if (tglElem && !tglElem.value) {
