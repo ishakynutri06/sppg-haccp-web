@@ -663,7 +663,7 @@
             }
         }
         
-        // AUTO SAVE REAL-TIME KE CLOUD
+        // AUTO SAVE REAL-TIME KE CLOUD & CACHE
         autoSaveCurrentSuhuToCache();
 
         // RENDER ULANG TABEL DENGAN THUMBNAIL FOTO FISIK LANGSUNG KELIHATAN
@@ -681,7 +681,17 @@
         }, 300);
     }
 
-    // FUNGSI KHUSUS MEMBERIKAN THUMBNAIL FOTO DI KOLOEM TABEL
+    // FUNGSI KHUSUS MEMBERIKAN THUMBNAIL FOTO DI KOLOM TABEL + FUNGSI HAPUS FOTO
+    function deleteSuhuPhoto(fotoId) {
+        if (confirm("Apakah Anda yakin ingin menghapus bukti foto ini?")) {
+            if (window.suhuPhotosMap && window.suhuPhotosMap[fotoId]) {
+                delete window.suhuPhotosMap[fotoId];
+            }
+            autoSaveCurrentSuhuToCache();
+            renderSuhuTable();
+        }
+    }
+
     function getPhotoCellHtml(fotoId, targetTempId) {
         const photoData = window.suhuPhotosMap && window.suhuPhotosMap[fotoId];
         const b64 = photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null;
@@ -689,10 +699,15 @@
         if (b64) {
             return `
             <div class="flex flex-col items-center justify-center gap-1.5 py-1">
-                <img src="${b64}" class="h-16 w-12 object-cover rounded-lg border-2 border-emerald-500 shadow-md">
-                <label for="${fotoId}" class="text-[10px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-md cursor-pointer transition-colors shadow-sm">
-                    📸 Ganti Foto
-                </label>
+                <img src="${b64}" width="80" height="110" style="width:80px; height:110px; object-fit:cover; border-radius:8px; border:2px solid #10b981;" class="shadow-md">
+                <div class="flex items-center gap-1">
+                    <label for="${fotoId}" class="text-[10px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-1 rounded-md cursor-pointer transition-colors shadow-sm">
+                        📸 Ganti
+                    </label>
+                    <button type="button" onclick="deleteSuhuPhoto('${fotoId}')" class="text-[10px] font-bold text-red-700 bg-red-100 hover:bg-red-200 px-2 py-1 rounded-md transition-colors shadow-sm">
+                        🗑️ Hapus
+                    </button>
+                </div>
                 <input type="file" accept="image/*" capture="environment" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}')" class="hidden">
             </div>`;
         } else {
@@ -740,20 +755,26 @@
               const b64 = origInp.getAttribute('data-base64') || (photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null);
               
               if (b64) {
-                  if (inp.parentNode.querySelector('img')) {
+                  const existingImg = inp.parentNode.querySelector('img');
+                  if (existingImg) {
+                      existingImg.setAttribute('width', '80');
+                      existingImg.setAttribute('height', '110');
+                      existingImg.style.width = '80px';
+                      existingImg.style.height = '110px';
+                      existingImg.style.objectFit = 'cover';
+                      existingImg.style.display = 'block';
+                      existingImg.style.margin = '0 auto';
                       inp.remove();
                   } else {
                       const img = document.createElement('img');
                       img.src = b64;
-                      let w = '2cm', h = '3cm';
-                      if (photoData && photoData.expW > photoData.expH) { 
-                          w = '3cm'; 
-                          h = '2cm'; 
-                      }
-                      img.style.width = w;
-                      img.style.height = h;
-                      img.style.objectFit = 'contain';
-                      img.style.borderRadius = '4px';
+                      img.setAttribute('width', '80');
+                      img.setAttribute('height', '110');
+                      img.style.width = '80px';
+                      img.style.height = '110px';
+                      img.style.objectFit = 'cover';
+                      img.style.display = 'block';
+                      img.style.margin = '0 auto';
                       inp.parentNode.replaceChild(img, inp);
                   }
               } else {
@@ -780,6 +801,7 @@
           th, td { border: 1px solid black; padding: 6px; font-size: 10pt; text-align: left; vertical-align: middle; }
           th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
           .header { text-align: center; font-weight: bold; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px; }
+          img { max-width: 100px; height: auto; display: block; margin: 0 auto; }
         </style>
         </head>
         <body>
@@ -809,6 +831,8 @@
       
       tables.forEach((table, tIdx) => {
           const ws = wb.addWorksheet(`Bagian ${tIdx + 1}`);
+          ws.views = [{ showGridLines: true }];
+          
           ws.addRow(['NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI']);
           ws.addRow(['TANGGAL: ' + dateText]);
           ws.addRow([title]);
@@ -824,25 +848,32 @@
             tr.querySelectorAll('th, td').forEach((td, cIdx) => {
                 if (td.classList.contains('hidden-print')) return; 
                 const origTd = originalTds[cIdx];
-                const input = origTd.querySelector('input, select, textarea');
+                const fileInput = origTd ? origTd.querySelector('input[type="file"]') : null;
+                const otherInput = origTd ? origTd.querySelector('input:not([type="file"]), select, textarea') : null;
+                const imgElem = origTd ? origTd.querySelector('img') : null;
                 let cellValue = '';
 
-                if (input) {
-                    if (input.type === 'file') {
-                        const photoData = window.suhuPhotosMap && window.suhuPhotosMap[input.id];
-                        const b64 = input.getAttribute('data-base64') || (photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null);
-                        
-                        if (b64) {
-                            let w = 76, h = 114;
-                            if (photoData && photoData.expW) { w = photoData.expW; h = photoData.expH; }
-                            imageTasks.push({ col: colIndex, base64: b64, expW: w, expH: h });
-                        }
-                        cellValue = ''; 
-                    } else {
-                        cellValue = input.value;
+                if (fileInput || imgElem) {
+                    let fotoId = fileInput ? fileInput.id : null;
+                    let photoData = fotoId ? (window.suhuPhotosMap && window.suhuPhotosMap[fotoId]) : null;
+                    let b64 = fileInput ? fileInput.getAttribute('data-base64') : null;
+                    if (!b64 && photoData) {
+                        b64 = typeof photoData === 'string' ? photoData : photoData.base64;
                     }
+                    if (!b64 && imgElem && imgElem.src && imgElem.src.startsWith('data:image')) {
+                        b64 = imgElem.src;
+                    }
+                    
+                    if (b64) {
+                        let w = 76, h = 114;
+                        if (photoData && photoData.expW) { w = photoData.expW; h = photoData.expH; }
+                        imageTasks.push({ col: colIndex, base64: b64, expW: w, expH: h });
+                    }
+                    cellValue = ''; 
+                } else if (otherInput) {
+                    cellValue = otherInput.value;
                 } else {
-                    cellValue = td.innerText;
+                    cellValue = td.innerText.trim();
                 }
                 excelRowData.push(cellValue);
                 colIndex++;
@@ -862,9 +893,15 @@
 
               imageTasks.forEach(task => {
                   try {
-                      const base64String = task.base64.split(',')[1];
-                      let ext = task.base64.substring(task.base64.indexOf('/') + 1, task.base64.indexOf(';'));
-                      if (ext === 'jpeg') ext = 'jpg';
+                      let base64String = task.base64;
+                      let ext = 'jpg';
+                      if (base64String.includes(',')) {
+                          let parts = base64String.split(',');
+                          base64String = parts[1];
+                          let mime = parts[0];
+                          if (mime.includes('png')) ext = 'png';
+                          else ext = 'jpg';
+                      }
                       
                       const imageId = wb.addImage({
                           base64: base64String,
@@ -873,9 +910,9 @@
                       
                       ws.addImage(imageId, {
                           tl: { col: task.col - 1 + 0.1, row: addedRow.number - 1 + 0.1 },
-                          ext: { width: task.expW, height: task.expH }
+                          ext: { width: task.expW || 76, height: task.expH || 114 }
                       });
-                  } catch(e) { console.error("Gagal menyisipkan foto", e); }
+                  } catch(e) { console.error("Gagal menyisipkan foto ke Excel", e); }
               });
             }
           });
@@ -1303,6 +1340,11 @@
         allData[window.currentSuhuDate] = existing;
         window.dbCache['sppg_log_suhu'] = allData;
 
+        // Backup Local Storage Guard
+        try {
+            localStorage.setItem('sppg_photos_' + window.currentSuhuDate, JSON.stringify(window.suhuPhotosMap || {}));
+        } catch(e) {}
+
         if (typeof window.fbSet === 'function') {
             window.fbSet('sppg_log_suhu', allData);
         }
@@ -1661,7 +1703,9 @@
     }
 
     function handleSuhuDateChange() {
-        autoSaveCurrentSuhuToCache();
+        if (window.currentSuhuDate && window.currentSuhuDate !== document.getElementById('suhu_tanggal')?.value) {
+            autoSaveCurrentSuhuToCache();
+        }
         const dateKey = document.getElementById('suhu_tanggal').value;
         window.currentSuhuDate = dateKey;
         const allData = window.dbCache['sppg_log_suhu'] || {};
@@ -1669,9 +1713,16 @@
         if (data) {
             suhuRuangColumns = data.suhuRuangColumns || 1;
             suhuBatchCounters = data.suhuBatchCounters || { matang: 1, pemorsian: 1 };
+            window.suhuPhotosMap = data.photos || {};
         } else {
             suhuRuangColumns = 1;
             suhuBatchCounters = { matang: 1, pemorsian: 1 };
+            try {
+                const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
+                window.suhuPhotosMap = lsPhotos ? JSON.parse(lsPhotos) : {};
+            } catch(e) {
+                window.suhuPhotosMap = {};
+            }
         }
         renderSuhuTable();
     }
@@ -1756,14 +1807,23 @@
       if (!thead || !tbody) return;
 
       const dateKey = document.getElementById('suhu_tanggal')?.value;
+      if (dateKey) window.currentSuhuDate = dateKey;
+
       let savedData = null;
       if (dateKey) {
           const allData = window.dbCache['sppg_log_suhu'] || {};
           savedData = allData[dateKey];
       }
 
-      if (savedData && savedData.photos) {
-          window.suhuPhotosMap = { ...window.suhuPhotosMap, ...savedData.photos };
+      if (savedData && savedData.photos && Object.keys(savedData.photos).length > 0) {
+          window.suhuPhotosMap = { ...savedData.photos, ...window.suhuPhotosMap };
+      } else if (dateKey) {
+          try {
+              const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
+              if (lsPhotos) {
+                  window.suhuPhotosMap = { ...JSON.parse(lsPhotos), ...window.suhuPhotosMap };
+              }
+          } catch(e) {}
       }
 
       const siklusSelect = document.getElementById('suhu_siklus_active');
