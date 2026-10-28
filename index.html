@@ -2099,15 +2099,15 @@
         htmlHead = `
           <tr>
             <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <!-- PERUBAHAN: Set lebar ke w-[1%] agar super ketat menyesuaikan konten menu -->
-            <th class="p-3 border-b border-slate-600 w-[1%] whitespace-nowrap">KOMPONEN & MENU HARI INI</th>
+            <!-- PERBAIKAN: Menggunakan inline CSS spesifik agar ukurannya KETAT mengikuti teks -->
+            <th class="p-3 border-b border-slate-600 whitespace-nowrap" style="width: 1%;">KOMPONEN & MENU HARI INI</th>
             <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
             <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU AKTUAL</th>
             <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
-            <!-- PERUBAHAN: Set Keterangan menjadi w-auto agar menyedot sisa lebar tabel kosong -->
-            <th class="p-3 border-b border-slate-600 w-auto">KETERANGAN</th>
+            <!-- PERBAIKAN: w-full pada KETERANGAN akan menyedot SEMUA sisa ruang kosong tabel -->
+            <th class="p-3 border-b border-slate-600 w-full">KETERANGAN</th>
           </tr>`;
 
         let rowCounter = 1;
@@ -2125,8 +2125,8 @@
                 htmlBody += `
                 <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
                   <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
-                  <!-- PERUBAHAN: Set w-[1%] agar kolom menempel kuat pada lebar kontainer Header dan tidak melar -->
-                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 w-[1%] whitespace-nowrap">
+                  <!-- PERBAIKAN: Inline style width 1% dipastikan mentok menyusut seukuran teks -->
+                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 whitespace-nowrap" style="width: 1%;">
                     <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
                     ${menuName}
                   </td>
