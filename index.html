@@ -344,11 +344,11 @@
                 <input type="date" id="suhu_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800 cursor-pointer" required>
               </div>
               <div>
-                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime)</label>
-                <select id="suhu_siklus_active" onchange="renderSuhuTable()" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
-                </select>
-              </div>
-              <div>
+            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime)</label>
+            <!-- PERUBAHAN: Menambahkan autoSaveCurrentSuhuToCache() agar siklus merekam pilihan baru dan tidak terkunci -->
+            <select id="suhu_siklus_active" onchange="autoSaveCurrentSuhuToCache(); renderSuhuTable();" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
+            </select>
+          </div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Petugas QC / Supervisor</label>
                 <input type="text" id="suhu_supervisor" placeholder="Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800" required>
               </div>
