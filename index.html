@@ -1964,83 +1964,7 @@
       }
     }
 
-    function addSuhuRuangColumn() {
-      if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
-        autoSaveCurrentSuhuToCache();
-        suhuRuangColumns++;
-        renderSuhuTable();
-      }
-    }
-
-    function evalSuhuStatusSingle(id, min, max) {
-      const val = parseFloat(document.getElementById(`suhu_val_${id}`)?.value);
-      const statusElem = document.getElementById(`suhu_status_${id}`);
-      if (!statusElem) return;
-      let isValid = (isNaN(val) || (val >= min && val <= max));
-      if (isValid) {
-        statusElem.innerHTML = `<span class="text-emerald-600 font-bold">Sesuai</span>`;
-      } else {
-        statusElem.innerHTML = `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
-      }
-    }
-
-    function evalSuhuStatus(id, min, max) {
-      const statusElem = document.getElementById(`suhu_status_${id}`);
-      if (!statusElem) return;
-      let allValid = true;
-      for (let c = 1; c <= suhuRuangColumns; c++) {
-        const val = parseFloat(document.getElementById(`suhu_val_${c}_${id}`)?.value);
-        if (!isNaN(val) && (val < min || val > max)) {
-          allValid = false;
-        }
-      }
-      if (allValid) {
-        statusElem.innerHTML = `<span class="text-emerald-600 font-bold">Sesuai</span>`;
-      } else {
-        statusElem.innerHTML = `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
-      }
-    }
-
-    function renderSuhuTable() {
-      const thead = document.getElementById('suhu_table_header');
-      const tbody = document.getElementById('tbody_suhu_monitoring');
-      if (!thead || !tbody) return;
-
-      const dateKey = document.getElementById('suhu_tanggal')?.value;
-      if (dateKey) window.currentSuhuDate = dateKey;
-
-      let savedData = null;
-      if (dateKey) {
-          const allData = window.dbCache['sppg_log_suhu'] || {};
-          savedData = allData[dateKey];
-      }
-
-      if (savedData && savedData.photos && Object.keys(savedData.photos).length > 0) {
-          window.suhuPhotosMap = { ...savedData.photos, ...window.suhuPhotosMap };
-      } else if (dateKey) {
-          try {
-              const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
-              if (lsPhotos) {
-                  window.suhuPhotosMap = { ...JSON.parse(lsPhotos), ...window.suhuPhotosMap };
-              }
-          } catch(e) {}
-      }
-
-      const siklusSelect = document.getElementById('suhu_siklus_active');
-      if (savedData && savedData['suhu_siklus_active'] !== undefined) {
-          siklusSelect.value = savedData['suhu_siklus_active'];
-      }
-      const activeDayIdx = parseInt(siklusSelect?.value || 0);
-      const menuMatrix = window.dbCache['sppg_siklus_menu_matrix'] || {};
-
-      let htmlHead = '';
-      let htmlBody = '';
-      let rowNo = 1;
-
-      const filteredConfigs = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
-      const realtimeNowTime = getRealtimeTimeString();
-
-      if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
+    if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
         let dynamicHeaders = '';
         for (let c = 1; c <= suhuRuangColumns; c++) {
             dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU ${c}</th>
@@ -2050,12 +1974,14 @@
         htmlHead = `
           <tr>
             <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <th class="p-3 border-b border-slate-600">AREA / RUANGAN</th>
+            <!-- PERBAIKAN: Lebar kolom Area/Ruangan diketatkan pas seukuran teks -->
+            <th class="p-3 border-b border-slate-600 whitespace-nowrap" style="width: 1%;">AREA / RUANGAN</th>
             <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
             ${dynamicHeaders}
             <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
-            <th class="p-3 border-b border-slate-600 w-48">KETERANGAN</th>
+            <!-- Keterangan diset w-full agar menyedot sisa ruang kosong tabel -->
+            <th class="p-3 border-b border-slate-600 w-full">KETERANGAN</th>
           </tr>`;
 
         filteredConfigs.forEach(cfg => {
@@ -2075,7 +2001,8 @@
           htmlBody += `
             <tr class="hover:bg-slate-50 border-b border-slate-100">
               <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
-              <td class="p-3 font-bold text-slate-800 bg-slate-50/50">${cfg.area}</td>
+              <!-- PERBAIKAN: whitespace-nowrap dan width 1% agar cell area tidak melebar -->
+              <td class="p-3 font-bold text-slate-800 bg-slate-50/50 whitespace-nowrap" style="width: 1%;">${cfg.area}</td>
               <td class="p-2 text-center">${fotoHtml}</td>
               ${dynamicCells}
               <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
@@ -2099,15 +2026,15 @@
         htmlHead = `
           <tr>
             <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <!-- PERBAIKAN: Menggunakan inline CSS spesifik agar ukurannya KETAT mengikuti teks -->
-            <th class="p-3 border-b border-slate-600 whitespace-nowrap" style="width: 1%;">KOMPONEN & MENU HARI INI</th>
+            <!-- PERUBAHAN: Set lebar ke w-[1%] agar super ketat menyesuaikan konten menu -->
+            <th class="p-3 border-b border-slate-600 w-[1%] whitespace-nowrap">KOMPONEN & MENU HARI INI</th>
             <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
             <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU AKTUAL</th>
             <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
-            <!-- PERBAIKAN: w-full pada KETERANGAN akan menyedot SEMUA sisa ruang kosong tabel -->
-            <th class="p-3 border-b border-slate-600 w-full">KETERANGAN</th>
+            <!-- PERUBAHAN: Set Keterangan menjadi w-auto agar menyedot sisa lebar tabel kosong -->
+            <th class="p-3 border-b border-slate-600 w-auto">KETERANGAN</th>
           </tr>`;
 
         let rowCounter = 1;
@@ -2125,8 +2052,8 @@
                 htmlBody += `
                 <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
                   <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
-                  <!-- PERBAIKAN: Inline style width 1% dipastikan mentok menyusut seukuran teks -->
-                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 whitespace-nowrap" style="width: 1%;">
+                  <!-- PERUBAHAN: Set w-[1%] agar kolom menempel kuat pada lebar kontainer Header dan tidak melar -->
+                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 w-[1%] whitespace-nowrap">
                     <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
                     ${menuName}
                   </td>
