@@ -1959,119 +1959,128 @@ function populateSuhuSiklusOptions() {
   return weeks;
 }
 
+// ===================== SINKRONISASI HEADER SUHU (TANGGAL + SIKLUS + PETUGAS) =====================
+
+// Tanggal LOKAL (bukan UTC) format YYYY-MM-DD
+function getLocalDateKey(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+const SUHU_MONTH_MAP = {
+  jan: 1, januari: 1, feb: 2, februari: 2, mar: 3, maret: 3, apr: 4, april: 4,
+  mei: 5, may: 5, jun: 6, juni: 6, jul: 7, juli: 7, agu: 8, agt: 8, agus: 8, agustus: 8, aug: 8,
+  sep: 9, sept: 9, september: 9, okt: 10, oktober: 10, oct: 10,
+  nov: 11, november: 11, des: 12, desember: 12, dec: 12
+};
+
+// "Rabu, 21 Okt 2026" -> "2026-10-21" (null jika tidak terbaca)
+function parseSiklusDateToKey(str) {
+  const m = String(str || '').match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+  if (!m) return null;
+  const mon = SUHU_MONTH_MAP[m[2].toLowerCase()];
+  if (!mon) return null;
+  return `${m[3]}-${String(mon).padStart(2, '0')}-${String(parseInt(m[1], 10)).padStart(2, '0')}`;
+}
+
+// Daftar tanggal (YYYY-MM-DD) sejajar dengan index hari siklus 0..19
+function getSuhuDateKeyList(weeks) {
+  const list = [];
+  (weeks || []).forEach(w => {
+    if (!w) return;
+    const dates = Array.isArray(w.dates) ? w.dates : Object.values(w.dates || {});
+    dates.forEach(ds => list.push(parseSiklusDateToKey(ds)));
+  });
+  return list;
+}
+
+// Tanggal -> index siklus
+function getSuhuCycleIndexForDate(weeks, dateKey) {
+  if (!dateKey) return getTodayCycleIndex(weeks);
+  const idx = getSuhuDateKeyList(weeks).indexOf(dateKey);
+  return idx !== -1 ? idx : getTodayCycleIndex(weeks);
+}
+
+// Index siklus -> tanggal
+function getSuhuDateKeyForIdx(weeks, idx) {
+  const list = getSuhuDateKeyList(weeks);
+  return (idx >= 0 && idx < list.length) ? list[idx] : null;
+}
+
+// Isi Siklus + Petugas sesuai tanggal terpilih (tanggal tanpa data = petugas kosong)
+function applySuhuDateFields(dateKey, data) {
+  const weeks = populateSuhuSiklusOptions();
+  ['suhu_supervisor', 'suhu_pemeriksa', 'suhu_penyetuju'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = (data && data[id] !== undefined) ? data[id] : '';
+  });
+  const sel = document.getElementById('suhu_siklus_active');
+  if (sel) {
+    const idx = getSuhuCycleIndexForDate(weeks, dateKey);
+    if (sel.querySelector(`option[value="${idx}"]`)) sel.value = idx;
+  }
+}
+
+// Saat DROPDOWN SIKLUS diubah -> tanggal ikut berubah -> petugas ikut dimuat
+function onSuhuSiklusChange() {
+  const sel = document.getElementById('suhu_siklus_active');
+  const dateInp = document.getElementById('suhu_tanggal');
+  if (!sel || !dateInp) return;
+  const weeks = getSuhuWeeks();
+  const key = getSuhuDateKeyForIdx(weeks, parseInt(sel.value, 10));
+  if (key && dateInp.value !== key) {
+    dateInp.value = key;
+    handleSuhuDateChange();
+  } else {
+    autoSaveCurrentSuhuToCache();
+    renderSuhuTable();
+  }
+}
+
+// Saat TANGGAL diubah -> simpan tanggal lama -> muat tanggal baru (siklus + petugas + tabel)
+function handleSuhuDateChange() {
+  const dateInp = document.getElementById('suhu_tanggal');
+  if (!dateInp || !dateInp.value) return;
+  const newKey = dateInp.value;
+
+  if (window.currentSuhuDate && window.currentSuhuDate !== newKey) {
+    autoSaveCurrentSuhuToCache(); // simpan dulu ke tanggal LAMA
+  }
+  window.currentSuhuDate = newKey;
+
+  const allData = window.dbCache['sppg_log_suhu'] || {};
+  const data = allData[newKey];
+  if (data) {
+    suhuRuangColumns = data.suhuRuangColumns || 1;
+    suhuBatchCounters = data.suhuBatchCounters || { matang: 1, pemorsian: 1 };
+    window.suhuPhotosMap = data.photos || {};
+  } else {
+    suhuRuangColumns = 1;
+    suhuBatchCounters = { matang: 1, pemorsian: 1 };
+    try {
+      const ls = localStorage.getItem('sppg_photos_' + newKey);
+      window.suhuPhotosMap = ls ? JSON.parse(ls) : {};
+    } catch (e) { window.suhuPhotosMap = {}; }
+  }
+
+  applySuhuDateFields(newKey, data);
+  renderSuhuTable();
+}
+
 function initSuhuModule() {
   const tglElem = document.getElementById('suhu_tanggal');
   if (tglElem) {
-    if (!tglElem.value) {
-      tglElem.value = new Date().toISOString().split('T')[0];
-      window.currentSuhuDate = tglElem.value;
-    } else {
-      window.currentSuhuDate = tglElem.value;
-    }
+    if (!tglElem.value) tglElem.value = getLocalDateKey(); // tanggal lokal, bukan UTC
+    window.currentSuhuDate = tglElem.value;
     tglElem.removeEventListener('change', handleSuhuDateChange);
     tglElem.addEventListener('change', handleSuhuDateChange);
   }
-
   populateSuhuSiklusOptions();
   handleSuhuDateChange();
 }
-
-
-// =====================================================================
-
-    // [BARU] Cari index siklus untuk tanggal tertentu (format input YYYY-MM-DD)
-    function getSuhuCycleIndexForDate(weeks, dateKey) {
-      if (!dateKey) return getTodayCycleIndex(weeks);
-      const parts = dateKey.split('-');
-      const day = parseInt(parts[2], 10);
-      const year = parts[0];
-      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-      const mon = monthNamesShort[parseInt(parts[1], 10) - 1];
-      let idx = 0;
-      let found = -1;
-      weeks.forEach(w => {
-        (w.dates || []).forEach(dateStr => {
-          const m = String(dateStr).match(/(\d+)\s+(\w+)\s+(\d{4})/);
-          if (found === -1 && m && parseInt(m[1], 10) === day && m[2] === mon && m[3] === year) found = idx;
-          idx++;
-        });
-      });
-      return found !== -1 ? found : getTodayCycleIndex(weeks);
-    }
-
-    // [BARU] Isi field header (Petugas, Supervisor, Penyetuju, Siklus) SESUAI tanggal yang dipilih.
-    // Tanggal tanpa data akan kosong, sehingga tidak mewarisi isian dari tanggal lain.
-    function applySuhuDateFields(dateKey, data) {
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-      ['suhu_supervisor', 'suhu_pemeriksa', 'suhu_penyetuju'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = (data && data[id] !== undefined) ? data[id] : '';
-      });
-      const sel = document.getElementById('suhu_siklus_active');
-      if (sel) {
-        const idx = getSuhuCycleIndexForDate(weeks, dateKey);
-        if (sel.querySelector(`option[value="${idx}"]`)) sel.value = idx;
-      }
-    }
-
-    // [BARU] Ubah index siklus -> tanggal YYYY-MM-DD
-    function getSuhuDateKeyForIdx(weeks, idx) {
-      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-      let k = 0, out = null;
-      weeks.forEach(w => (w.dates || []).forEach(ds => {
-        if (k === idx && out === null) {
-          const m = String(ds).match(/(\d+)\s+(\w+)\s+(\d{4})/);
-          if (m) {
-            const mi = monthNamesShort.findIndex(x => x.toLowerCase() === m[2].toLowerCase());
-            if (mi >= 0) out = `${m[3]}-${String(mi + 1).padStart(2, '0')}-${String(parseInt(m[1], 10)).padStart(2, '0')}`;
-          }
-        }
-        k++;
-      }));
-      return out;
-    }
-
-    // [BARU] Saat dropdown siklus diubah, tanggal pemantauan ikut berubah
-    function onSuhuSiklusChange() {
-      const sel = document.getElementById('suhu_siklus_active');
-      const dateInp = document.getElementById('suhu_tanggal');
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-      const key = getSuhuDateKeyForIdx(weeks, parseInt(sel.value, 10));
-      if (key && dateInp && dateInp.value !== key) {
-        dateInp.value = key;
-        handleSuhuDateChange(); // menyimpan tanggal lama lalu memuat tanggal baru
-      } else {
-        autoSaveCurrentSuhuToCache();
-        renderSuhuTable();
-      }
-    }
-
-    function handleSuhuDateChange() {
-        if (window.currentSuhuDate && window.currentSuhuDate !== document.getElementById('suhu_tanggal')?.value) {
-            autoSaveCurrentSuhuToCache();
-        }
-        const dateKey = document.getElementById('suhu_tanggal').value;
-        window.currentSuhuDate = dateKey;
-        const allData = window.dbCache['sppg_log_suhu'] || {};
-        const data = allData[dateKey];
-        if (data) {
-            suhuRuangColumns = data.suhuRuangColumns || 1;
-            suhuBatchCounters = data.suhuBatchCounters || { matang: 1, pemorsian: 1 };
-            window.suhuPhotosMap = data.photos || {};
-        } else {
-            suhuRuangColumns = 1;
-            suhuBatchCounters = { matang: 1, pemorsian: 1 };
-            try {
-                const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
-                window.suhuPhotosMap = lsPhotos ? JSON.parse(lsPhotos) : {};
-            } catch(e) {
-                window.suhuPhotosMap = {};
-            }
-        }
-        applySuhuDateFields(dateKey, data);
-        renderSuhuTable();
-    }
-
+// =================================================================================================
 
     function addSuhuBatch() {
       if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
@@ -2293,9 +2302,9 @@ function renderSuhuTable() {
        const inputs = form.querySelectorAll('input, select, textarea');
        
        let dateInput = Array.from(inputs).find(inp => inp.type === 'date');
-       let dateKey = dateInput && dateInput.value ? dateInput.value : new Date().toISOString().split('T')[0];
+       let dateKey = dateInput && dateInput.value ? dateInput.value : getLocalDateKey();
        
-       const todayStr = new Date().toISOString().split('T')[0];
+       const todayStr = getLocalDateKey();
        if (dateKey < todayStr) {
            const confirmEdit = confirm("⚠️ PERHATIAN: Anda akan menyimpan/mengubah data untuk hari kerja yang TELAH BERLALU (" + dateKey + ").\n\nApakah Anda yakin ingin melanjutkan perubahan data lampau ini?");
            if (!confirmEdit) return; 
@@ -2402,7 +2411,7 @@ function renderSuhuTable() {
       }
       const tglElem = document.getElementById('al_tanggal');
       if (tglElem) {
-          if (!tglElem.value) tglElem.value = new Date().toISOString().split('T')[0];
+          if (!tglElem.value) tglElem.value = getLocalDateKey();
           tglElem.removeEventListener('change', handleAlergenDateChange);
           tglElem.addEventListener('change', handleAlergenDateChange);
       }
@@ -2532,7 +2541,7 @@ function renderSuhuTable() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.dbCache, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `BACKUP_DATABASE_SPPG_${new Date().toISOString().split('T')[0]}.json`);
+      downloadAnchor.setAttribute("download", `BACKUP_DATABASE_SPPG_${getLocalDateKey()}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -2553,7 +2562,7 @@ function renderSuhuTable() {
       
       const tglElemKS = document.getElementById('ks_tanggal');
       if (tglElemKS) {
-          if (!tglElemKS.value) tglElemKS.value = new Date().toISOString().split('T')[0];
+          if (!tglElemKS.value) tglElemKS.value = getLocalDateKey();
           tglElemKS.removeEventListener('change', handleSilangDateChange);
           tglElemKS.addEventListener('change', handleSilangDateChange);
       }
