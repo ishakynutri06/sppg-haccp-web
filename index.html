@@ -636,7 +636,11 @@
   <script>
     window.dbCache = {};
     window.suhuPhotosMap = {}; 
-    window.currentSuhuDate = null; 
+    window.currentSuhuDate = null;
+    window.suhuDirty = {};          // tanggal -> true jika ada input MANUAL yang belum disimpan
+    window.suhuRenderedDate = null; // tanggal milik isi tabel yang sedang tampil di layar
+    window.suhuSwitching = false;   // true saat sedang berpindah tanggal
+    function markSuhuDirty() { if (window.suhuRenderedDate) window.suhuDirty[window.suhuRenderedDate] = true; }
     window.currentActiveTab = 'overview';
 
     // FUNGSI MENDAPATKAN JAM REALTIME DALAM FORMAT HH:mm
@@ -689,6 +693,8 @@
     let pendingTempTargetId = null;
     let pendingTimeTargetId = null;
 
+    let pendingPhoto = null;
+
     function openImageConfirmation(fileInput, targetTempId, targetTimeId) {
         if (!fileInput.files || fileInput.files.length === 0) return;
 
@@ -724,13 +730,7 @@
                     expW = 114; expH = 76; 
                 }
 
-                window.suhuPhotosMap[fileInput.id] = {
-                    base64: compressedBase64,
-                    expW: expW,
-                    expH: expH
-                };
-                fileInput.setAttribute('data-base64', compressedBase64); 
-                
+                pendingPhoto = { id: fileInput.id, base64: compressedBase64, expW: expW, expH: expH };
                 document.getElementById('imageConfirmPreview').src = compressedBase64;
                 
                 // Inisialisasi Input Suhu di Modal
@@ -762,6 +762,7 @@
     }
 
     function cancelImageConfirmation() {
+        pendingPhoto = null;
         if (pendingFileInput) pendingFileInput.value = ''; 
         pendingFileInput = null;
         pendingTempTargetId = null;
@@ -770,6 +771,11 @@
     }
 
     function confirmImageConfirmation() {
+        if (pendingPhoto) {
+            window.suhuPhotosMap[pendingPhoto.id] = { base64: pendingPhoto.base64, expW: pendingPhoto.expW, expH: pendingPhoto.expH };
+            pendingPhoto = null;
+        }
+        markSuhuDirty();
         const tempVal = document.getElementById('imageConfirmTempInput').value;
         const timeVal = document.getElementById('imageConfirmTimeInput').value;
         
@@ -818,6 +824,7 @@
             if (window.suhuPhotosMap && window.suhuPhotosMap[fotoId]) {
                 delete window.suhuPhotosMap[fotoId];
             }
+            markSuhuDirty();
             autoSaveCurrentSuhuToCache();
             renderSuhuTable();
         }
@@ -1495,35 +1502,37 @@
 
     // ==== Auto Save Cache & Firebase Cloud untuk form Suhu ====
     function autoSaveCurrentSuhuToCache() {
-        if (!window.currentSuhuDate) return;
+        // Disimpan HANYA ke tanggal yang isinya sedang tampil, dan HANYA jika ada input manual.
+        const dateKey = window.suhuRenderedDate;
+        if (!dateKey) return;
+        if (!window.suhuDirty[dateKey]) return;
         const form = document.getElementById('formSuhuDoc');
         if (!form) return;
-        
+
         const inputs = form.querySelectorAll('input:not([type="file"]), select, textarea');
         let allData = window.dbCache['sppg_log_suhu'] || {};
-        let existing = allData[window.currentSuhuDate] ? { ...allData[window.currentSuhuDate] } : {};
-        
+        let existing = allData[dateKey] ? { ...allData[dateKey] } : {};
+
         inputs.forEach(inp => {
             if (inp.id && inp.id !== 'suhu_tanggal') {
                 existing[inp.id] = inp.value;
             }
         });
-        
+
         existing.suhuRuangColumns = suhuRuangColumns;
         existing.suhuBatchCounters = suhuBatchCounters;
-        existing.photos = window.suhuPhotosMap || {}; 
-        
-        allData[window.currentSuhuDate] = existing;
-        window.dbCache['sppg_log_suhu'] = allData;
+        existing.photos = { ...(window.suhuPhotosMap || {}) };
 
-        // Backup Local Storage Guard
+        allData[dateKey] = existing;
+        window.dbCache['sppg_log_suhu'] = allData;
+        window.suhuDirty[dateKey] = false; // harus sebelum fbSet (listener realtime bisa terpanggil langsung)
+
         try {
-            localStorage.setItem('sppg_photos_' + window.currentSuhuDate, JSON.stringify(window.suhuPhotosMap || {}));
+            localStorage.setItem('sppg_photos_' + dateKey, JSON.stringify(window.suhuPhotosMap || {}));
         } catch(e) {}
 
-        // [DIUBAH] hanya menulis tanggal yang sedang aktif (tidak menimpa seluruh node sppg_log_suhu)
         if (typeof window.fbSet === 'function') {
-            window.fbSet('sppg_log_suhu/' + window.currentSuhuDate, allData[window.currentSuhuDate]);
+            window.fbSet('sppg_log_suhu/' + dateKey, existing);
         }
     }
 
@@ -2045,31 +2054,40 @@ function handleSuhuDateChange() {
   if (!dateInp || !dateInp.value) return;
   const newKey = dateInp.value;
 
-  if (window.currentSuhuDate && window.currentSuhuDate !== newKey) {
-    autoSaveCurrentSuhuToCache(); // simpan dulu ke tanggal LAMA
-  }
-  window.currentSuhuDate = newKey;
+  window.suhuSwitching = true; // cegah render dari listener realtime di tengah perpindahan
+  try {
+    // Simpan tanggal yang SEDANG tampil (hanya jika ada input manual). Tidak pernah ke tanggal baru.
+    autoSaveCurrentSuhuToCache();
 
-  const allData = window.dbCache['sppg_log_suhu'] || {};
-  const data = allData[newKey];
-  if (data) {
-    suhuRuangColumns = data.suhuRuangColumns || 1;
-    suhuBatchCounters = data.suhuBatchCounters || { matang: 1, pemorsian: 1 };
-    window.suhuPhotosMap = data.photos || {};
-  } else {
-    suhuRuangColumns = 1;
-    suhuBatchCounters = { matang: 1, pemorsian: 1 };
-    try {
-      const ls = localStorage.getItem('sppg_photos_' + newKey);
-      window.suhuPhotosMap = ls ? JSON.parse(ls) : {};
-    } catch (e) { window.suhuPhotosMap = {}; }
-  }
+    const data = (window.dbCache['sppg_log_suhu'] || {})[newKey];
+    suhuRuangColumns = (data && data.suhuRuangColumns) || 1;
+    suhuBatchCounters = (data && data.suhuBatchCounters) || { matang: 1, pemorsian: 1 };
 
-  applySuhuDateFields(newKey, data);
-  renderSuhuTable();
+    applySuhuDateFields(newKey, data);
+    renderSuhuTable(); // memuat foto + isian milik tanggal baru saja
+  } finally {
+    window.suhuSwitching = false;
+  }
+}
+
+// Tandai input MANUAL (event asli dari pengguna) sebagai perubahan yang perlu disimpan
+function bindSuhuDirtyTracking() {
+  const form = document.getElementById('formSuhuDoc');
+  if (!form || form.dataset.dirtyBound === '1') return;
+  form.dataset.dirtyBound = '1';
+  ['input', 'change'].forEach(ev => {
+    form.addEventListener(ev, e => {
+      if (!e.isTrusted) return; // abaikan event buatan program
+      const el = e.target;
+      if (!el || el.type === 'file') return;
+      if (el.id === 'suhu_tanggal' || el.id === 'suhu_siklus_active') return; // navigasi, bukan isian
+      markSuhuDirty();
+    }, true);
+  });
 }
 
 function initSuhuModule() {
+  bindSuhuDirtyTracking();
   const tglElem = document.getElementById('suhu_tanggal');
   if (tglElem) {
     if (!tglElem.value) tglElem.value = getLocalDateKey(); // tanggal lokal, bukan UTC
@@ -2084,6 +2102,7 @@ function initSuhuModule() {
 
     function addSuhuBatch() {
       if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
+        markSuhuDirty();
         autoSaveCurrentSuhuToCache();
         suhuBatchCounters[activeSuhuCategory]++;
         renderSuhuTable();
@@ -2092,6 +2111,7 @@ function initSuhuModule() {
 
     function addSuhuRuangColumn() {
       if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
+        markSuhuDirty();
         autoSaveCurrentSuhuToCache();
         suhuRuangColumns++;
         renderSuhuTable();
@@ -2135,7 +2155,6 @@ function renderSuhuTable() {
   if (!thead || !tbody) return;
 
   const dateKey = document.getElementById('suhu_tanggal')?.value;
-  if (dateKey) window.currentSuhuDate = dateKey;
 
   let savedData = null;
   if (dateKey) {
@@ -2143,15 +2162,16 @@ function renderSuhuTable() {
     savedData = allData[dateKey];
   }
 
-  if (savedData && savedData.photos && Object.keys(savedData.photos).length > 0) {
-    window.suhuPhotosMap = { ...savedData.photos, ...window.suhuPhotosMap };
+  // Foto 100% milik tanggal ini (tidak digabung dengan foto tanggal lain)
+  if (savedData) {
+    window.suhuPhotosMap = { ...(savedData.photos || {}) };
   } else if (dateKey) {
     try {
       const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
-      if (lsPhotos) {
-        window.suhuPhotosMap = { ...JSON.parse(lsPhotos), ...window.suhuPhotosMap };
-      }
-    } catch (e) {}
+      window.suhuPhotosMap = lsPhotos ? JSON.parse(lsPhotos) : {};
+    } catch (e) { window.suhuPhotosMap = {}; }
+  } else {
+    window.suhuPhotosMap = {};
   }
 
   // [DIUBAH] Segarkan dropdown siklus dari data realtime, lalu terapkan pilihan tersimpan
@@ -2284,6 +2304,9 @@ function renderSuhuTable() {
   thead.innerHTML = htmlHead;
   tbody.innerHTML = htmlBody;
 
+  window.suhuRenderedDate = dateKey || null; // isi tabel kini milik tanggal ini
+  window.currentSuhuDate = dateKey || null;
+
   // RESTORE DATA INPUTS
   if (savedData) {
     Object.keys(savedData).forEach(id => {
@@ -2303,6 +2326,11 @@ function renderSuhuTable() {
        
        let dateInput = Array.from(inputs).find(inp => inp.type === 'date');
        let dateKey = dateInput && dateInput.value ? dateInput.value : getLocalDateKey();
+
+       if (formId === 'formSuhuDoc' && window.suhuRenderedDate && window.suhuRenderedDate !== dateKey) {
+           alert('Tanggal belum selesai dimuat. Silakan pilih ulang tanggal lalu simpan kembali.');
+           return;
+       }
        
        const todayStr = getLocalDateKey();
        if (dateKey < todayStr) {
@@ -2328,7 +2356,8 @@ function renderSuhuTable() {
        if (formId === 'formSuhuDoc') {
            mergedData.suhuRuangColumns = suhuRuangColumns;
            mergedData.suhuBatchCounters = suhuBatchCounters;
-           mergedData.photos = window.suhuPhotosMap || {}; 
+           mergedData.photos = { ...(window.suhuPhotosMap || {}) };
+           window.suhuDirty[dateKey] = false;
        }
 
        allData[dateKey] = mergedData;
@@ -2580,7 +2609,7 @@ function renderSuhuTable() {
        if (tabId === 'master-bahan-20') renderMasterBahan20Table();
        if (tabId === 'siklus-menu-20') renderSiklusMenu20Table();
        if (tabId === 'pemorsian') loadPemorsianFromMenu();
-       if (tabId === 'suhu-ruangan') renderSuhuTable(); 
+       if (tabId === 'suhu-ruangan' && !window.suhuSwitching) { autoSaveCurrentSuhuToCache(); renderSuhuTable(); }
        if (tabId === 'inspeksi-silang') renderInspeksiSilangTable();
        if (tabId === 'inspeksi-alergen') renderAlergenMenuAndTable();
     };
