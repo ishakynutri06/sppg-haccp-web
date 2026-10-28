@@ -293,18 +293,15 @@
 
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
         <div id="wrapper_pemorsian" class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm w-full">
-          <table class="w-full text-xs text-left min-w-[1000px]">
+          <table class="w-full text-xs text-left min-w-[700px]">
             <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold tracking-wider text-[11px]">
               <tr>
                 <th class="p-3 text-center border-b border-slate-600 w-12">No</th>
                 <th class="p-3 border-b border-slate-600">Komponen Menu</th>
                 <th class="p-3 text-center border-b border-slate-600 w-28">Standar (gr)</th>
                 <th class="p-3 text-center border-b border-slate-600 w-24">S1 (gr)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">FOTO S1</th>
                 <th class="p-3 text-center border-b border-slate-600 w-24">S2 (gr)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">FOTO S2</th>
                 <th class="p-3 text-center border-b border-slate-600 w-24">S3 (gr)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">FOTO S3</th>
                 <th class="p-3 text-center border-b border-slate-600 w-28">Rata-Rata</th>
                 <th class="p-3 text-center border-b border-slate-600 w-44">Keterangan</th>
               </tr>
@@ -344,11 +341,11 @@
                 <input type="date" id="suhu_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800 cursor-pointer" required>
               </div>
               <div>
-            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime)</label>
-            <!-- PERUBAHAN: Menambahkan autoSaveCurrentSuhuToCache() agar siklus merekam pilihan baru dan tidak terkunci -->
-            <select id="suhu_siklus_active" onchange="autoSaveCurrentSuhuToCache(); renderSuhuTable();" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
-            </select>
-          </div>
+                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime)</label>
+                <select id="suhu_siklus_active" onchange="renderSuhuTable()" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
+                </select>
+              </div>
+              <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Petugas QC / Supervisor</label>
                 <input type="text" id="suhu_supervisor" placeholder="Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800" required>
               </div>
@@ -557,24 +554,17 @@
     </div>
   </div>
 
-  <!-- IMAGE CONFIRMATION MODAL (POP-UP BERSAMAAN FOTO, WAKTU & SUHU) -->
+  <!-- IMAGE CONFIRMATION MODAL (POP-UP BERSAMAAN FOTO & SUHU) -->
   <div id="imageConfirmModal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-slate-900/80 backdrop-blur-sm opacity-0 transition-opacity duration-300 p-4">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md transform scale-95 transition-transform duration-300 overflow-hidden flex flex-col">
         <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-4 text-white text-center font-bold text-lg flex items-center justify-center gap-2">
-            <span>📸</span> Konfirmasi Bukti Foto
+            <span>📸</span> Konfirmasi Bukti Foto & Suhu Aktual
         </div>
         <div class="p-6 space-y-4 flex flex-col items-center">
             <img id="imageConfirmPreview" class="max-h-48 rounded-2xl object-contain border-2 border-indigo-100 bg-slate-50 shadow-md" src="" alt="Preview">
-            
-            <div id="imageConfirmInputsContainer" class="w-full grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block font-extrabold text-slate-700 mb-2 text-[10px] uppercase tracking-wider text-center">Waktu Aktual</label>
-                    <input type="time" id="imageConfirmTimeInput" class="w-full border-2 border-indigo-200 rounded-xl p-3 text-center font-black text-indigo-700 text-xl shadow-sm focus:ring-4 focus:ring-indigo-100">
-                </div>
-                <div>
-                    <label class="block font-extrabold text-slate-700 mb-2 text-[10px] uppercase tracking-wider text-center">Suhu Aktual (°C)</label>
-                    <input type="number" step="0.1" id="imageConfirmTempInput" class="w-full border-2 border-indigo-200 rounded-xl p-3 text-center font-black text-indigo-700 text-xl shadow-sm focus:ring-4 focus:ring-indigo-100" placeholder="Cth: 24.5">
-                </div>
+            <div class="w-full">
+                <label class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider text-center">Masukkan Suhu Aktual (°C)</label>
+                <input type="number" step="0.1" id="imageConfirmTempInput" class="w-full border-2 border-indigo-200 rounded-xl p-3 text-center font-black text-indigo-700 text-2xl shadow-sm focus:ring-4 focus:ring-indigo-100" placeholder="Contoh: 24.5">
             </div>
         </div>
         <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-3">
@@ -669,6 +659,7 @@
 
       if (matchedIndex !== -1) return matchedIndex;
 
+      // Secondary check: match day number if month string format differs slightly
       dayCounter = 0;
       const dayNumStr = String(d).padStart(2, '0');
       weeks.forEach((w) => {
@@ -683,17 +674,15 @@
       return matchedIndex !== -1 ? matchedIndex : 0;
     }
 
-    // ================= FUNGSI PREVIEW GAMBAR, WAKTU & INPUT SUHU =================
+    // ================= FUNGSI PREVIEW GAMBAR & INPUT SUHU =================
     let pendingFileInput = null;
     let pendingTempTargetId = null;
-    let pendingTimeTargetId = null;
 
-    function openImageConfirmation(fileInput, targetTempId, targetTimeId) {
+    function openImageConfirmation(fileInput, targetTempId) {
         if (!fileInput.files || fileInput.files.length === 0) return;
 
         pendingFileInput = fileInput;
         pendingTempTargetId = targetTempId;
-        pendingTimeTargetId = targetTimeId;
 
         const file = fileInput.files[0];
         const reader = new FileReader();
@@ -731,22 +720,7 @@
                 fileInput.setAttribute('data-base64', compressedBase64); 
                 
                 document.getElementById('imageConfirmPreview').src = compressedBase64;
-                
-                // Inisialisasi Input Suhu di Modal
-                if (targetTempId && targetTempId !== 'null' && targetTempId !== '') {
-                    document.getElementById('imageConfirmTempInput').value = document.getElementById(targetTempId)?.value || '';
-                    document.getElementById('imageConfirmTempInput').parentElement.classList.remove('hidden');
-                } else {
-                    document.getElementById('imageConfirmTempInput').parentElement.classList.add('hidden');
-                }
-
-                // Inisialisasi Input Waktu di Modal (Default ke Jam Saat Ini)
-                if (targetTimeId && targetTimeId !== 'null' && targetTimeId !== '') {
-                    document.getElementById('imageConfirmTimeInput').value = document.getElementById(targetTimeId)?.value || getRealtimeTimeString();
-                    document.getElementById('imageConfirmTimeInput').parentElement.classList.remove('hidden');
-                } else {
-                    document.getElementById('imageConfirmTimeInput').parentElement.classList.add('hidden');
-                }
+                document.getElementById('imageConfirmTempInput').value = document.getElementById(targetTempId)?.value || '';
 
                 const modal = document.getElementById('imageConfirmModal');
                 modal.classList.remove('hidden');
@@ -764,14 +738,11 @@
         if (pendingFileInput) pendingFileInput.value = ''; 
         pendingFileInput = null;
         pendingTempTargetId = null;
-        pendingTimeTargetId = null;
         closeImageConfirmModal();
     }
 
     function confirmImageConfirmation() {
         const tempVal = document.getElementById('imageConfirmTempInput').value;
-        const timeVal = document.getElementById('imageConfirmTimeInput').value;
-        
         if (pendingTempTargetId) {
             const targetInput = document.getElementById(pendingTempTargetId);
             if (targetInput) {
@@ -779,28 +750,14 @@
                 targetInput.dispatchEvent(new Event('input')); 
             }
         }
-
-        // Terapkan Waktu dari Modal ke Tabel
-        if (pendingTimeTargetId) {
-            const timeInput = document.getElementById(pendingTimeTargetId);
-            if (timeInput) {
-                timeInput.value = timeVal;
-                timeInput.dispatchEvent(new Event('input'));
-            }
-        }
         
+        // AUTO SAVE REAL-TIME KE CLOUD & CACHE
         autoSaveCurrentSuhuToCache();
-        renderSuhuTable();
-        closeImageConfirmModal();
-    }
 
-    function closeImageConfirmModal() {
-        const modal = document.getElementById('imageConfirmModal');
-        modal.classList.add('opacity-0');
-        modal.children[0].classList.add('scale-95');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
+        // RENDER ULANG TABEL DENGAN THUMBNAIL FOTO FISIK LANGSUNG KELIHATAN
+        renderSuhuTable();
+
+        closeImageConfirmModal();
     }
 
     function closeImageConfirmModal() {
@@ -822,7 +779,7 @@
         }
     }
 
-    function getPhotoCellHtml(fotoId, targetTempId, targetTimeId) {
+    function getPhotoCellHtml(fotoId, targetTempId) {
         const photoData = window.suhuPhotosMap && window.suhuPhotosMap[fotoId];
         const b64 = photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null;
 
@@ -838,59 +795,14 @@
                         🗑️ Hapus
                     </button>
                 </div>
-                <input type="file" accept="image/*" capture="environment" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">
+                <input type="file" accept="image/*" capture="environment" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}')" class="hidden">
             </div>`;
         } else {
             return `
-            <input type="file" accept="image/*" capture="environment" id="${fotoId}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="w-full min-w-[140px] text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 cursor-pointer transition-colors">`;
+            <input type="file" accept="image/*" capture="environment" id="${fotoId}" onchange="openImageConfirmation(this, '${targetTempId}')" class="w-full min-w-[140px] text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 cursor-pointer transition-colors">`;
         }
     }
-
-    // ================= FUNGSI KHUSUS PEMORSIAN PHOTO =================
-    // Fungsi ini ditambahkan agar foto pemorsian berjalan mulus tanpa mengganggu firebase suhu/bahan (Poin 1, 5, 7)
-    function handlePemorsianPhoto(input) {
-        if (!input.files || input.files.length === 0) return;
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let width = img.width, height = img.height;
-                if(width > 600) { height *= 600/width; width = 600; }
-                canvas.width = width; canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                const b64 = canvas.toDataURL('image/jpeg', 0.6);
-                input.setAttribute('data-base64', b64);
-                
-                let parent = input.parentElement;
-                let existingImg = parent.querySelector('img');
-                if(!existingImg) {
-                    existingImg = document.createElement('img');
-                    existingImg.style.width = '60px';
-                    existingImg.style.height = '60px';
-                    existingImg.style.objectFit = 'cover';
-                    existingImg.style.borderRadius = '8px';
-                    existingImg.style.marginTop = '4px';
-                    parent.appendChild(existingImg);
-                }
-                existingImg.src = b64;
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-    
-    function buildPemorsianUploadHtml(id, existingB64) {
-        let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px;" class="mx-auto shadow-sm">` : '';
-        return `<div class="flex flex-col items-center gap-1">
-                    <label for="${id}" class="text-[10px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-sm whitespace-nowrap">📸 Upload</label>
-                    <input type="file" accept="image/*" capture="environment" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
-                    ${imgHtml}
-                </div>`;
-    }
-    // =================================================================
+    // ======================================================================
 
     window.alert = function(message) {
       const modal = document.getElementById('customAlert');
@@ -927,7 +839,7 @@
           const origInp = originalInputs[index];
           if (origInp && origInp.type === 'file') {
               const photoData = window.suhuPhotosMap && window.suhuPhotosMap[origInp.id];
-              let b64 = origInp.getAttribute('data-base64') || (photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null);
+              const b64 = origInp.getAttribute('data-base64') || (photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null);
               
               if (b64) {
                   const existingImg = inp.parentNode.querySelector('img');
@@ -1761,21 +1673,14 @@
         let s1 = dayData[i] ? dayData[i].s1 : 200;
         let s2 = dayData[i] ? dayData[i].s2 : 200;
         let s3 = dayData[i] ? dayData[i].s3 : 200;
-
-        let fs1 = dayData[i] ? (dayData[i].fs1 || '') : '';
-        let fs2 = dayData[i] ? (dayData[i].fs2 || '') : '';
-        let fs3 = dayData[i] ? (dayData[i].fs3 || '') : '';
         
         html += `<tr class="border-b border-slate-100">
             <td class="p-3 text-center font-bold text-slate-500">${no++}</td>
             <td class="p-3 font-semibold text-slate-600">${KELOMPOK_LABELS_MENU[k]}: <br><span class="text-blue-700 font-bold uppercase">${item}</span></td>
             <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl p-2 font-black text-slate-700 std-val bg-slate-50 text-center" value="${std}" oninput="calcAvgPemorsian(this)"></td>
             <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600 sample-val" value="${s1}" oninput="calcAvgPemorsian(this)"></td>
-            <td class="p-2 text-center">${buildPemorsianUploadHtml(`pemorsian_foto_s1_${idx}_${i}`, fs1)}</td>
             <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600 sample-val" value="${s2}" oninput="calcAvgPemorsian(this)"></td>
-            <td class="p-2 text-center">${buildPemorsianUploadHtml(`pemorsian_foto_s2_${idx}_${i}`, fs2)}</td>
             <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600 sample-val" value="${s3}" oninput="calcAvgPemorsian(this)"></td>
-            <td class="p-2 text-center">${buildPemorsianUploadHtml(`pemorsian_foto_s3_${idx}_${i}`, fs3)}</td>
             <td class="p-3 text-center font-black text-slate-800 avg-cell bg-slate-50/50">0.00</td>
             <td class="p-3 text-center font-bold status-cell text-xs">-</td>
         </tr>`;
@@ -1799,18 +1704,14 @@
 
       let dayData = [];
       const tbody = document.getElementById('tbody_pemorsian_b1');
-      tbody.querySelectorAll('tr').forEach((tr) => {
+      tbody.querySelectorAll('tr').forEach(tr => {
           const inputs = tr.querySelectorAll('input[type="number"]');
-          const fileInputs = tr.querySelectorAll('input[type="file"]');
           if (inputs.length >= 4) {
               dayData.push({
                   std: inputs[0].value,
                   s1: inputs[1].value,
                   s2: inputs[2].value,
-                  s3: inputs[3].value,
-                  fs1: fileInputs[0] ? (fileInputs[0].getAttribute('data-base64') || '') : '',
-                  fs2: fileInputs[1] ? (fileInputs[1].getAttribute('data-base64') || '') : '',
-                  fs3: fileInputs[2] ? (fileInputs[2].getAttribute('data-base64') || '') : ''
+                  s3: inputs[3].value
               });
           }
       });
@@ -1964,7 +1865,83 @@
       }
     }
 
-    if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
+    function addSuhuRuangColumn() {
+      if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
+        autoSaveCurrentSuhuToCache();
+        suhuRuangColumns++;
+        renderSuhuTable();
+      }
+    }
+
+    function evalSuhuStatusSingle(id, min, max) {
+      const val = parseFloat(document.getElementById(`suhu_val_${id}`)?.value);
+      const statusElem = document.getElementById(`suhu_status_${id}`);
+      if (!statusElem) return;
+      let isValid = (isNaN(val) || (val >= min && val <= max));
+      if (isValid) {
+        statusElem.innerHTML = `<span class="text-emerald-600 font-bold">Sesuai</span>`;
+      } else {
+        statusElem.innerHTML = `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
+      }
+    }
+
+    function evalSuhuStatus(id, min, max) {
+      const statusElem = document.getElementById(`suhu_status_${id}`);
+      if (!statusElem) return;
+      let allValid = true;
+      for (let c = 1; c <= suhuRuangColumns; c++) {
+        const val = parseFloat(document.getElementById(`suhu_val_${c}_${id}`)?.value);
+        if (!isNaN(val) && (val < min || val > max)) {
+          allValid = false;
+        }
+      }
+      if (allValid) {
+        statusElem.innerHTML = `<span class="text-emerald-600 font-bold">Sesuai</span>`;
+      } else {
+        statusElem.innerHTML = `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
+      }
+    }
+
+    function renderSuhuTable() {
+      const thead = document.getElementById('suhu_table_header');
+      const tbody = document.getElementById('tbody_suhu_monitoring');
+      if (!thead || !tbody) return;
+
+      const dateKey = document.getElementById('suhu_tanggal')?.value;
+      if (dateKey) window.currentSuhuDate = dateKey;
+
+      let savedData = null;
+      if (dateKey) {
+          const allData = window.dbCache['sppg_log_suhu'] || {};
+          savedData = allData[dateKey];
+      }
+
+      if (savedData && savedData.photos && Object.keys(savedData.photos).length > 0) {
+          window.suhuPhotosMap = { ...savedData.photos, ...window.suhuPhotosMap };
+      } else if (dateKey) {
+          try {
+              const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
+              if (lsPhotos) {
+                  window.suhuPhotosMap = { ...JSON.parse(lsPhotos), ...window.suhuPhotosMap };
+              }
+          } catch(e) {}
+      }
+
+      const siklusSelect = document.getElementById('suhu_siklus_active');
+      if (savedData && savedData['suhu_siklus_active'] !== undefined) {
+          siklusSelect.value = savedData['suhu_siklus_active'];
+      }
+      const activeDayIdx = parseInt(siklusSelect?.value || 0);
+      const menuMatrix = window.dbCache['sppg_siklus_menu_matrix'] || {};
+
+      let htmlHead = '';
+      let htmlBody = '';
+      let rowNo = 1;
+
+      const filteredConfigs = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
+      const realtimeNowTime = getRealtimeTimeString();
+
+      if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
         let dynamicHeaders = '';
         for (let c = 1; c <= suhuRuangColumns; c++) {
             dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU ${c}</th>
@@ -1974,20 +1951,19 @@
         htmlHead = `
           <tr>
             <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <!-- PERBAIKAN: Lebar kolom Area/Ruangan diketatkan pas seukuran teks -->
-            <th class="p-3 border-b border-slate-600 whitespace-nowrap" style="width: 1%;">AREA / RUANGAN</th>
-            <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+            <th class="p-3 border-b border-slate-600 w-32">KATEGORI</th>
+            <th class="p-3 border-b border-slate-600">AREA / RUANGAN</th>
             ${dynamicHeaders}
             <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
-            <!-- Keterangan diset w-full agar menyedot sisa ruang kosong tabel -->
-            <th class="p-3 border-b border-slate-600 w-full">KETERANGAN</th>
+            <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+            <th class="p-3 border-b border-slate-600 w-48">KETERANGAN</th>
           </tr>`;
 
         filteredConfigs.forEach(cfg => {
           let dynamicCells = '';
           for (let c = 1; c <= suhuRuangColumns; c++) {
-              let defTime = realtimeNowTime; 
+              let defTime = realtimeNowTime; // WAKTU REFERENSI REALTIME (EDITABLE)
               let defVal = c === 1 ? cfg.defPagi : cfg.defMalam; 
               
               dynamicCells += `
@@ -1996,22 +1972,22 @@
               `;
           }
 
-          let fotoHtml = getPhotoCellHtml(`suhu_foto_${cfg.id}`, `suhu_val_1_${cfg.id}`, `suhu_waktu_1_${cfg.id}`);
+          let fotoHtml = getPhotoCellHtml(`suhu_foto_${cfg.id}`, `suhu_val_1_${cfg.id}`);
 
           htmlBody += `
             <tr class="hover:bg-slate-50 border-b border-slate-100">
               <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
-              <!-- PERBAIKAN: whitespace-nowrap dan width 1% agar cell area tidak melebar -->
-              <td class="p-3 font-bold text-slate-800 bg-slate-50/50 whitespace-nowrap" style="width: 1%;">${cfg.area}</td>
-              <td class="p-2 text-center">${fotoHtml}</td>
+              <td class="p-3 font-extrabold text-slate-800 bg-slate-50/50">${cfg.cat}</td>
+              <td class="p-3 font-bold text-slate-600">${cfg.area}</td>
               ${dynamicCells}
               <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
               <td class="p-3 text-center font-bold text-sm" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
+              <td class="p-2 text-center">${fotoHtml}</td>
               <td class="p-2"><input type="text" id="suhu_cat_${cfg.id}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
             </tr>`;
         });
         
-        let totalCols = 6 + (2 * suhuRuangColumns);
+        let totalCols = 7 + (2 * suhuRuangColumns);
         htmlBody += `
           <tr class="hidden-print border-t border-slate-200">
             <td colspan="${totalCols}" class="p-5 text-center bg-slate-50/80">
@@ -2026,15 +2002,14 @@
         htmlHead = `
           <tr>
             <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <!-- PERUBAHAN: Set lebar ke w-[1%] agar super ketat menyesuaikan konten menu -->
-            <th class="p-3 border-b border-slate-600 w-[1%] whitespace-nowrap">KOMPONEN & MENU HARI INI</th>
-            <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+            <th class="p-3 border-b border-slate-600 w-32">KATEGORI</th>
+            <th class="p-3 border-b border-slate-600 min-w-[150px]">MENU HARI INI</th>
             <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU AKTUAL</th>
             <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
-            <!-- PERUBAHAN: Set Keterangan menjadi w-auto agar menyedot sisa lebar tabel kosong -->
-            <th class="p-3 border-b border-slate-600 w-auto">KETERANGAN</th>
+            <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+            <th class="p-3 border-b border-slate-600 w-48">KETERANGAN</th>
           </tr>`;
 
         let rowCounter = 1;
@@ -2046,22 +2021,19 @@
               submenus.forEach((sub) => {
                 let menuName = (menuMatrix[sub.key.toUpperCase()] && menuMatrix[sub.key.toUpperCase()][activeDayIdx]) ? menuMatrix[sub.key.toUpperCase()][activeDayIdx] : '-';
                 let uniqueId = `${cfg.id}_${sub.key}_b${b}`;
-                let defTime = realtimeNowTime; 
-                let fotoHtml = getPhotoCellHtml(`suhu_foto_${uniqueId}`, `suhu_val_${uniqueId}`, `suhu_waktu_${uniqueId}`);
+                let defTime = realtimeNowTime; // WAKTU REFERENSI REALTIME (EDITABLE)
+                let fotoHtml = getPhotoCellHtml(`suhu_foto_${uniqueId}`, `suhu_val_${uniqueId}`);
 
                 htmlBody += `
                 <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
                   <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
-                  <!-- PERUBAHAN: Set w-[1%] agar kolom menempel kuat pada lebar kontainer Header dan tidak melar -->
-                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 w-[1%] whitespace-nowrap">
-                    <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
-                    ${menuName}
-                  </td>
-                  <td class="p-2 text-center">${fotoHtml}</td>
+                  <td class="p-3 font-extrabold bg-slate-50/50 text-slate-800">${sub.labelName} <br/><span class="mt-1 inline-block text-[9px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span></td>
+                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide">${menuName}</td>
                   <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
                   <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
                   <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
                   <td class="p-3 text-center font-bold text-sm" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
+                  <td class="p-2 text-center">${fotoHtml}</td>
                   <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
                 </tr>`;
               });
@@ -2071,7 +2043,7 @@
         let nextBatchNum = maxBatches + 1;
         htmlBody += `
           <tr class="hidden-print border-t border-slate-200">
-            <td colspan="8" class="p-5 text-center bg-slate-50/80">
+            <td colspan="9" class="p-5 text-center bg-slate-50/80">
               <button type="button" onclick="addSuhuBatch()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
                 <span>➕</span> Tambah Form Input Untuk Batch ${nextBatchNum}
               </button>
