@@ -2050,7 +2050,6 @@
         htmlHead = `
           <tr>
             <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <th class="p-3 border-b border-slate-600 w-32">KATEGORI</th>
             <th class="p-3 border-b border-slate-600">AREA / RUANGAN</th>
             <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
             ${dynamicHeaders}
@@ -2062,7 +2061,7 @@
         filteredConfigs.forEach(cfg => {
           let dynamicCells = '';
           for (let c = 1; c <= suhuRuangColumns; c++) {
-              let defTime = realtimeNowTime; // WAKTU REFERENSI REALTIME (EDITABLE)
+              let defTime = realtimeNowTime; 
               let defVal = c === 1 ? cfg.defPagi : cfg.defMalam; 
               
               dynamicCells += `
@@ -2076,8 +2075,7 @@
           htmlBody += `
             <tr class="hover:bg-slate-50 border-b border-slate-100">
               <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
-              <td class="p-3 font-extrabold text-slate-800 bg-slate-50/50">${cfg.cat}</td>
-              <td class="p-3 font-bold text-slate-600">${cfg.area}</td>
+              <td class="p-3 font-bold text-slate-800 bg-slate-50/50">${cfg.area}</td>
               <td class="p-2 text-center">${fotoHtml}</td>
               ${dynamicCells}
               <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
@@ -2086,7 +2084,7 @@
             </tr>`;
         });
         
-        let totalCols = 7 + (2 * suhuRuangColumns);
+        let totalCols = 6 + (2 * suhuRuangColumns);
         htmlBody += `
           <tr class="hidden-print border-t border-slate-200">
             <td colspan="${totalCols}" class="p-5 text-center bg-slate-50/80">
@@ -2101,8 +2099,7 @@
         htmlHead = `
           <tr>
             <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <th class="p-3 border-b border-slate-600 w-32">KATEGORI</th>
-            <th class="p-3 border-b border-slate-600 min-w-[150px]">MENU HARI INI</th>
+            <th class="p-3 border-b border-slate-600 min-w-[150px]">KOMPONEN & MENU HARI INI</th>
             <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
             <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
             <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU AKTUAL</th>
@@ -2120,14 +2117,16 @@
               submenus.forEach((sub) => {
                 let menuName = (menuMatrix[sub.key.toUpperCase()] && menuMatrix[sub.key.toUpperCase()][activeDayIdx]) ? menuMatrix[sub.key.toUpperCase()][activeDayIdx] : '-';
                 let uniqueId = `${cfg.id}_${sub.key}_b${b}`;
-                let defTime = realtimeNowTime; // WAKTU REFERENSI REALTIME (EDITABLE)
+                let defTime = realtimeNowTime; 
                 let fotoHtml = getPhotoCellHtml(`suhu_foto_${uniqueId}`, `suhu_val_${uniqueId}`, `suhu_waktu_${uniqueId}`);
 
                 htmlBody += `
                 <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
                   <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
-                  <td class="p-3 font-extrabold bg-slate-50/50 text-slate-800">${sub.labelName} <br/><span class="mt-1 inline-block text-[9px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span></td>
-                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide">${menuName}</td>
+                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50">
+                    <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
+                    ${menuName}
+                  </td>
                   <td class="p-2 text-center">${fotoHtml}</td>
                   <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
                   <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
@@ -2142,7 +2141,7 @@
         let nextBatchNum = maxBatches + 1;
         htmlBody += `
           <tr class="hidden-print border-t border-slate-200">
-            <td colspan="9" class="p-5 text-center bg-slate-50/80">
+            <td colspan="8" class="p-5 text-center bg-slate-50/80">
               <button type="button" onclick="addSuhuBatch()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
                 <span>➕</span> Tambah Form Input Untuk Batch ${nextBatchNum}
               </button>
