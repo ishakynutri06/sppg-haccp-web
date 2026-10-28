@@ -338,6 +338,7 @@
 
         <div id="suhuSubViewInput" class="space-y-8">
           <form id="formSuhuDoc" onsubmit="event.preventDefault(); saveGenericForm('formSuhuDoc', 'sppg_log_suhu', 'Data Pemantauan Suhu Area & Makanan berhasil disimpan!');" class="space-y-8">
+            <!-- HEADER FORM (DIPERBAIKI: tidak ada lagi tag ganda / penutup berlebih) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
               <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Pemantauan</label>
@@ -345,8 +346,7 @@
               </div>
               <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime)</label>
-                <!-- Menambahkan autoSaveCurrentSuhuToCache() agar siklus merekam pilihan baru dan tidak terkunci -->
-                <select id="suhu_siklus_active" onchange="autoSaveCurrentSuhuToCache(); renderSuhuTable();" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
+                <select id="suhu_siklus_active" onchange="onSuhuSiklusChange();" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
                 </select>
               </div>
               <div>
@@ -487,7 +487,7 @@
             </div>
             <div>
               <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime):</label>
-              <select id="al_siklus_active" onchange="renderAlergenMenuAndTable()" class="w-full border-2 border-amber-200 rounded-xl p-2.5 text-sm font-bold bg-amber-50 text-amber-900 cursor-pointer">
+              <select id="al_siklus_active" onchange="onAlergenSiklusChange()" class="w-full border-2 border-amber-200 rounded-xl p-2.5 text-sm font-bold bg-amber-50 text-amber-900 cursor-pointer">
               </select>
             </div>
             <div>
@@ -1521,8 +1521,9 @@
             localStorage.setItem('sppg_photos_' + window.currentSuhuDate, JSON.stringify(window.suhuPhotosMap || {}));
         } catch(e) {}
 
+        // [DIUBAH] hanya menulis tanggal yang sedang aktif (tidak menimpa seluruh node sppg_log_suhu)
         if (typeof window.fbSet === 'function') {
-            window.fbSet('sppg_log_suhu', allData);
+            window.fbSet('sppg_log_suhu/' + window.currentSuhuDate, allData[window.currentSuhuDate]);
         }
     }
 
@@ -1899,6 +1900,152 @@
       }
     }
 
+
+// BAGIAN A  --  GANTI function initSuhuModule() LAMA DENGAN BLOK INI
+// (blok ini berisi 3 fungsi bantu BARU + initSuhuModule versi baru)
+// =====================================================================
+
+// [BARU] Ambil data siklus menu (realtime dari Firebase cache, sama dengan modul Siklus Menu 20 Hari)
+function getSuhuWeeks() {
+  let weeks = window.dbCache['sppg_siklus_menu_weeks'];
+  if (!weeks) return JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+  if (!Array.isArray(weeks)) weeks = Object.values(weeks);
+  return weeks.filter(w => w);
+}
+
+// [BARU] Ambil nama menu 1 komponen pada hari siklus tertentu langsung dari data siklus (bukan dari matrix)
+function getSuhuMenuName(weeks, kKey, dayIdx) {
+  let result = '';
+  const w = weeks[Math.floor(dayIdx / 5)];
+  if (w && w.items && w.items[kKey]) {
+    const arr = w.items[kKey];
+    const v = Array.isArray(arr) ? arr[dayIdx % 5] : arr[String(dayIdx % 5)];
+    result = (v === undefined || v === null) ? '' : String(v).trim();
+  }
+  if (result === '' || result === '0') {
+    // cadangan: matrix hasil sinkronisasi
+    const m = window.dbCache['sppg_siklus_menu_matrix'];
+    if (m && m[kKey] && m[kKey][dayIdx]) result = String(m[kKey][dayIdx]).trim();
+  }
+  return (result === '' || result === '0') ? '-' : result.toUpperCase();
+}
+
+// [BARU] Isi / segarkan dropdown Siklus Menu. Pilihan user tetap dipertahankan saat data berubah realtime.
+function populateSuhuSiklusOptions() {
+  const weeks = getSuhuWeeks();
+  const sel = document.getElementById('suhu_siklus_active');
+  if (!sel) return weeks;
+
+  let options = '';
+  let dayCounter = 0;
+  weeks.forEach(w => {
+    const dates = Array.isArray(w.dates) ? w.dates : Object.values(w.dates || {});
+    dates.forEach(d => {
+      options += `<option value="${dayCounter}">Hari Ke-${dayCounter + 1} (${d})</option>`;
+      dayCounter++;
+    });
+  });
+
+  if (sel.dataset.sig !== options) {
+    const prev = sel.value;
+    sel.innerHTML = options;
+    sel.dataset.sig = options;
+    if (prev !== '' && sel.querySelector(`option[value="${prev}"]`)) {
+      sel.value = prev;
+    } else {
+      sel.value = getTodayCycleIndex(weeks); // otomatis sesuai tanggal realtime hari ini
+    }
+  }
+  return weeks;
+}
+
+function initSuhuModule() {
+  const tglElem = document.getElementById('suhu_tanggal');
+  if (tglElem) {
+    if (!tglElem.value) {
+      tglElem.value = new Date().toISOString().split('T')[0];
+      window.currentSuhuDate = tglElem.value;
+    } else {
+      window.currentSuhuDate = tglElem.value;
+    }
+    tglElem.removeEventListener('change', handleSuhuDateChange);
+    tglElem.addEventListener('change', handleSuhuDateChange);
+  }
+
+  populateSuhuSiklusOptions();
+  handleSuhuDateChange();
+}
+
+
+// =====================================================================
+
+    // [BARU] Cari index siklus untuk tanggal tertentu (format input YYYY-MM-DD)
+    function getSuhuCycleIndexForDate(weeks, dateKey) {
+      if (!dateKey) return getTodayCycleIndex(weeks);
+      const parts = dateKey.split('-');
+      const day = parseInt(parts[2], 10);
+      const year = parts[0];
+      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      const mon = monthNamesShort[parseInt(parts[1], 10) - 1];
+      let idx = 0;
+      let found = -1;
+      weeks.forEach(w => {
+        (w.dates || []).forEach(dateStr => {
+          const m = String(dateStr).match(/(\d+)\s+(\w+)\s+(\d{4})/);
+          if (found === -1 && m && parseInt(m[1], 10) === day && m[2] === mon && m[3] === year) found = idx;
+          idx++;
+        });
+      });
+      return found !== -1 ? found : getTodayCycleIndex(weeks);
+    }
+
+    // [BARU] Isi field header (Petugas, Supervisor, Penyetuju, Siklus) SESUAI tanggal yang dipilih.
+    // Tanggal tanpa data akan kosong, sehingga tidak mewarisi isian dari tanggal lain.
+    function applySuhuDateFields(dateKey, data) {
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      ['suhu_supervisor', 'suhu_pemeriksa', 'suhu_penyetuju'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = (data && data[id] !== undefined) ? data[id] : '';
+      });
+      const sel = document.getElementById('suhu_siklus_active');
+      if (sel) {
+        const idx = getSuhuCycleIndexForDate(weeks, dateKey);
+        if (sel.querySelector(`option[value="${idx}"]`)) sel.value = idx;
+      }
+    }
+
+    // [BARU] Ubah index siklus -> tanggal YYYY-MM-DD
+    function getSuhuDateKeyForIdx(weeks, idx) {
+      const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      let k = 0, out = null;
+      weeks.forEach(w => (w.dates || []).forEach(ds => {
+        if (k === idx && out === null) {
+          const m = String(ds).match(/(\d+)\s+(\w+)\s+(\d{4})/);
+          if (m) {
+            const mi = monthNamesShort.findIndex(x => x.toLowerCase() === m[2].toLowerCase());
+            if (mi >= 0) out = `${m[3]}-${String(mi + 1).padStart(2, '0')}-${String(parseInt(m[1], 10)).padStart(2, '0')}`;
+          }
+        }
+        k++;
+      }));
+      return out;
+    }
+
+    // [BARU] Saat dropdown siklus diubah, tanggal pemantauan ikut berubah
+    function onSuhuSiklusChange() {
+      const sel = document.getElementById('suhu_siklus_active');
+      const dateInp = document.getElementById('suhu_tanggal');
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      const key = getSuhuDateKeyForIdx(weeks, parseInt(sel.value, 10));
+      if (key && dateInp && dateInp.value !== key) {
+        dateInp.value = key;
+        handleSuhuDateChange(); // menyimpan tanggal lama lalu memuat tanggal baru
+      } else {
+        autoSaveCurrentSuhuToCache();
+        renderSuhuTable();
+      }
+    }
+
     function handleSuhuDateChange() {
         if (window.currentSuhuDate && window.currentSuhuDate !== document.getElementById('suhu_tanggal')?.value) {
             autoSaveCurrentSuhuToCache();
@@ -1921,41 +2068,10 @@
                 window.suhuPhotosMap = {};
             }
         }
+        applySuhuDateFields(dateKey, data);
         renderSuhuTable();
     }
 
-    function initSuhuModule() {
-      const tglElem = document.getElementById('suhu_tanggal');
-      if (tglElem) {
-        if(!tglElem.value) {
-            tglElem.value = new Date().toISOString().split('T')[0];
-            window.currentSuhuDate = tglElem.value;
-        } else {
-            window.currentSuhuDate = tglElem.value;
-        }
-        tglElem.removeEventListener('change', handleSuhuDateChange);
-        tglElem.addEventListener('change', handleSuhuDateChange);
-      }
-
-      const siklusSelect = document.getElementById('suhu_siklus_active');
-      if (siklusSelect) {
-        const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
-        let options = '';
-        let dayCounter = 0;
-        weeks.forEach(w => {
-          w.dates.forEach(d => {
-            options += `<option value="${dayCounter}">Hari Ke-${dayCounter + 1} (${d})</option>`;
-            dayCounter++;
-          });
-        });
-        siklusSelect.innerHTML = options;
-        
-        // AUTO SELECT BERDASARKAN TANGGAL REALTIME
-        const todayIdx = getTodayCycleIndex(weeks);
-        siklusSelect.value = todayIdx;
-      }
-      handleSuhuDateChange();
-    }
 
     function addSuhuBatch() {
       if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
@@ -2002,171 +2118,174 @@
       }
     }
 
-        function renderSuhuTable() {
-      const thead = document.getElementById('suhu_table_header');
-      const tbody = document.getElementById('tbody_suhu_monitoring');
-      if (!thead || !tbody) return;
+// BAGIAN B  --  GANTI function renderSuhuTable() LAMA DENGAN BLOK INI
+// =====================================================================
+function renderSuhuTable() {
+  const thead = document.getElementById('suhu_table_header');
+  const tbody = document.getElementById('tbody_suhu_monitoring');
+  if (!thead || !tbody) return;
 
-      const dateKey = document.getElementById('suhu_tanggal')?.value;
-      if (dateKey) window.currentSuhuDate = dateKey;
+  const dateKey = document.getElementById('suhu_tanggal')?.value;
+  if (dateKey) window.currentSuhuDate = dateKey;
 
-      let savedData = null;
-      if (dateKey) {
-          const allData = window.dbCache['sppg_log_suhu'] || {};
-          savedData = allData[dateKey];
+  let savedData = null;
+  if (dateKey) {
+    const allData = window.dbCache['sppg_log_suhu'] || {};
+    savedData = allData[dateKey];
+  }
+
+  if (savedData && savedData.photos && Object.keys(savedData.photos).length > 0) {
+    window.suhuPhotosMap = { ...savedData.photos, ...window.suhuPhotosMap };
+  } else if (dateKey) {
+    try {
+      const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
+      if (lsPhotos) {
+        window.suhuPhotosMap = { ...JSON.parse(lsPhotos), ...window.suhuPhotosMap };
+      }
+    } catch (e) {}
+  }
+
+  // [DIUBAH] Segarkan dropdown siklus dari data realtime, lalu terapkan pilihan tersimpan
+  const weeks = populateSuhuSiklusOptions();
+  const siklusSelect = document.getElementById('suhu_siklus_active');
+  if (siklusSelect && dateKey) {
+    const idxFromDate = getSuhuCycleIndexForDate(weeks, dateKey);
+    if (siklusSelect.querySelector(`option[value="${idxFromDate}"]`)) siklusSelect.value = idxFromDate;
+  }
+  const activeDayIdx = parseInt(siklusSelect?.value || 0);
+
+  let htmlHead = '';
+  let htmlBody = '';
+  let rowNo = 1;
+
+  const filteredConfigs = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
+  const realtimeNowTime = getRealtimeTimeString();
+
+  if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
+    let dynamicHeaders = '';
+    for (let c = 1; c <= suhuRuangColumns; c++) {
+      dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU ${c}</th>
+                         <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU ${c}</th>`;
+    }
+
+    htmlHead = `
+      <tr>
+        <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
+        <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
+        <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+        ${dynamicHeaders}
+        <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
+        <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
+        <th class="p-3 border-b border-slate-600">KETERANGAN</th>
+      </tr>`;
+
+    filteredConfigs.forEach(cfg => {
+      let dynamicCells = '';
+      for (let c = 1; c <= suhuRuangColumns; c++) {
+        let defTime = realtimeNowTime;
+        let defVal = c === 1 ? cfg.defPagi : cfg.defMalam;
+
+        dynamicCells += `
+          <td class="p-2 text-center"><input type="time" id="suhu_waktu_${c}_${cfg.id}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
+          <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${c}_${cfg.id}" value="${defVal}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})"></td>
+        `;
       }
 
-      if (savedData && savedData.photos && Object.keys(savedData.photos).length > 0) {
-          window.suhuPhotosMap = { ...savedData.photos, ...window.suhuPhotosMap };
-      } else if (dateKey) {
-          try {
-              const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
-              if (lsPhotos) {
-                  window.suhuPhotosMap = { ...JSON.parse(lsPhotos), ...window.suhuPhotosMap };
-              }
-          } catch(e) {}
-      }
+      let fotoHtml = getPhotoCellHtml(`suhu_foto_${cfg.id}`, `suhu_val_1_${cfg.id}`, `suhu_waktu_1_${cfg.id}`);
 
-      const siklusSelect = document.getElementById('suhu_siklus_active');
-      if (savedData && savedData['suhu_siklus_active'] !== undefined) {
-          siklusSelect.value = savedData['suhu_siklus_active'];
-      }
-      const activeDayIdx = parseInt(siklusSelect?.value || 0);
-      const menuMatrix = window.dbCache['sppg_siklus_menu_matrix'] || {};
+      htmlBody += `
+        <tr class="hover:bg-slate-50 border-b border-slate-100">
+          <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
+          <td class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap">${cfg.area}</td>
+          <td class="p-2 text-center">${fotoHtml}</td>
+          ${dynamicCells}
+          <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
+          <td class="p-3 text-center font-bold text-sm" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
+          <td class="p-2"><input type="text" id="suhu_cat_${cfg.id}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
+        </tr>`;
+    });
 
-      let htmlHead = '';
-      let htmlBody = '';
-      let rowNo = 1;
+    let totalCols = 6 + (2 * suhuRuangColumns);
+    htmlBody += `
+      <tr class="hidden-print border-t border-slate-200">
+        <td colspan="${totalCols}" class="p-5 text-center bg-slate-50/80">
+          <button type="button" onclick="addSuhuRuangColumn()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
+            <span>➕</span> Tambah Waktu Pengukuran (Ke-${suhuRuangColumns + 1})
+          </button>
+        </td>
+      </tr>
+    `;
 
-      const filteredConfigs = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
-      const realtimeNowTime = getRealtimeTimeString();
+  } else if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
+    htmlHead = `
+      <tr>
+        <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
+        <th class="p-3 border-b border-slate-600 w-[1%]">KOMPONEN & MENU HARI INI</th>
+        <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+        <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
+        <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU AKTUAL</th>
+        <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
+        <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
+        <th class="p-3 border-b border-slate-600">KETERANGAN</th>
+      </tr>`;
 
-      if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
-        let dynamicHeaders = '';
-        for (let c = 1; c <= suhuRuangColumns; c++) {
-            dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU ${c}</th>
-                               <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU ${c}</th>`;
-        }
+    let rowCounter = 1;
+    let maxBatches = suhuBatchCounters[activeSuhuCategory] || 1;
 
-        // PERUBAHAN: kolom AREA dibuat selebar isi, kolom KETERANGAN fleksibel (menyerap sisa ruang)
-        htmlHead = `
-          <tr>
-            <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
-            <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
-            ${dynamicHeaders}
-            <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
-            <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
-            <th class="p-3 border-b border-slate-600">KETERANGAN</th>
-          </tr>`;
-
-        filteredConfigs.forEach(cfg => {
-          let dynamicCells = '';
-          for (let c = 1; c <= suhuRuangColumns; c++) {
-              let defTime = realtimeNowTime; 
-              let defVal = c === 1 ? cfg.defPagi : cfg.defMalam; 
-              
-              dynamicCells += `
-                <td class="p-2 text-center"><input type="time" id="suhu_waktu_${c}_${cfg.id}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
-                <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${c}_${cfg.id}" value="${defVal}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})"></td>
-              `;
-          }
-
-          let fotoHtml = getPhotoCellHtml(`suhu_foto_${cfg.id}`, `suhu_val_1_${cfg.id}`, `suhu_waktu_1_${cfg.id}`);
+    for (let b = 1; b <= maxBatches; b++) {
+      filteredConfigs.forEach(cfg => {
+        let submenus = cfg.template;
+        submenus.forEach((sub) => {
+          // [DIUBAH] nama menu diambil langsung dari data Siklus Menu 20 Hari (realtime)
+          let menuName = getSuhuMenuName(weeks, sub.key.toUpperCase(), activeDayIdx);
+          let uniqueId = `${cfg.id}_${sub.key}_b${b}`;
+          let defTime = realtimeNowTime;
+          let fotoHtml = getPhotoCellHtml(`suhu_foto_${uniqueId}`, `suhu_val_${uniqueId}`, `suhu_waktu_${uniqueId}`);
 
           htmlBody += `
-            <tr class="hover:bg-slate-50 border-b border-slate-100">
-              <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
-              <td class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap">${cfg.area}</td>
-              <td class="p-2 text-center">${fotoHtml}</td>
-              ${dynamicCells}
-              <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
-              <td class="p-3 text-center font-bold text-sm" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
-              <td class="p-2"><input type="text" id="suhu_cat_${cfg.id}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
-            </tr>`;
-        });
-        
-        let totalCols = 6 + (2 * suhuRuangColumns);
-        htmlBody += `
-          <tr class="hidden-print border-t border-slate-200">
-            <td colspan="${totalCols}" class="p-5 text-center bg-slate-50/80">
-              <button type="button" onclick="addSuhuRuangColumn()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
-                <span>➕</span> Tambah Waktu Pengukuran (Ke-${suhuRuangColumns + 1})
-              </button>
+          <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
+            <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
+            <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 w-[1%] whitespace-nowrap">
+              <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
+              ${menuName}
             </td>
-          </tr>
-        `;
-
-      } else if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
-        // PERUBAHAN: judul kolom menu boleh wrap (tanpa nowrap) agar lebar kolom mengikuti isi menu
-        htmlHead = `
-          <tr>
-            <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-            <th class="p-3 border-b border-slate-600 w-[1%]">KOMPONEN & MENU HARI INI</th>
-            <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
-            <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
-            <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU AKTUAL</th>
-            <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
-            <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
-            <th class="p-3 border-b border-slate-600">KETERANGAN</th>
+            <td class="p-2 text-center">${fotoHtml}</td>
+            <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
+            <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
+            <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
+            <td class="p-3 text-center font-bold text-sm" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
+            <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
           </tr>`;
-
-        let rowCounter = 1;
-        let maxBatches = suhuBatchCounters[activeSuhuCategory] || 1;
-
-        for (let b = 1; b <= maxBatches; b++) {
-            filteredConfigs.forEach(cfg => {
-              let submenus = cfg.template;
-              submenus.forEach((sub) => {
-                let menuName = (menuMatrix[sub.key.toUpperCase()] && menuMatrix[sub.key.toUpperCase()][activeDayIdx]) ? menuMatrix[sub.key.toUpperCase()][activeDayIdx] : '-';
-                let uniqueId = `${cfg.id}_${sub.key}_b${b}`;
-                let defTime = realtimeNowTime; 
-                let fotoHtml = getPhotoCellHtml(`suhu_foto_${uniqueId}`, `suhu_val_${uniqueId}`, `suhu_waktu_${uniqueId}`);
-
-                htmlBody += `
-                <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
-                  <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
-                  <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 w-[1%] whitespace-nowrap">
-                    <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
-                    ${menuName}
-                  </td>
-                  <td class="p-2 text-center">${fotoHtml}</td>
-                  <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
-                  <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
-                  <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
-                  <td class="p-3 text-center font-bold text-sm" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
-                  <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
-                </tr>`;
-              });
-            });
-        }
-
-        let nextBatchNum = maxBatches + 1;
-        htmlBody += `
-          <tr class="hidden-print border-t border-slate-200">
-            <td colspan="8" class="p-5 text-center bg-slate-50/80">
-              <button type="button" onclick="addSuhuBatch()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
-                <span>➕</span> Tambah Form Input Untuk Batch ${nextBatchNum}
-              </button>
-            </td>
-          </tr>
-        `;
-      }
-
-      thead.innerHTML = htmlHead;
-      tbody.innerHTML = htmlBody;
-
-      // RESTORE DATA INPUTS
-      if (savedData) {
-          Object.keys(savedData).forEach(id => {
-              const el = document.getElementById(id);
-              if (el && el.type !== 'file') el.value = savedData[id];
-          });
-          document.querySelectorAll('#tbody_suhu_monitoring input[type="number"]').forEach(inp => {
-              inp.dispatchEvent(new Event('input'));
-          });
-      }
+        });
+      });
     }
+
+    let nextBatchNum = maxBatches + 1;
+    htmlBody += `
+      <tr class="hidden-print border-t border-slate-200">
+        <td colspan="8" class="p-5 text-center bg-slate-50/80">
+          <button type="button" onclick="addSuhuBatch()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
+            <span>➕</span> Tambah Form Input Untuk Batch ${nextBatchNum}
+          </button>
+        </td>
+      </tr>
+    `;
+  }
+
+  thead.innerHTML = htmlHead;
+  tbody.innerHTML = htmlBody;
+
+  // RESTORE DATA INPUTS
+  if (savedData) {
+    Object.keys(savedData).forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.type !== 'file' && id !== 'suhu_siklus_active') el.value = savedData[id];
+    });
+    document.querySelectorAll('#tbody_suhu_monitoring input[type="number"]').forEach(inp => {
+      inp.dispatchEvent(new Event('input'));
+    });
+  }
+}
 
     function saveGenericForm(formId, storageKey, alertMsg) {
        const form = document.getElementById(formId);
@@ -2206,10 +2325,28 @@
        allData[dateKey] = mergedData;
        window.dbCache[storageKey] = allData; 
        
-       if (typeof window.fbSet === 'function') {
+       if (formId === 'formSuhuDoc' || formId === 'formInspeksiSilang' || formId === 'formInspeksiAlergen') {
+           // [DIUBAH] Suhu, Silang, Alergen: tulis hanya tanggal ini ke Firebase (tidak menimpa tanggal lain)
+           if (typeof window.fbSet === 'function') window.fbSet(storageKey + '/' + dateKey, allData[dateKey]);
+       } else if (typeof window.fbSet === 'function') {
            window.fbSet(storageKey, allData);
        }
        alert(alertMsg + " (Tersimpan Real-Time di Server)");
+    }
+
+    // [BARU] Isi Shift & Auditor SESUAI tanggal yang dipilih (tanggal tanpa data = kosong)
+    function applySilangDateFields() {
+      const dateKey = document.getElementById('ks_tanggal')?.value;
+      const data = dateKey ? (window.dbCache['sppg_log_silang'] || {})[dateKey] : null;
+      const shift = document.getElementById('ks_shift');
+      if (shift) shift.value = (data && data.ks_shift !== undefined) ? data.ks_shift : 'Pagi';
+      const aud = document.getElementById('ks_auditor');
+      if (aud) aud.value = (data && data.ks_auditor !== undefined) ? data.ks_auditor : '';
+    }
+
+    function handleSilangDateChange() {
+      applySilangDateFields();
+      renderInspeksiSilangTable();
     }
 
     function renderInspeksiSilangTable() {
@@ -2264,10 +2401,45 @@
         siklusSelect.value = todayIdx;
       }
       const tglElem = document.getElementById('al_tanggal');
-      if (tglElem && !tglElem.value) {
-          tglElem.value = new Date().toISOString().split('T')[0];
-          tglElem.addEventListener('change', renderAlergenMenuAndTable);
+      if (tglElem) {
+          if (!tglElem.value) tglElem.value = new Date().toISOString().split('T')[0];
+          tglElem.removeEventListener('change', handleAlergenDateChange);
+          tglElem.addEventListener('change', handleAlergenDateChange);
       }
+      applyAlergenDateFields();
+      renderAlergenMenuAndTable();
+    }
+
+    // [BARU] Isi Supervisor & Siklus SESUAI tanggal yang dipilih (tanggal tanpa data = kosong / siklus sesuai tanggal)
+    function applyAlergenDateFields() {
+      const dateKey = document.getElementById('al_tanggal')?.value;
+      const data = dateKey ? (window.dbCache['sppg_log_alergen'] || {})[dateKey] : null;
+      const sup = document.getElementById('al_supervisor');
+      if (sup) sup.value = (data && data.al_supervisor !== undefined) ? data.al_supervisor : '';
+      const sel = document.getElementById('al_siklus_active');
+      if (sel) {
+        const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+        const idx = getSuhuCycleIndexForDate(weeks, dateKey);
+        if (sel.querySelector(`option[value="${idx}"]`)) sel.value = idx;
+      }
+    }
+
+    // [BARU] Saat dropdown siklus Alergen diubah, tanggal inspeksi ikut berubah
+    function onAlergenSiklusChange() {
+      const sel = document.getElementById('al_siklus_active');
+      const tgl = document.getElementById('al_tanggal');
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      const key = getSuhuDateKeyForIdx(weeks, parseInt(sel.value, 10));
+      if (key && tgl && tgl.value !== key) {
+        tgl.value = key;
+        handleAlergenDateChange();
+      } else {
+        renderAlergenMenuAndTable();
+      }
+    }
+
+    function handleAlergenDateChange() {
+      applyAlergenDateFields();
       renderAlergenMenuAndTable();
     }
 
@@ -2304,7 +2476,10 @@
       if (menuContainer) {
         let menuHtml = `<div class="font-bold text-xs text-amber-900 mb-2">🍱 Menu Hari Ini (Siklus Ke-${activeDayIdx + 1}):</div><div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">`;
         KELOMPOK_LIST_MENU.forEach(k => {
-          let item = (menuMatrix[k] && menuMatrix[k][activeDayIdx]) ? menuMatrix[k][activeDayIdx] : '-';
+          const wksAl = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
+          const wkArr = wksAl[Math.floor(activeDayIdx / 5)]?.items?.[k];
+          let item = Array.isArray(wkArr) ? (wkArr[activeDayIdx % 5] || '-') : ((menuMatrix[k] && menuMatrix[k][activeDayIdx]) ? menuMatrix[k][activeDayIdx] : '-');
+          item = String(item);
           let hasAlg = ALLERGEN_KEYWORDS.some(kw => item.toUpperCase().includes(kw));
           menuHtml += `
             <div class="bg-white p-2.5 rounded-xl border ${hasAlg ? 'border-amber-400 bg-amber-50/50' : 'border-slate-200'} shadow-sm">
@@ -2379,8 +2554,10 @@
       const tglElemKS = document.getElementById('ks_tanggal');
       if (tglElemKS) {
           if (!tglElemKS.value) tglElemKS.value = new Date().toISOString().split('T')[0];
-          tglElemKS.addEventListener('change', renderInspeksiSilangTable);
+          tglElemKS.removeEventListener('change', handleSilangDateChange);
+          tglElemKS.addEventListener('change', handleSilangDateChange);
       }
+      applySilangDateFields();
       renderInspeksiSilangTable();
       initAlergenModule();
       updateDashboardSummary();
