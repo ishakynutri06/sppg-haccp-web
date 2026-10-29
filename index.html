@@ -846,11 +846,11 @@
                         🗑️ Hapus
                     </button>
                 </div>
-                <input type="file" accept="image/*" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">
+                <input type="file" accept="image/*" capture="environment" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">
             </div>`;
         } else {
             return `
-            <input type="file" accept="image/*" id="${fotoId}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="w-full min-w-[140px] text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 cursor-pointer transition-colors">`;
+            <input type="file" accept="image/*" capture="environment" id="${fotoId}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="w-full min-w-[140px] text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 cursor-pointer transition-colors">`;
         }
     }
 
@@ -894,7 +894,7 @@
         let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px;" class="mx-auto shadow-sm">` : '';
         return `<div class="flex flex-col items-center gap-1">
                     <label for="${id}" class="text-[10px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-sm whitespace-nowrap">📸 Upload</label>
-                    <input type="file" accept="image/*" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
+                    <input type="file" accept="image/*" capture="environment" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
                     ${imgHtml}
                 </div>`;
     }
@@ -920,198 +920,346 @@
       }, 300);
     }
 
-    function getCleanTableHtml(wrapperId) {
-      const wrapper = document.getElementById(wrapperId);
-      if (!wrapper) return '<p>Data kosong</p>';
-      const clone = wrapper.cloneNode(true);
-      
-      const hiddens = clone.querySelectorAll('.hidden-print, button, label');
-      hiddens.forEach(h => h.remove());
+    // =====================================================================
+    // EXPORT EXCEL & WORD (GENERIK)
+    // Foto selalu diekspor dengan ukuran seragam:
+    //   PORTRAIT  = 2 cm (lebar) x 3 cm (tinggi)
+    //   LANDSCAPE = 3 cm (lebar) x 2 cm (tinggi)
+    // Foto di-crop tengah ke rasio 2:3 / 3:2 (tidak gepeng) lalu disisipkan.
+    // =====================================================================
+    const EXPORT_PX_SHORT = 720000 / 9525 + 0.0001;   // 2 cm dalam piksel 96 dpi (= 720000 EMU)
+    const EXPORT_PX_LONG  = 1080000 / 9525 + 0.0001;  // 3 cm dalam piksel 96 dpi (= 1080000 EMU)
 
-      const inputs = clone.querySelectorAll('input, select, textarea');
-      const originalInputs = wrapper.querySelectorAll('input, select, textarea');
-      
-      inputs.forEach((inp, index) => {
-          const origInp = originalInputs[index];
-          if (origInp && origInp.type === 'file') {
-              const photoData = window.suhuPhotosMap && window.suhuPhotosMap[origInp.id];
-              let b64 = origInp.getAttribute('data-base64') || (photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null);
-              
-              if (b64) {
-                  const existingImg = inp.parentNode.querySelector('img');
-                  if (existingImg) {
-                      existingImg.setAttribute('width', '80');
-                      existingImg.setAttribute('height', '110');
-                      existingImg.style.width = '80px';
-                      existingImg.style.height = '110px';
-                      existingImg.style.objectFit = 'cover';
-                      existingImg.style.display = 'block';
-                      existingImg.style.margin = '0 auto';
-                      inp.remove();
-                  } else {
-                      const img = document.createElement('img');
-                      img.src = b64;
-                      img.setAttribute('width', '80');
-                      img.setAttribute('height', '110');
-                      img.style.width = '80px';
-                      img.style.height = '110px';
-                      img.style.objectFit = 'cover';
-                      img.style.display = 'block';
-                      img.style.margin = '0 auto';
-                      inp.parentNode.replaceChild(img, inp);
-                  }
-              } else {
-                  inp.parentNode.replaceChild(document.createTextNode('-'), inp);
-              }
-          } else {
-              const val = document.createTextNode(origInp ? (origInp.value || '') : '');
-              inp.parentNode.replaceChild(val, inp);
-          }
+    function exportLoadImage(src) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
       });
-      return clone.innerHTML;
     }
 
-    function exportGenericWord(title, wrapperId) {
-      let tableHtml = getCleanTableHtml(wrapperId);
-      let dateText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      
-      let content = `
+    // Foto -> JPEG berukuran tepat 2:3 (portrait) atau 3:2 (landscape)
+    async function exportNormalizePhoto(b64, cache) {
+      if (!b64 || !String(b64).startsWith('data:image')) return null;
+      if (cache && cache.has(b64)) return cache.get(b64);
+      const img = await exportLoadImage(b64);
+      let result = null;
+      if (img && img.naturalWidth && img.naturalHeight) {
+        const sw = img.naturalWidth, sh = img.naturalHeight;
+        const landscape = sw > sh;
+        const cw = landscape ? 600 : 400, ch = landscape ? 400 : 600;
+        const canvas = document.createElement('canvas');
+        canvas.width = cw; canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, cw, ch);
+        const scale = Math.max(cw / sw, ch / sh);   // "cover": penuh, crop bagian tepi yang berlebih
+        const dw = sw * scale, dh = sh * scale;
+        ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+        result = { dataUrl: canvas.toDataURL('image/jpeg', 0.9), landscape: landscape };
+      }
+      if (cache) cache.set(b64, result);
+      return result;
+    }
+
+    // Ambil foto dari sebuah sel tabel. undefined = bukan sel foto, null = sel foto tapi belum ada foto
+    function exportGetPhotoB64(td) {
+      if (!td) return undefined;
+      const fileInput = td.querySelector('input[type="file"]');
+      const imgElem = td.querySelector('img');
+      if (!fileInput && !imgElem) return undefined;
+      let b64 = null;
+      if (fileInput) {
+        const pd = window.suhuPhotosMap && window.suhuPhotosMap[fileInput.id];
+        b64 = fileInput.getAttribute('data-base64') || (pd ? (typeof pd === 'string' ? pd : pd.base64) : null);
+      }
+      if (!b64 && imgElem && imgElem.src && imgElem.src.startsWith('data:image')) b64 = imgElem.src;
+      return b64 || null;
+    }
+
+    // Tanggal dokumen: pakai tanggal pemantauan di form (jika ada), jika tidak pakai hari ini
+    function exportGetDocDateText(wrapperId) {
+      const opts = { day: 'numeric', month: 'long', year: 'numeric' };
+      try {
+        const wrapper = document.getElementById(wrapperId);
+        const sec = wrapper ? wrapper.closest('section') : null;
+        const dEl = sec ? sec.querySelector('input[type="date"]') : null;
+        if (dEl && /^\d{4}-\d{2}-\d{2}$/.test(dEl.value)) {
+          const p = dEl.value.split('-');
+          return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', opts);
+        }
+      } catch (e) {}
+      return new Date().toLocaleDateString('id-ID', opts);
+    }
+
+    function exportDownloadBlob(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+
+    // Salin tabel untuk Word: input -> teks, input file -> <img> penanda (foto diisi kemudian)
+    function getCleanTableHtml(wrapperId) {
+      const wrapper = document.getElementById(wrapperId);
+      if (!wrapper) return { clone: null };
+      const clone = wrapper.cloneNode(true);
+
+      // pasangkan elemen salinan dengan aslinya SEBELUM ada yang dihapus (agar urutan tidak bergeser)
+      const cInputs = Array.from(clone.querySelectorAll('input, select, textarea'));
+      const oInputs = Array.from(wrapper.querySelectorAll('input, select, textarea'));
+      clone.querySelectorAll('.hidden-print, button, label').forEach(h => h.remove());
+
+      cInputs.forEach((inp, index) => {
+        if (!inp.parentNode || !clone.contains(inp)) return;   // ikut terhapus
+        const orig = oInputs[index];
+        if (orig && orig.type === 'file') {
+          const cell = inp.closest('td, th') || inp.parentNode;
+          const origCell = orig.closest('td, th') || orig.parentNode;
+          const b64 = exportGetPhotoB64(origCell);
+          cell.querySelectorAll('img').forEach(im => im.remove());
+          if (b64) {
+            const marker = document.createElement('img');
+            marker.setAttribute('data-export-b64', b64);
+            inp.parentNode.replaceChild(marker, inp);
+            cell.setAttribute('data-export-photo-cell', '1');
+          } else {
+            inp.parentNode.replaceChild(document.createTextNode('-'), inp);
+          }
+        } else {
+          inp.parentNode.replaceChild(document.createTextNode(orig ? (orig.value || '') : ''), inp);
+        }
+      });
+      return { clone: clone };
+    }
+
+    // Susun file MHTML (.doc) -- foto disimpan sebagai bagian terpisah agar tampil di Microsoft Word
+    function exportBuildMhtml(html, files, docName) {
+      const boundary = '----=_NextPart_SPPG_' + Date.now().toString(16);
+      const base = 'file:///C:/SPPG_Export/';
+      const toB64Utf8 = s => {
+        const bytes = new TextEncoder().encode(s);
+        let bin = '';
+        for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+        return btoa(bin);
+      };
+      const wrap = s => s.replace(/.{1,76}/g, '$&\r\n');
+      let out = 'MIME-Version: 1.0\r\nContent-Type: multipart/related; type="text/html"; boundary="' + boundary + '"\r\n\r\n';
+      out += '--' + boundary + '\r\nContent-Type: text/html; charset="utf-8"\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ' + base + docName + '.htm\r\n\r\n' + wrap(toB64Utf8(html)) + '\r\n';
+      files.forEach(f => {
+        out += '--' + boundary + '\r\nContent-Type: image/jpeg\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ' + base + docName + '_files/' + f.name + '\r\n\r\n' + wrap(f.dataUrl.split(',')[1]) + '\r\n';
+      });
+      out += '--' + boundary + '--\r\n';
+      return out;
+    }
+
+    async function exportGenericWord(title, wrapperId) {
+      try {
+        const built = getCleanTableHtml(wrapperId);
+        if (!built.clone) return alert('Data tidak ditemukan');
+        const clone = built.clone;
+        const dateText = exportGetDocDateText(wrapperId);
+        const docName = 'dokumen';
+        const cache = new Map();
+        const files = [];
+
+        // Sisipkan foto: ukuran tepat 2x3 cm (portrait) atau 3x2 cm (landscape)
+        const markers = Array.from(clone.querySelectorAll('img[data-export-b64]'));
+        for (let i = 0; i < markers.length; i++) {
+          const m = markers[i];
+          const norm = await exportNormalizePhoto(m.getAttribute('data-export-b64'), cache);
+          const cell = m.closest('td, th');
+          if (!norm) { m.parentNode.replaceChild(document.createTextNode('-'), m); continue; }
+          const name = 'foto_' + (files.length + 1) + '.jpg';
+          files.push({ name: name, dataUrl: norm.dataUrl });
+          const wCm = norm.landscape ? 3 : 2, hCm = norm.landscape ? 2 : 3;
+          const wPx = Math.round(wCm * 37.795), hPx = Math.round(hCm * 37.795);
+          m.removeAttribute('data-export-b64');
+          m.setAttribute('src', docName + '_files/' + name);
+          m.setAttribute('width', wPx);
+          m.setAttribute('height', hPx);
+          m.setAttribute('style', 'width:' + wCm + 'cm;height:' + hCm + 'cm;display:block;margin:0 auto;');
+          if (cell) cell.setAttribute('style', 'text-align:center;vertical-align:middle;width:3.4cm;padding:3px;');
+        }
+
+        const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>${title}</title>
+        <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
-          body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; margin: 20px; }
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm; }
+          div.Section1 { page: Section1; }
+          body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
           table { width: 100%; border-collapse: collapse; margin-top: 10px; }
           th, td { border: 1px solid black; padding: 6px; font-size: 10pt; text-align: left; vertical-align: middle; }
           th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
           .header { text-align: center; font-weight: bold; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px; }
-          img { max-width: 100px; height: auto; display: block; margin: 0 auto; }
         </style>
         </head>
         <body>
+          <div class="Section1">
           <div class="header">
             <h2 style="margin:0;">NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</h2>
             <h3 style="margin:5px 0;">TANGGAL: ${dateText}</h3>
             <h3 style="margin:5px 0;">${title}</h3>
           </div>
-          ${tableHtml}
+          ${clone.innerHTML}
+          </div>
         </body></html>
       `;
-      const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `${title.replace(/\s+/g, '_')}.doc`;
-      a.click();
+        const mhtml = exportBuildMhtml(html, files, docName);
+        const blob = new Blob([mhtml], { type: 'application/msword' });
+        exportDownloadBlob(blob, `${title.replace(/\s+/g, '_')}.doc`);
+      } catch (e) {
+        console.error('Export Word gagal', e);
+        alert('Export Word gagal: ' + (e && e.message ? e.message : e));
+      }
     }
 
-    function exportGenericExcel(title, wrapperId) {
-      const wrapper = document.getElementById(wrapperId);
-      if(!wrapper) return alert('Data tidak ditemukan');
-      const tables = wrapper.querySelectorAll('table');
-      if(tables.length === 0) return alert('Tabel tidak ditemukan');
-      
-      const wb = new ExcelJS.Workbook();
-      let dateText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      
-      tables.forEach((table, tIdx) => {
-          const ws = wb.addWorksheet(`Bagian ${tIdx + 1}`);
+    async function exportGenericExcel(title, wrapperId) {
+      try {
+        const wrapper = document.getElementById(wrapperId);
+        if (!wrapper) return alert('Data tidak ditemukan');
+        const tables = wrapper.querySelectorAll('table');
+        if (tables.length === 0) return alert('Tabel tidak ditemukan');
+
+        const wb = new ExcelJS.Workbook();
+        const dateText = exportGetDocDateText(wrapperId);
+        const cache = new Map();
+        const imageIdCache = new Map();
+        const HDR_ROWS = 4;                 // 3 baris judul + 1 baris kosong
+        const PHOTO_COL_WIDTH = 18;         // ~131 px, cukup untuk foto 3 cm (113 px)
+        const PORTRAIT_ROW_PT = 96;         // foto 3 cm (85 pt) + ruang
+        const LANDSCAPE_ROW_PT = 67;        // foto 2 cm (57 pt) + ruang
+
+        let tIdx = 0;
+        for (const table of tables) {
+          tIdx++;
+          const ws = wb.addWorksheet(`Bagian ${tIdx}`);
           ws.views = [{ showGridLines: true }];
-          
+          ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
+
           ws.addRow(['NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI']);
           ws.addRow(['TANGGAL: ' + dateText]);
           ws.addRow([title]);
           ws.addRow([]);
-          
-          const rows = table.querySelectorAll('tr');
-          rows.forEach((tr, rIdx) => {
-            const excelRowData = [];
-            const imageTasks = [];
-            const originalTds = wrapper.querySelectorAll('table')[tIdx].querySelectorAll('tr')[rIdx].querySelectorAll('th, td');
-            let colIndex = 1;
 
-            tr.querySelectorAll('th, td').forEach((td, cIdx) => {
-                if (td.classList.contains('hidden-print')) return; 
-                const origTd = originalTds[cIdx];
-                const fileInput = origTd ? origTd.querySelector('input[type="file"]') : null;
-                const otherInput = origTd ? origTd.querySelector('input:not([type="file"]), select, textarea') : null;
-                const imgElem = origTd ? origTd.querySelector('img') : null;
-                let cellValue = '';
-
-                if (fileInput || imgElem) {
-                    let fotoId = fileInput ? fileInput.id : null;
-                    let photoData = fotoId ? (window.suhuPhotosMap && window.suhuPhotosMap[fotoId]) : null;
-                    let b64 = fileInput ? fileInput.getAttribute('data-base64') : null;
-                    if (!b64 && photoData) {
-                        b64 = typeof photoData === 'string' ? photoData : photoData.base64;
-                    }
-                    if (!b64 && imgElem && imgElem.src && imgElem.src.startsWith('data:image')) {
-                        b64 = imgElem.src;
-                    }
-                    
-                    if (b64) {
-                        let w = 76, h = 114;
-                        if (photoData && photoData.expW) { w = photoData.expW; h = photoData.expH; }
-                        imageTasks.push({ col: colIndex, base64: b64, expW: w, expH: h });
-                    }
-                    cellValue = ''; 
-                } else if (otherInput) {
-                    cellValue = otherInput.value;
-                } else {
-                    cellValue = td.innerText.trim();
-                }
-                excelRowData.push(cellValue);
-                colIndex++;
-            });
-
-            if (excelRowData.length > 0) {
-              const addedRow = ws.addRow(excelRowData);
-              addedRow.eachCell(c => {
-                  c.font = { name: 'Calibri' };
-                  c.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                  c.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-              });
-              
-              if (imageTasks.length > 0) {
-                  addedRow.height = 85; 
+          // 1) Baca isi tabel -> model sel (mendukung colspan / rowspan)
+          const cells = [];
+          const occupied = new Set();
+          let r = 0;
+          table.querySelectorAll('tr').forEach(tr => {
+            if (tr.classList.contains('hidden-print')) return;
+            const tds = Array.from(tr.children).filter(x => (x.tagName === 'TD' || x.tagName === 'TH') && !x.classList.contains('hidden-print'));
+            if (tds.length === 0) return;
+            r++;
+            let c = 1;
+            tds.forEach(td => {
+              while (occupied.has(r + ',' + c)) c++;
+              const cs = Math.max(1, td.colSpan || 1), rs = Math.max(1, td.rowSpan || 1);
+              const photoB64 = exportGetPhotoB64(td);
+              let value = '';
+              if (photoB64 === undefined) {
+                const other = td.querySelector('input:not([type="file"]), select, textarea');
+                value = other ? other.value : td.innerText.trim();
               }
+              cells.push({ r: r, c: c, rs: rs, cs: cs, value: value, header: td.tagName === 'TH', b64: photoB64 || null, norm: null });
+              for (let i = 0; i < rs; i++) for (let j = 0; j < cs; j++) if (i || j) occupied.add((r + i) + ',' + (c + j));
+              c += cs;
+            });
+          });
 
-              imageTasks.forEach(task => {
-                  try {
-                      let base64String = task.base64;
-                      let ext = 'jpg';
-                      if (base64String.includes(',')) {
-                          let parts = base64String.split(',');
-                          base64String = parts[1];
-                          let mime = parts[0];
-                          if (mime.includes('png')) ext = 'png';
-                          else ext = 'jpg';
-                      }
-                      
-                      const imageId = wb.addImage({
-                          base64: base64String,
-                          extension: ext,
-                      });
-                      
-                      ws.addImage(imageId, {
-                          tl: { col: task.col - 1 + 0.1, row: addedRow.number - 1 + 0.1 },
-                          ext: { width: task.expW || 76, height: task.expH || 114 }
-                      });
-                  } catch(e) { console.error("Gagal menyisipkan foto ke Excel", e); }
+          // 2) Siapkan foto (crop 2:3 / 3:2)
+          for (const x of cells) {
+            if (x.b64) x.norm = await exportNormalizePhoto(x.b64, cache);
+          }
+
+          // 3) Lebar kolom & tinggi baris
+          const maxCol = cells.reduce((m, x) => Math.max(m, x.c + x.cs - 1), 1);
+          const photoCols = new Set(cells.filter(x => x.norm).map(x => x.c));
+          const colWidth = {};
+          for (let c = 1; c <= maxCol; c++) {
+            if (photoCols.has(c)) { colWidth[c] = PHOTO_COL_WIDTH; }
+            else {
+              let len = 8;
+              cells.forEach(x => {
+                if (x.c === c && x.cs === 1) String(x.value).split('\n').forEach(s => { len = Math.max(len, s.length); });
               });
+              colWidth[c] = Math.min(Math.max(len + 2, 10), 40);
+            }
+            ws.getColumn(c).width = colWidth[c];
+          }
+          // Tinggi SEMUA baris dibuat eksplisit (perkiraan baris teks yang terlipat), agar posisi foto
+          // tidak bergeser ketika Excel/LibreOffice menghitung ulang tinggi baris otomatis.
+          const rowPt = {};
+          cells.forEach(x => {
+            let w = 0;
+            for (let j = 0; j < x.cs; j++) w += colWidth[x.c + j] || 10;
+            const per = Math.max(1, (w - 1) / (x.header ? 1.15 : 1));
+            let lines = 1;
+            if (!x.norm) lines = String(x.value).split('\n').reduce((s, l) => s + Math.max(1, Math.ceil(l.length / per)), 0);
+            const need = x.norm ? (x.norm.landscape ? LANDSCAPE_ROW_PT : PORTRAIT_ROW_PT) : Math.max(20, lines * 15 + 5) / x.rs;
+            rowPt[x.r] = Math.max(rowPt[x.r] || 20, need);
+          });
+          Object.keys(rowPt).forEach(k => { ws.getRow(HDR_ROWS + Number(k)).height = rowPt[k]; });
+
+          // 4) Tulis sel, gabung sel, gaya
+          cells.forEach(x => {
+            const top = HDR_ROWS + x.r;
+            ws.getCell(top, x.c).value = x.value;
+            if (x.cs > 1 || x.rs > 1) ws.mergeCells(top, x.c, top + x.rs - 1, x.c + x.cs - 1);
+            for (let i = 0; i < x.rs; i++) for (let j = 0; j < x.cs; j++) {
+              const cell = ws.getCell(top + i, x.c + j);
+              cell.font = { name: 'Calibri', bold: x.header };
+              cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+              cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+              if (x.header) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
             }
           });
+
+          // 5) Sisipkan foto: tepat 2x3 cm / 3x2 cm, di tengah sel
+          cells.forEach(x => {
+            if (!x.norm) return;
+            try {
+              let imageId = imageIdCache.get(x.norm.dataUrl);
+              if (imageId === undefined) {
+                imageId = wb.addImage({ base64: x.norm.dataUrl.split(',')[1], extension: 'jpeg' });
+                imageIdCache.set(x.norm.dataUrl, imageId);
+              }
+              const wPx = x.norm.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT;
+              const hPx = x.norm.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG;
+              const colPx = colWidth[x.c] * 7 + 5;
+              const rowPx = (rowPt[x.r] || 20) * 96 / 72;
+              ws.addImage(imageId, {
+                tl: {
+                  nativeCol: x.c - 1,
+                  nativeColOff: Math.round(Math.max(0, (colPx - wPx) / 2) * 9525),
+                  nativeRow: HDR_ROWS + x.r - 1,
+                  nativeRowOff: Math.round(Math.max(0, (rowPx - hPx) / 2) * 9525)
+                },
+                ext: { width: wPx, height: hPx },
+                editAs: 'oneCell'
+              });
+            } catch (e) { console.error('Gagal menyisipkan foto ke Excel', e); }
+          });
+
           ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
           ws.getCell('A2').font = { name: 'Calibri', bold: true, size: 11 };
           ws.getCell('A3').font = { name: 'Calibri', bold: true, size: 11 };
-      });
-      
-      wb.xlsx.writeBuffer().then(buffer => {
+        }
+
+        const buffer = await wb.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${title.replace(/\s+/g, '_')}.xlsx`;
-        a.click();
-      });
+        exportDownloadBlob(blob, `${title.replace(/\s+/g, '_')}.xlsx`);
+      } catch (e) {
+        console.error('Export Excel gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      }
     }
 
     function exportFrekuensiExcel() {
