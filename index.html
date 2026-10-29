@@ -995,6 +995,7 @@
     }
 
     function exportDownloadBlob(blob, fileName) {
+      if (window.exportFileNameOverride) fileName = window.exportFileNameOverride;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -1122,7 +1123,7 @@
       }
     }
 
-    async function exportGenericExcel(title, wrapperId) {
+    async function exportGenericExcelLegacy(title, wrapperId) {
       try {
         const wrapper = document.getElementById(wrapperId);
         if (!wrapper) return alert('Data tidak ditemukan');
@@ -1263,82 +1264,496 @@
       }
     }
 
-    function exportFrekuensiExcel() {
-      const freqMap = window.dbCache['sppg_frequency_map'] || {};
-      const freqDetails = window.dbCache['sppg_frequency_details'] || {};
-      const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    // =====================================================================
+    // LAPORAN EXPORT EXCEL BAKU
+    // Kop surat (logo + nama SPPG + FORMULIR + judul), kode dokumen, revisi, tanggal,
+    // lalu tabel sesuai template. Logo diambil dari logo yang tampil di Dashboard.
+    // Dipakai oleh: FM-SGR-SPPG-01.03, 01.04, 06.01, 21.01, 22.01
+    // (Pemantauan Suhu 03.05 sementara tetap memakai export lama - menunggu rincian format)
+    // =====================================================================
+    const RPT_SPPG_NAME = 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI';
+    const RPT_GREY = 'FFCCCCCC';
+
+    function rptLogoSrc() {
+      const el = document.querySelector('img[alt^="Logo Berkah"]');
+      return (el && el.src && el.src.indexOf('data:image') === 0) ? el.src : null;
+    }
+    function rptLongDate(key) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(key || '')) return '';
+      const p = key.split('-');
+      return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    function rptToday() {
+      return new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    function rptTitleCase(s) {
+      return String(s || '').toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase());
+    }
+    function rptMerge(ws, r1, c1, r2, c2) { if (r1 !== r2 || c1 !== c2) ws.mergeCells(r1, c1, r2, c2); }
+    function rptBorder(ws, r1, c1, r2, c2, mode) {
+      const t = { style: 'thin' };
+      for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) {
+        const cell = ws.getCell(r, c);
+        const b = Object.assign({}, cell.border || {});
+        if (mode === 'grid' || c === c1) b.left = t;
+        if (mode === 'grid' || c === c2) b.right = t;
+        if (mode === 'grid' || r === r1) b.top = t;
+        if (mode === 'grid' || r === r2) b.bottom = t;
+        cell.border = b;
+      }
+    }
+    function rptFill(ws, r1, c1, r2, c2, argb) {
+      for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++)
+        ws.getCell(r, c).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: argb } };
+    }
+    function rptPut(ws, r, c, value, o) {
+      o = o || {};
+      const cell = ws.getCell(r, c);
+      cell.value = value;
+      cell.font = { name: o.font || 'Calibri', size: o.size || 11, bold: !!o.bold, italic: !!o.italic };
+      cell.alignment = { horizontal: o.h || 'left', vertical: o.v || 'middle', wrapText: o.wrap !== false };
+      if (o.numFmt) cell.numFmt = o.numFmt;
+      return cell;
+    }
+    function rptLines(text, widthChars, fontPt) {
+      const per = Math.max(1, Math.floor(widthChars * (11 / fontPt) * 0.95));
+      return String(text == null ? '' : text).split('\n').reduce((s, l) => s + Math.max(1, Math.ceil(l.length / per)), 0);
+    }
+    function rptColPx(ws, c) { return Math.round((ws.getColumn(c).width || 8.43) * 7); }
+    function rptRowPx(ws, r) { return (ws.getRow(r).height || 15) * 96 / 72; }
+
+    // Logo (dari Dashboard) di tengah sel logo pada kop
+    function rptLogo(wb, ws, r1, c1, r2, c2) {
+      const src = rptLogoSrc();
+      if (!src) return;
+      let wPx = 0, hPx = 0;
+      for (let c = c1; c <= c2; c++) wPx += rptColPx(ws, c);
+      for (let r = r1; r <= r2; r++) hPx += rptRowPx(ws, r);
+      const nat = 269 / 122;
+      let w = wPx - 8, h = w / nat;
+      if (h > hPx - 8) { h = hPx - 8; w = h * nat; }
+      const id = wb.addImage({ base64: src.split(',')[1], extension: 'png' });
+      let col = c1, remX = (wPx - w) / 2;
+      while (col < c2 && remX >= rptColPx(ws, col)) { remX -= rptColPx(ws, col); col++; }
+      let row = r1, remY = (hPx - h) / 2;
+      while (row < r2 && remY >= rptRowPx(ws, row)) { remY -= rptRowPx(ws, row); row++; }
+      ws.addImage(id, {
+        tl: { nativeCol: col - 1, nativeColOff: Math.round(remX * 9525), nativeRow: row - 1, nativeRowOff: Math.round(remY * 9525) },
+        ext: { width: w, height: h }, editAs: 'oneCell'
+      });
+    }
+
+    // Kop surat baku: logo | nama SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal
+    function rptKop(wb, ws, o) {
+      const r = o.r;
+      for (let i = 0; i < 3; i++) ws.getRow(r + i).height = o.rowH;
+      rptMerge(ws, r, o.logo[0], r + 2, o.logo[1]);
+      rptBorder(ws, r, o.logo[0], r + 2, o.logo[1], 'box');
+      [RPT_SPPG_NAME, 'FORMULIR', o.judul].forEach((t, i) => {
+        rptMerge(ws, r + i, o.title[0], r + i, o.title[1]);
+        rptPut(ws, r + i, o.title[0], t, { size: 16, bold: true, h: 'center' });
+      });
+      rptBorder(ws, r, o.title[0], r + 2, o.title[1], 'box');
+      const pre = o.colon ? ': ' : '';
+      [['No. dokumen', o.noDoc], ['No. revisi', '00'], ['Tanggal', o.tgl]].forEach((p, i) => {
+        rptPut(ws, r + i, o.lab, p[0], {});
+        rptPut(ws, r + i, o.val, pre + p[1], {});
+        rptBorder(ws, r + i, o.lab, r + i, o.val, 'grid');
+      });
+      rptLogo(wb, ws, r, o.logo[0], r + 2, o.logo[1]);
+    }
+
+    function rptPage(ws, landscape, printArea) {
+      ws.pageSetup = {
+        orientation: landscape ? 'landscape' : 'portrait', paperSize: 9,
+        fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true,
+        margins: { left: 0.4, right: 0.4, top: 0.5, bottom: 0.5, header: 0.3, footer: 0.3 }
+      };
+      if (printArea) ws.pageSetup.printArea = printArea;
+    }
+
+    async function rptDownload(wb, fileName) {
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      exportDownloadBlob(blob, fileName);
+    }
+
+    // ---------- FM-SGR-SPPG-01.03  FORMULIR JENIS DAN FREKUENSI BAHAN BAKU ----------
+    async function exportFrekuensiExcel() {
+      try {
+        const freqMap = window.dbCache['sppg_frequency_map'] || {};
+        const freqDetails = window.dbCache['sppg_frequency_details'] || {};
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('FM-SGR-SPPG-01.03');
+        [4.33, 6.33, 16, 4, 22.83, 27.5, 22.16, 15.16, 21.16, 8.66].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+
+        rptKop(wb, ws, { r: 1, rowH: 25, logo: [2, 4], title: [5, 7], lab: 8, val: 9,
+          judul: 'JENIS DAN FREKUENSI BAHAN BAKU', noDoc: 'FM-SGR-SPPG-01.03', tgl: rptToday(), colon: false });
+        ws.getRow(4).height = 14.25;
+
+        const order = ['MAKANAN POKOK', 'LAUK HEWANI', 'LAUK NABATI', 'SAYUR', 'BUAH', 'SUSU'];
+        const groups = {};
+        Object.keys(freqMap).forEach(bahan => {
+          const g = String(freqDetails[bahan] || 'BAHAN BAKU').toUpperCase();
+          (groups[g] = groups[g] || []).push([bahan, freqMap[bahan]]);
+        });
+        let keys = order.filter(k => groups[k]).concat(Object.keys(groups).filter(k => order.indexOf(k) === -1));
+        if (!keys.length) {
+          keys = ['MAKANAN POKOK', 'LAUK HEWANI', 'LAUK NABATI', 'SAYUR', 'BUAH'];
+          keys.forEach(k => { groups[k] = [['', ''], ['', ''], ['', ''], ['', ''], ['', '']]; });
+        }
+
+        // header tabel
+        ws.getRow(5).height = 29;
+        [[2, 4, 'Kelompok Bahan Pangan'], [5, 7, 'Nama Bahan Baku'], [8, 9, 'Frekuensi']].forEach(h => {
+          rptMerge(ws, 5, h[0], 5, h[1]);
+          rptPut(ws, 5, h[0], h[2], { size: 13, bold: true, h: 'center' });
+          rptFill(ws, 5, h[0], 5, h[1], RPT_GREY);
+        });
+        rptBorder(ws, 5, 2, 5, 9, 'grid');
+
+        let row = 6;
+        keys.forEach(k => {
+          const items = groups[k];
+          const start = row;
+          items.forEach(it => {
+            ws.getRow(row).height = 29;
+            rptMerge(ws, row, 5, row, 7);
+            rptMerge(ws, row, 8, row, 9);
+            rptPut(ws, row, 5, it[0], { size: 12, h: 'center' });
+            rptPut(ws, row, 8, it[1] === '' ? '' : (it[1] + ' Kali'), { size: 12, h: 'center' });
+            rptBorder(ws, row, 5, row, 9, 'grid');
+            row++;
+          });
+          rptMerge(ws, start, 2, row - 1, 4);
+          rptPut(ws, start, 2, rptTitleCase(k), { size: 15, h: 'center' });
+          rptBorder(ws, start, 2, row - 1, 4, 'box');
+        });
+        rptPage(ws, false, 'B1:I' + (row - 1));
+        await rptDownload(wb, 'LAPORAN_EXPORT_FORMULIR_FREKUENSI_BAHAN_FM-SGR-SPPG-01.03.xlsx');
+      } catch (e) {
+        console.error('Export Excel Frekuensi gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    // ---------- FM-SGR-SPPG-01.04  SIKLUS MENU 20 HARI ----------
+    async function rptExportSiklus(wrapperId) {
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet('FM-SGR-SPPG-01.04');
+      ws.getColumn(1).width = 2.5; ws.getColumn(2).width = 11.5; ws.getColumn(3).width = 17.5;
+      for (let c = 4; c <= 13; c++) ws.getColumn(c).width = 20.2;
+      ws.getColumn(14).width = 8.66;
+      ws.getRow(1).height = 3.75;
+      rptKop(wb, ws, { r: 2, rowH: 27, logo: [2, 3], title: [4, 11], lab: 12, val: 13,
+        judul: 'SIKLUS MENU 20 HARI', noDoc: 'FM-SGR-SPPG-01.04', tgl: exportGetDocDateText(wrapperId), colon: false });
+      ws.getRow(5).height = 17.25;
+
+      const weeks = getSuhuWeeks();
+      const readCell = (k, m) => {
+        const el = document.getElementById(`sm_cell_${k}_${m}`);
+        if (el) return String(el.value || '').trim();
+        const w = weeks[Math.floor(m / 5)];
+        const arr = w && w.items ? w.items[k] : null;
+        const v = arr ? (Array.isArray(arr) ? arr[m % 5] : arr[String(m % 5)]) : '';
+        return (v === undefined || v === null) ? '' : String(v).trim();
+      };
+      const groups = [['KARBO', 'Makanan Pokok'], ['PH', 'Lauk Hewani'], ['PN', 'Lauk Nabati'], ['SAYUR', 'Sayur'], ['BUAH', 'Buah']];
+      let hasSusu = false;
+      for (let m = 0; m < 20; m++) if (readCell('SUSU', m) !== '') hasSusu = true;
+      if (hasSusu) groups.push(['SUSU', 'Susu']);
+
+      let row = 6;
+      for (let b = 0; b < 2; b++) {
+        ws.getRow(row).height = 43;
+        rptMerge(ws, row, 2, row, 3);
+        rptPut(ws, row, 2, 'Kelompok Bahan Makanan', { size: 14 });
+        for (let i = 0; i < 10; i++) rptPut(ws, row, 4 + i, 'Menu ' + (b * 10 + i + 1), { size: 14, h: 'center' });
+        rptFill(ws, row, 2, row, 13, RPT_GREY);
+        rptBorder(ws, row, 2, row, 13, 'grid');
+        row++;
+        groups.forEach(g => {
+          let maxLines = 1;
+          const vals = [];
+          for (let i = 0; i < 10; i++) {
+            const v = readCell(g[0], b * 10 + i).toUpperCase();
+            vals.push(v);
+            maxLines = Math.max(maxLines, rptLines(v, 20.2, 14));
+          }
+          ws.getRow(row).height = Math.max(43, maxLines * 19 + 5);
+          rptMerge(ws, row, 2, row, 3);
+          rptPut(ws, row, 2, g[1], { size: 14 });
+          vals.forEach((v, i) => rptPut(ws, row, 4 + i, v, { size: 14, h: 'center' }));
+          rptBorder(ws, row, 2, row, 13, 'grid');
+          row++;
+        });
+        ws.getRow(row).height = 20;
+        row++;
+      }
+      rptPage(ws, true, 'B1:M' + (row - 2));
+      await rptDownload(wb, 'LAPORAN_EXPORT_Siklus_Menu_20_Hari_FM-SGR-SPPG-01.04.xlsx');
+    }
+
+    // ---------- FM-SGR-SPPG-06.01  CHECKLIST PEMORSIAN DAN BERAT PORSI MBG ----------
+    async function rptExportPemorsian(wrapperId) {
+      const sel = document.getElementById('selectSiklusPemorsian');
+      const optText = (sel && sel.selectedOptions && sel.selectedOptions[0]) ? sel.selectedOptions[0].text : '';
+      const mt = optText.match(/^(.*?)\s*\((.*)\)\s*$/);
+      const siklusTxt = mt ? mt[1] : optText;
+      const dateTxt = mt ? mt[2] : '';
+      const dKey = parseSiklusDateToKey(dateTxt);
+      const tgl = dKey ? rptLongDate(dKey) : rptToday();
 
       const wb = new ExcelJS.Workbook();
-      const ws = wb.addWorksheet('FM-SGR-SPPG-01.03 Frekuensi');
-      ws.views = [{ showGridLines: true }];
+      const ws = wb.addWorksheet('FM-SGR-SPPG-06.01');
+      [3.8, 6.5, 9.2, 9.3, 15.8, 15.8, 15.8, 15.8, 15.8, 12.7, 20.2, 8.66].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+      ws.getRow(1).height = 21;
+      rptKop(wb, ws, { r: 2, rowH: 19.5, logo: [2, 4], title: [5, 9], lab: 10, val: 11,
+        judul: 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', noDoc: 'FM-SGR-SPPG-06.01', tgl: tgl, colon: false });
 
-      ws.mergeCells('A1:I1');
-      ws.getCell('A1').value = 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI';
-      ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 12 };
-      ws.getCell('A1').alignment = { horizontal: 'center' };
+      ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
+      rptMerge(ws, 5, 2, 5, 4); rptPut(ws, 5, 2, 'Hari/Tanggal ', { bold: true });
+      rptMerge(ws, 5, 5, 5, 11); rptPut(ws, 5, 5, ': ' + (dateTxt || '….....................'), { bold: true });
+      rptMerge(ws, 6, 2, 6, 4); rptPut(ws, 6, 2, 'Siklus Menu Hari ini ', { bold: true });
+      rptMerge(ws, 6, 5, 6, 11); rptPut(ws, 6, 5, ': ' + (siklusTxt || '….....................'), { bold: true });
 
-      ws.mergeCells('A2:I2');
-      ws.getCell('A2').value = 'FORMULIR JENIS DAN FREKUENSI BAHAN BAKU';
-      ws.getCell('A2').font = { name: 'Calibri', bold: true, size: 11 };
-      ws.getCell('A2').alignment = { horizontal: 'center' };
+      // header tabel
+      ws.getRow(7).height = 50.25;
+      rptPut(ws, 7, 2, 'No', { bold: true, h: 'center' });
+      rptMerge(ws, 7, 3, 7, 4); rptPut(ws, 7, 3, 'Komponen Menu', { bold: true, h: 'center' });
+      rptPut(ws, 7, 5, 'Standar \nGramasi (gr)', { bold: true, h: 'center' });
+      rptPut(ws, 7, 6, 'Sampel 1 (gr)', { bold: true, h: 'center' });
+      rptPut(ws, 7, 7, 'Sampel 2 (gr)', { bold: true, h: 'center' });
+      rptPut(ws, 7, 8, 'Sampel 3 (gr)', { bold: true, h: 'center' });
+      rptPut(ws, 7, 9, 'Rata-Rata (gr)', { bold: true, h: 'center' });
+      rptMerge(ws, 7, 10, 7, 11); rptPut(ws, 7, 10, 'Keterangan/Kesesuaian', { bold: true, h: 'center' });
+      rptFill(ws, 7, 2, 7, 11, RPT_GREY);
+      rptBorder(ws, 7, 2, 7, 11, 'grid');
 
-      ws.addRow([]);
-
-      ws.getCell('H1').value = 'No. dokumen'; ws.getCell('I1').value = ': FM-SGR-SPPG-01.03';
-      ws.getCell('H2').value = 'No. revisi'; ws.getCell('I2').value = ': 00';
-      ws.getCell('H3').value = 'Tanggal'; ws.getCell('I3').value = ': ' + currentDate;
-
-      ws.addRow([]);
-
-      ws.mergeCells('B5:D5');
-      ws.mergeCells('E5:G5');
-      ws.mergeCells('H5:I5');
-      
-      ws.getCell('B5').value = 'Kelompok Bahan Pangan';
-      ws.getCell('E5').value = 'Nama Bahan Baku';
-      ws.getCell('H5').value = 'Frekuensi';
-
-      [ws.getCell('B5'), ws.getCell('E5'), ws.getCell('H5')].forEach(cell => {
-        cell.font = { name: 'Calibri', bold: true };
-        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      // isi tabel dari form
+      const num = v => { const n = parseFloat(v); return isNaN(n) ? '' : n; };
+      const data = [];
+      document.querySelectorAll('#tbody_pemorsian_b1 tr').forEach(tr => {
+        const td1 = tr.children[1];
+        if (!td1) return;
+        const lab = (td1.childNodes[0] ? td1.childNodes[0].textContent : '').replace(':', '').trim();
+        const menuSpan = td1.querySelector('span');
+        const menu = menuSpan ? menuSpan.textContent.trim() : '';
+        const std = tr.querySelector('.std-val');
+        const smp = tr.querySelectorAll('.sample-val');
+        const files = tr.querySelectorAll('input[type="file"]');
+        const avgTxt = (tr.querySelector('.avg-cell') || {}).textContent || '';
+        const stTxt = ((tr.querySelector('.status-cell') || {}).textContent || '').trim();
+        data.push({
+          label: lab + (menu ? '\n' + menu : ''),
+          std: num(std ? std.value : ''),
+          s: [0, 1, 2].map(i => num(smp[i] ? smp[i].value : '')),
+          avg: (avgTxt && parseFloat(avgTxt) > 0) ? parseFloat(avgTxt) : '',
+          ket: stTxt === '-' ? '' : stTxt,
+          foto: [0, 1, 2].map(i => (files[i] && files[i].getAttribute('data-base64')) || '')
+        });
       });
 
-      let rowIdx = 6;
-      let idx = 1;
-      for (const [bahan, count] of Object.entries(freqMap)) {
-        let kelompokLabel = freqDetails[bahan] || "BAHAN BAKU";
-        
-        ws.mergeCells(`B${rowIdx}:D${rowIdx}`);
-        ws.mergeCells(`E${rowIdx}:G${rowIdx}`);
-        ws.mergeCells(`H${rowIdx}:I${rowIdx}`);
+      let row = 8;
+      data.forEach((d, i) => {
+        ws.getRow(row).height = Math.max(24.75, rptLines(d.label, 18.5, 11) * 15 + 6);
+        rptPut(ws, row, 2, i + 1, { h: 'center' });
+        rptMerge(ws, row, 3, row, 4); rptPut(ws, row, 3, d.label, { h: 'center' });
+        rptPut(ws, row, 5, d.std, { h: 'center' });
+        d.s.forEach((v, k) => rptPut(ws, row, 6 + k, v, { h: 'center' }));
+        rptPut(ws, row, 9, d.avg, { h: 'center', numFmt: '0.00' });
+        rptMerge(ws, row, 10, row, 11); rptPut(ws, row, 10, d.ket, { h: 'center' });
+        rptBorder(ws, row, 2, row, 11, 'grid');
+        row++;
+      });
 
-        ws.getCell(`A${rowIdx}`).value = idx++;
-        ws.getCell(`B${rowIdx}`).value = kelompokLabel;
-        ws.getCell(`E${rowIdx}`).value = bahan;
-        ws.getCell(`H${rowIdx}`).value = `${count} Kali`;
+      // tanda tangan
+      row += 1;
+      rptMerge(ws, row, 10, row, 11); rptPut(ws, row, 10, 'Yang Memeriksa', { h: 'center' });
+      row++;
+      ws.getRow(row).height = 69.75;
+      rptMerge(ws, row, 10, row, 11); rptPut(ws, row, 10, '(____________________________) ', { h: 'center', v: 'bottom' });
+      const lastForm = row;
 
-        ws.getCell(`A${rowIdx}`).alignment = { horizontal: 'center' };
-        ws.getCell(`B${rowIdx}`).alignment = { horizontal: 'left' };
-        ws.getCell(`E${rowIdx}`).alignment = { horizontal: 'left' };
-        ws.getCell(`H${rowIdx}`).alignment = { horizontal: 'center' };
+      rptPage(ws, true, 'B1:K' + lastForm);
+      ws.pageSetup.fitToHeight = 1; // halaman 1 = laporan utama
 
-        for (let col = 1; col <= 9; col++) {
-          const c = ws.getCell(rowIdx, col);
-          c.font = { name: 'Calibri', size: 10 };
-          c.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+      // halaman berikutnya: lampiran foto bukti (sheet terpisah, hanya jika ada foto)
+      const withPhoto = data.filter(d => d.foto.some(f => f));
+      if (withPhoto.length) {
+        const w2 = wb.addWorksheet('Lampiran Foto');
+        [3.8, 6.5, 9.2, 9.3, 22, 22, 22, 22, 22, 12.7, 20.2, 8.66].forEach((w, i) => { w2.getColumn(i + 1).width = w; });
+        w2.getRow(1).height = 21;
+        rptKop(wb, w2, { r: 2, rowH: 19.5, logo: [2, 4], title: [5, 9], lab: 10, val: 11,
+          judul: 'LAMPIRAN FOTO PEMORSIAN DAN BERAT PORSI MBG', noDoc: 'FM-SGR-SPPG-06.01', tgl: tgl, colon: false });
+        let r2 = 5;
+        w2.getRow(r2).height = 24.75;
+        rptMerge(w2, r2, 2, r2, 4); rptPut(w2, r2, 2, 'Hari/Tanggal ', { bold: true });
+        rptMerge(w2, r2, 5, r2, 11); rptPut(w2, r2, 5, ': ' + (dateTxt || '….....................') + '   |   ' + (siklusTxt || ''), { bold: true });
+        r2 = 7;
+        w2.getRow(r2).height = 30;
+        rptPut(w2, r2, 2, 'No', { bold: true, h: 'center' });
+        rptMerge(w2, r2, 3, r2, 4); rptPut(w2, r2, 3, 'Komponen Menu', { bold: true, h: 'center' });
+        rptPut(w2, r2, 5, 'Foto Sampel 1', { bold: true, h: 'center' });
+        rptPut(w2, r2, 6, 'Foto Sampel 2', { bold: true, h: 'center' });
+        rptPut(w2, r2, 7, 'Foto Sampel 3', { bold: true, h: 'center' });
+        rptMerge(w2, r2, 8, r2, 11); rptPut(w2, r2, 8, 'Rata-Rata & Keterangan', { bold: true, h: 'center' });
+        rptFill(w2, r2, 2, r2, 11, RPT_GREY);
+        rptBorder(w2, r2, 2, r2, 11, 'grid');
+        r2++;
+        const cache = new Map(); const idCache = new Map();
+        for (let di = 0; di < data.length; di++) {
+          const d = data[di];
+          if (!d.foto.some(f => f)) continue;
+          const norms = [];
+          for (const f of d.foto) norms.push(f ? await exportNormalizePhoto(f, cache) : null);
+          const anyPortrait = norms.some(n => n && !n.landscape);
+          const rowPt = anyPortrait ? 96 : 67;
+          w2.getRow(r2).height = rowPt;
+          rptPut(w2, r2, 2, di + 1, { h: 'center' });
+          rptMerge(w2, r2, 3, r2, 4); rptPut(w2, r2, 3, d.label, { h: 'center' });
+          rptMerge(w2, r2, 8, r2, 11);
+          rptPut(w2, r2, 8, (d.avg !== '' ? ('Rata-rata ' + Number(d.avg).toFixed(2) + ' gr') : '') + (d.ket ? '\n' + d.ket : ''), { h: 'center' });
+          rptBorder(w2, r2, 2, r2, 11, 'grid');
+          norms.forEach((n, k) => {
+            if (!n) return;
+            let id = idCache.get(n.dataUrl);
+            if (id === undefined) { id = wb.addImage({ base64: n.dataUrl.split(',')[1], extension: 'jpeg' }); idCache.set(n.dataUrl, id); }
+            const wPx = n.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT;   // 3 cm x 2 cm (landscape) / 2 cm x 3 cm (portrait)
+            const hPx = n.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG;
+            const colPx = rptColPx(w2, 5 + k), rowPx = rowPt * 96 / 72;
+            w2.addImage(id, {
+              tl: { nativeCol: 4 + k, nativeColOff: Math.round(Math.max(0, (colPx - wPx) / 2) * 9525),
+                    nativeRow: r2 - 1, nativeRowOff: Math.round(Math.max(0, (rowPx - hPx) / 2) * 9525) },
+              ext: { width: wPx, height: hPx }, editAs: 'oneCell'
+            });
+          });
+          r2++;
         }
-        rowIdx++;
+        rptPage(w2, true, 'B1:K' + (r2 - 1));
       }
+      await rptDownload(wb, 'LAPORAN_EXPORT_Checklist_Pemorsian_FM-SGR-SPPG-06.01.xlsx');
+    }
 
-      wb.xlsx.writeBuffer().then(buffer => {
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `FM-SGR-SPPG-01.03_Frekuensi_Bahan_Baku.xlsx`;
-        a.click();
-        window.URL.revokeObjectURL(url);
+    // ---------- Checklist inspeksi (FM-SGR-SPPG-21.01 Kontaminasi Silang & 22.01 Manajemen Alergen) ----------
+    async function rptExportChecklist(cfg) {
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet(cfg.sheet);
+      cfg.widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+      ws.getColumn(8).width = 8.66;
+      const F = cfg.font, SZ = cfg.sz;
+      const val = id => { const el = document.getElementById(id); return el ? String(el.value || '') : ''; };
+      const dKey = val(cfg.dateId);
+      const tglKop = rptLongDate(dKey) || rptToday();
+
+      rptKop(wb, ws, { r: 1, rowH: 19.5, logo: [1, 2], title: [3, 5], lab: 6, val: 7,
+        judul: cfg.judul, noDoc: cfg.noDoc, tgl: tglKop, colon: true });
+      ws.getRow(4).height = 14.25;
+
+      // data isian (tanggal, shift/lokasi, petugas)
+      ws.getRow(5).height = 20.25; ws.getRow(6).height = 20.25;
+      cfg.meta(ws, { val: val, tgl: rptLongDate(dKey), put: (r, c, v, o) => rptPut(ws, r, c, v, Object.assign({ font: F, size: 9 }, o || {})) });
+
+      // header tabel
+      ws.getRow(8).height = 42;
+      cfg.head.forEach((h, i) => rptPut(ws, 8, i + 1, h, { font: F, size: 10, bold: true, h: 'center' }));
+      rptFill(ws, 8, 1, 8, 7, cfg.hdrFill);
+      rptBorder(ws, 8, 1, 8, 7, 'grid');
+
+      let row = 9;
+      cfg.items.forEach((it, i) => {
+        const res = val(cfg.prefix + 'res_' + it.id);
+        const ya = cfg.isYa(res);
+        const hasil = ya ? '[ ✓ ] Ya  [    ] Tdk' : '[    ] Ya  [ ✓ ] Tdk';
+        const cat = val(cfg.prefix + 'cat_' + it.id), kor = val(cfg.prefix + 'kor_' + it.id), paraf = val(cfg.prefix + 'paraf_' + it.id);
+        const lines = Math.max(rptLines(it[cfg.stdKey], cfg.widths[2], SZ), rptLines(it[cfg.areaKey], cfg.widths[1], SZ),
+                               rptLines(cat, cfg.widths[4], SZ), rptLines(kor, cfg.widths[5], SZ));
+        ws.getRow(row).height = Math.max(24, lines * 13 + 8);
+        const o = { font: F, size: cfg.rowSz || SZ };
+        rptPut(ws, row, 1, it.id, Object.assign({ h: 'center' }, o));
+        rptPut(ws, row, 2, it[cfg.areaKey], o);
+        rptPut(ws, row, 3, it[cfg.stdKey], o);
+        rptPut(ws, row, 4, hasil, Object.assign({ h: 'center' }, o));
+        rptPut(ws, row, 5, cat, o);
+        rptPut(ws, row, 6, kor, o);
+        rptPut(ws, row, 7, paraf, Object.assign({ h: 'center' }, o));
+        if (cfg.alt && i % 2 === 1) rptFill(ws, row, 1, row, 7, cfg.alt);
+        rptBorder(ws, row, 1, row, 7, 'grid');
+        row++;
       });
+
+      // tanda tangan
+      row += 2;
+      const sg = { font: F, size: 9, bold: true, wrap: false };
+      rptPut(ws, row, 2, cfg.sigLeft, sg);
+      rptPut(ws, row, 6, 'Disetujui Oleh (Kepala Dapur SPPG):', sg);
+      row += 4;
+      rptPut(ws, row, 2, '( ' + (val(cfg.nameId) || '________________________') + ' )', sg);
+      rptPut(ws, row, 6, '( ________________________ )', sg);
+      rptPage(ws, true, 'A1:G' + row);
+      ws.pageSetup.fitToHeight = 1; // satu lembar, sama seperti template
+      await rptDownload(wb, cfg.file);
+    }
+
+    function rptExportSilang() {
+      return rptExportChecklist({
+        sheet: 'FM-SGR-SPPG-21.01', noDoc: 'FM-SGR-SPPG-21.01', judul: ' INSPEKSI KONTAMINASI SILANG',
+        file: 'LAPORAN_EXPORT_INSPEKSI_KONTAMINASI_SILANG_FM-SGR-SPPG-21.01.xlsx',
+        font: 'Quattrocento Sans', sz: 10, hdrFill: RPT_GREY, alt: null,
+        widths: [4.2, 16, 38.3, 18.2, 18.2, 18.3, 20.7],
+        head: ['NO', 'AREA / ELEMEN PEMERIKSAAN', 'STANDAR OPERASIONAL (GHP/HACCP)', 'HASIL INSPEKSI\n(Ya / Tidak / NA)', 'CATATAN KETIDAKSESUAIAN', 'TINDAKAN KOREKSI LANGSUNG', 'PARAF SUPERVISOR'],
+        items: INSPEKSI_SILANG_ITEMS, areaKey: 'area', stdKey: 'std', prefix: 'ks_', dateId: 'ks_tanggal', nameId: 'ks_auditor',
+        sigLeft: 'Diperiksa Oleh (Supervisor K3/QC):',
+        isYa: v => v === 'Ya',
+        meta: (ws, m) => {
+          rptMerge(ws, 5, 1, 5, 2); m.put(5, 1, 'Tanggal ', { bold: true });
+          m.put(5, 3, ': ' + m.tgl);
+          m.put(5, 6, 'Shift :', { bold: true });
+          const pagi = m.val('ks_shift') !== 'Sore';
+          m.put(5, 7, pagi ? '[ ✓ ] Pagi   [     ] Sore' : '[     ] Pagi   [ ✓ ] Sore');
+          rptMerge(ws, 6, 1, 6, 2); m.put(6, 1, 'Auditor / Supervisor ', { bold: true });
+          m.put(6, 3, ': ' + m.val('ks_auditor'));
+        }
+      });
+    }
+
+    function rptExportAlergen() {
+      return rptExportChecklist({
+        sheet: 'FM-SGR-SPPG-22.01', noDoc: 'FM-SGR-SPPG-22.01', judul: 'CHECKLIST INSPEKSI HARIAN MANAJEMEN ALERGEN',
+        file: 'LAPORAN_EXPORT_INSPEKSI_MANAJEMEN_ALERGEN_FM-SGR-SPPG-22.01.xlsx',
+        font: 'Quattrocento Sans', sz: 10, rowSz: 9, hdrFill: 'FFB7B7B7', alt: 'FFF4F7F9',
+        widths: [5.8, 18, 49.2, 15.7, 17.3, 18.2, 21.5],
+        head: ['NO', 'TAHAPAN OPERASIONAL', 'STANDAR PENGENDALIAN ALERGEN (GHP/HACCP)', 'HASIL INSPEKSI\n(Ya / Tidak / NA)', 'CATATAN KETIDAKSESUAIAN', 'TINDAKAN KOREKSI LANGSUNG', 'PARAF SUPERVISOR'],
+        items: INSPEKSI_ALERGEN_ITEMS, areaKey: 'tahap', stdKey: 'std', prefix: 'al_', dateId: 'al_tanggal', nameId: 'al_supervisor',
+        sigLeft: 'Diperiksa Oleh (Supervisor QC/Gizi):',
+        isYa: v => v !== 'Tidak Sesuai',
+        meta: (ws, m) => {
+          rptMerge(ws, 5, 1, 5, 2); m.put(5, 1, 'Tanggal / Bulan:', { bold: true });
+          m.put(5, 3, m.tgl);
+          m.put(5, 5, 'Lokasi / Area:', { bold: true }); m.put(5, 7, 'Dapur SPPG');
+          rptMerge(ws, 6, 1, 6, 2); m.put(6, 1, 'Supervisor QC:', { bold: true });
+          m.put(6, 3, m.val('al_supervisor'));
+          m.put(6, 5, 'No. Revisi / Tgl:', { bold: true }); m.put(6, 7, '00 / Sep 2026');
+        }
+      });
+    }
+
+    // ---------- PINTU MASUK EXPORT EXCEL ----------
+    // Modul berformat baku -> laporan baku. Modul lain (Master Bahan, Pemantauan Suhu) -> export lama.
+    async function exportGenericExcel(title, wrapperId) {
+      try {
+        if (wrapperId === 'siklus_menu_tables_wrapper') return await rptExportSiklus(wrapperId);
+        if (wrapperId === 'wrapper_pemorsian') return await rptExportPemorsian(wrapperId);
+        if (wrapperId === 'wrapper_inspeksi_silang') return await rptExportSilang();
+        if (wrapperId === 'sec-inspeksi-alergen') return await rptExportAlergen();
+        if (wrapperId === 'wrapper_suhu') window.exportFileNameOverride = 'LAPORAN_EXPORT_PEMANTAUAN_SUHU_FM-SGR-SPPG-03.05.xlsx';
+        return await exportGenericExcelLegacy(title, wrapperId);
+      } catch (e) {
+        console.error('Export Excel gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      } finally {
+        window.exportFileNameOverride = null;
+      }
     }
 
     function exportFrekuensiWord() {
