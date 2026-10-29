@@ -847,11 +847,11 @@
                         🗑️ Hapus
                     </button>
                 </div>
-                <input type="file" accept="image/*" capture="environment" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">
+                <input type="file" accept="image/*" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">
             </div>`;
         } else {
             return `
-            <input type="file" accept="image/*" capture="environment" id="${fotoId}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="w-full min-w-[140px] text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 cursor-pointer transition-colors">`;
+            <input type="file" accept="image/*" id="${fotoId}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="w-full min-w-[140px] text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 cursor-pointer transition-colors">`;
         }
     }
 
@@ -895,7 +895,7 @@
         let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px;" class="mx-auto shadow-sm">` : '';
         return `<div class="flex flex-col items-center gap-1">
                     <label for="${id}" class="text-[10px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-sm whitespace-nowrap">📸 Upload</label>
-                    <input type="file" accept="image/*" capture="environment" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
+                    <input type="file" accept="image/*" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
                     ${imgHtml}
                 </div>`;
     }
