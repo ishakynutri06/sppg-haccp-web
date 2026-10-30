@@ -2325,13 +2325,20 @@
                     ${days.map(m => {
                       const d = dayInfo(m);
                       const val = (d.w.items && d.w.items[kKey] && d.w.items[kKey][d.i]) ? d.w.items[kKey][d.i] : '';
-                      return `<td class="p-2 border-b border-l border-slate-100"><input type="text" id="sm_cell_${kKey}_${m}" value="${val}" class="w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs font-bold uppercase bg-transparent text-center focus:bg-white"></td>`;
+                      return `<td class="p-2 border-b border-l border-slate-100"><textarea id="sm_cell_${kKey}_${m}" rows="1" spellcheck="false" onkeydown="if(event.key==='Enter')event.preventDefault()" oninput="autoGrowMenuCell(this)" style="resize:none;overflow:hidden;min-height:38px;word-break:break-word;" class="block w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs font-bold uppercase bg-transparent text-center focus:bg-white leading-snug">${String(val).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea></td>`;
                     }).join('')}
                   </tr>`).join('')}
               </tbody></table></div>
           </div>`;
       });
       wrapper.innerHTML = html;
+      wrapper.querySelectorAll('textarea[id^="sm_cell_"]').forEach(autoGrowMenuCell);
+    }
+
+    // Tinggi kolom menyesuaikan panjang teks agar seluruh isi terbaca
+    function autoGrowMenuCell(el) {
+      el.style.height = 'auto';
+      if (el.scrollHeight > 0) el.style.height = el.scrollHeight + 'px';
     }
 
     function saveSiklusMenuManual() {
