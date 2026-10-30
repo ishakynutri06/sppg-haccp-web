@@ -732,6 +732,7 @@
                 }
 
                 pendingPhoto = { id: fileInput.id, base64: compressedBase64, expW: expW, expH: expH };
+                setImageConfirmValueLabel('Suhu Aktual (°C)');
                 document.getElementById('imageConfirmPreview').src = compressedBase64;
                 
                 // Inisialisasi Input Suhu di Modal
@@ -763,6 +764,7 @@
     }
 
     function cancelImageConfirmation() {
+        if (pendingPemorsianPhoto) { cancelPemorsianPhotoConfirm(); return; }
         pendingPhoto = null;
         if (pendingFileInput) pendingFileInput.value = ''; 
         pendingFileInput = null;
@@ -772,6 +774,7 @@
     }
 
     function confirmImageConfirmation() {
+        if (pendingPemorsianPhoto) { confirmPemorsianPhoto(); return; }
         if (pendingPhoto) {
             window.suhuPhotosMap[pendingPhoto.id] = { base64: pendingPhoto.base64, expW: pendingPhoto.expW, expH: pendingPhoto.expH };
             pendingPhoto = null;
@@ -879,6 +882,14 @@
 
     // ================= FUNGSI KHUSUS PEMORSIAN PHOTO =================
     // Fungsi ini ditambahkan agar foto pemorsian berjalan mulus tanpa mengganggu firebase suhu/bahan (Poin 1, 5, 7)
+    let pendingPemorsianPhoto = null;
+
+    function setImageConfirmValueLabel(text) {
+        const lbl = document.getElementById('imageConfirmTempInput').previousElementSibling;
+        if (lbl) lbl.textContent = text;
+    }
+
+    // Foto pemorsian: tampilkan pop-up konfirmasi + isian nilai sampel sebelum foto dipakai
     function handlePemorsianPhoto(input) {
         if (!input.files || input.files.length === 0) return;
         const file = input.files[0];
@@ -893,24 +904,65 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 const b64 = canvas.toDataURL('image/jpeg', 0.6);
-                input.setAttribute('data-base64', b64);
-                
-                let parent = input.parentElement;
-                let existingImg = parent.querySelector('img');
-                if(!existingImg) {
-                    existingImg = document.createElement('img');
-                    existingImg.style.width = '60px';
-                    existingImg.style.height = '60px';
-                    existingImg.style.objectFit = 'cover';
-                    existingImg.style.borderRadius = '8px';
-                    existingImg.style.marginTop = '4px';
-                    parent.appendChild(existingImg);
-                }
-                existingImg.src = b64;
+
+                // cari kolom nilai sampel (S1/S2/S3) pada baris yang sama
+                const tr = input.closest('tr');
+                const m = String(input.id).match(/pemorsian_foto_s(\d)_/);
+                const sampleInput = (tr && m) ? tr.querySelectorAll('.sample-val')[parseInt(m[1], 10) - 1] : null;
+
+                pendingPemorsianPhoto = { input: input, b64: b64, sampleInput: sampleInput };
+                document.getElementById('imageConfirmPreview').src = b64;
+                setImageConfirmValueLabel('Berat Sampel (gr)');
+                const valInp = document.getElementById('imageConfirmTempInput');
+                valInp.value = sampleInput ? sampleInput.value : '';
+                valInp.parentElement.classList.remove('hidden');
+                document.getElementById('imageConfirmTimeInput').parentElement.classList.add('hidden');
+
+                const modal = document.getElementById('imageConfirmModal');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.children[0].classList.remove('scale-95');
+                }, 10);
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
+    }
+
+    function cancelPemorsianPhotoConfirm() {
+        if (pendingPemorsianPhoto && pendingPemorsianPhoto.input) pendingPemorsianPhoto.input.value = '';
+        pendingPemorsianPhoto = null;
+        setImageConfirmValueLabel('Suhu Aktual (°C)');
+        closeImageConfirmModal();
+    }
+
+    function confirmPemorsianPhoto() {
+        const p = pendingPemorsianPhoto;
+        if (p) {
+            const input = p.input;
+            input.setAttribute('data-base64', p.b64);
+            const parent = input.parentElement;
+            let existingImg = parent.querySelector('img');
+            if (!existingImg) {
+                existingImg = document.createElement('img');
+                existingImg.style.width = '60px';
+                existingImg.style.height = '60px';
+                existingImg.style.objectFit = 'cover';
+                existingImg.style.borderRadius = '8px';
+                existingImg.style.marginTop = '4px';
+                parent.appendChild(existingImg);
+            }
+            existingImg.src = p.b64;
+            const v = document.getElementById('imageConfirmTempInput').value;
+            if (p.sampleInput && v !== '') {
+                p.sampleInput.value = v;
+                if (typeof calcAvgPemorsian === 'function') calcAvgPemorsian(p.sampleInput);
+            }
+        }
+        pendingPemorsianPhoto = null;
+        setImageConfirmValueLabel('Suhu Aktual (°C)');
+        closeImageConfirmModal();
     }
     
     function buildPemorsianUploadHtml(id, existingB64) {
@@ -1080,10 +1132,50 @@
       let out = 'MIME-Version: 1.0\r\nContent-Type: multipart/related; type="text/html"; boundary="' + boundary + '"\r\n\r\n';
       out += '--' + boundary + '\r\nContent-Type: text/html; charset="utf-8"\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ' + base + docName + '.htm\r\n\r\n' + wrap(toB64Utf8(html)) + '\r\n';
       files.forEach(f => {
-        out += '--' + boundary + '\r\nContent-Type: image/jpeg\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ' + base + docName + '_files/' + f.name + '\r\n\r\n' + wrap(f.dataUrl.split(',')[1]) + '\r\n';
+        out += '--' + boundary + '\r\nContent-Type: ' + (f.type || 'image/jpeg') + '\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ' + base + docName + '_files/' + f.name + '\r\n\r\n' + wrap(f.dataUrl.split(',')[1]) + '\r\n';
       });
       out += '--' + boundary + '--\r\n';
       return out;
+    }
+
+    // Kop baku laporan Word: logo | SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal (tetap)
+    const WORD_KOP_TGL = '12 Oktober 2026';
+    const WORD_KOP_JUDUL = {
+      '01.03': 'JENIS DAN FREKUENSI BAHAN BAKU', '01.04': 'SIKLUS MENU 20 HARI',
+      '06.01': 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', '03.05': 'PEMANTAUAN SUHU RUANGAN',
+      '21.01': 'INSPEKSI KONTAMINASI SILANG', '22.01': 'CHECKLIST INSPEKSI HARIAN MANAJEMEN ALERGEN'
+    };
+    function exportWordKop(code, docName, files) {
+      const num = code.replace('FM-SGR-SPPG-', '');
+      const judul = WORD_KOP_JUDUL[num] || '';
+      let logoHtml = '';
+      const logo = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
+      if (logo) {
+        files.push({ name: 'logo.png', type: 'image/png', dataUrl: logo });
+        logoHtml = '<img src="' + docName + '_files/logo.png" width="136" height="62" style="width:3.6cm;height:1.63cm;">';
+      }
+      const b = 'border:1px solid black;padding:4px;';
+      return '<table style="width:100%;border-collapse:collapse;margin:0 0 12px 0;">' +
+        '<tr><td rowspan="3" style="' + b + 'width:18%;text-align:center;vertical-align:middle;">' + logoHtml + '</td>' +
+        '<td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</td>' +
+        '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">: ' + code + '</td></tr>' +
+        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: 00</td></tr>' +
+        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + WORD_KOP_TGL + '</td></tr>' +
+        '</table>';
+    }
+
+    // Blok keterangan laporan Pemantauan Suhu (FM-SGR-SPPG-03.05) - dipakai Export Word & Excel
+    function suhuReportHeaderLines() {
+      const names = g => SUHU_ITEMS_CONFIG.filter(c => c.groupKey === g).map(c => c.area).join(', ');
+      return [
+        ['NAMA SPPG/ID SPPG', 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI'],
+        ['JENIS RUANGAN', names('ruang')],
+        ['JENIS PENYIMPANAN', names('penyimpanan')],
+        ['PENANGGUNG JAWAB', ''],
+        ['JENIS PASOKAN', ''],
+        ['PETUGAS PENERIMA', ''],
+        ['ID SPPG', '']
+      ];
     }
 
     async function exportGenericWord(title, wrapperId) {
@@ -1115,6 +1207,7 @@
           if (cell) cell.setAttribute('style', 'text-align:center;vertical-align:middle;width:3.4cm;padding:3px;');
         }
 
+        const kopCode = (String(title).match(/FM-SGR-SPPG-[\d.]+/) || [])[0] || '';
         const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>${title}</title>
@@ -1131,11 +1224,12 @@
         </head>
         <body>
           <div class="Section1">
-          <div class="header">
+          ${kopCode ? exportWordKop(kopCode, docName, files) : `<div class="header">
             <h2 style="margin:0;">NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</h2>
             <h3 style="margin:5px 0;">TANGGAL: ${dateText}</h3>
             <h3 style="margin:5px 0;">${title}</h3>
-          </div>
+          </div>`}
+          ${wrapperId === 'wrapper_suhu' ? `<table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">${suhuReportHeaderLines().map(l => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${l[0]}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${l[1]}</td></tr>`).join('')}</table>` : ''}
           ${clone.innerHTML}
           </div>
         </body></html>
@@ -1160,7 +1254,10 @@
         const dateText = exportGetDocDateText(wrapperId);
         const cache = new Map();
         const imageIdCache = new Map();
-        const HDR_ROWS = 4;                 // 3 baris judul + 1 baris kosong
+        const suhuHdr = wrapperId === 'wrapper_suhu' ? suhuReportHeaderLines() : [];
+        const isSuhu = suhuHdr.length > 0;
+        // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
+        const HDR_ROWS = isSuhu ? 5 + suhuHdr.length : 4;
         const PHOTO_COL_WIDTH = 18;         // ~131 px, cukup untuk foto 3 cm (113 px)
         const PORTRAIT_ROW_PT = 96;         // foto 3 cm (85 pt) + ruang
         const LANDSCAPE_ROW_PT = 67;        // foto 2 cm (57 pt) + ruang
@@ -1172,10 +1269,19 @@
           ws.views = [{ showGridLines: true }];
           ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
 
-          ws.addRow(['NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI']);
-          ws.addRow(['TANGGAL: ' + dateText]);
-          ws.addRow([title]);
-          ws.addRow([]);
+          if (isSuhu) {
+            ws.addRow([]); ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (diisi setelah lebar kolom diketahui)
+            suhuHdr.forEach(l => {
+              const row = ws.addRow([l[0] + (l[0].length < 18 ? ' '.repeat(18 - l[0].length) : '') + ': ' + l[1]]);
+              row.getCell(1).font = { name: 'Calibri', size: 11, bold: true };
+            });
+            ws.addRow([]);
+          } else {
+            ws.addRow(['NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI']);
+            ws.addRow(['TANGGAL: ' + dateText]);
+            ws.addRow([title]);
+            ws.addRow([]);
+          }
 
           // 1) Baca isi tabel -> model sel (mendukung colspan / rowspan)
           const cells = [];
@@ -1276,9 +1382,18 @@
             } catch (e) { console.error('Gagal menyisipkan foto ke Excel', e); }
           });
 
-          ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
-          ws.getCell('A2').font = { name: 'Calibri', bold: true, size: 11 };
-          ws.getCell('A3').font = { name: 'Calibri', bold: true, size: 11 };
+          if (isSuhu) {
+            // Kop baku: logo | SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal (tetap)
+            const lastC = Math.max(maxCol, 6);
+            ws.getColumn(lastC).width = Math.max(ws.getColumn(lastC).width || 0, 20);
+            ws.getColumn(lastC - 1).width = Math.max(ws.getColumn(lastC - 1).width || 0, 14);
+            rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 2], title: [3, lastC - 2], lab: lastC - 1, val: lastC,
+              judul: 'PEMANTAUAN SUHU RUANGAN', noDoc: 'FM-SGR-SPPG-03.05', tgl: '12 Oktober 2026', colon: false });
+          } else {
+            ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
+            ws.getCell('A2').font = { name: 'Calibri', bold: true, size: 11 };
+            ws.getCell('A3').font = { name: 'Calibri', bold: true, size: 11 };
+          }
         }
 
         const buffer = await wb.xlsx.writeBuffer();
@@ -1381,7 +1496,7 @@
       });
       rptBorder(ws, r, o.title[0], r + 2, o.title[1], 'box');
       const pre = o.colon ? ': ' : '';
-      [['No. dokumen', o.noDoc], ['No. revisi', '00'], ['Tanggal', o.tgl]].forEach((p, i) => {
+      [['No. dokumen', o.noDoc], ['No. revisi', '00'], ['Tanggal', '12 Oktober 2026']] /* tanggal kop tetap */.forEach((p, i) => {
         rptPut(ws, r + i, o.lab, p[0], {});
         rptPut(ws, r + i, o.val, pre + p[1], {});
         rptBorder(ws, r + i, o.lab, r + i, o.val, 'grid');
@@ -1785,7 +1900,8 @@
     function exportFrekuensiWord() {
       const freqMap = window.dbCache['sppg_frequency_map'] || {};
       const freqDetails = window.dbCache['sppg_frequency_details'] || {};
-      const currentDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const kopFiles = [];
+      const kopHtml = exportWordKop('FM-SGR-SPPG-01.03', 'dokumen', kopFiles);
 
       let tableRows = '';
       let idx = 1;
@@ -1815,15 +1931,7 @@
         </style>
         </head>
         <body>
-          <div class="header">
-            <h2 style="margin:0;">SPPG PANGKAJENE DAN KEPULAUAN SEGERI</h2>
-            <h3 style="margin:5px 0;">FORMULIR JENIS DAN FREKUENSI BAHAN BAKU</h3>
-          </div>
-          <table class="info-table">
-            <tr><td width="70%"></td><td width="15%">No. dokumen</td><td width="15%">: FM-SGR-SPPG-01.03</td></tr>
-            <tr><td></td><td>No. revisi</td><td>: 00</td></tr>
-            <tr><td></td><td>Tanggal</td><td>: ${currentDate}</td></tr>
-          </table>
+          ${kopHtml}
           <table class="main-table">
             <thead>
               <tr>
@@ -1839,7 +1947,7 @@
           </table>
         </body></html>
       `;
-      const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+      const blob = new Blob([exportBuildMhtml(content, kopFiles, 'dokumen')], { type: 'application/msword' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -2159,25 +2267,29 @@
       if (!wrapper) return;
       const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
       
+      // Model tabel sama dengan laporan: Tabel 1 = Hari 1-10 (Menu 1-10), Tabel 2 = Hari 11-20 (Menu 11-20)
+      const dayInfo = m => {
+        const w = weeks[Math.floor(m / 5)] || { dates: [], items: {} };
+        return { date: (w.dates && w.dates[m % 5]) || '', w: w, i: m % 5 };
+      };
       let html = '';
-      weeks.forEach((w, wIdx) => {
-        let startDayNum = wIdx * 5 + 1;
-        let endDayNum = wIdx * 5 + 5;
+      [0, 1].forEach(tIdx => {
+        const days = Array.from({ length: 10 }, (_, i) => tIdx * 10 + i);
         html += `
           <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white space-y-2">
             <div class="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 font-bold text-xs flex justify-between items-center">
-              <span>Siklus Menu - Hari ke-${startDayNum} s.d. Hari ke-${endDayNum}</span>
-              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Blok ${wIdx + 1} / 4</span>
+              <span>Siklus Menu - Hari ke-${days[0] + 1} s.d. Hari ke-${days[9] + 1} (Menu ${days[0] + 1} - Menu ${days[9] + 1})</span>
+              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Tabel ${tIdx + 1} / 2</span>
             </div>
-            <div class="overflow-x-auto"><table class="w-full text-xs border-collapse min-w-[700px]">
-              <thead class="bg-blue-50 text-blue-900"><tr><th class="p-3 border-b w-36">Kelompok</th>${w.dates.map((d, dIdx) => `<th class="p-3 border-b border-l border-white/50 text-center">Hari ke-${wIdx * 5 + dIdx + 1}<br/><span class="text-[10px] text-blue-600/70 font-normal">${d}</span></th>`).join('')}</tr></thead>
+            <div class="overflow-x-auto"><table class="w-full text-xs border-collapse min-w-[1100px]">
+              <thead class="bg-blue-50 text-blue-900"><tr><th class="p-3 border-b w-36">Kelompok</th>${days.map(m => `<th class="p-3 border-b border-l border-white/50 text-center">Menu ${m + 1}<br/><span class="text-[10px] font-bold">Hari ke-${m + 1}</span><br/><span class="text-[10px] text-blue-600/70 font-normal">${dayInfo(m).date}</span></th>`).join('')}</tr></thead>
               <tbody>
                 ${KELOMPOK_LIST_MENU.map(kKey => `
                   <tr class="hover:bg-blue-50/30 transition-colors"><td class="p-3 border-b font-extrabold text-slate-600 bg-slate-50/50">${KELOMPOK_LABELS_MENU[kKey]}</td>
-                    ${[0, 1, 2, 3, 4].map(dIdx => {
-                      let globalDayIdx = wIdx * 5 + dIdx;
-                      let val = (w.items[kKey] && w.items[kKey][dIdx]) ? w.items[kKey][dIdx] : '';
-                      return `<td class="p-2 border-b border-l border-slate-100"><input type="text" id="sm_cell_${kKey}_${globalDayIdx}" value="${val}" class="w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs font-bold uppercase bg-transparent text-center focus:bg-white"></td>`;
+                    ${days.map(m => {
+                      const d = dayInfo(m);
+                      const val = (d.w.items && d.w.items[kKey] && d.w.items[kKey][d.i]) ? d.w.items[kKey][d.i] : '';
+                      return `<td class="p-2 border-b border-l border-slate-100"><input type="text" id="sm_cell_${kKey}_${m}" value="${val}" class="w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs font-bold uppercase bg-transparent text-center focus:bg-white"></td>`;
                     }).join('')}
                   </tr>`).join('')}
               </tbody></table></div>
@@ -2708,33 +2820,57 @@ function initSuhuModule() {
       }
     }
 
-    function evalSuhuStatusSingle(id, min, max) {
-      const val = parseFloat(document.getElementById(`suhu_val_${id}`)?.value);
-      const statusElem = document.getElementById(`suhu_status_${id}`);
-      if (!statusElem) return;
-      let isValid = (isNaN(val) || (val >= min && val <= max));
-      if (isValid) {
-        statusElem.innerHTML = `<span class="text-emerald-600 font-bold">Sesuai</span>`;
-      } else {
-        statusElem.innerHTML = `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
+    // Membaca teks kolom BATAS SUHU ("≤ 28°C", "15°C – 25°C", "≥ 60°C", "28", dst.) -> {min, max}
+    // Angka tunggal tanpa tanda dianggap nilai target (min = max). Jika tak terbaca -> null.
+    function parseSuhuLimit(text) {
+      let t = String(text || '').toLowerCase().replace(/,/g, '.').replace(/°\s*c?/g, '').replace(/\s+/g, ' ').trim();
+      if (!t) return null;
+      const num = '(-?\\d+(?:\\.\\d+)?)';
+      let m;
+      if ((m = t.match(new RegExp('(?:<=|≤|=<|maks(?:imal)?\\.?|max\\.?|<)\\s*' + num)))) return { min: null, max: parseFloat(m[1]) };
+      if ((m = t.match(new RegExp('(?:>=|≥|=>|min(?:imal)?\\.?|>)\\s*' + num)))) return { min: parseFloat(m[1]), max: null };
+      if ((m = t.match(new RegExp(num + '\\s*(?:to|s/d|s\\.d\\.?|sd|–|—|-)\\s*' + num)))) {
+        const a = parseFloat(m[1]), b = parseFloat(m[2]);
+        return { min: Math.min(a, b), max: Math.max(a, b) };
       }
+      if ((m = t.match(new RegExp(num)))) { const v = parseFloat(m[1]); return { min: v, max: v }; }
+      return null;
     }
 
+    function suhuValueOk(val, limit, fbMin, fbMax) {
+      if (isNaN(val)) return true;
+      const lim = limit || { min: fbMin, max: fbMax };
+      if (lim.min !== null && lim.min !== undefined && val < lim.min - 1e-9) return false;
+      if (lim.max !== null && lim.max !== undefined && val > lim.max + 1e-9) return false;
+      return true;
+    }
+
+    function setSuhuStatusHtml(statusElem, ok) {
+      statusElem.innerHTML = ok
+        ? `<span class="text-emerald-600 font-bold">Sesuai</span>`
+        : `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
+    }
+
+    // Menu Makanan Matang / Pemorsian (1 kolom suhu)
+    function evalSuhuStatusSingle(id, min, max) {
+      const statusElem = document.getElementById(`suhu_status_${id}`);
+      if (!statusElem) return;
+      const val = parseFloat(String(document.getElementById(`suhu_val_${id}`)?.value).replace(',', '.'));
+      const limit = parseSuhuLimit(document.getElementById(`suhu_std_${id}`)?.value);
+      setSuhuStatusHtml(statusElem, suhuValueOk(val, limit, min, max));
+    }
+
+    // Suhu Ruangan / Penyimpanan (bisa banyak kolom waktu & suhu)
     function evalSuhuStatus(id, min, max) {
       const statusElem = document.getElementById(`suhu_status_${id}`);
       if (!statusElem) return;
+      const limit = parseSuhuLimit(document.getElementById(`suhu_std_${id}`)?.value);
       let allValid = true;
       for (let c = 1; c <= suhuRuangColumns; c++) {
-        const val = parseFloat(document.getElementById(`suhu_val_${c}_${id}`)?.value);
-        if (!isNaN(val) && (val < min || val > max)) {
-          allValid = false;
-        }
+        const val = parseFloat(String(document.getElementById(`suhu_val_${c}_${id}`)?.value).replace(',', '.'));
+        if (!suhuValueOk(val, limit, min, max)) allValid = false;
       }
-      if (allValid) {
-        statusElem.innerHTML = `<span class="text-emerald-600 font-bold">Sesuai</span>`;
-      } else {
-        statusElem.innerHTML = `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
-      }
+      setSuhuStatusHtml(statusElem, allValid);
     }
 
 // BAGIAN B  --  GANTI function renderSuhuTable() LAMA DENGAN BLOK INI
@@ -2818,7 +2954,7 @@ function renderSuhuTable() {
           <td class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap">${cfg.area}</td>
           <td class="p-2 text-center">${fotoHtml}</td>
           ${dynamicCells}
-          <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
+          <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
           <td class="p-3 text-center font-bold text-sm" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
           <td class="p-2"><input type="text" id="suhu_cat_${cfg.id}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
         </tr>`;
@@ -2871,7 +3007,7 @@ function renderSuhuTable() {
             <td class="p-2 text-center">${fotoHtml}</td>
             <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
             <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
-            <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
+            <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
             <td class="p-3 text-center font-bold text-sm" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
             <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
           </tr>`;
@@ -2903,10 +3039,11 @@ function renderSuhuTable() {
       const el = document.getElementById(id);
       if (el && el.type !== 'file' && id !== 'suhu_siklus_active') el.value = savedData[id];
     });
-    document.querySelectorAll('#tbody_suhu_monitoring input[type="number"]').forEach(inp => {
-      inp.dispatchEvent(new Event('input'));
-    });
   }
+  // Hitung ulang status semua baris memakai nilai suhu & batas suhu yang tampil
+  document.querySelectorAll('#tbody_suhu_monitoring input[type="number"]').forEach(inp => {
+    inp.dispatchEvent(new Event('input'));
+  });
 }
 
     function saveGenericForm(formId, storageKey, alertMsg) {
