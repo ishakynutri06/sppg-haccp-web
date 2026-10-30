@@ -5,9 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0f172a">
   <title>Dashboard HACCP & Pemenuhan Gizi SPPG (Real-Time)</title>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://sppg-haccp-db-default-rtdb.asia-southeast1.firebasedatabase.app" crossorigin>
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
+  <!-- Library export (hanya dipakai saat tombol Excel ditekan) dimuat tanpa memblokir halaman -->
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
   <style>
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -25,7 +30,7 @@
   <div id="loadingOverlay" class="fixed inset-0 z-[200] bg-slate-900 flex flex-col items-center justify-center text-white transition-opacity duration-500">
     <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
     <h2 class="text-xl font-bold">Menghubungkan ke Server...</h2>
-    <p class="text-slate-400 text-sm mt-2">Sinkronisasi Real-Time Firebase</p>
+    <p id="loadingHint" class="text-slate-400 text-sm mt-2">Sinkronisasi Real-Time Firebase</p>
   </div>
 
   <!-- MOBILE HEADER -->
@@ -589,7 +594,7 @@
   <!-- FIREBASE MODULE SDK & INISIALISASI -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCf8-Owm9rviYKtlUvB74JDWuEVt1VzO0o",
@@ -605,37 +610,67 @@
     const db = getDatabase(app);
 
     window.fbSet = (path, data) => set(ref(db, path), data);
-    
+    window.fbGet = (path) => get(ref(db, path)).then(s => s.val());
+
+    // DATA RINGAN (menu, bahan, frekuensi, alergen) -> dimuat di awal, layar loading menunggu ini saja.
     const keys = [
-      'sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map', 
-      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 
-      'sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen'
+      'sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map',
+      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix'
     ];
-    
+
     let loadedCount = 0;
     keys.forEach(key => {
         onValue(ref(db, key), (snapshot) => {
-            window.dbCache[key] = snapshot.val(); 
-            
+            window.dbCache[key] = snapshot.val();
+
             if(loadedCount < keys.length) {
                 loadedCount++;
                 if(loadedCount === keys.length) {
-                    setTimeout(() => {
-                        const overlay = document.getElementById('loadingOverlay');
-                        if(overlay) overlay.classList.add('hidden');
-                        window.initializeAppUI(); 
-                    }, 500);
+                    const overlay = document.getElementById('loadingOverlay');
+                    if(overlay) overlay.classList.add('hidden');
+                    window.initializeAppUI();
                 }
             } else {
                 if(window.reRenderActiveTab) window.reRenderActiveTab();
             }
         });
     });
+
+    // DATA BERAT (log harian + foto base64) -> TIDAK dimuat di awal.
+    // Hanya tanggal / hari siklus yang sedang dibuka yang diambil, dan tetap realtime.
+    // path = 'sppg_log_suhu' | 'sppg_log_silang' | 'sppg_log_alergen' | 'sppg_pemorsian_data'
+    window.dbLoaded = {};
+    const subscribed = {};
+    window.subscribeItem = (path, itemKey) => {
+        if (itemKey === undefined || itemKey === null || itemKey === '') return;
+        const id = path + '/' + itemKey;
+        if (subscribed[id]) return;
+        subscribed[id] = true;
+        let first = true;
+        onValue(ref(db, id), (snapshot) => {
+            if (!window.dbCache[path] || typeof window.dbCache[path] !== 'object') window.dbCache[path] = {};
+            window.dbCache[path][itemKey] = snapshot.val();
+            window.dbLoaded[id] = true;
+            if (first) {
+                first = false;
+                if (window.onItemFirstLoad) window.onItemFirstLoad(path, itemKey);
+            } else if (window.reRenderActiveTab) {
+                window.reRenderActiveTab();
+            }
+        });
+    };
+    // Ambil SEMUA data berat sekali (dipakai untuk Backup lengkap)
+    window.fbGetHeavyAll = async () => {
+        const out = {};
+        for (const k of ['sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen']) out[k] = await get(ref(db, k)).then(x => x.val());
+        return out;
+    };
   </script>
 
   <!-- JAVASCRIPT ENGINE -->
   <script>
     window.dbCache = {};
+    setTimeout(() => { const h = document.getElementById('loadingHint'); const o = document.getElementById('loadingOverlay'); if (h && o && !o.classList.contains('hidden')) h.textContent = 'Koneksi lambat, mohon tunggu... (periksa jaringan internet)'; }, 8000);
     window.suhuPhotosMap = {}; 
     window.currentSuhuDate = null;
     window.suhuDirty = {};          // tanggal -> true jika ada input MANUAL yang belum disimpan
@@ -2203,6 +2238,7 @@
         // Disimpan HANYA ke tanggal yang isinya sedang tampil, dan HANYA jika ada input manual.
         const dateKey = window.suhuRenderedDate;
         if (!dateKey) return;
+        if (window.dbLoaded && !window.dbLoaded['sppg_log_suhu/' + dateKey]) return; // data tanggal ini belum termuat
         if (!window.suhuDirty[dateKey]) return;
         const form = document.getElementById('formSuhuDoc');
         if (!form) return;
@@ -2458,6 +2494,7 @@
       const sel = document.getElementById('selectSiklusPemorsian');
       if (!sel) return;
       const idx = parseInt(sel.value) || 0;
+      window.subscribeItem('sppg_pemorsian_data', idx);
       const tbody = document.getElementById('tbody_pemorsian_b1');
       const menuMatrix = window.dbCache['sppg_siklus_menu_matrix'] || {};
       
@@ -2528,8 +2565,13 @@
           }
       });
       
+      if (window.dbLoaded && !window.dbLoaded['sppg_pemorsian_data/' + dayIdx]) {
+          alert('Data hari ini masih dimuat dari server. Mohon tunggu sebentar lalu simpan kembali.');
+          return;
+      }
       savedData[dayIdx] = dayData;
-      window.fbSet('sppg_pemorsian_data', savedData);
+      window.dbCache['sppg_pemorsian_data'] = savedData;
+      window.fbSet('sppg_pemorsian_data/' + dayIdx, dayData); // hanya hari ini, tidak menimpa hari lain
       alert('Data Checklist Pemorsian berhasil disimpan di Server Real-Time!');
     }
 
@@ -2755,6 +2797,7 @@ function handleSuhuDateChange() {
   const dateInp = document.getElementById('suhu_tanggal');
   if (!dateInp || !dateInp.value) return;
   const newKey = dateInp.value;
+  window.subscribeItem('sppg_log_suhu', newKey); // muat hanya tanggal ini
 
   window.suhuSwitching = true; // cegah render dari listener realtime di tengah perpindahan
   try {
@@ -3059,6 +3102,11 @@ function renderSuhuTable() {
            return;
        }
        
+       if (window.dbLoaded && !window.dbLoaded[storageKey + '/' + dateKey]) {
+           alert('Data tanggal ini masih dimuat dari server. Mohon tunggu sebentar lalu simpan kembali agar data lama tidak tertimpa.');
+           return;
+       }
+
        const todayStr = getLocalDateKey();
        if (dateKey < todayStr) {
            const confirmEdit = confirm("⚠️ PERHATIAN: Anda akan menyimpan/mengubah data untuk hari kerja yang TELAH BERLALU (" + dateKey + ").\n\nApakah Anda yakin ingin melanjutkan perubahan data lampau ini?");
@@ -3102,6 +3150,7 @@ function renderSuhuTable() {
     // [BARU] Isi Shift & Auditor SESUAI tanggal yang dipilih (tanggal tanpa data = kosong)
     function applySilangDateFields() {
       const dateKey = document.getElementById('ks_tanggal')?.value;
+      window.subscribeItem('sppg_log_silang', dateKey);
       const data = dateKey ? (window.dbCache['sppg_log_silang'] || {})[dateKey] : null;
       const shift = document.getElementById('ks_shift');
       if (shift) shift.value = (data && data.ks_shift !== undefined) ? data.ks_shift : 'Pagi';
@@ -3178,6 +3227,7 @@ function renderSuhuTable() {
     // [BARU] Isi Supervisor & Siklus SESUAI tanggal yang dipilih (tanggal tanpa data = kosong / siklus sesuai tanggal)
     function applyAlergenDateFields() {
       const dateKey = document.getElementById('al_tanggal')?.value;
+      window.subscribeItem('sppg_log_alergen', dateKey);
       const data = dateKey ? (window.dbCache['sppg_log_alergen'] || {})[dateKey] : null;
       const sup = document.getElementById('al_supervisor');
       if (sup) sup.value = (data && data.al_supervisor !== undefined) ? data.al_supervisor : '';
@@ -3293,8 +3343,11 @@ function renderSuhuTable() {
     function exportAlergenExcel() { exportGenericExcel('Inspeksi_Manajemen_Alergen', 'sec-inspeksi-alergen'); }
     function exportAlergenWord() { exportGenericWord('Inspeksi Manajemen Alergen (FM-SGR-SPPG-22.01)', 'sec-inspeksi-alergen'); }
 
-    function exportSystemJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.dbCache, null, 2));
+    async function exportSystemJSON() {
+      let full = Object.assign({}, window.dbCache);
+      try { Object.assign(full, await window.fbGetHeavyAll()); }
+      catch (e) { alert('Gagal mengambil seluruh data log dari server. Pastikan internet aktif lalu coba lagi.'); return; }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(full, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
       downloadAnchor.setAttribute("download", `BACKUP_DATABASE_SPPG_${getLocalDateKey()}.json`);
@@ -3329,6 +3382,19 @@ function renderSuhuTable() {
     };
 
     // Fungsi Utama Re-render UI jika ada orang lain yang mengubah data (Sync HP-Laptop)
+    window.onItemFirstLoad = function(path, itemKey) {
+       const tabId = window.currentActiveTab;
+       if (path === 'sppg_log_suhu') {
+         if (tabId === 'suhu-ruangan' && !window.suhuSwitching && document.getElementById('suhu_tanggal')?.value === itemKey) handleSuhuDateChange();
+       } else if (path === 'sppg_log_silang') {
+         if (document.getElementById('ks_tanggal')?.value === itemKey) { applySilangDateFields(); if (tabId === 'inspeksi-silang') renderInspeksiSilangTable(); }
+       } else if (path === 'sppg_log_alergen') {
+         if (document.getElementById('al_tanggal')?.value === itemKey) { applyAlergenDateFields(); if (tabId === 'inspeksi-alergen') renderAlergenMenuAndTable(); }
+       } else if (path === 'sppg_pemorsian_data') {
+         if (tabId === 'pemorsian') loadPemorsianFromMenu();
+       }
+    };
+
     window.reRenderActiveTab = function() {
        const tabId = window.currentActiveTab;
        if (tabId === 'overview') updateDashboardSummary();
