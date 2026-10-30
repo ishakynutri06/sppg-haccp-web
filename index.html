@@ -831,28 +831,50 @@
         }
     }
 
+    // Pilih sumber bukti foto tanpa mengubah alur penyimpanan yang sudah ada.
+    // Kamera: capture=environment meminta kamera belakang pada perangkat yang mendukung.
+    // Galeri: atribut capture dihapus agar pemilih file/foto perangkat digunakan.
+    function openPhotoSourcePicker(inputId, source) {
+        const input = document.getElementById(inputId);
+        if (!input) {
+            console.warn('Input foto tidak ditemukan:', inputId);
+            return;
+        }
+
+        if (source === 'camera') {
+            input.setAttribute('capture', 'environment');
+        } else {
+            input.removeAttribute('capture');
+        }
+
+        input.click();
+    }
+
     function getPhotoCellHtml(fotoId, targetTempId, targetTimeId) {
         const photoData = window.suhuPhotosMap && window.suhuPhotosMap[fotoId];
         const b64 = photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null;
+        const photoInput = `<input type="file" accept="image/*" id="${fotoId}" data-base64="${b64 || ''}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">`;
+        const sourceButtons = `
+            <div class="flex flex-wrap items-center justify-center gap-1">
+                <button type="button" onclick="openPhotoSourcePicker('${fotoId}', 'camera')" class="text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-2 py-1.5 rounded-md transition-colors shadow-sm" title="Ambil foto langsung dari kamera">📷 Kamera</button>
+                <button type="button" onclick="openPhotoSourcePicker('${fotoId}', 'gallery')" class="text-[10px] font-bold text-indigo-800 bg-indigo-100 hover:bg-indigo-200 px-2 py-1.5 rounded-md transition-colors shadow-sm" title="Pilih foto dari galeri/perangkat">🖼️ Galeri</button>
+            </div>`;
 
         if (b64) {
             return `
             <div class="flex flex-col items-center justify-center gap-1.5 py-1">
                 <img src="${b64}" width="80" height="110" style="width:80px; height:110px; object-fit:cover; border-radius:8px; border:2px solid #10b981;" class="shadow-md">
-                <div class="flex items-center gap-1">
-                    <label for="${fotoId}" class="text-[10px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-1 rounded-md cursor-pointer transition-colors shadow-sm">
-                        📸 Ganti
-                    </label>
-                    <button type="button" onclick="deleteSuhuPhoto('${fotoId}')" class="text-[10px] font-bold text-red-700 bg-red-100 hover:bg-red-200 px-2 py-1 rounded-md transition-colors shadow-sm">
-                        🗑️ Hapus
-                    </button>
-                </div>
-                <input type="file" accept="image/*" id="${fotoId}" data-base64="${b64}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">
+                ${sourceButtons}
+                <button type="button" onclick="deleteSuhuPhoto('${fotoId}')" class="text-[10px] font-bold text-red-700 bg-red-100 hover:bg-red-200 px-2 py-1 rounded-md transition-colors shadow-sm">🗑️ Hapus</button>
+                ${photoInput}
             </div>`;
-        } else {
-            return `
-            <input type="file" accept="image/*" id="${fotoId}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="w-full min-w-[140px] text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200 cursor-pointer transition-colors">`;
         }
+
+        return `
+            <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                ${sourceButtons}
+                ${photoInput}
+            </div>`;
     }
 
     // ================= FUNGSI KHUSUS PEMORSIAN PHOTO =================
@@ -894,11 +916,15 @@
     function buildPemorsianUploadHtml(id, existingB64) {
         let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px;" class="mx-auto shadow-sm">` : '';
         return `<div class="flex flex-col items-center gap-1">
-                    <label for="${id}" class="text-[10px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-sm whitespace-nowrap">📸 Upload</label>
+                    <div class="flex flex-wrap items-center justify-center gap-1">
+                        <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" aria-label="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
+                        <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" aria-label="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
+                    </div>
                     <input type="file" accept="image/*" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
                     ${imgHtml}
                 </div>`;
     }
+
     // =================================================================
 
     window.alert = function(message) {
