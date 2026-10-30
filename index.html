@@ -283,7 +283,7 @@
           <div class="flex flex-wrap gap-2 w-full lg:w-auto">
             <button onclick="exportGenericExcel('Pemorsian', 'wrapper_pemorsian')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
             <button onclick="exportGenericWord('Checklist Pemorsian Dan Berat Porsi (FM-SGR-SPPG-06.01)', 'wrapper_pemorsian')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
-            <button id="btnSavePemorsian" onclick="savePemorsianLog()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Pemorsian</button>
+            <button onclick="savePemorsianLog()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Pemorsian</button>
           </div>
         </div>
         
@@ -567,8 +567,6 @@
         </div>
         <div class="p-6 space-y-4 flex flex-col items-center">
             <img id="imageConfirmPreview" class="max-h-48 rounded-2xl object-contain border-2 border-indigo-100 bg-slate-50 shadow-md" src="" alt="Preview">
-            <div id="imageScanStatus" role="status" aria-live="polite" class="w-full rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs text-indigo-800">🔎 Pemindaian otomatis akan dimulai setelah foto dipilih.</div>
-            <p class="w-full text-[11px] text-slate-500 text-center">Hasil pindai hanya saran. Periksa angka pada foto dan sesuaikan secara manual sebelum menyimpan.</p>
             
             <div id="imageConfirmInputsContainer" class="w-full grid grid-cols-2 gap-3">
                 <div>
@@ -583,7 +581,7 @@
         </div>
         <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-3">
             <button onclick="cancelImageConfirmation()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 rounded-xl transition-all">Batal</button>
-            <button id="btnConfirmImageConfirmation" onclick="confirmImageConfirmation()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all">Simpan &amp; Lanjutkan</button>
+            <button onclick="confirmImageConfirmation()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all">Simpan & Lanjutkan</button>
         </div>
     </div>
   </div>
@@ -697,148 +695,19 @@
     let pendingTimeTargetId = null;
 
     let pendingPhoto = null;
-    let imageOcrScanToken = 0;
-    let ocrLibraryPromise = null;
-    let ocrWorkerPromise = null;
-    window.pendingPemorsianOcrJobs = window.pendingPemorsianOcrJobs || {};
-
-    // OCR berjalan di browser. Foto tidak dikirim ke layanan AI pihak ketiga;
-    // file pustaka dan model OCR dimuat dari CDN ketika pemindaian pertama kali diperlukan.
-    function ensureTesseractLoaded() {
-        if (window.Tesseract) return Promise.resolve(window.Tesseract);
-        if (ocrLibraryPromise) return ocrLibraryPromise;
-        ocrLibraryPromise = new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-            script.async = true;
-            script.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('Mesin OCR tidak tersedia.'));
-            script.onerror = () => {
-                ocrLibraryPromise = null;
-                reject(new Error('Pustaka OCR gagal dimuat. Periksa koneksi internet.'));
-            };
-            document.head.appendChild(script);
-        });
-        return ocrLibraryPromise;
-    }
-
-    async function getTesseractWorker(statusEl) {
-        const Tesseract = await ensureTesseractLoaded();
-        if (!ocrWorkerPromise) {
-            ocrWorkerPromise = Tesseract.createWorker('eng').catch(err => {
-                ocrWorkerPromise = null;
-                throw err;
-            });
-        }
-        if (statusEl && statusEl.isConnected) setOcrStatus(statusEl, 'Mesin OCR siap; sedang membaca tulisan pada foto…', 'busy');
-        return ocrWorkerPromise;
-    }
-
-    function setOcrStatus(statusEl, message, state = 'info') {
-        if (!statusEl || !statusEl.isConnected) return;
-        statusEl.textContent = message;
-        const isPemorsianStatus = String(statusEl.id || '').startsWith('pemorsian-ocr-');
-        const layoutClass = isPemorsianStatus
-            ? 'w-full max-w-[150px] rounded-lg border px-2 py-1 text-[9px] leading-tight '
-            : 'w-full rounded-xl border px-3 py-2 text-xs ';
-        statusEl.className = layoutClass +
-            (state === 'busy' ? 'border-blue-200 bg-blue-50 text-blue-800' :
-             state === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' :
-             state === 'warning' ? 'border-amber-200 bg-amber-50 text-amber-800' :
-             'border-indigo-100 bg-indigo-50 text-indigo-800');
-    }
-
-    function setImageConfirmScanButtonBusy(isBusy) {
-        const button = document.getElementById('btnConfirmImageConfirmation');
-        if (!button) return;
-        button.disabled = !!isBusy;
-        button.textContent = isBusy ? '⏳ Memindai foto…' : 'Simpan & Lanjutkan';
-        button.classList.toggle('opacity-60', !!isBusy);
-        button.classList.toggle('cursor-not-allowed', !!isBusy);
-    }
-
-    async function recognizeImageText(file, statusEl) {
-        setOcrStatus(statusEl, '⏳ Menyiapkan pemindai OCR. Pemindaian pertama bisa memerlukan waktu untuk memuat mesin…', 'busy');
-        const worker = await getTesseractWorker(statusEl);
-        setOcrStatus(statusEl, '🔎 Sedang memindai teks/angka pada foto…', 'busy');
-        const result = await worker.recognize(file);
-        return {
-            text: (result && result.data && result.data.text) ? result.data.text : '',
-            confidence: Number(result && result.data ? result.data.confidence : 0) || 0
-        };
-    }
-
-    function extractOcrTime(text) {
-        const source = String(text || '');
-        // Dahulukan format jam yang jelas seperti 08:35. Format titik hanya diterima
-        // bila ada penanda waktu untuk menghindari salah baca kode formulir (mis. 03.05).
-        const colonMatches = [...source.matchAll(/(?<![\w.-])([01]?\d|2[0-3])\s*:\s*([0-5]\d)(?!\d)/g)];
-        if (colonMatches.length) return String(colonMatches[0][1]).padStart(2, '0') + ':' + colonMatches[0][2];
-        if (/\b(jam|waktu|time|wita|wib|wit|am|pm)\b/i.test(source)) {
-            const dottedMatches = [...source.matchAll(/(?<![\w.-])([01]?\d|2[0-3])\s*\.\s*([0-5]\d)(?!\d)/g)];
-            if (dottedMatches.length) return String(dottedMatches[0][1]).padStart(2, '0') + ':' + dottedMatches[0][2];
-        }
-        return '';
-    }
-
-    function extractOcrTemperature(text) {
-        const source = String(text || '').replace(/[，,]/g, '.').replace(/[º]/g, '°');
-        const toValue = value => {
-            const n = Number(String(value).replace(',', '.'));
-            return Number.isFinite(n) && n >= -30 && n <= 150 ? String(n) : '';
-        };
-        const patterns = [
-            /(?:suhu|temperature|temp\.?|thermometer)[^\d\-]{0,16}(-?\d{1,3}(?:\.\d{1,2})?)/ig,
-            /(-?\d{1,3}(?:\.\d{1,2})?)\s*(?:°\s*c|℃|degrees?\s*c|deg(?:ree)?s?\s*c|celsius|\bC\b)/ig
-        ];
-        for (const pattern of patterns) {
-            const matches = [...source.matchAll(pattern)];
-            for (const m of matches) {
-                const candidate = toValue(m[1]);
-                if (candidate !== '') return candidate;
-            }
-        }
-        // Cadangan terbatas: bila hanya ada satu angka desimal yang masuk akal, gunakan
-        // sebagai saran. Jika beberapa angka mungkin suhu, jangan menebak.
-        const withoutTimes = source.replace(/\b(?:[01]?\d|2[0-3])\s*:\s*[0-5]\d\b/g, ' ');
-        const decimals = [...withoutTimes.matchAll(/(?<![\w.-])(-?\d{1,3}\.\d{1,2})(?![\d.])/g)]
-            .map(m => toValue(m[1])).filter(v => v !== '');
-        return decimals.length === 1 ? decimals[0] : '';
-    }
-
-    function extractOcrWeight(text) {
-        const source = String(text || '').replace(/[，,]/g, '.');
-        const unitPattern = /(?<![\d.])(\d{1,4}(?:\.\d{1,2})?)\s*(kg|g|gr|grams?|gram)\b/ig;
-        const unitMatches = [...source.matchAll(unitPattern)];
-        if (unitMatches.length === 1) {
-            const value = Number(unitMatches[0][1]);
-            const grams = unitMatches[0][2].toLowerCase() === 'kg' ? value * 1000 : value;
-            if (grams > 0 && grams <= 5000) return String(Number(grams.toFixed(2)));
-        }
-        if (unitMatches.length > 1) return '';
-        const withoutTimes = source.replace(/\b(?:[01]?\d|2[0-3])\s*:\s*[0-5]\d\b/g, ' ');
-        const nums = [...withoutTimes.matchAll(/(?<![\w.-])(\d{1,4}(?:\.\d{1,2})?)(?![\d.])/g)]
-            .map(m => Number(m[1])).filter(n => Number.isFinite(n) && n > 0 && n <= 2000);
-        // Hanya isi otomatis tanpa satuan jika OCR menemukan satu angka yang masuk akal.
-        return nums.length === 1 ? String(nums[0]) : '';
-    }
 
     function openImageConfirmation(fileInput, targetTempId, targetTimeId) {
         if (!fileInput.files || fileInput.files.length === 0) return;
 
-        const scanToken = ++imageOcrScanToken;
         pendingFileInput = fileInput;
         pendingTempTargetId = targetTempId;
         pendingTimeTargetId = targetTimeId;
 
         const file = fileInput.files[0];
         const reader = new FileReader();
-        reader.onerror = () => setOcrStatus(document.getElementById('imageScanStatus'), 'Foto gagal dibaca. Silakan pilih ulang file gambar.', 'warning');
         reader.onload = function(e) {
-            if (scanToken !== imageOcrScanToken) return;
             const img = new Image();
-            img.onerror = () => setOcrStatus(document.getElementById('imageScanStatus'), 'Format gambar tidak dapat dibuka. Silakan pilih foto JPG/PNG.', 'warning');
             img.onload = function() {
-                if (scanToken !== imageOcrScanToken) return;
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 600;
                 const MAX_HEIGHT = 600;
@@ -850,90 +719,55 @@
                 } else {
                     if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
                 }
-                canvas.width = Math.max(1, Math.round(width));
-                canvas.height = Math.max(1, Math.round(height));
+                canvas.width = width;
+                canvas.height = height;
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, width, height);
+                
                 const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
-                let expW = 76, expH = 114;
-                if (width > height) { expW = 114; expH = 76; }
+                let expW = 76, expH = 114; 
+                if (width > height) { 
+                    expW = 114; expH = 76; 
+                }
+
                 pendingPhoto = { id: fileInput.id, base64: compressedBase64, expW: expW, expH: expH };
                 document.getElementById('imageConfirmPreview').src = compressedBase64;
-
-                const tempInput = document.getElementById('imageConfirmTempInput');
-                const timeInput = document.getElementById('imageConfirmTimeInput');
+                
+                // Inisialisasi Input Suhu di Modal
                 if (targetTempId && targetTempId !== 'null' && targetTempId !== '') {
-                    tempInput.value = document.getElementById(targetTempId)?.value || '';
-                    tempInput.parentElement.classList.remove('hidden');
+                    document.getElementById('imageConfirmTempInput').value = document.getElementById(targetTempId)?.value || '';
+                    document.getElementById('imageConfirmTempInput').parentElement.classList.remove('hidden');
                 } else {
-                    tempInput.value = '';
-                    tempInput.parentElement.classList.add('hidden');
-                }
-                if (targetTimeId && targetTimeId !== 'null' && targetTimeId !== '') {
-                    timeInput.value = document.getElementById(targetTimeId)?.value || getRealtimeTimeString();
-                    timeInput.parentElement.classList.remove('hidden');
-                } else {
-                    timeInput.value = '';
-                    timeInput.parentElement.classList.add('hidden');
+                    document.getElementById('imageConfirmTempInput').parentElement.classList.add('hidden');
                 }
 
-                // Simpan nilai awal agar OCR tidak menimpa perubahan manual pengguna saat pemindaian berlangsung.
-                const initialTemp = tempInput.value;
-                const initialTime = timeInput.value;
-                const statusEl = document.getElementById('imageScanStatus');
-                setOcrStatus(statusEl, '⏳ Foto siap. Pemindaian otomatis sedang dimulai…', 'busy');
-                setImageConfirmScanButtonBusy(true);
+                // Inisialisasi Input Waktu di Modal (Default ke Jam Saat Ini)
+                if (targetTimeId && targetTimeId !== 'null' && targetTimeId !== '') {
+                    document.getElementById('imageConfirmTimeInput').value = document.getElementById(targetTimeId)?.value || getRealtimeTimeString();
+                    document.getElementById('imageConfirmTimeInput').parentElement.classList.remove('hidden');
+                } else {
+                    document.getElementById('imageConfirmTimeInput').parentElement.classList.add('hidden');
+                }
+
                 const modal = document.getElementById('imageConfirmModal');
                 modal.classList.remove('hidden');
                 setTimeout(() => {
                     modal.classList.remove('opacity-0');
                     modal.children[0].classList.remove('scale-95');
                 }, 10);
-
-                // OCR menggunakan file asli (resolusi penuh), bukan thumbnail terkompresi.
-                recognizeImageText(file, statusEl).then(result => {
-                    if (scanToken !== imageOcrScanToken || !pendingPhoto || pendingPhoto.id !== fileInput.id) return;
-                    const foundTime = extractOcrTime(result.text);
-                    const foundTemp = extractOcrTemperature(result.text);
-                    const confidenceOK = result.confidence >= 30;
-                    const filled = [];
-                    if (confidenceOK && foundTime && targetTimeId && targetTimeId !== 'null' && timeInput.value === initialTime) {
-                        timeInput.value = foundTime;
-                        filled.push('waktu ' + foundTime);
-                    }
-                    if (confidenceOK && foundTemp && targetTempId && targetTempId !== 'null' && tempInput.value === initialTemp) {
-                        tempInput.value = foundTemp;
-                        filled.push('suhu ' + foundTemp + ' °C');
-                    }
-                    const confidenceText = 'Keyakinan OCR ' + Math.round(result.confidence) + '%. ';
-                    if (filled.length) {
-                        setOcrStatus(statusEl, '✅ Pindai selesai. Saran terisi: ' + filled.join(' dan ') + '. ' + confidenceText + 'Mohon cocokkan dengan angka di foto.', 'success');
-                    } else {
-                        const detected = String(result.text || '').replace(/\s+/g, ' ').trim().slice(0, 110);
-                        setOcrStatus(statusEl, '⚠️ Pindai selesai, waktu/suhu belum terbaca dengan cukup jelas. Isi atau koreksi manual. ' + confidenceText + (detected ? 'Teks terbaca: “' + detected + (result.text.length > 110 ? '…' : '') + '”' : ''), 'warning');
-                    }
-                }).catch(err => {
-                    if (scanToken !== imageOcrScanToken) return;
-                    console.warn('OCR bukti pemantauan suhu tidak berhasil:', err);
-                    setOcrStatus(statusEl, '⚠️ Pemindaian otomatis tidak tersedia. Anda tetap dapat mengisi waktu dan suhu secara manual. Periksa koneksi internet.', 'warning');
-                }).finally(() => {
-                    if (scanToken === imageOcrScanToken) setImageConfirmScanButtonBusy(false);
-                });
             };
             img.src = e.target.result;
-        };
+        }
         reader.readAsDataURL(file);
     }
 
     function cancelImageConfirmation() {
-        imageOcrScanToken++;
         pendingPhoto = null;
         if (pendingFileInput) pendingFileInput.value = ''; 
         pendingFileInput = null;
         pendingTempTargetId = null;
         pendingTimeTargetId = null;
-        setImageConfirmScanButtonBusy(false);
         closeImageConfirmModal();
     }
 
@@ -1023,40 +857,25 @@
 
     // ================= FUNGSI KHUSUS PEMORSIAN PHOTO =================
     // Fungsi ini ditambahkan agar foto pemorsian berjalan mulus tanpa mengganggu firebase suhu/bahan (Poin 1, 5, 7)
-    async function handlePemorsianPhoto(input) {
+    function handlePemorsianPhoto(input) {
         if (!input.files || input.files.length === 0) return;
         const file = input.files[0];
-        const statusEl = document.getElementById('pemorsian-ocr-' + input.id);
-
-        // Daftarkan pekerjaan sejak awal agar tombol Simpan dapat menunggu foto selesai diproses.
-        const job = (async () => {
-            try {
-                const fileData = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = () => reject(new Error('Foto gagal dibaca.'));
-                    reader.readAsDataURL(file);
-                });
-                const img = await new Promise((resolve, reject) => {
-                    const image = new Image();
-                    image.onload = () => resolve(image);
-                    image.onerror = () => reject(new Error('Format gambar tidak dapat dibuka.'));
-                    image.src = fileData;
-                });
-
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
                 const canvas = document.createElement('canvas');
                 let width = img.width, height = img.height;
-                if (width > 600) { height *= 600 / width; width = 600; }
-                canvas.width = Math.max(1, Math.round(width));
-                canvas.height = Math.max(1, Math.round(height));
+                if(width > 600) { height *= 600/width; width = 600; }
+                canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, width, height);
                 const b64 = canvas.toDataURL('image/jpeg', 0.6);
                 input.setAttribute('data-base64', b64);
-
-                const parent = input.parentElement;
+                
+                let parent = input.parentElement;
                 let existingImg = parent.querySelector('img');
-                if (!existingImg) {
+                if(!existingImg) {
                     existingImg = document.createElement('img');
                     existingImg.style.width = '60px';
                     existingImg.style.height = '60px';
@@ -1066,47 +885,18 @@
                     parent.appendChild(existingImg);
                 }
                 existingImg.src = b64;
-
-                // Pindai tampilan timbangan dan isi kolom sampel terkait bila angka terbaca jelas.
-                const sampleIndexMatch = input.id.match(/_s([123])_/);
-                const row = input.closest('tr');
-                const sampleInputs = row ? row.querySelectorAll('.sample-val') : [];
-                const sampleInput = sampleIndexMatch ? sampleInputs[Number(sampleIndexMatch[1]) - 1] : null;
-                const initialSampleValue = sampleInput ? sampleInput.value : null;
-                setOcrStatus(statusEl, '⏳ Foto tersimpan. Sedang membaca angka timbangan…', 'busy');
-                const result = await recognizeImageText(file, statusEl);
-                if (!input.isConnected || !statusEl || !statusEl.isConnected) return;
-                const weight = extractOcrWeight(result.text);
-                if (result.confidence >= 30 && weight !== '' && sampleInput && sampleInput.isConnected && sampleInput.value === initialSampleValue) {
-                    sampleInput.value = weight;
-                    sampleInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    setOcrStatus(statusEl, '✅ Saran berat terbaca: ' + weight + ' gram. Keyakinan OCR ' + Math.round(result.confidence) + '%. Periksa angka timbangan dan koreksi bila perlu.', 'success');
-                } else if (sampleInput && sampleInput.isConnected && sampleInput.value !== initialSampleValue) {
-                    setOcrStatus(statusEl, 'ℹ️ Kolom berat sudah Anda ubah secara manual; hasil OCR tidak menimpa nilai tersebut.', 'info');
-                } else {
-                    setOcrStatus(statusEl, '⚠️ Angka berat belum terbaca dengan cukup jelas. Foto tersimpan; masukkan berat manual dan periksa foto.', 'warning');
-                }
-            } catch (err) {
-                console.warn('OCR foto pemorsian tidak berhasil:', err);
-                setOcrStatus(statusEl, '⚠️ Pemindaian otomatis tidak tersedia. Foto tetap tersimpan; isi berat secara manual.', 'warning');
-            }
-        })();
-        window.pendingPemorsianOcrJobs[input.id] = job;
-        try {
-            await job;
-        } finally {
-            if (window.pendingPemorsianOcrJobs[input.id] === job) delete window.pendingPemorsianOcrJobs[input.id];
-        }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     }
     
     function buildPemorsianUploadHtml(id, existingB64) {
-        const imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px;" class="mx-auto shadow-sm">` : '';
-        const statusText = existingB64 ? 'Foto bukti tersimpan.' : 'Foto timbangan akan dipindai otomatis.';
+        let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px;" class="mx-auto shadow-sm">` : '';
         return `<div class="flex flex-col items-center gap-1">
                     <label for="${id}" class="text-[10px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-sm whitespace-nowrap">📸 Upload</label>
                     <input type="file" accept="image/*" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
                     ${imgHtml}
-                    <div id="pemorsian-ocr-${id}" role="status" aria-live="polite" class="w-full max-w-[150px] rounded-lg border border-indigo-100 bg-indigo-50 px-2 py-1 text-[9px] leading-tight text-indigo-700">${statusText}</div>
                 </div>`;
     }
     // =================================================================
@@ -2570,27 +2360,7 @@
       tbody.querySelectorAll('.std-val').forEach(inp => calcAvgPemorsian(inp));
     }
 
-    async function savePemorsianLog() {
-      // Tunggu OCR foto yang masih berjalan agar saran angka yang terbaca sempat masuk ke kolom.
-      const pendingJobs = Object.values(window.pendingPemorsianOcrJobs || {});
-      const saveButton = document.getElementById('btnSavePemorsian');
-      if (pendingJobs.length) {
-          const originalButtonHtml = saveButton ? saveButton.innerHTML : '';
-          const originalButtonClass = saveButton ? saveButton.className : '';
-          if (saveButton) {
-              saveButton.disabled = true;
-              saveButton.textContent = '⏳ Menunggu pemindaian foto…';
-              saveButton.classList.add('opacity-60', 'cursor-not-allowed');
-          }
-          try { await Promise.allSettled(pendingJobs); }
-          finally {
-              if (saveButton) {
-                  saveButton.disabled = false;
-                  saveButton.innerHTML = originalButtonHtml;
-                  saveButton.className = originalButtonClass;
-              }
-          }
-      }
+    function savePemorsianLog() {
       const sel = document.getElementById('selectSiklusPemorsian');
       if (!sel) return;
       
