@@ -294,7 +294,7 @@
         
         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
             <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider">Pilih Hari Siklus Menu Aktif (Otomatis Tanggal Realtime):</label>
-            <select id="selectSiklusPemorsian" onchange="window.pemorsianDirty=false; loadPemorsianFromMenu()" class="border-2 border-slate-200 p-3 rounded-xl text-sm font-bold w-full lg:w-1/2 bg-white text-slate-800 cursor-pointer shadow-sm"></select>
+            <select id="selectSiklusPemorsian" onchange="onPemorsianDayChange(this)" class="border-2 border-slate-200 p-3 rounded-xl text-sm font-bold w-full lg:w-1/2 bg-white text-slate-800 cursor-pointer shadow-sm"></select>
         </div>
 
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
@@ -602,6 +602,18 @@
             <button onclick="cancelImageConfirmation()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 rounded-xl transition-all">Batal</button>
             <button onclick="confirmImageConfirmation()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/30 transition-all">Simpan & Lanjutkan</button>
         </div>
+    </div>
+  </div>
+
+  <!-- MODAL REVIEW FOTO -->
+  <div id="photoReviewModal" class="fixed inset-0 z-[130] hidden items-center justify-center bg-slate-900/85 backdrop-blur-sm p-4" onclick="closePhotoReview()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-4 space-y-3" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-slate-800 text-sm">👁️ Review Foto</h3>
+        <button type="button" onclick="closePhotoReview()" class="text-slate-500 hover:text-slate-800 font-bold text-lg px-2">✕</button>
+      </div>
+      <img id="photoReviewImg" src="" alt="Review foto" class="w-full max-h-[75vh] object-contain rounded-xl border border-slate-200 bg-slate-50">
+      <button type="button" onclick="closePhotoReview()" class="w-full bg-slate-800 hover:bg-black text-white font-bold py-2.5 rounded-xl text-sm">Tutup</button>
     </div>
   </div>
 
@@ -929,6 +941,7 @@
             <div class="flex flex-col items-center justify-center gap-1.5 py-1">
                 <img src="${b64}" width="80" height="110" style="width:80px; height:110px; object-fit:cover; border-radius:8px; border:2px solid #10b981;" class="shadow-md">
                 ${sourceButtons}
+                <button type="button" onclick="reviewPhoto('${fotoId}')" class="text-[10px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-1 rounded-md transition-colors shadow-sm">👁️ Review</button>
                 <button type="button" onclick="deleteSuhuPhoto('${fotoId}')" class="text-[10px] font-bold text-red-700 bg-red-100 hover:bg-red-200 px-2 py-1 rounded-md transition-colors shadow-sm">🗑️ Hapus</button>
                 ${photoInput}
             </div>`;
@@ -1016,6 +1029,14 @@
                 parent.appendChild(existingImg);
             }
             existingImg.src = p.b64;
+            if (!parent.querySelector('.btn-review-photo')) {
+                const rb = document.createElement('button');
+                rb.type = 'button';
+                rb.className = 'btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm';
+                rb.textContent = '👁️ Review';
+                rb.onclick = () => reviewPhoto(input.id);
+                parent.appendChild(rb);
+            }
             const v = document.getElementById('imageConfirmTempInput').value;
             if (p.sampleInput && v !== '') {
                 p.sampleInput.value = v;
@@ -1035,11 +1056,47 @@
                         <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" aria-label="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
                     </div>
                     <input type="file" accept="image/*" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
-                    ${imgHtml}
+                    ${imgHtml}${existingB64 ? `<button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>` : ''}
                 </div>`;
     }
 
     // =================================================================
+
+    function reviewPhoto(inputId) {
+      const el = document.getElementById(inputId);
+      let b64 = el ? el.getAttribute('data-base64') : '';
+      if (!b64 && window.suhuPhotosMap && window.suhuPhotosMap[inputId]) {
+        const pd = window.suhuPhotosMap[inputId];
+        b64 = typeof pd === 'string' ? pd : pd.base64;
+      }
+      if (!b64) { alert('Belum ada foto yang diunggah.'); return; }
+      document.getElementById('photoReviewImg').src = b64;
+      const m = document.getElementById('photoReviewModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closePhotoReview() {
+      const m = document.getElementById('photoReviewModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+      document.getElementById('photoReviewImg').src = '';
+    }
+    function suhuHasPhotos() {
+      const map = window.suhuPhotosMap || {};
+      return Object.keys(map).some(k => { const v = map[k]; return v && (typeof v === 'string' ? v : v.base64); });
+    }
+    function onPemorsianDayChange(sel) {
+      const prev = window.pemorsianCurrentIdx;
+      if (prev !== undefined && String(prev) !== String(sel.value)) {
+        const hasPhoto = Array.from(document.querySelectorAll('#tbody_pemorsian_b1 input[type="file"]')).some(i => i.getAttribute('data-base64'));
+        if (hasPhoto && !confirm('Tanggal/hari yang sedang dibuka memiliki lampiran foto.\n\nYakin ingin pindah ke tanggal lain?' + (window.pemorsianDirty ? '\n\nPerubahan yang belum disimpan akan hilang.' : ''))) {
+          sel.value = prev;
+          return;
+        }
+      }
+      window.pemorsianDirty = false;
+      loadPemorsianFromMenu();
+    }
 
     window.alert = function(message) {
       const modal = document.getElementById('customAlert');
@@ -1134,8 +1191,31 @@
       return new Date().toLocaleDateString('id-ID', opts);
     }
 
-    function exportDownloadBlob(blob, fileName) {
+    async function exportDownloadBlob(blob, fileName) {
       if (window.exportFileNameOverride) fileName = window.exportFileNameOverride;
+      // Browser yang mendukung (Chrome/Edge desktop): tampilkan jendela "Simpan Sebagai" untuk memilih lokasi
+      if (typeof window.showSaveFilePicker === 'function') {
+        try {
+          const ext = (fileName.split('.').pop() || '').toLowerCase();
+          const typeMap = {
+            xlsx: { description: 'Excel Workbook (.xlsx)', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } },
+            doc: { description: 'Dokumen Word (.doc)', accept: { 'application/msword': ['.doc'] } }
+          };
+          const opts = { suggestedName: fileName };
+          if (typeMap[ext]) opts.types = [typeMap[ext]];
+          const handle = await window.showSaveFilePicker(opts);
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          alert('File berhasil disimpan: ' + handle.name);
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return; // pengguna membatalkan
+          console.warn('Jendela simpan tidak tersedia, memakai unduhan biasa', e);
+        }
+      }
+      // Cadangan (Firefox/Safari/HP): konfirmasi lalu unduh; lokasi mengikuti pengaturan unduhan browser
+      if (!confirm('Simpan file "' + fileName + '" ke perangkat Anda?\n\n(Lokasi penyimpanan mengikuti pengaturan unduhan browser. Aktifkan "Tanyakan lokasi simpan" di pengaturan browser untuk memilih folder.)')) return;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -2029,12 +2109,7 @@
         </body></html>
       `;
       const blob = new Blob([exportBuildMhtml(content, kopFiles, 'dokumen')], { type: 'application/msword' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `FM-SGR-SPPG-01.03_Frekuensi_Bahan_Baku.doc`;
-      a.click();
-      URL.revokeObjectURL(url);
+      exportDownloadBlob(blob, `FM-SGR-SPPG-01.03_Frekuensi_Bahan_Baku.doc`);
     }
 
     const ALLERGEN_KEYWORDS = ['UDANG', 'TELUR', 'SUSU', 'IKAN', 'KACANG', 'SEAFOOD', 'KEPITING', 'CUMI'];
@@ -2562,6 +2637,7 @@
 
       const idx = parseInt(sel.value) || 0;
       const storeKey = getPemorsianStoreKey(idx);
+      window.pemorsianCurrentIdx = idx;
       window.subscribeItem('sppg_pemorsian_data', storeKey);
       window.subscribeItem('sppg_pemorsian_data', idx); // data lama (kunci nomor urut)
       const weeks = getSuhuWeeks();
@@ -2678,13 +2754,15 @@
       const dayInWeek = activeDayIdx % 5;
       const activeDateStr = (weeks[weekIdx] && weeks[weekIdx].dates && weeks[weekIdx].dates[dayInWeek]) ? weeks[weekIdx].dates[dayInWeek] : `Hari ke-${activeDayIdx + 1}`;
 
-      if (activeMenuEl) activeMenuEl.innerText = `Hari Ke-${activeDayIdx + 1} (${activeDateStr})`;
-      if (menuSummaryEl) menuSummaryEl.innerText = `Menu Aktif Realtime Hari Ini`;
+      const _keys = getSuhuDateKeyList(weeks);
+      const _todayInCycle = !_keys.some(k => k) || _keys.indexOf(getLocalDateKey()) !== -1;
+      if (activeMenuEl) activeMenuEl.innerText = _todayInCycle ? `Hari Ke-${activeDayIdx + 1} (${activeDateStr})` : 'TIDAK TERSEDIA MENU';
+      if (menuSummaryEl) menuSummaryEl.innerText = _todayInCycle ? `Menu Aktif Realtime Hari Ini` : `Tanggal hari ini tidak ada dalam siklus`;
 
       if (menuDetailContainer) {
         let menuHtml = '';
         KELOMPOK_LIST_MENU.forEach(k => {
-          let itemVal = (menuMatrix[k] && menuMatrix[k][activeDayIdx]) ? menuMatrix[k][activeDayIdx] : '-';
+          let itemVal = (_todayInCycle && menuMatrix[k] && String(menuMatrix[k][activeDayIdx] || '').trim() !== '') ? menuMatrix[k][activeDayIdx] : 'TIDAK TERSEDIA MENU';
           menuHtml += `
             <div class="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
               <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">${KELOMPOK_LABELS_MENU[k]}</span>
@@ -2873,6 +2951,17 @@ function handleSuhuDateChange() {
   const dateInp = document.getElementById('suhu_tanggal');
   if (!dateInp || !dateInp.value) return;
   const newKey = dateInp.value;
+  if (window.suhuRenderedDate && window.suhuRenderedDate !== newKey && suhuHasPhotos()) {
+    if (!confirm('Tanggal ' + window.suhuRenderedDate + ' memiliki lampiran foto.\n\nYakin ingin pindah ke tanggal lain?')) {
+      dateInp.value = window.suhuRenderedDate;
+      const _sel = document.getElementById('suhu_siklus_active');
+      if (_sel) {
+        const _i = getSuhuCycleIndexForDate(getSuhuWeeks(), window.suhuRenderedDate);
+        if (_sel.querySelector(`option[value="${_i}"]`)) _sel.value = _i;
+      }
+      return;
+    }
+  }
   window.subscribeItem('sppg_log_suhu', newKey); // muat hanya tanggal ini
 
   window.suhuSwitching = true; // cegah render dari listener realtime di tengah perpindahan
