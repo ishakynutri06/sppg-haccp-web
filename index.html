@@ -197,6 +197,7 @@
         <button id="nav-siklus-menu-20" onclick="switchTab('siklus-menu-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍱</span> <span>Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</span></button>
         <button id="nav-pemorsian" onclick="switchTab('pemorsian')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">⚖️</span> <span>Pemorsian & Berat (FM-SGR-SPPG-06.01)</span></button>
         <button id="nav-suhu-ruangan" onclick="switchTab('suhu-ruangan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🌡️</span> <span>Pemantauan Suhu (FM-SGR-SPPG-03.05)</span></button>
+        <button id="nav-pendinginan" onclick="switchTab('pendinginan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">❄️</span> <span>Pendinginan Makanan (IK-SGR-SPPG-.04.01)</span></button>
         <button id="nav-inspeksi-silang" onclick="switchTab('inspeksi-silang')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🛡️</span> <span>Kontaminasi Silang (FM-SGR-SPPG-21.01)</span></button>
         <button id="nav-inspeksi-alergen" onclick="switchTab('inspeksi-alergen')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white shadow-lg shadow-amber-900/40 hover:-translate-y-0.5 transition-all duration-300 border border-amber-500/50"><span class="text-base drop-shadow-md">⚠️</span> <span>Manajemen Alergen (FM-SGR-SPPG-22.01)</span></button>
         <button id="nav-backup-data" onclick="switchTab('backup-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">💾</span> <span>Backup & Export Excel</span></button>
@@ -883,6 +884,62 @@
             <button type="submit" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg shadow-slate-800/40 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>💾</span> Simpan Log Alergen</button>
           </div>
         </form>
+      </div>
+    </section>
+
+    <!-- PENDINGINAN MAKANAN (IK-SGR-SPPG-.04.01) -->
+    <section id="sec-pendinginan" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
+      <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
+          <div>
+            <div class="text-[10px] font-extrabold text-cyan-600 tracking-widest uppercase bg-cyan-50 w-fit px-2 py-0.5 rounded">Keamanan Pangan</div>
+            <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">❄️ PENDINGINAN MAKANAN (IK-SGR-SPPG-.04.01)</h2>
+          </div>
+          <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+            <button type="button" onclick="exportPendinginanExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button>
+            <button type="button" onclick="exportPendinginanWord()" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button>
+            <button type="button" onclick="savePendinginanLog()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">💾 Simpan Pendinginan</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+          <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider">Pilih Hari Siklus Menu Aktif (Otomatis Tanggal Realtime):</label>
+          <select id="selectSiklusPendinginan" onchange="onPendDayChange(this)" class="border-2 border-slate-200 p-3 rounded-xl text-sm font-bold w-full lg:w-1/2 bg-white text-slate-800 cursor-pointer shadow-sm"></select>
+          <p class="text-[11px] text-slate-500">Kolom <b>Nama Menu / Olahan</b> otomatis mengikuti Siklus Menu 20 Hari. Tekan 📷 / 🖼️ pada kolom FOTO, lalu isi <b>waktu</b> dan <b>suhu aktual</b> pada pop-up konfirmasi.</p>
+        </div>
+
+        <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+        <div id="wrapper_pendinginan" class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm w-full">
+          <table class="w-full text-xs text-left min-w-[1500px]">
+            <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold tracking-wider text-[11px]">
+              <tr>
+                <th class="p-3 text-center border-b border-slate-600 w-12">No.</th>
+                <th class="p-3 text-center border-b border-slate-600 w-16">Tahap</th>
+                <th class="p-3 border-b border-slate-600 w-32">Jenis Menu</th>
+                <th class="p-3 border-b border-slate-600 w-48">Nama Menu / Olahan</th>
+                <th class="p-3 text-center border-b border-slate-600 w-28">Jumlah Produksi</th>
+                <th class="p-3 text-center border-b border-slate-600 w-32">Pukul Mulai Resting</th>
+                <th class="p-3 text-center border-b border-slate-600 w-24">Suhu Makanan (°C)</th>
+                <th class="p-3 text-center border-b border-slate-600 w-36">FOTO MULAI</th>
+                <th class="p-3 text-center border-b border-slate-600 w-32">Pukul Selesai Resting</th>
+                <th class="p-3 text-center border-b border-slate-600 w-24">Suhu Makanan (°C)</th>
+                <th class="p-3 text-center border-b border-slate-600 w-36">FOTO SELESAI</th>
+                <th class="p-3 text-center border-b border-slate-600 w-24">Total Durasi (menit)</th>
+                <th class="p-3 text-center border-b border-slate-600 w-24">Suhu Ruang (°C)</th>
+              </tr>
+            </thead>
+            <tbody id="tbody_pendinginan" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" id="btnPendAddBatch" onclick="pendAddBatch()" class="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-cyan-500/30 hover:-translate-y-0.5 transition-all">➕ Tambah Batch (T02)</button>
+          <button type="button" id="btnPendDelBatch" onclick="pendDelBatch()" class="hidden bg-red-100 hover:bg-red-200 text-red-700 font-bold px-5 py-2.5 rounded-xl text-xs shadow-sm transition-all">🗑️ Hapus Batch</button>
+        </div>
       </div>
     </section>
 
@@ -4674,6 +4731,533 @@ function renderSuhuTable() {
       }).observe(document.querySelector('main'), { childList: true, subtree: true });
       labelTables();
     })();
+  </script>
+  <script>
+    // =====================================================================
+    // MODUL BARU: PENDINGINAN MAKANAN (IK-SGR-SPPG-.04.01)
+    // Berdiri sendiri -- tidak mengubah fungsi modul lain. Memakai ulang helper yang sudah ada:
+    // getSuhuWeeks / getSuhuMenuName (sinkron Siklus Menu), imageConfirmModal (foto + waktu + suhu),
+    // askExportPhotoMode, rptKop (kop baku), exportNormalizePhoto, exportBuildMhtml, exportDownloadBlob.
+    // Data tersimpan di Firebase: sppg_pendinginan_data/<YYYY-MM-DD>
+    // =====================================================================
+    const PEND_DOC_CODE = 'IK-SGR-SPPG-.04.01';
+    const PEND_PATH = 'sppg_pendinginan_data';
+    const PEND_JENIS = [
+      { label: 'Karbohidrat', key: 'KARBO' },
+      { label: 'Protein Hewani', key: 'PH' },
+      { label: 'Protein Nabati', key: 'PN' },
+      { label: 'Sayur', key: 'SAYUR' }
+    ];
+    const PEND_MAX_BATCH = 10;
+    window.pendBatches = 1;   // jumlah tahap/batch yang tampil (T01 selalu ada; T02, T03, ... lewat tombol Tambah Batch)
+    function pendRowsFor(n) {
+      const rows = [];
+      for (let b = 1; b <= n; b++) PEND_JENIS.forEach(j => rows.push({ tahap: 'T' + String(b).padStart(2, '0'), label: j.label, key: j.key }));
+      return rows;
+    }
+    function pendRowHasData(d) { return !!d && ['jml', 'jm', 'sm', 'fm', 'js', 'ss', 'fs', 'sr'].some(k => String(d[k] || '') !== ''); }
+
+    window.pendDirty = false;
+    window.pendCurrentIdx = undefined;
+    let pendingPendPhoto = null;
+
+    function pendEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+    function pendStoreKey(idx) {
+      const dk = getSuhuDateKeyForIdx(getSuhuWeeks(), idx);
+      return dk || ('idx_' + idx);
+    }
+
+    // ---------- tab dibuka: isi pilihan hari siklus ----------
+    function initPendinginan() {
+      const sel = document.getElementById('selectSiklusPendinginan');
+      if (!sel) return;
+      const weeks = getSuhuWeeks();
+      let html = '', n = 0;
+      weeks.forEach(w => {
+        const dates = Array.isArray(w.dates) ? w.dates : Object.values(w.dates || {});
+        dates.forEach(d => { html += `<option value="${n}">Hari Ke-${n + 1} (${d})</option>`; n++; });
+      });
+      const prev = sel.value;
+      sel.innerHTML = html;
+      if (prev !== '' && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
+      else sel.value = getTodayCycleIndex(weeks);   // otomatis tanggal realtime hari ini
+      window.pendDirty = false;
+      loadPendinginan();
+    }
+
+    function onPendDayChange(sel) {
+      const prev = window.pendCurrentIdx;
+      if (prev !== undefined && String(prev) !== String(sel.value) && window.pendDirty) {
+        if (!confirm('Ada perubahan Pendinginan Makanan yang belum disimpan.\n\nYakin pindah ke hari lain? Perubahan akan hilang.')) { sel.value = prev; return; }
+      }
+      window.pendDirty = false;
+      loadPendinginan();
+    }
+
+    // ---------- sel foto ----------
+    function buildPendPhotoHtml(id, kind, b64) {
+      const img = b64 ? `<img src="${b64}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #10b981;" class="mx-auto shadow-sm">` : '';
+      const extra = b64 ? `
+        <button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>
+        <button type="button" onclick="deletePendPhoto('${id}')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>` : '';
+      return `<div class="flex flex-col items-center gap-1">
+        <div class="flex flex-wrap items-center justify-center gap-1">
+          <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
+          <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
+        </div>
+        <input type="file" accept="image/*" id="${id}" class="hidden" data-kind="${kind}" data-base64="${pendEsc(b64 || '')}" onchange="handlePendinginanPhoto(this)">
+        ${img}${extra}
+      </div>`;
+    }
+
+    function deletePendPhoto(id) {
+      if (!confirm('Apakah Anda yakin ingin menghapus bukti foto ini?')) return;
+      const input = document.getElementById(id);
+      if (!input) return;
+      const cell = input.closest('td');
+      cell.innerHTML = buildPendPhotoHtml(id, input.dataset.kind, '');
+      window.pendDirty = true;
+    }
+
+    // ---------- tabel ----------
+    function loadPendinginan(fromRealtime) {
+      const sel = document.getElementById('selectSiklusPendinginan');
+      const tbody = document.getElementById('tbody_pendinginan');
+      if (!sel || !tbody) return;
+      if (fromRealtime === true && window.pendDirty) return;   // jangan hapus isian yang belum disimpan
+      if (fromRealtime !== true) window.pendDirty = false;
+
+      const idx = parseInt(sel.value) || 0;
+      const storeKey = pendStoreKey(idx);
+      window.pendCurrentIdx = idx;
+      if (window.subscribeItem) window.subscribeItem(PEND_PATH, storeKey);
+      const weeks = getSuhuWeeks();
+      const saved = (window.dbCache[PEND_PATH] || {})[storeKey];
+      const dayData = Array.isArray(saved) ? saved : (saved ? Object.values(saved) : []);
+      // jumlah batch = batch terakhir yang berisi data (minimal 1)
+      let n = 1;
+      for (let b = PEND_MAX_BATCH; b >= 2; b--) {
+        if (dayData.slice((b - 1) * 4, b * 4).some(pendRowHasData)) { n = b; break; }
+      }
+      pendRender(dayData, idx, n);
+    }
+
+    function pendRender(dayData, idx, n) {
+      const tbody = document.getElementById('tbody_pendinginan');
+      const weeks = getSuhuWeeks();
+      window.pendBatches = n;
+      let html = '';
+      pendRowsFor(n).forEach((r, i) => {
+        const d = dayData[i] || {};
+        const menu = getSuhuMenuName(weeks, r.key, idx);       // SINKRON dengan Siklus Menu 20 Hari
+        const idM = `pend_foto_m_${idx}_${i}`, idS = `pend_foto_s_${idx}_${i}`;
+        const cls = 'w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600';
+        html += `<tr class="border-b border-slate-100" data-no="${i + 1}" data-tahap="${r.tahap}" data-jenis="${r.label}">
+          <td class="p-3 text-center font-bold text-slate-500">${i + 1}</td>
+          <td class="p-3 text-center font-black text-slate-700">${r.tahap}</td>
+          <td class="p-3 font-semibold text-slate-600">${r.label}</td>
+          <td class="p-3 font-bold uppercase text-blue-700 pend-menu">${pendEsc(menu)}</td>
+          <td class="p-2 text-center"><input type="number" min="0" inputmode="numeric" class="${cls} pend-jml" value="${pendEsc(d.jml || '')}" placeholder="porsi"></td>
+          <td class="p-2 text-center"><input type="time" class="${cls} pend-jm" value="${pendEsc(d.jm || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
+          <td class="p-2 text-center"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sm" value="${pendEsc(d.sm || '')}" placeholder="°C"></td>
+          <td class="p-2 text-center">${buildPendPhotoHtml(idM, 'm', d.fm || '')}</td>
+          <td class="p-2 text-center"><input type="time" class="${cls} pend-js" value="${pendEsc(d.js || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
+          <td class="p-2 text-center"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-ss" value="${pendEsc(d.ss || '')}" placeholder="°C"></td>
+          <td class="p-2 text-center">${buildPendPhotoHtml(idS, 's', d.fs || '')}</td>
+          <td class="p-3 text-center font-black text-slate-800 bg-slate-50/50 pend-dur">-</td>
+          <td class="p-2 text-center"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sr" value="${pendEsc(d.sr || '')}" placeholder="°C"></td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+      if (tbody.dataset.dirtyBound !== '1') {
+        tbody.dataset.dirtyBound = '1';
+        tbody.addEventListener('input', e => { if (e.isTrusted) window.pendDirty = true; }, true);
+      }
+      tbody.querySelectorAll('tr').forEach(tr => pendCalcRow(tr));
+      pendUpdateBatchButtons();
+    }
+
+    function pendUpdateBatchButtons() {
+      const n = window.pendBatches;
+      const add = document.getElementById('btnPendAddBatch'), del = document.getElementById('btnPendDelBatch');
+      if (add) {
+        add.textContent = n >= PEND_MAX_BATCH ? 'Batas batch tercapai' : '➕ Tambah Batch (T' + String(n + 1).padStart(2, '0') + ')';
+        add.disabled = n >= PEND_MAX_BATCH;
+      }
+      if (del) {
+        del.textContent = '🗑️ Hapus Batch T' + String(n).padStart(2, '0');
+        del.classList.toggle('hidden', n <= 1);
+      }
+    }
+
+    function pendAddBatch() {
+      if (window.pendBatches >= PEND_MAX_BATCH) return;
+      const cur = pendCollectRows();                 // isian & foto yang sudah ada dipertahankan
+      window.pendDirty = true;
+      pendRender(cur, window.pendCurrentIdx, window.pendBatches + 1);
+    }
+
+    function pendDelBatch() {
+      const n = window.pendBatches;
+      if (n <= 1) return;
+      const cur = pendCollectRows();
+      const last = cur.slice((n - 1) * 4, n * 4);
+      if (last.some(pendRowHasData) && !confirm('Batch T' + String(n).padStart(2, '0') + ' berisi data. Yakin ingin menghapus batch ini?')) return;
+      window.pendDirty = true;
+      pendRender(cur.slice(0, (n - 1) * 4), window.pendCurrentIdx, n - 1);
+    }
+
+    // Total durasi (menit) = selesai - mulai. Bila selesai lebih kecil dari mulai dianggap lewat tengah malam.
+    function pendMinutes(t) {
+      const m = String(t || '').match(/^(\d{1,2}):(\d{2})/);
+      return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null;
+    }
+    function pendCalcRow(tr) {
+      if (!tr) return;
+      const a = pendMinutes(tr.querySelector('.pend-jm').value);
+      const b = pendMinutes(tr.querySelector('.pend-js').value);
+      const cell = tr.querySelector('.pend-dur');
+      if (a === null || b === null) { cell.textContent = '-'; return; }
+      let diff = b - a;
+      if (diff < 0) diff += 1440;
+      cell.textContent = diff;
+    }
+
+    function pendCollectRows() {
+      const rows = [];
+      document.querySelectorAll('#tbody_pendinginan tr').forEach(tr => {
+        const files = tr.querySelectorAll('input[type="file"]');
+        rows.push({
+          jml: tr.querySelector('.pend-jml').value,
+          jm: tr.querySelector('.pend-jm').value,
+          sm: tr.querySelector('.pend-sm').value,
+          fm: (files[0] && files[0].getAttribute('data-base64')) || '',
+          js: tr.querySelector('.pend-js').value,
+          ss: tr.querySelector('.pend-ss').value,
+          fs: (files[1] && files[1].getAttribute('data-base64')) || '',
+          sr: tr.querySelector('.pend-sr').value
+        });
+      });
+      return rows;
+    }
+
+    function savePendinginanLog() {
+      const sel = document.getElementById('selectSiklusPendinginan');
+      if (!sel) return;
+      const idx = parseInt(sel.value) || 0;
+      const storeKey = pendStoreKey(idx);
+      const all = window.dbCache[PEND_PATH] || {};
+      if (window.dbLoaded && !window.dbLoaded[PEND_PATH + '/' + storeKey]) {
+        alert('Data hari ini masih dimuat dari server. Mohon tunggu sebentar lalu simpan kembali.');
+        return;
+      }
+      if (all[storeKey] && Object.keys(all[storeKey]).length > 0) {
+        if (!confirm('⚠️ PERHATIAN: Data Pendinginan Makanan untuk Hari ke-' + (idx + 1) + ' ini sudah pernah disimpan.\n\nApakah Anda yakin ingin memperbarui dan menimpa data yang lama?')) return;
+      }
+      const rows = pendCollectRows();
+      all[storeKey] = rows;
+      window.dbCache[PEND_PATH] = all;
+      window.fbSet(PEND_PATH + '/' + storeKey, rows);   // hanya tanggal ini, tidak menimpa hari lain
+      window.pendDirty = false;
+      alert('Data Pendinginan Makanan berhasil disimpan di Server Real-Time!');
+    }
+
+    // ---------- foto -> pop-up konfirmasi (waktu + suhu aktual) ----------
+    function pendSetModalLabels(kind) {
+      const tLbl = document.getElementById('imageConfirmTimeInput').previousElementSibling;
+      if (tLbl) tLbl.textContent = kind === 'm' ? 'Pukul Mulai Resting' : kind === 's' ? 'Pukul Selesai Resting' : 'Waktu Aktual';
+      setImageConfirmValueLabel('Suhu Aktual (°C)');
+    }
+
+    function handlePendinginanPhoto(input) {
+      if (!input.files || input.files.length === 0) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          let w = img.width, h = img.height;
+          const MAX = 600;
+          if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } } else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const b64 = canvas.toDataURL('image/jpeg', 0.6);
+
+          const tr = input.closest('tr');
+          const kind = input.dataset.kind;
+          const timeInp = tr.querySelector(kind === 'm' ? '.pend-jm' : '.pend-js');
+          const tempInp = tr.querySelector(kind === 'm' ? '.pend-sm' : '.pend-ss');
+          pendingPendPhoto = { input: input, b64: b64, timeInp: timeInp, tempInp: tempInp, kind: kind };
+
+          document.getElementById('imageConfirmPreview').src = b64;
+          pendSetModalLabels(kind);
+          const tInp = document.getElementById('imageConfirmTempInput');
+          const wInp = document.getElementById('imageConfirmTimeInput');
+          tInp.value = tempInp.value || '';
+          wInp.value = timeInp.value || getRealtimeTimeString();
+          tInp.parentElement.classList.remove('hidden');
+          wInp.parentElement.classList.remove('hidden');
+
+          const modal = document.getElementById('imageConfirmModal');
+          modal.classList.remove('hidden');
+          setTimeout(() => { modal.classList.remove('opacity-0'); modal.children[0].classList.remove('scale-95'); }, 10);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+
+    function confirmPendPhoto() {
+      const p = pendingPendPhoto;
+      if (p) {
+        const id = p.input.id, kind = p.kind;
+        const tr = p.input.closest('tr');
+        const cell = p.input.closest('td');
+        const t = document.getElementById('imageConfirmTimeInput').value;
+        const v = document.getElementById('imageConfirmTempInput').value;
+        if (t !== '') p.timeInp.value = t;
+        if (v !== '') p.tempInp.value = v;
+        cell.innerHTML = buildPendPhotoHtml(id, kind, p.b64);
+        pendCalcRow(tr);
+        window.pendDirty = true;
+      }
+      pendingPendPhoto = null;
+      pendSetModalLabels('');
+      closeImageConfirmModal();
+    }
+
+    function cancelPendPhoto() {
+      if (pendingPendPhoto && pendingPendPhoto.input) pendingPendPhoto.input.value = '';
+      pendingPendPhoto = null;
+      pendSetModalLabels('');
+      closeImageConfirmModal();
+    }
+
+    // Sambungkan ke pop-up konfirmasi yang sudah ada (tanpa mengubah kodenya): bila foto Pendinginan yang aktif,
+    // tangani di sini; selain itu jalankan fungsi aslinya.
+    (function () {
+      const origConfirm = window.confirmImageConfirmation;
+      const origCancel = window.cancelImageConfirmation;
+      window.confirmImageConfirmation = function () { if (pendingPendPhoto) return confirmPendPhoto(); return origConfirm.apply(this, arguments); };
+      window.cancelImageConfirmation = function () { if (pendingPendPhoto) return cancelPendPhoto(); return origCancel.apply(this, arguments); };
+
+      // tab, realtime, dan backup
+      const baseSwitch = window.switchTab;
+      window.switchTab = function (id) { baseSwitch(id); if (id === 'pendinginan') initPendinginan(); };
+      const baseRe = window.reRenderActiveTab;
+      window.reRenderActiveTab = function () { if (baseRe) baseRe.apply(this, arguments); if (window.currentActiveTab === 'pendinginan') loadPendinginan(true); };
+      const baseFirst = window.onItemFirstLoad;
+      window.onItemFirstLoad = function (path, key) {
+        if (baseFirst) baseFirst.apply(this, arguments);
+        if (path === PEND_PATH && window.currentActiveTab === 'pendinginan') loadPendinginan(true);
+      };
+      // Backup JSON lengkap ikut memuat data Pendinginan (gagal membaca tidak membatalkan backup lama)
+      function hookBackup() {
+        if (!window.fbGetHeavyAll || window.fbGetHeavyAll.__pend) return !!(window.fbGetHeavyAll && window.fbGetHeavyAll.__pend);
+        const orig = window.fbGetHeavyAll;
+        window.fbGetHeavyAll = async function () {
+          const out = await orig.apply(this, arguments);
+          try { out[PEND_PATH] = await window.fbGet(PEND_PATH); } catch (e) { console.warn('Backup pendinginan dilewati', e); }
+          return out;
+        };
+        window.fbGetHeavyAll.__pend = true;
+        return true;
+      }
+      let tries = 0;
+      (function wait() { if (!hookBackup() && tries++ < 50) setTimeout(wait, 200); })();
+    })();
+
+    // =====================================================================
+    // EXPORT (Excel & Word) -- kop baku, no. dokumen IK-SGR-SPPG-.04.01, tanggal tetap 26 Oktober 2026
+    // Pilihan "Dengan Gambar" / "Tanpa Gambar" memakai pop-up yang sama dengan modul lain.
+    // =====================================================================
+    function pendDayInfo() {
+      const sel = document.getElementById('selectSiklusPendinginan');
+      const optText = (sel && sel.selectedOptions && sel.selectedOptions[0]) ? sel.selectedOptions[0].text : '';
+      const mt = optText.match(/^(.*?)\s*\((.*)\)\s*$/);
+      return { siklus: mt ? mt[1] : optText, tanggal: mt ? mt[2] : '' };
+    }
+
+    function pendReadRows() {
+      const out = [];
+      document.querySelectorAll('#tbody_pendinginan tr').forEach(tr => {
+        const files = tr.querySelectorAll('input[type="file"]');
+        const num = v => { const n = parseFloat(v); return isNaN(n) ? '' : n; };
+        const dur = (tr.querySelector('.pend-dur').textContent || '').trim();
+        out.push({
+          no: tr.dataset.no, tahap: tr.dataset.tahap, jenis: tr.dataset.jenis,
+          menu: (tr.querySelector('.pend-menu').textContent || '').trim(),
+          jml: num(tr.querySelector('.pend-jml').value),
+          jm: tr.querySelector('.pend-jm').value, sm: num(tr.querySelector('.pend-sm').value),
+          js: tr.querySelector('.pend-js').value, ss: num(tr.querySelector('.pend-ss').value),
+          dur: dur === '-' ? '' : parseInt(dur, 10),
+          sr: num(tr.querySelector('.pend-sr').value),
+          fm: (files[0] && files[0].getAttribute('data-base64')) || '',
+          fs: (files[1] && files[1].getAttribute('data-base64')) || ''
+        });
+      });
+      return out;
+    }
+
+    async function exportPendinginanExcel() {
+      try {
+        const mode = await askExportPhotoMode();
+        if (!mode) return;
+        const inl = mode === 'inline';
+        const info = pendDayInfo();
+        const rows = pendReadRows();
+
+        const cols = [
+          { k: 'no', w: 5, h: 'No.' }, { k: 'tahap', w: 8, h: 'Tahap' }, { k: 'jenis', w: 15, h: 'Jenis Menu' },
+          { k: 'menu', w: 26, h: 'Nama Menu / Olahan' }, { k: 'jml', w: 12, h: 'Jumlah Produksi' },
+          { k: 'jm', w: 12, h: 'Pukul Mulai Resting' }, { k: 'sm', w: 11, h: 'Suhu Makanan (°C)' }
+        ];
+        if (inl) cols.push({ k: 'fm', w: 18, h: 'Foto Mulai Resting' });
+        cols.push({ k: 'js', w: 12, h: 'Pukul Selesai Resting' }, { k: 'ss', w: 11, h: 'Suhu Makanan (°C)' });
+        if (inl) cols.push({ k: 'fs', w: 18, h: 'Foto Selesai Resting' });
+        cols.push({ k: 'dur', w: 14, h: 'Total Durasi (menit)' }, { k: 'sr', w: 22, h: 'Suhu Ruang (°C)' });
+
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet(PEND_DOC_CODE);
+        ws.getColumn(1).width = 3.8;
+        const cx = {};
+        cols.forEach((c, i) => { cx[c.k] = i + 2; ws.getColumn(i + 2).width = c.w; });
+        const first = 2, last = cols.length + 1;
+
+        ws.getRow(1).height = 21;
+        rptKop(wb, ws, { r: 2, rowH: 19.5, logo: [first, cx.jenis], title: [cx.menu, cx.dur - 1], lab: cx.dur, val: cx.sr,
+          judul: 'PENDINGINAN MAKANAN', noDoc: PEND_DOC_CODE, rev: '00', colon: false });
+
+        ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
+        rptMerge(ws, 5, first, 5, cx.jenis); rptPut(ws, 5, first, 'Hari/Tanggal ', { bold: true });
+        rptMerge(ws, 5, cx.menu, 5, last); rptPut(ws, 5, cx.menu, ': ' + (info.tanggal || '….....................'), { bold: true });
+        rptMerge(ws, 6, first, 6, cx.jenis); rptPut(ws, 6, first, 'Siklus Menu Hari ini ', { bold: true });
+        rptMerge(ws, 6, cx.menu, 6, last); rptPut(ws, 6, cx.menu, ': ' + (info.siklus || '….....................'), { bold: true });
+
+        ws.getRow(7).height = 50.25;
+        cols.forEach(c => rptPut(ws, 7, cx[c.k], c.h, { bold: true, h: 'center' }));
+        rptFill(ws, 7, first, 7, last, RPT_GREY);
+        rptBorder(ws, 7, first, 7, last, 'grid');
+
+        const cache = new Map(), idCache = new Map();
+        let row = 8;
+        for (let i = 0; i < rows.length; i++) {
+          const d = rows[i];
+          const norms = [];
+          if (inl) { norms.push(d.fm ? await exportNormalizePhoto(d.fm, cache) : null); norms.push(d.fs ? await exportNormalizePhoto(d.fs, cache) : null); }
+          const hasPhoto = norms.some(n => n);
+          const anyPortrait = norms.some(n => n && !n.landscape);
+          const textH = Math.max(24.75, rptLines(d.menu, 26, 11) * 15 + 6);
+          ws.getRow(row).height = hasPhoto ? Math.max(textH, anyPortrait ? 96 : 67) : textH;
+
+          const put = (k, v, o) => rptPut(ws, row, cx[k], v, Object.assign({ h: 'center' }, o || {}));
+          put('no', parseInt(d.no, 10)); put('tahap', d.tahap); put('jenis', d.jenis, { h: 'left' }); put('menu', d.menu, { h: 'left' });
+          put('jml', d.jml); put('jm', d.jm); put('sm', d.sm, { numFmt: '0.0' });
+          put('js', d.js); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' });
+          rptBorder(ws, row, first, row, last, 'grid');
+
+          [['fm', norms[0]], ['fs', norms[1]]].forEach(p => {
+            const n = p[1];
+            if (!n) return;
+            let id = idCache.get(n.dataUrl);
+            if (id === undefined) { id = wb.addImage({ base64: n.dataUrl.split(',')[1], extension: 'jpeg' }); idCache.set(n.dataUrl, id); }
+            rptPlaceImage(ws, id, row, cx[p[0]], row, cx[p[0]], n.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT, n.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG);
+          });
+          row++;
+        }
+
+        row += 1;
+        rptMerge(ws, row, cx.dur, row, cx.sr); rptPut(ws, row, cx.dur, 'Yang Memeriksa', { h: 'center' });
+        row++;
+        ws.getRow(row).height = 69.75;
+        rptMerge(ws, row, cx.dur, row, cx.sr); rptPut(ws, row, cx.dur, '(____________________________) ', { h: 'center', v: 'bottom' });
+
+        rptPage(ws, true, 'B1:' + ws.getColumn(last).letter + row);
+        ws.pageSetup.fitToHeight = 1;
+        await rptDownload(wb, 'LAPORAN_EXPORT_PENDINGINAN_MAKANAN_' + PEND_DOC_CODE + (inl ? '_DENGAN_GAMBAR' : '_TANPA_GAMBAR') + '.xlsx');
+      } catch (e) {
+        console.error('Export Excel Pendinginan gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    // Kop baku Word: logo | SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal (tetap)
+    function pendWordKop(files) {
+      let logoHtml = '';
+      const logo = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
+      if (logo) {
+        files.push({ name: 'logo.png', type: 'image/png', dataUrl: logo });
+        logoHtml = '<img src="dokumen_files/logo.png" width="136" height="62" style="width:3.6cm;height:1.63cm;">';
+      }
+      const b = 'border:1px solid black;padding:4px;';
+      return '<table style="width:100%;border-collapse:collapse;margin:0 0 12px 0;">' +
+        '<tr><td rowspan="3" style="' + b + 'width:18%;text-align:center;vertical-align:middle;">' + logoHtml + '</td>' +
+        '<td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + RPT_SPPG_NAME + '</td>' +
+        '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">: ' + PEND_DOC_CODE + '</td></tr>' +
+        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: 00</td></tr>' +
+        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">PENDINGINAN MAKANAN</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + KOP_TGL_BAKU + '</td></tr>' +
+        '</table>';
+    }
+
+    async function exportPendinginanWord() {
+      try {
+        const mode = await askExportPhotoMode();
+        if (!mode) return;
+        const built = getCleanTableHtml('wrapper_pendinginan', mode === 'none');
+        if (!built.clone) return alert('Data tidak ditemukan');
+        const clone = built.clone;
+        const info = pendDayInfo();
+        const docName = 'dokumen';
+        const cache = new Map();
+        const files = [];
+
+        // foto: 2x3 cm (portrait) atau 3x2 cm (landscape), sama seperti modul lain
+        const markers = Array.from(clone.querySelectorAll('img[data-export-b64]'));
+        for (const m of markers) {
+          const norm = await exportNormalizePhoto(m.getAttribute('data-export-b64'), cache);
+          const cell = m.closest('td, th');
+          if (!norm) { m.parentNode.replaceChild(document.createTextNode('-'), m); continue; }
+          const name = 'foto_' + (files.length + 1) + '.jpg';
+          files.push({ name: name, dataUrl: norm.dataUrl });
+          const wCm = norm.landscape ? 3 : 2, hCm = norm.landscape ? 2 : 3;
+          m.removeAttribute('data-export-b64');
+          m.setAttribute('src', docName + '_files/' + name);
+          m.setAttribute('width', Math.round(wCm * 37.795));
+          m.setAttribute('height', Math.round(hCm * 37.795));
+          m.setAttribute('style', 'width:' + wCm + 'cm;height:' + hCm + 'cm;display:block;margin:0 auto;');
+          if (cell) cell.setAttribute('style', 'text-align:center;vertical-align:middle;width:3.4cm;padding:3px;');
+        }
+
+        const infoRow = (a, b) => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${a}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${pendEsc(b)}</td></tr>`;
+        const html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Pendinginan Makanan (${PEND_DOC_CODE})</title>
+        <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+        <style>
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm; }
+          div.Section1 { page: Section1; }
+          body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid black; padding: 6px; font-size: 10pt; text-align: left; vertical-align: middle; }
+          th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+        </style>
+        </head>
+        <body>
+          <div class="Section1">
+          ${pendWordKop(files)}
+          <table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">${infoRow('Hari/Tanggal', info.tanggal)}${infoRow('Siklus Menu Hari ini', info.siklus)}</table>
+          ${clone.innerHTML}
+          <table style="width:100%;border:none;border-collapse:collapse;margin-top:18px;"><tr><td style="border:none;width:75%;"></td><td style="border:none;text-align:center;">Yang Memeriksa<br><br><br><br><br>(____________________________)</td></tr></table>
+          </div>
+        </body></html>`;
+        const blob = new Blob([exportBuildMhtml(html, files, docName)], { type: 'application/msword' });
+        exportDownloadBlob(blob, 'LAPORAN_EXPORT_PENDINGINAN_MAKANAN_' + PEND_DOC_CODE + (mode === 'none' ? '_TANPA_GAMBAR' : '_DENGAN_GAMBAR') + '.doc');
+      } catch (e) {
+        console.error('Export Word Pendinginan gagal', e);
+        alert('Export Word gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
   </script>
 </body>
 </html>
