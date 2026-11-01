@@ -63,6 +63,7 @@
 
       <nav class="space-y-1.5 text-xs font-semibold flex-1">
         <button id="nav-overview" onclick="switchTab('overview')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📊</span> <span>Overview Dashboard</span></button>
+        <button id="nav-sasaran-didik" onclick="switchTab('sasaran-didik')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🧒</span> <span>Pendataan Sasaran Peserta Didik (FM-SGR-SPPG-01.01)</span></button>
         <button id="nav-frekuensi-bahan" onclick="switchTab('frekuensi-bahan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🥬</span> <span>Frekuensi Bahan (FM-SGR-SPPG-01.03)</span></button>
         <button id="nav-master-bahan-20" onclick="switchTab('master-bahan-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📦</span> <span>Master Bahan 20 Hari</span></button>
         <button id="nav-siklus-menu-20" onclick="switchTab('siklus-menu-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍱</span> <span>Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</span></button>
@@ -468,6 +469,228 @@
       </div>
     </section>
 
+    <!-- PENDATAAN SASARAN PESERTA DIDIK (FM-SGR-SPPG-01.01) -->
+    <section id="sec-sasaran-didik" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
+
+      <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-8">
+        <div class="border-b border-slate-100 pb-5 space-y-4">
+          <div>
+            <div class="text-[10px] font-extrabold text-rose-500 tracking-widest uppercase bg-rose-50 w-fit px-2 py-0.5 rounded border border-rose-200">Data Sasaran &amp; Pengendalian Alergi</div>
+            <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">PENDATAAN SASARAN PESERTA DIDIK (FM-SGR-SPPG-01.01)</h2>
+            <p class="text-[11px] text-slate-500 font-medium mt-1">Data peserta didik beralergi &middot; impor Excel atau input manual &middot; label reminder 5 &times; 7 cm &middot; tersinkron dengan Inspeksi Manajemen Alergen (FM-SGR-SPPG-22.01).</p>
+          </div>
+        </div>
+
+        <!-- RINGKASAN -->
+        <div id="sd_stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs"></div>
+
+        <!-- REMINDER MENU -->
+        <div class="bg-gradient-to-br from-amber-50 to-white p-5 rounded-2xl border border-amber-200 shadow-inner space-y-3">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-3">
+            <div>
+              <div class="font-extrabold text-amber-900 text-xs uppercase tracking-wider">🍱 Reminder Menu &amp; Label Alergi</div>
+              <p class="text-[11px] text-amber-800/80 font-medium mt-0.5">Pilih tanggal; bila menu pada tanggal tersebut mengandung bahan alergen, tombol cetak label muncul otomatis.</p>
+            </div>
+            <div class="w-full md:w-52">
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Tanggal Menu:</label>
+              <input type="date" id="sd_rem_date" onchange="sdRenderReminder()" class="w-full border-2 border-amber-200 rounded-xl p-2 text-sm font-bold bg-white text-slate-800">
+            </div>
+          </div>
+          <div id="sd_reminder" class="text-xs"></div>
+        </div>
+
+        <!-- IMPOR EXCEL -->
+        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">📥 Impor Data dari Excel</div>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">Format kolom: <b>NO | NAMA | ASAL SEKOLAH | JENJANG PENDIDIKAN | JENIS ALERGI</b>. Beberapa alergi dalam satu anak dipisah koma (contoh: <i>Telur, Udang</i>).</p>
+            </div>
+            <button type="button" onclick="sdDownloadTemplate()" class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 transition-all whitespace-nowrap">⬇️ Unduh Format Impor (.xlsx)</button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div class="md:col-span-2">
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Pilih File (.xlsx / .xls / .csv):</label>
+              <input type="file" id="sd_file" accept=".xlsx,.xls,.csv" onchange="sdHandleFile(this)" class="w-full text-xs border-2 border-dashed border-slate-300 rounded-xl p-2.5 bg-white cursor-pointer">
+            </div>
+            <div>
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Mode Impor:</label>
+              <select id="sd_import_mode" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold bg-white text-slate-800 cursor-pointer">
+                <option value="tambah">Tambahkan ke data yang ada (gabung alergi bila nama &amp; sekolah sama)</option>
+                <option value="ganti">Ganti seluruh data dengan isi file</option>
+              </select>
+            </div>
+          </div>
+          <div id="sd_import_preview" class="hidden"></div>
+        </div>
+
+        <!-- INPUT MANUAL -->
+        <form id="sd_form" onsubmit="event.preventDefault(); sdSubmitForm();" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <div id="sd_form_title" class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">✍️ Input Manual / Tambah Data Alergi</div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div>
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Nama:</label>
+              <input type="text" id="sd_f_nama" placeholder="Nama peserta didik..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" autocomplete="off">
+            </div>
+            <div>
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Asal Sekolah:</label>
+              <input type="text" id="sd_f_sekolah" list="sd_dl_sekolah" placeholder="Nama sekolah..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" autocomplete="off">
+              <datalist id="sd_dl_sekolah"></datalist>
+            </div>
+            <div>
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Jenjang Pendidikan:</label>
+              <input type="text" id="sd_f_jenjang" list="sd_dl_jenjang" placeholder="SD / SMP / ..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" autocomplete="off">
+              <datalist id="sd_dl_jenjang"></datalist>
+            </div>
+            <div>
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Jenis Alergi:</label>
+              <input type="text" id="sd_f_alergi" list="sd_dl_alergi" placeholder="Telur, Udang..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" autocomplete="off">
+              <datalist id="sd_dl_alergi"></datalist>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-[11px]">
+            <span class="font-bold text-slate-500">Pilih cepat:</span>
+            <span id="sd_chips" class="flex flex-wrap gap-1.5"></span>
+            <span class="text-slate-400 font-medium">(jenis alergi baru cukup diketik; otomatis masuk daftar)</span>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button type="submit" id="sd_btn_save" class="bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/40 transition-all">💾 Simpan Data</button>
+            <button type="button" id="sd_btn_cancel" onclick="sdCancelEdit()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-6 py-2.5 rounded-xl text-xs transition-all">Batal Ubah</button>
+          </div>
+        </form>
+
+        <!-- TABEL DATA -->
+        <div class="space-y-3">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+            <input type="text" id="sd_q" oninput="sdPage=1; sdRenderTable()" placeholder="🔎 Cari nama / sekolah..." class="md:col-span-2 border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold bg-white text-slate-800">
+            <select id="sd_filter_jenjang" onchange="sdPage=1; sdRenderTable()" class="border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold bg-white text-slate-800 cursor-pointer"></select>
+            <select id="sd_filter_alergi" onchange="sdPage=1; sdRenderTable()" class="border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold bg-white text-slate-800 cursor-pointer"></select>
+          </div>
+          <div class="md:hidden text-[10px] text-slate-400 italic flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+          <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white w-full">
+            <table class="w-full text-xs text-left border-collapse min-w-[760px]">
+              <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold text-[11px] tracking-wider border-b-2 border-slate-600">
+                <tr>
+                  <th class="p-4 text-center w-14 border-b border-slate-600">NO</th>
+                  <th class="p-4 border-b border-slate-600">NAMA</th>
+                  <th class="p-4 border-b border-slate-600">ASAL SEKOLAH</th>
+                  <th class="p-4 w-32 border-b border-slate-600">JENJANG PENDIDIKAN</th>
+                  <th class="p-4 border-b border-slate-600">JENIS ALERGI</th>
+                  <th class="p-4 w-44 text-center border-b border-slate-600">AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="sd_tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div id="sd_pager" class="flex items-center justify-between text-[11px] font-bold text-slate-500"></div>
+        </div>
+
+        <!-- CETAK LABEL -->
+        <!-- EDIT KHUSUS: PANEL HASIL CETAK LABEL REMINDER ALERGI (FM-SGR-SPPG-01.01) -->
+  <!-- MODERAN, WARNA BERVARIASI, & ATRAKTIF -->
+  <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-6 md:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-6 relative overflow-hidden text-white">
+    <!-- Hiasan Glow Latar Belakang -->
+    <div class="absolute -right-16 -top-16 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[10px] font-black uppercase tracking-widest shadow-inner mb-1">
+          <span class="animate-ping w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+          Modul Cetak Label Presisi (5 x 7 cm)
+        </div>
+        <h3 class="font-black text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200 tracking-tight">🏷️ Cetak Label Reminder Alergi Peserta Didik</h3>
+        <p class="text-xs text-slate-400 font-medium mt-1">Sistem otomatis mencetak identitas alergi peserta didik sesuai standar dimensi label makanan SPPG.</p>
+      </div>
+      <div class="bg-slate-800/80 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-700/80 text-xs flex items-center gap-3 shadow-lg">
+        <span class="text-xl">🖨️</span>
+        <div>
+          <div class="text-[10px] text-slate-400 uppercase font-bold">Standar Ukuran</div>
+          <div class="font-extrabold text-amber-400">50 mm &times; 70 mm</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-start">
+      <!-- Opsi Pengaturan Cetak -->
+      <div class="space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div class="bg-slate-800/50 p-3.5 rounded-2xl border border-slate-700/60 focus-within:border-indigo-500 transition-colors space-y-1.5">
+            <label class="block font-extrabold text-indigo-300 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <span>⚠️</span> Jenis Alergi pada Label:
+            </label>
+            <select id="sd_lbl_alergi" onchange="sdRenderLabelPanel()" class="w-full border-0 rounded-xl p-2.5 text-xs font-extrabold bg-slate-900 text-amber-300 cursor-pointer ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500"></select>
+          </div>
+
+          <div class="bg-slate-800/50 p-3.5 rounded-2xl border border-slate-700/60 focus-within:border-indigo-500 transition-colors space-y-1.5">
+            <label class="block font-extrabold text-indigo-300 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <span>🏫</span> Asal Sekolah:
+            </label>
+            <select id="sd_lbl_sekolah" onchange="sdRenderLabelPanel()" class="w-full border-0 rounded-xl p-2.5 text-xs font-extrabold bg-slate-900 text-slate-100 cursor-pointer ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500"></select>
+          </div>
+
+          <div class="bg-slate-800/50 p-3.5 rounded-2xl border border-slate-700/60 focus-within:border-indigo-500 transition-colors space-y-1.5">
+            <label class="block font-extrabold text-indigo-300 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <span>⚙️</span> Mode Kertas Printer:
+            </label>
+            <select id="sd_lbl_mode" class="w-full border-0 rounded-xl p-2.5 text-xs font-extrabold bg-slate-900 text-slate-100 cursor-pointer ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500">
+              <option value="label">🖨️ Printer Thermal Label (1 Label per Lembar - 5x7 cm)</option>
+              <option value="a4">📄 Kertas A4 Standar (12 Label per Lembar Grid)</option>
+            </select>
+          </div>
+
+          <div class="bg-slate-800/50 p-3.5 rounded-2xl border border-slate-700/60 focus-within:border-indigo-500 transition-colors space-y-1.5">
+            <label class="block font-extrabold text-indigo-300 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <span>🔢</span> Jumlah Salinan per Anak:
+            </label>
+            <input type="number" id="sd_lbl_copies" value="1" min="1" max="20" class="w-full border-0 rounded-xl p-2.5 text-xs font-black bg-slate-900 text-emerald-400 ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500 text-center">
+          </div>
+        </div>
+
+        <!-- Panel Info Jumlah Target Cetak -->
+        <div id="sd_lbl_info" class="text-xs font-bold text-indigo-200 bg-gradient-to-r from-indigo-900/60 to-purple-900/60 border border-indigo-500/40 rounded-2xl p-4 flex items-center gap-3 shadow-inner">
+          <span class="text-2xl shrink-0">📊</span>
+          <div class="leading-relaxed">Menghitung jumlah data...</div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button type="button" onclick="sdPrintLabels()" class="w-full sm:w-auto bg-gradient-to-r from-rose-500 via-rose-600 to-amber-600 hover:from-rose-600 hover:to-amber-700 text-white font-black px-8 py-3.5 rounded-2xl text-xs shadow-xl shadow-rose-900/40 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2 tracking-wide uppercase">
+            <span>🖨️</span> Cetak Label Sekarang
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Kartu Label Modern -->
+      <div class="flex flex-col items-center gap-3 shrink-0 mx-auto lg:mx-0">
+        <div class="text-[10px] font-black text-indigo-300 uppercase tracking-widest bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">
+          ✨ Live Preview (Skala 1:1)
+        </div>
+        <div class="p-4 bg-slate-950/80 rounded-3xl border border-slate-800 shadow-2xl flex items-center justify-center min-w-[220px]">
+          <div id="sd_lbl_preview" class="transition-transform hover:scale-105 duration-300"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END EDIT KHUSUS PANEL CETAK LABEL -->
+
+        <!-- LAPORAN -->
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-2 border-t border-slate-100">
+          <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full lg:w-auto pt-4">
+            <button type="button" onclick="exportSasaranExcel()" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2">📊 Export Laporan Excel (FM-SGR-SPPG-01.01)</button>
+            <button type="button" onclick="exportSasaranWord()" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2">📝 Export Laporan Word</button>
+            <button type="button" onclick="sdExportData()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-5 py-3 rounded-xl text-xs transition-all flex justify-center items-center gap-2">🗂️ Unduh Data Lengkap (format impor)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- MANAJEMEN ALERGEN (FM-SGR-SPPG-22.01) -->
     <section id="sec-inspeksi-alergen" class="tab-content hidden space-y-6">
       <div class="flex items-center justify-between">
@@ -503,6 +726,8 @@
           </div>
 
           <div id="al_menu_integration" class="bg-gradient-to-br from-amber-50 to-white p-5 rounded-2xl border border-amber-200 shadow-inner space-y-3"></div>
+
+          <div id="al_sasaran_sync" class="hidden-print bg-gradient-to-br from-rose-50 to-white p-5 rounded-2xl border border-rose-200 shadow-inner"></div>
 
           <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
           <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white w-full">
@@ -641,7 +866,7 @@
     // DATA RINGAN (menu, bahan, frekuensi, alergen) -> dimuat di awal, layar loading menunggu ini saja.
     const keys = [
       'sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map',
-      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix'
+      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik'
     ];
 
     let loadedCount = 0;
@@ -1315,9 +1540,10 @@
     }
 
     // Kop baku laporan Word: logo | SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal (tetap)
-    const WORD_KOP_TGL = '12 Oktober 2026';
+    const KOP_TGL_BAKU = '26 Oktober 2026'; // tanggal baku kop SEMUA laporan (Excel & Word)
+    const WORD_KOP_TGL = KOP_TGL_BAKU;
     const WORD_KOP_JUDUL = {
-      '01.03': 'JENIS DAN FREKUENSI BAHAN BAKU', '01.04': 'SIKLUS MENU 20 HARI',
+      '01.01': 'PENDATAAN SASARAN PESERTA DIDIK', '01.03': 'JENIS DAN FREKUENSI BAHAN BAKU', '01.04': 'SIKLUS MENU 20 HARI',
       '06.01': 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', '03.05': 'PEMANTAUAN SUHU RUANGAN',
       '21.01': 'INSPEKSI KONTAMINASI SILANG', '22.01': 'CHECKLIST INSPEKSI HARIAN MANAJEMEN ALERGEN'
     };
@@ -1335,7 +1561,7 @@
         '<tr><td rowspan="3" style="' + b + 'width:18%;text-align:center;vertical-align:middle;">' + logoHtml + '</td>' +
         '<td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</td>' +
         '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">: ' + code + '</td></tr>' +
-        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: 00</td></tr>' +
+        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (num === '01.01' ? '01' : '00') + '</td></tr>' +
         '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + WORD_KOP_TGL + '</td></tr>' +
         '</table>';
     }
@@ -1562,7 +1788,7 @@
             ws.getColumn(lastC).width = Math.max(ws.getColumn(lastC).width || 0, 20);
             ws.getColumn(lastC - 1).width = Math.max(ws.getColumn(lastC - 1).width || 0, 14);
             rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 2], title: [3, lastC - 2], lab: lastC - 1, val: lastC,
-              judul: 'PEMANTAUAN SUHU RUANGAN', noDoc: 'FM-SGR-SPPG-03.05', tgl: '12 Oktober 2026', colon: false });
+              judul: 'PEMANTAUAN SUHU RUANGAN', noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
           } else {
             ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
             ws.getCell('A2').font = { name: 'Calibri', bold: true, size: 11 };
@@ -1682,7 +1908,7 @@
       });
       rptBorder(ws, r, o.title[0], r + 2, o.title[1], 'box');
       const pre = o.colon ? ': ' : '';
-      [['No. dokumen', o.noDoc], ['No. revisi', '00'], ['Tanggal', '12 Oktober 2026']] /* tanggal kop tetap */.forEach((p, i) => {
+      [['No. dokumen', o.noDoc], ['No. revisi', o.rev || '00'], ['Tanggal', KOP_TGL_BAKU]] /* tanggal kop tetap */.forEach((p, i) => {
         rptPut(ws, r + i, o.lab, p[0], {});
         rptPut(ws, r + i, o.val, pre + p[1], {});
         rptBorder(ws, r + i, o.lab, r + i, o.val, 'grid');
@@ -2351,6 +2577,7 @@
         if (tabId === 'suhu-ruangan') renderSuhuTable();
         if (tabId === 'inspeksi-alergen') initAlergenModule();
         if (tabId === 'inspeksi-silang') renderInspeksiSilangTable();
+        if (tabId === 'sasaran-didik') renderSasaran();
       }
       if(window.innerWidth < 768) closeSidebar();
     }
@@ -3473,6 +3700,8 @@ function renderSuhuTable() {
         menuContainer.innerHTML = menuHtml;
       }
 
+      renderAlergenSasaranSync(activeDayIdx);
+
       const tbody = document.getElementById('tbody_inspeksi_alergen');
       if(!tbody) return;
       const dateKey = document.getElementById('al_tanggal')?.value;
@@ -3519,6 +3748,645 @@ function renderSuhuTable() {
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
+    }
+
+    // =====================================================================
+    // PENDATAAN SASARAN PESERTA DIDIK (FM-SGR-SPPG-01.01)
+    // Data disimpan di Firebase: 'sppg_sasaran_didik' (array of {id,nama,sekolah,jenjang,alergi})
+    // Terhubung ke: label reminder 5x7 cm, Inspeksi Manajemen Alergen (22.01) -> panel sinkron,
+    // dan laporan baku 01.01 (ringkasan per jenjang).
+    // =====================================================================
+    const SD_PATH = 'sppg_sasaran_didik';
+    const SD_REPORT_FILE = 'LAPORAN_EXPORT_PENDATAAN_SASARAN_PESERTA_DIDIK_FM-SGR-SPPG-01.01';
+    const SD_JENJANG_ORDER = ['PAUD', 'TK', 'SD', 'MI', 'SMP', 'MTS', 'SMA', 'SMK', 'MA'];
+    const SD_JENJANG_ALIAS = { 'SEKOLAH DASAR': 'SD', 'SEKOLAH MENENGAH PERTAMA': 'SMP', 'SEKOLAH MENENGAH ATAS': 'SMA', 'SEKOLAH MENENGAH KEJURUAN': 'SMK', 'TAMAN KANAK-KANAK': 'TK', 'TAMAN KANAK KANAK': 'TK', 'MADRASAH IBTIDAIYAH': 'MI', 'MADRASAH TSANAWIYAH': 'MTs', 'MADRASAH ALIYAH': 'MA' };
+    const SD_ALERGI_DEFAULT = ['TELUR', 'UDANG', 'IKAN', 'SUSU', 'KACANG', 'SEAFOOD'];
+    const SD_SEAFOOD_GROUP = ['UDANG', 'IKAN', 'CUMI', 'KEPITING', 'SEAFOOD'];
+    const SD_PAGE_SIZE = 50;
+    let sdPage = 1;
+    let sdEditId = null;
+    let sdPending = null;
+
+    function sdEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function sdTitle(s) { return String(s || '').toLowerCase().replace(/(^|[\s\-\/(])\S/g, m => m.toUpperCase()); }
+    function sdNorm(s) { return String(s == null ? '' : s).trim().replace(/\s+/g, ' '); }
+    function sdKey(nama, sekolah) { return sdNorm(nama).toUpperCase() + '|' + sdNorm(sekolah).toUpperCase(); }
+    function sdNewId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+    function sdGetAll() {
+      const v = window.dbCache[SD_PATH];
+      if (!v) return [];
+      return (Array.isArray(v) ? v : Object.values(v)).filter(x => x && x.nama);
+    }
+    function sdSave(list) {
+      window.dbCache[SD_PATH] = list;
+      if (typeof window.fbSet === 'function') window.fbSet(SD_PATH, list.length ? list : null);
+    }
+
+    // "Telur, Udang / ikan" -> ['TELUR','UDANG','IKAN'] ; "-", "tidak ada" -> []
+    function sdTokens(str) {
+      const raw = String(str || '').split(/[,;\/\n]+|\s+dan\s+/i).map(t => sdNorm(t).toUpperCase()).filter(Boolean);
+      const out = [];
+      raw.forEach(t => { if (!/^(-|TIDAK ADA|TIDAK|NIHIL|NONE|N\/A)$/.test(t) && out.indexOf(t) === -1) out.push(t); });
+      return out;
+    }
+    function sdAlergiText(tokens) { return tokens.map(sdTitle).join(', '); }
+    function sdNormJenjang(j) {
+      const u = sdNorm(j).toUpperCase();
+      if (SD_JENJANG_ALIAS[u]) return SD_JENJANG_ALIAS[u];
+      return sdNorm(j);
+    }
+    function sdMatches(stu, kw) {
+      const k = String(kw || '').toUpperCase();
+      if (!k) return false;
+      const toks = sdTokens(stu.alergi);
+      if (toks.some(t => t.indexOf(k) !== -1)) return true;
+      if (SD_SEAFOOD_GROUP.indexOf(k) !== -1 && toks.some(t => t.indexOf('SEAFOOD') !== -1)) return true;
+      if (k === 'SUSU' && toks.some(t => t.indexOf('LAKTOSA') !== -1)) return true;
+      return false;
+    }
+    function sdAllergyTypes(list) {
+      const set = {};
+      SD_ALERGI_DEFAULT.forEach(t => { set[t] = true; });
+      list.forEach(s => sdTokens(s.alergi).forEach(t => { set[t] = true; }));
+      return Object.keys(set);
+    }
+    function sdJenjangRank(j) {
+      const i = SD_JENJANG_ORDER.indexOf(String(j).toUpperCase());
+      return i === -1 ? 100 : i;
+    }
+
+    // ---------------------------------------------------------------- RENDER UTAMA
+    function renderSasaran() {
+      if (!document.getElementById('sec-sasaran-didik')) return;
+      const list = sdGetAll();
+      sdInjectLabelCss();
+      const remDate = document.getElementById('sd_rem_date');
+      if (remDate && !remDate.value) remDate.value = getLocalDateKey();
+      sdRenderStats(list);
+      sdRenderLists(list);
+      sdRenderReminder();
+      sdRenderTable();
+      sdRenderLabelPanel();
+    }
+
+    function sdRenderStats(list) {
+      const el = document.getElementById('sd_stats');
+      if (!el) return;
+      const dengan = list.filter(s => sdTokens(s.alergi).length).length;
+      const sekolah = new Set(list.map(s => sdNorm(s.sekolah).toUpperCase())).size;
+      const counts = {};
+      list.forEach(s => sdTokens(s.alergi).forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
+      const chips = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).map(t =>
+        `<span class="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md font-bold">${sdEsc(sdTitle(t))}: ${counts[t]}</span>`).join(' ');
+      const card = (lab, val, cls) => `<div class="p-4 rounded-2xl border ${cls} shadow-sm"><div class="text-[10px] font-extrabold uppercase tracking-wider opacity-70">${lab}</div><div class="text-2xl font-black mt-1">${val}</div></div>`;
+      el.innerHTML =
+        card('Total Peserta Didik', list.length, 'bg-slate-50 border-slate-200 text-slate-800') +
+        card('Memiliki Alergi', dengan, 'bg-rose-50 border-rose-200 text-rose-800') +
+        card('Jumlah Sekolah', sekolah, 'bg-indigo-50 border-indigo-200 text-indigo-800') +
+        `<div class="p-4 rounded-2xl border bg-white border-slate-200 shadow-sm"><div class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">Sebaran Jenis Alergi</div><div class="flex flex-wrap gap-1.5 text-[11px]">${chips || '<span class="text-slate-400 font-medium">Belum ada data</span>'}</div></div>`;
+    }
+
+    // datalist, filter, pilihan label (dibangun ulang tanpa menghapus pilihan pengguna)
+    function sdRenderLists(list) {
+      const sekolah = Array.from(new Set(list.map(s => sdNorm(s.sekolah)).filter(Boolean))).sort();
+      const jenjang = Array.from(new Set(list.map(s => sdNorm(s.jenjang)).filter(Boolean)));
+      SD_JENJANG_ORDER.forEach(j => { if (!jenjang.some(x => x.toUpperCase() === j)) jenjang.push(j === 'MTS' ? 'MTs' : j); });
+      jenjang.sort((a, b) => sdJenjangRank(a) - sdJenjangRank(b) || a.localeCompare(b));
+      const types = sdAllergyTypes(list);
+
+      const setHtml = (id, html) => { const e = document.getElementById(id); if (e) e.innerHTML = html; };
+      setHtml('sd_dl_sekolah', sekolah.map(s => `<option value="${sdEsc(s)}">`).join(''));
+      setHtml('sd_dl_jenjang', jenjang.map(s => `<option value="${sdEsc(s)}">`).join(''));
+      setHtml('sd_dl_alergi', types.map(s => `<option value="${sdEsc(sdTitle(s))}">`).join(''));
+      setHtml('sd_chips', types.map(t => `<button type="button" onclick="sdToggleChip('${sdEsc(t)}')" class="px-2.5 py-1 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 font-bold hover:bg-rose-100 transition-all">${sdEsc(sdTitle(t))}</button>`).join(''));
+
+      const keep = (id, build) => { const e = document.getElementById(id); if (!e) return; const prev = e.value; e.innerHTML = build; if (Array.from(e.options).some(o => o.value === prev)) e.value = prev; };
+      const usedJenjang = jenjang.filter(j => list.some(s => sdNorm(s.jenjang).toUpperCase() === j.toUpperCase()));
+      keep('sd_filter_jenjang', '<option value="">Semua Jenjang</option>' + usedJenjang.map(j => `<option value="${sdEsc(j.toUpperCase())}">${sdEsc(j)}</option>`).join(''));
+      keep('sd_filter_alergi', '<option value="">Semua Jenis Alergi</option>' + types.map(t => `<option value="${sdEsc(t)}">${sdEsc(sdTitle(t))}</option>`).join(''));
+      const lblA = document.getElementById('sd_lbl_alergi');
+      const firstTime = lblA && !lblA.options.length;
+      keep('sd_lbl_alergi', types.map(t => `<option value="${sdEsc(t)}">${sdEsc(sdTitle(t))}</option>`).join(''));
+      if (firstTime && lblA && Array.from(lblA.options).some(o => o.value === 'TELUR')) lblA.value = 'TELUR';
+      keep('sd_lbl_sekolah', '<option value="">Semua Sekolah</option>' + sekolah.map(s => `<option value="${sdEsc(s)}">${sdEsc(s)}</option>`).join(''));
+    }
+
+    function sdFiltered() {
+      const list = sdGetAll();
+      const q = (document.getElementById('sd_q')?.value || '').trim().toUpperCase();
+      const fj = document.getElementById('sd_filter_jenjang')?.value || '';
+      const fa = document.getElementById('sd_filter_alergi')?.value || '';
+      return list.filter(s =>
+        (!q || s.nama.toUpperCase().includes(q) || String(s.sekolah || '').toUpperCase().includes(q)) &&
+        (!fj || sdNorm(s.jenjang).toUpperCase() === fj) &&
+        (!fa || sdMatches(s, fa)));
+    }
+
+    function sdRenderTable() {
+      const tbody = document.getElementById('sd_tbody');
+      if (!tbody) return;
+      const all = sdGetAll();
+      const rows = sdFiltered();
+      const pages = Math.max(1, Math.ceil(rows.length / SD_PAGE_SIZE));
+      if (sdPage > pages) sdPage = pages;
+      const start = (sdPage - 1) * SD_PAGE_SIZE;
+      const pos = {}; all.forEach((s, i) => { pos[s.id] = i + 1; });
+      let html = '';
+      rows.slice(start, start + SD_PAGE_SIZE).forEach(s => {
+        const chips = sdTokens(s.alergi).map(t => `<span class="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md font-bold mr-1 mb-1">${sdEsc(sdTitle(t))}</span>`).join('') || '<span class="text-slate-400">-</span>';
+        html += `
+          <tr class="hover:bg-slate-50 border-b border-slate-100">
+            <td class="p-3 text-center font-bold text-slate-400">${pos[s.id]}</td>
+            <td class="p-3 font-extrabold text-slate-800">${sdEsc(s.nama)}</td>
+            <td class="p-3 text-slate-600 font-medium">${sdEsc(s.sekolah)}</td>
+            <td class="p-3 font-bold text-slate-700">${sdEsc(s.jenjang)}</td>
+            <td class="p-3">${chips}</td>
+            <td class="p-2 text-center whitespace-nowrap">
+              <button type="button" title="Cetak label" onclick="sdPrintOne('${s.id}')" class="px-2 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold">🏷️</button>
+              <button type="button" title="Ubah" onclick="sdEdit('${s.id}')" class="px-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 font-bold">✏️</button>
+              <button type="button" title="Hapus" onclick="sdDelete('${s.id}')" class="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button>
+            </td>
+          </tr>`;
+      });
+      tbody.innerHTML = html || `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">${all.length ? 'Tidak ada data yang cocok dengan pencarian/filter.' : 'Belum ada data. Impor dari Excel atau tambahkan secara manual di atas.'}</td></tr>`;
+      const pager = document.getElementById('sd_pager');
+      if (pager) {
+        pager.innerHTML = `<span>Menampilkan ${rows.length ? start + 1 : 0}-${Math.min(start + SD_PAGE_SIZE, rows.length)} dari ${rows.length} data</span>
+          <span class="flex items-center gap-2">
+            <button type="button" ${sdPage <= 1 ? 'disabled' : ''} onclick="sdPage--; sdRenderTable()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white disabled:opacity-40">← Sebelumnya</button>
+            <span>Hal. ${sdPage}/${pages}</span>
+            <button type="button" ${sdPage >= pages ? 'disabled' : ''} onclick="sdPage++; sdRenderTable()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white disabled:opacity-40">Berikutnya →</button>
+          </span>`;
+      }
+    }
+
+    // ---------------------------------------------------------------- INPUT MANUAL
+    function sdToggleChip(t) {
+      const inp = document.getElementById('sd_f_alergi');
+      const toks = sdTokens(inp.value);
+      const i = toks.indexOf(t);
+      if (i === -1) toks.push(t); else toks.splice(i, 1);
+      inp.value = sdAlergiText(toks);
+    }
+    function sdSubmitForm() {
+      const nama = sdNorm(document.getElementById('sd_f_nama').value);
+      const sekolah = sdNorm(document.getElementById('sd_f_sekolah').value);
+      const jenjang = sdNormJenjang(document.getElementById('sd_f_jenjang').value);
+      const toks = sdTokens(document.getElementById('sd_f_alergi').value);
+      if (!nama || !sekolah || !jenjang || !toks.length) { alert('Nama, Asal Sekolah, Jenjang Pendidikan, dan Jenis Alergi wajib diisi.'); return; }
+      const list = sdGetAll().slice();
+      const alergi = sdAlergiText(toks);
+      if (sdEditId) {
+        const i = list.findIndex(s => s.id === sdEditId);
+        if (i !== -1) list[i] = { id: sdEditId, nama: nama, sekolah: sekolah, jenjang: jenjang, alergi: alergi };
+        sdSave(list); sdCancelEdit(); renderSasaran(); alert('Data peserta didik berhasil diperbarui!');
+        return;
+      }
+      const dup = list.findIndex(s => sdKey(s.nama, s.sekolah) === sdKey(nama, sekolah));
+      if (dup !== -1) {
+        if (!confirm('Data "' + list[dup].nama + '" dari ' + list[dup].sekolah + ' sudah ada.\n\nGabungkan jenis alergi baru ke data tersebut?')) return;
+        const merged = sdTokens(list[dup].alergi); toks.forEach(t => { if (merged.indexOf(t) === -1) merged.push(t); });
+        list[dup] = Object.assign({}, list[dup], { jenjang: jenjang, alergi: sdAlergiText(merged) });
+      } else {
+        list.push({ id: sdNewId(), nama: nama, sekolah: sekolah, jenjang: jenjang, alergi: alergi });
+      }
+      sdSave(list);
+      ['sd_f_nama', 'sd_f_alergi'].forEach(id => { document.getElementById(id).value = ''; }); // sekolah & jenjang dipertahankan agar input berurutan lebih cepat
+      document.getElementById('sd_f_nama').focus();
+      renderSasaran();
+    }
+    function sdEdit(id) {
+      const s = sdGetAll().find(x => x.id === id);
+      if (!s) return;
+      sdEditId = id;
+      document.getElementById('sd_f_nama').value = s.nama;
+      document.getElementById('sd_f_sekolah').value = s.sekolah;
+      document.getElementById('sd_f_jenjang').value = s.jenjang;
+      document.getElementById('sd_f_alergi').value = s.alergi;
+      document.getElementById('sd_form_title').textContent = '✏️ Ubah Data Peserta Didik';
+      document.getElementById('sd_btn_cancel').classList.remove('hidden');
+      document.getElementById('sd_form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    function sdCancelEdit() {
+      sdEditId = null;
+      ['sd_f_nama', 'sd_f_sekolah', 'sd_f_jenjang', 'sd_f_alergi'].forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('sd_form_title').textContent = '✍️ Input Manual / Tambah Data Alergi';
+      document.getElementById('sd_btn_cancel').classList.add('hidden');
+    }
+    function sdDelete(id) {
+      const s = sdGetAll().find(x => x.id === id);
+      if (!s || !confirm('Hapus data "' + s.nama + '" (' + s.sekolah + ')?')) return;
+      sdSave(sdGetAll().filter(x => x.id !== id));
+      if (sdEditId === id) sdCancelEdit();
+      renderSasaran();
+    }
+
+    // ---------------------------------------------------------------- IMPOR EXCEL
+    function sdDownloadTemplate() {
+      if (typeof XLSX === 'undefined') { alert('Library Excel belum termuat. Tunggu beberapa detik lalu coba lagi.'); return; }
+      const head = ['NO', 'NAMA', 'ASAL SEKOLAH', 'JENJANG PENDIDIKAN', 'JENIS ALERGI'];
+      const wsData = XLSX.utils.aoa_to_sheet([head]);
+      wsData['!cols'] = [{ wch: 6 }, { wch: 34 }, { wch: 34 }, { wch: 22 }, { wch: 30 }];
+      const guide = [
+        ['PETUNJUK PENGISIAN FORMAT IMPOR - PENDATAAN SASARAN PESERTA DIDIK (FM-SGR-SPPG-01.01)'],
+        [''],
+        ['1. Isi data pada sheet "DATA" mulai baris ke-2. Jangan mengubah / menghapus judul kolom pada baris 1.'],
+        ['2. Kolom NO boleh dikosongkan (nomor dibuat otomatis oleh sistem).'],
+        ['3. NAMA, ASAL SEKOLAH, JENJANG PENDIDIKAN, dan JENIS ALERGI wajib diisi.'],
+        ['4. Jika satu anak memiliki lebih dari satu alergi, pisahkan dengan koma. Contoh: Telur, Udang'],
+        ['5. Jenjang diisi singkat, contoh: PAUD, TK, SD, SMP, SMA, SMK, MI, MTs, MA.'],
+        ['6. Jenis alergi baru (selain Telur, Udang, Ikan, Susu, Kacang) boleh langsung ditulis; otomatis masuk daftar.'],
+        ['7. Nama + sekolah yang sama dengan data lama akan digabung (jenis alergi ditambahkan) pada mode "Tambahkan".'],
+        [''],
+        ['CONTOH PENGISIAN (jangan ikut diimpor - salin pola saja):'],
+        ['NO', 'NAMA', 'ASAL SEKOLAH', 'JENJANG PENDIDIKAN', 'JENIS ALERGI'],
+        [1, 'Ahmad Fauzi', 'SDN 1 Contoh', 'SD', 'Telur'],
+        [2, 'Siti Aisyah', 'SMPN 2 Contoh', 'SMP', 'Telur, Udang'],
+        [3, 'Budi Santoso', 'TK Pertiwi Contoh', 'TK', 'Susu']
+      ];
+      const wsGuide = XLSX.utils.aoa_to_sheet(guide);
+      wsGuide['!cols'] = [{ wch: 90 }, { wch: 24 }, { wch: 24 }, { wch: 22 }, { wch: 22 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, wsData, 'DATA');
+      XLSX.utils.book_append_sheet(wb, wsGuide, 'PETUNJUK & CONTOH');
+      const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+      exportDownloadBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'FORMAT_IMPOR_PENDATAAN_SASARAN_PESERTA_DIDIK_FM-SGR-SPPG-01.01.xlsx');
+    }
+
+    function sdHandleFile(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      if (typeof XLSX === 'undefined') { alert('Library Excel belum termuat. Tunggu beberapa detik lalu pilih file lagi.'); input.value = ''; return; }
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+          const sheetName = wb.SheetNames.find(n => n.toUpperCase() === 'DATA') || wb.SheetNames[0];
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: '', raw: false });
+          sdPending = sdParseRows(rows);
+        } catch (err) {
+          console.error(err);
+          sdPending = { error: 'File tidak dapat dibaca. Pastikan formatnya .xlsx / .xls / .csv.' };
+        }
+        sdRenderImportPreview();
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function sdParseRows(rows) {
+      const clean = h => String(h || '').toUpperCase().replace(/[^A-Z]/g, '');
+      let hIdx = -1, map = {};
+      for (let i = 0; i < Math.min(rows.length, 15) && hIdx === -1; i++) {
+        const m = {};
+        (rows[i] || []).forEach((c, ci) => {
+          const h = clean(c);
+          if (!h) return;
+          if (h.indexOf('NAMA') !== -1 && m.nama === undefined && h.indexOf('SEKOLAH') === -1) m.nama = ci;
+          else if (h.indexOf('SEKOLAH') !== -1 && m.sekolah === undefined) m.sekolah = ci;
+          else if ((h.indexOf('JENJANG') !== -1 || h.indexOf('PENDIDIKAN') !== -1) && m.jenjang === undefined) m.jenjang = ci;
+          else if (h.indexOf('ALERGI') !== -1 && m.alergi === undefined) m.alergi = ci;
+        });
+        if (m.nama !== undefined && m.sekolah !== undefined && m.jenjang !== undefined && m.alergi !== undefined) { hIdx = i; map = m; }
+      }
+      if (hIdx === -1) return { error: 'Judul kolom tidak ditemukan. Gunakan format impor: NO | NAMA | ASAL SEKOLAH | JENJANG PENDIDIKAN | JENIS ALERGI (unduh format di atas).' };
+      const out = [], bad = [];
+      const idx = {};
+      for (let i = hIdx + 1; i < rows.length; i++) {
+        const r = rows[i] || [];
+        const nama = sdNorm(r[map.nama]), sekolah = sdNorm(r[map.sekolah]), jenjang = sdNormJenjang(r[map.jenjang]), toks = sdTokens(r[map.alergi]);
+        if (!nama && !sekolah && !jenjang && !toks.length) continue; // baris kosong
+        if (!nama || !sekolah || !jenjang || !toks.length) { bad.push('Baris ' + (i + 1) + (nama ? ' (' + nama + ')' : '') + ': ada kolom yang kosong'); continue; }
+        const k = sdKey(nama, sekolah);
+        if (idx[k] !== undefined) { toks.forEach(t => { if (out[idx[k]].toks.indexOf(t) === -1) out[idx[k]].toks.push(t); }); continue; }
+        idx[k] = out.length;
+        out.push({ nama: nama, sekolah: sekolah, jenjang: jenjang, toks: toks });
+      }
+      return { rows: out, bad: bad };
+    }
+
+    function sdRenderImportPreview() {
+      const box = document.getElementById('sd_import_preview');
+      if (!box) return;
+      box.classList.remove('hidden');
+      if (!sdPending || sdPending.error) {
+        box.innerHTML = `<div class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">⚠️ ${sdEsc(sdPending ? sdPending.error : 'Terjadi kesalahan.')}</div>`;
+        return;
+      }
+      const p = sdPending;
+      const sample = p.rows.slice(0, 6).map(r => `<tr class="border-b border-slate-100"><td class="p-2 font-bold">${sdEsc(r.nama)}</td><td class="p-2">${sdEsc(r.sekolah)}</td><td class="p-2">${sdEsc(r.jenjang)}</td><td class="p-2">${sdEsc(sdAlergiText(r.toks))}</td></tr>`).join('');
+      box.innerHTML = `
+        <div class="p-4 rounded-xl bg-white border border-emerald-200 space-y-3">
+          <div class="text-xs font-extrabold text-emerald-700">✅ ${p.rows.length} baris data valid siap diimpor${p.bad.length ? ' &middot; <span class="text-red-600">' + p.bad.length + ' baris dilewati</span>' : ''}</div>
+          <div class="overflow-x-auto"><table class="w-full text-[11px] text-left"><thead class="text-slate-500 uppercase"><tr><th class="p-2">Nama</th><th class="p-2">Sekolah</th><th class="p-2">Jenjang</th><th class="p-2">Alergi</th></tr></thead><tbody>${sample}</tbody></table></div>
+          ${p.rows.length > 6 ? '<div class="text-[10px] text-slate-400">... dan ' + (p.rows.length - 6) + ' baris lainnya</div>' : ''}
+          ${p.bad.length ? '<div class="text-[10px] text-red-600 font-medium max-h-24 overflow-y-auto">' + p.bad.slice(0, 20).map(sdEsc).join('<br>') + (p.bad.length > 20 ? '<br>...' : '') + '</div>' : ''}
+          <div class="flex gap-2">
+            <button type="button" onclick="sdConfirmImport()" ${p.rows.length ? '' : 'disabled'} class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold px-5 py-2.5 rounded-xl text-xs">✔ Impor Sekarang</button>
+            <button type="button" onclick="sdCancelImport()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2.5 rounded-xl text-xs">Batal</button>
+          </div>
+        </div>`;
+    }
+    function sdCancelImport() {
+      sdPending = null;
+      const box = document.getElementById('sd_import_preview'); if (box) { box.classList.add('hidden'); box.innerHTML = ''; }
+      const f = document.getElementById('sd_file'); if (f) f.value = '';
+    }
+    function sdConfirmImport() {
+      if (!sdPending || !sdPending.rows || !sdPending.rows.length) return;
+      const mode = document.getElementById('sd_import_mode').value;
+      let list = sdGetAll().slice();
+      if (mode === 'ganti') {
+        if (!confirm('Mode GANTI: seluruh ' + list.length + ' data lama akan dihapus dan diganti dengan ' + sdPending.rows.length + ' data dari file.\n\nLanjutkan?')) return;
+        list = [];
+      }
+      let baru = 0, gabung = 0;
+      const idx = {}; list.forEach((s, i) => { idx[sdKey(s.nama, s.sekolah)] = i; });
+      sdPending.rows.forEach(r => {
+        const k = sdKey(r.nama, r.sekolah);
+        if (idx[k] !== undefined) {
+          const cur = list[idx[k]], merged = sdTokens(cur.alergi);
+          r.toks.forEach(t => { if (merged.indexOf(t) === -1) merged.push(t); });
+          list[idx[k]] = Object.assign({}, cur, { jenjang: r.jenjang, alergi: sdAlergiText(merged) });
+          gabung++;
+        } else {
+          idx[k] = list.length;
+          list.push({ id: sdNewId(), nama: r.nama, sekolah: r.sekolah, jenjang: r.jenjang, alergi: sdAlergiText(r.toks) });
+          baru++;
+        }
+      });
+      sdSave(list);
+      sdCancelImport();
+      renderSasaran();
+      alert('Impor selesai: ' + baru + ' data baru, ' + gabung + ' data lama digabung (alergi ditambahkan).');
+    }
+
+    function sdExportData() {
+      if (typeof XLSX === 'undefined') { alert('Library Excel belum termuat. Tunggu beberapa detik lalu coba lagi.'); return; }
+      const list = sdGetAll();
+      const aoa = [['NO', 'NAMA', 'ASAL SEKOLAH', 'JENJANG PENDIDIKAN', 'JENIS ALERGI']].concat(list.map((s, i) => [i + 1, s.nama, s.sekolah, s.jenjang, s.alergi]));
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols'] = [{ wch: 6 }, { wch: 34 }, { wch: 34 }, { wch: 22 }, { wch: 30 }];
+      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'DATA');
+      const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+      exportDownloadBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'DATA_SASARAN_PESERTA_DIDIK_' + getLocalDateKey() + '.xlsx');
+    }
+
+    // ---------------------------------------------------------------- MENU -> REMINDER & SINKRON
+    // Isi menu satu hari siklus (idx 0..19) per kelompok; cara baca sama dengan modul Alergen (22.01)
+    function sdMenuItemsForIdx(idx) {
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
+      const matrix = window.dbCache['sppg_siklus_menu_matrix'] || {};
+      return KELOMPOK_LIST_MENU.map(k => {
+        const wkArr = weeks[Math.floor(idx / 5)]?.items?.[k];
+        const item = Array.isArray(wkArr) ? (wkArr[idx % 5] || '') : ((matrix[k] && matrix[k][idx]) ? matrix[k][idx] : '');
+        return String(item || '');
+      }).filter(Boolean);
+    }
+    function sdDetectAllergens(items) {
+      return ALLERGEN_KEYWORDS.filter(kw => items.some(it => it.toUpperCase().includes(kw)));
+    }
+
+    function sdRenderReminder() {
+      const box = document.getElementById('sd_reminder');
+      if (!box) return;
+      const dateKey = document.getElementById('sd_rem_date')?.value || getLocalDateKey();
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
+      const idx = getSuhuDateKeyList(weeks).indexOf(dateKey);
+      if (idx === -1) {
+        box.innerHTML = '<div class="text-amber-800/80 font-medium">Tanggal ini tidak ada dalam Siklus Menu 20 Hari. Anda tetap dapat mencetak label manual pada panel <b>Cetak Label</b> di bawah.</div>';
+        return;
+      }
+      const items = sdMenuItemsForIdx(idx);
+      const found = sdDetectAllergens(items);
+      const list = sdGetAll();
+      if (!found.length) {
+        box.innerHTML = `<div class="text-emerald-700 font-bold">✅ Menu hari ke-${idx + 1} (${sdEsc(rptLongDate(dateKey))}) tidak mengandung bahan alergen yang terdaftar.</div>`;
+        return;
+      }
+      box.innerHTML = `<div class="font-bold text-amber-900 mb-2">⚠️ Menu hari ke-${idx + 1} (${sdEsc(rptLongDate(dateKey))}) mengandung: ${found.map(f => '<b>' + sdEsc(sdTitle(f)) + '</b>').join(', ')}</div>
+        <div class="flex flex-wrap gap-2">` + found.map(f => {
+          const n = list.filter(s => sdMatches(s, f)).length;
+          return `<button type="button" onclick="sdPrintLabels('${f}')" ${n ? '' : 'disabled'} class="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 disabled:opacity-40 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-rose-500/30 transition-all">🏷️ Cetak Label ALERGI ${sdEsc(f)} (${n} anak)</button>`;
+        }).join('') + '</div>';
+    }
+
+    // Panel sinkron di modul Inspeksi Manajemen Alergen (22.01). Hanya tampilan layar (tidak ikut laporan).
+    function renderAlergenSasaranSync(activeDayIdx) {
+      const box = document.getElementById('al_sasaran_sync');
+      if (!box) return;
+      try {
+        const list = sdGetAll();
+        const found = sdDetectAllergens(sdMenuItemsForIdx(activeDayIdx));
+        let html = '<div class="font-bold text-xs text-rose-900 mb-2 flex flex-wrap items-center gap-2">🧒 Sasaran Peserta Didik Beralergi (FM-SGR-SPPG-01.01)<button type="button" onclick="switchTab(\'sasaran-didik\')" class="ml-auto text-[10px] px-2.5 py-1 rounded-lg bg-white border border-rose-200 text-rose-700 hover:bg-rose-100">Buka Pendataan →</button></div>';
+        if (!list.length) {
+          html += '<div class="text-xs text-slate-500 font-medium">Belum ada data peserta didik. Isi dahulu pada menu Pendataan Sasaran Peserta Didik.</div>';
+        } else if (!found.length) {
+          html += `<div class="text-xs text-emerald-700 font-bold">✅ Menu hari ini tidak mengandung bahan alergen terdaftar &middot; ${list.length} peserta didik terdata.</div>`;
+        } else {
+          html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' + found.map(f => {
+            const m = list.filter(s => sdMatches(s, f));
+            const names = m.slice(0, 10).map(s => sdEsc(s.nama) + ' <span class="text-slate-400">(' + sdEsc(s.jenjang) + ')</span>').join(', ');
+            return `<div class="bg-white p-3 rounded-xl border border-rose-200 shadow-sm space-y-1.5">
+              <div class="font-extrabold text-rose-700 text-[11px] uppercase">⚠️ Menu mengandung ${sdEsc(f)} &middot; ${m.length} peserta didik alergi</div>
+              <div class="text-[11px] text-slate-600 font-medium leading-snug">${names || '-'}${m.length > 10 ? ' ... +' + (m.length - 10) + ' lainnya' : ''}</div>
+              ${m.length ? `<button type="button" onclick="sdOpenLabel('${f}')" class="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white">🏷️ Siapkan Label ${sdEsc(f)}</button>` : ''}
+            </div>`;
+          }).join('') + '</div>';
+        }
+        box.innerHTML = html;
+      } catch (e) { console.error('Sinkron sasaran gagal', e); box.innerHTML = ''; }
+    }
+    function sdOpenLabel(kw) {
+      switchTab('sasaran-didik');
+      const sel = document.getElementById('sd_lbl_alergi');
+      if (sel && Array.from(sel.options).some(o => o.value === kw)) { sel.value = kw; sdRenderLabelPanel(); }
+      setTimeout(() => { document.getElementById('sd_lbl_info')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
+    }
+
+    // ---------------------------------------------------------------- LABEL 5 x 7 CM
+    const SD_LABEL_CSS = `
+      .sdlbl{box-sizing:border-box;width:5cm;height:7cm;border:0.5mm solid #000;border-radius:2mm;overflow:hidden;background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;display:flex;flex-direction:column;page-break-inside:avoid;break-inside:avoid}
+      .sdlbl .hd{background:#000;color:#fff;text-align:center;padding:1.6mm 1mm 1.4mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .sdlbl .hd .w{font-size:8pt;font-weight:700;letter-spacing:.3mm}
+      .sdlbl .hd .a{font-size:17pt;font-weight:900;line-height:1.05;margin-top:.5mm;word-break:break-word}
+      .sdlbl .hd .a.s2{font-size:13pt}.sdlbl .hd .a.s3{font-size:10pt}
+      .sdlbl .bd{flex:1;padding:2.2mm 2.6mm;display:flex;flex-direction:column;justify-content:flex-start;gap:.6mm;overflow:hidden}
+      .sdlbl .k{font-size:6.5pt;font-weight:700;color:#444;letter-spacing:.2mm;margin-top:1.4mm}
+      .sdlbl .nm{font-size:15pt;font-weight:900;line-height:1.1;word-break:break-word;text-transform:uppercase}
+      .sdlbl .nm.s2{font-size:12.5pt}.sdlbl .nm.s3{font-size:10.5pt}.sdlbl .nm.s4{font-size:9pt}
+      .sdlbl .v{font-size:10pt;font-weight:700;line-height:1.15;word-break:break-word}
+      .sdlbl .v.s2{font-size:8.5pt}`;
+    function sdInjectLabelCss() {
+      if (document.getElementById('sdLabelStyle')) return;
+      const st = document.createElement('style'); st.id = 'sdLabelStyle'; st.textContent = SD_LABEL_CSS;
+      document.head.appendChild(st);
+    }
+    function sdLabelHtml(o) {
+      const a = String(o.heading || '').toUpperCase();
+      const aCls = a.length > 22 ? 's3' : (a.length > 11 ? 's2' : '');
+      const n = String(o.nama || '');
+      const nCls = n.length > 40 ? 's4' : (n.length > 26 ? 's3' : (n.length > 14 ? 's2' : ''));
+      const vCls = String(o.sekolah || '').length > 32 ? 's2' : '';
+      return `<div class="sdlbl"><div class="hd"><div class="w">⚠ ALERGI</div><div class="a ${aCls}">${sdEsc(a)}</div></div>
+        <div class="bd"><div class="k">NAMA</div><div class="nm ${nCls}">${sdEsc(n)}</div>
+        <div class="k">SEKOLAH</div><div class="v ${vCls}">${sdEsc(o.sekolah)}</div>
+        <div class="k">JENJANG</div><div class="v">${sdEsc(o.jenjang)}</div></div></div>`;
+    }
+    // Daftar peserta untuk label sesuai pilihan panel
+    function sdLabelTargets(kw) {
+      const sekolah = document.getElementById('sd_lbl_sekolah')?.value || '';
+      return sdGetAll().filter(s => sdMatches(s, kw) && (!sekolah || sdNorm(s.sekolah) === sekolah));
+    }
+    function sdRenderLabelPanel() {
+      const kw = document.getElementById('sd_lbl_alergi')?.value || '';
+      const info = document.getElementById('sd_lbl_info');
+      const prev = document.getElementById('sd_lbl_preview');
+      if (!info || !prev) return;
+      const t = kw ? sdLabelTargets(kw) : [];
+      const copies = Math.max(1, parseInt(document.getElementById('sd_lbl_copies')?.value, 10) || 1);
+      info.innerHTML = t.length ? `Label <b>ALERGI ${sdEsc(kw)}</b>: ${t.length} peserta didik &times; ${copies} salinan = <b>${t.length * copies} label</b>` : `Belum ada peserta didik dengan alergi ${sdEsc(kw || '-')} pada pilihan ini.`;
+      const first = t[0] || { nama: 'NAMA PESERTA DIDIK', sekolah: 'Nama Sekolah', jenjang: 'SD' };
+      prev.innerHTML = sdLabelHtml({ heading: kw || 'TELUR', nama: first.nama, sekolah: first.sekolah, jenjang: first.jenjang });
+    }
+    function sdPrintLabels(kw) {
+      const sel = document.getElementById('sd_lbl_alergi');
+      if (kw && sel) {
+        if (!Array.from(sel.options).some(o => o.value === kw)) { sel.insertAdjacentHTML('beforeend', `<option value="${sdEsc(kw)}">${sdEsc(sdTitle(kw))}</option>`); }
+        sel.value = kw;
+        const sk = document.getElementById('sd_lbl_sekolah'); if (sk) sk.value = '';
+      }
+      const key = sel ? sel.value : (kw || '');
+      const targets = sdLabelTargets(key);
+      if (!targets.length) { alert('Tidak ada peserta didik dengan alergi ' + key + ' untuk dicetak.'); return; }
+      const copies = Math.max(1, Math.min(20, parseInt(document.getElementById('sd_lbl_copies')?.value, 10) || 1));
+      sdRenderLabelPanel();
+      const labels = [];
+      targets.forEach(s => { for (let i = 0; i < copies; i++) labels.push({ heading: key, nama: s.nama, sekolah: s.sekolah, jenjang: s.jenjang }); });
+      sdPrintLabelDoc(labels, document.getElementById('sd_lbl_mode')?.value || 'label');
+    }
+    function sdPrintOne(id) {
+      const s = sdGetAll().find(x => x.id === id);
+      if (!s) return;
+      const toks = sdTokens(s.alergi);
+      const copies = Math.max(1, Math.min(20, parseInt(document.getElementById('sd_lbl_copies')?.value, 10) || 1));
+      const labels = []; for (let i = 0; i < copies; i++) labels.push({ heading: toks.map(sdTitle).join(', '), nama: s.nama, sekolah: s.sekolah, jenjang: s.jenjang });
+      sdPrintLabelDoc(labels, document.getElementById('sd_lbl_mode')?.value || 'label');
+    }
+    function sdPrintLabelDoc(labels, mode) {
+      const a4 = mode === 'a4';
+      const page = a4 ? '@page{size:A4 portrait;margin:8mm}' : '@page{size:5cm 7cm;margin:0}';
+      const layout = a4
+        ? '.sheet{display:flex;flex-wrap:wrap;width:15.2cm;margin:0 auto}.sheet .sdlbl{margin:0;border-style:solid}'
+        : '.sdlbl{border-radius:0;page-break-after:always;break-after:page}.sdlbl:last-child{page-break-after:auto;break-after:auto}';
+      const body = a4 ? '<div class="sheet">' + labels.map(sdLabelHtml).join('') + '</div>' : labels.map(sdLabelHtml).join('');
+      const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Label Alergi</title><style>' + page + 'html,body{margin:0;padding:0;background:#fff}' + SD_LABEL_CSS + layout + '</style></head><body>' + body + '</body></html>';
+      const old = document.getElementById('sdPrintFrame'); if (old) old.remove();
+      const fr = document.createElement('iframe');
+      fr.id = 'sdPrintFrame';
+      fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+      document.body.appendChild(fr);
+      const doc = fr.contentWindow.document;
+      doc.open(); doc.write(html); doc.close();
+      setTimeout(() => { try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (e) { alert('Gagal membuka dialog cetak: ' + e.message); } }, 350);
+    }
+
+    // ---------------------------------------------------------------- LAPORAN BAKU FM-SGR-SPPG-01.01
+    // Isi laporan mengikuti template: No | Jenjang | Jumlah Peserta Didik | Kondisi Khusus (ringkasan)
+    function sdSummaryRows() {
+      const groups = {};
+      sdGetAll().forEach(s => {
+        const label = sdNormJenjang(s.jenjang) || '-';
+        const k = label.toUpperCase();
+        if (!groups[k]) groups[k] = { jenjang: label, jumlah: 0, c: {} };
+        groups[k].jumlah++;
+        sdTokens(s.alergi).forEach(t => { groups[k].c[t] = (groups[k].c[t] || 0) + 1; });
+      });
+      return Object.keys(groups).sort((a, b) => sdJenjangRank(a) - sdJenjangRank(b) || a.localeCompare(b)).map(k => {
+        const g = groups[k];
+        const lines = Object.keys(g.c).sort((a, b) => g.c[b] - g.c[a] || a.localeCompare(b)).map(t => 'Alergi ' + sdTitle(t) + ': ' + g.c[t] + ' anak');
+        return { jenjang: g.jenjang, jumlah: g.jumlah, kondisi: lines.join('\n') || '-' };
+      });
+    }
+
+    async function exportSasaranExcel() {
+      try {
+        if (typeof ExcelJS === 'undefined') { alert('Library Excel belum termuat. Tunggu beberapa detik lalu coba lagi.'); return; }
+        const data = sdSummaryRows();
+        const total = Math.max(12, data.length);              // template memuat 12 baris bernomor
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('PR 01.01');
+        [2.5, 4.5, 11.5, 9.33, 3.66, 32.83, 18.16, 15.5, 13.83, 21, 8.66].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+
+        rptKop(wb, ws, { r: 1, rowH: 20.25, logo: [2, 4], title: [5, 8], lab: 9, val: 10,
+          judul: 'PENDATAAN SASARAN PESERTA DIDIK', noDoc: 'FM-SGR-SPPG-01.01', rev: '01', colon: false });
+        ws.getRow(1).height = 21.75;
+        ws.getRow(4).height = 20.25;
+
+        ws.getRow(5).height = 24.75;
+        rptMerge(ws, 5, 3, 5, 4); rptMerge(ws, 5, 5, 5, 6); rptMerge(ws, 5, 7, 5, 10);
+        rptPut(ws, 5, 2, 'No', { bold: true, h: 'center' });
+        rptPut(ws, 5, 3, 'Jenjang', { bold: true, h: 'center' });
+        rptPut(ws, 5, 5, 'Jumlah Peserta Didik', { bold: true, h: 'center' });
+        rptPut(ws, 5, 7, 'Kondisi Khusus ( ringkasan )', { bold: true, h: 'center' });
+        rptBorder(ws, 5, 2, 5, 10, 'grid');
+
+        for (let i = 0; i < total; i++) {
+          const r = 6 + i, d = data[i];
+          rptMerge(ws, r, 3, r, 4); rptMerge(ws, r, 5, r, 6); rptMerge(ws, r, 7, r, 10);
+          rptPut(ws, r, 2, i + 1, { h: 'center' });
+          rptPut(ws, r, 3, d ? d.jenjang : '', { bold: true, h: 'center' });
+          rptPut(ws, r, 5, d ? d.jumlah : '', { h: 'center' });
+          rptPut(ws, r, 7, d ? d.kondisi : '', { h: 'center' });
+          ws.getRow(r).height = Math.max(23.25, (d ? rptLines(d.kondisi, 66, 11) : 1) * 15 + 8);
+          rptBorder(ws, r, 2, r, 10, 'grid');
+        }
+        const last = 5 + total;
+        rptPage(ws, true, 'B1:J' + (last + 1));
+        if (total <= 20) ws.pageSetup.fitToHeight = 1;
+        await rptDownload(wb, SD_REPORT_FILE + '.xlsx');
+      } catch (e) {
+        console.error('Export Excel 01.01 gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    function exportSasaranWord() {
+      try {
+        const data = sdSummaryRows();
+        const total = Math.max(12, data.length);
+        const kopFiles = [];
+        const kopHtml = exportWordKop('FM-SGR-SPPG-01.01', 'dokumen', kopFiles);
+        let rows = '';
+        for (let i = 0; i < total; i++) {
+          const d = data[i];
+          rows += `<tr><td style="text-align:center;width:8%;">${i + 1}</td><td style="text-align:center;font-weight:bold;width:22%;">${d ? sdEsc(d.jenjang) : '&nbsp;'}</td><td style="text-align:center;width:22%;">${d ? d.jumlah : '&nbsp;'}</td><td style="text-align:center;width:48%;">${d ? sdEsc(d.kondisi).replace(/\n/g, '<br>') : '&nbsp;'}</td></tr>`;
+        }
+        const content = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Formulir Pendataan Sasaran Peserta Didik (FM-SGR-SPPG-01.01)</title>
+        <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+        <style>
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm; }
+          div.Section1 { page: Section1; }
+          body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
+          table.main-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          table.main-table th, table.main-table td { border: 1px solid black; padding: 6px; font-size: 11pt; vertical-align: middle; }
+          table.main-table th { text-align: center; font-weight: bold; }
+        </style></head>
+        <body><div class="Section1">
+          ${kopHtml}
+          <table class="main-table">
+            <thead><tr><th>No</th><th>Jenjang</th><th>Jumlah Peserta Didik</th><th>Kondisi Khusus ( ringkasan )</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div></body></html>`;
+        const blob = new Blob([exportBuildMhtml(content, kopFiles, 'dokumen')], { type: 'application/msword' });
+        exportDownloadBlob(blob, SD_REPORT_FILE + '.doc');
+      } catch (e) {
+        console.error('Export Word 01.01 gagal', e);
+        alert('Export Word gagal: ' + (e && e.message ? e.message : e));
+      }
     }
 
     // Fungsi Utama Inisialisasi UI setelah Firebase dimuat
@@ -3570,6 +4438,7 @@ function renderSuhuTable() {
        if (tabId === 'suhu-ruangan' && !window.suhuSwitching) { autoSaveCurrentSuhuToCache(); renderSuhuTable(); }
        if (tabId === 'inspeksi-silang') renderInspeksiSilangTable();
        if (tabId === 'inspeksi-alergen') renderAlergenMenuAndTable();
+       if (tabId === 'sasaran-didik') renderSasaran();
     };
 
     window.addEventListener('load', () => {
