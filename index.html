@@ -22,7 +22,135 @@
     input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus, textarea:focus { outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25); border-color: #6366f1; }
     tbody tr { transition: background-color 0.2s ease; }
     tbody tr:hover { background-color: rgba(248, 250, 252, 0.8) !important; }
-  </style>
+      /* =================== REVISI TAMPILAN =================== */
+    :root{
+      --ink:#10241d; --forest:#0d3b36; --forest-2:#17564b; --sage:#b4d2c4;
+      --panel:#d3e6db; --panel-2:#e6f1ea; --line:#97b9a7; --line-2:#b3cfc0; --accent:#e9a93b;
+    }
+    html, body { max-width:100vw; overflow-x:hidden; }
+    html body { font-family:'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; background:var(--sage) !important; color:var(--ink); }
+    ::-webkit-scrollbar-track { background:#c2dbce; }
+    ::-webkit-scrollbar-thumb { background:#2f7566; border-radius:6px; }
+    ::-webkit-scrollbar-thumb:hover { background:#0d3b36; }
+
+    /* ---- palet permukaan (tidak putih polos) ---- */
+    html body .bg-white { background-color:var(--panel-2) !important; }
+    html body .bg-slate-50 { background-color:#dcebe3 !important; }
+    html body .bg-slate-100 { background-color:#c7ddd0 !important; }
+    html body .bg-slate-200 { background-color:#b2cdbf !important; }
+    html body .bg-blue-50 { background-color:#cde3f1 !important; }
+    html body .bg-indigo-50 { background-color:#d5def3 !important; }
+    html body .bg-amber-50 { background-color:#f4e2b0 !important; }
+    html body .bg-emerald-50 { background-color:#c3e7d2 !important; }
+    html body .bg-rose-50 { background-color:#f4d3d1 !important; }
+    html body .bg-red-50 { background-color:#f4d3d1 !important; }
+    html body .border-slate-100 { border-color:var(--line-2) !important; }
+    html body .border-slate-200 { border-color:var(--line) !important; }
+    html body .border-slate-300 { border-color:#7fa793 !important; }
+    html body .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color:var(--line-2) !important; }
+    html body .text-slate-400 { color:#557868 !important; }
+    html body .text-slate-500 { color:#3d5e4f !important; }
+    html body .text-slate-600 { color:#2d483c !important; }
+    html body .text-slate-700 { color:#1d352b !important; }
+
+    /* gradien bawaan diganti warna solid */
+    html body [class*="from-amber-50"] { background-image:none !important; background-color:#f2dfae !important; }
+    html body [class*="from-indigo-50"] { background-image:none !important; background-color:#d5def3 !important; }
+    html body [class*="from-blue-50"] { background-image:none !important; background-color:#cde3f1 !important; }
+    html body [class*="from-rose-50"] { background-image:none !important; background-color:#f2d1cf !important; }
+    html body [class*="from-slate-50"] { background-image:none !important; background-color:#dfece4 !important; }
+    html body [class*="from-slate-800"] { background-image:none !important; background-color:var(--forest-2) !important; }
+    html body [class*="from-blue-900"] { background-image:none !important; background-color:#1e4e79 !important; }
+    html body [class*="via-indigo-950"] { background-image:none !important; background-color:#0f3f39 !important; border-color:#2f7566 !important; }
+    html body [class*="via-indigo-950"] .text-slate-400 { color:#a9cbbd !important; }
+    html body .bg-clip-text { background-image:none !important; }
+    html body .text-transparent { color:#e9f6ef !important; }
+    html body .blur-3xl { display:none !important; }
+    html body button[class*="bg-gradient"]:hover { filter:brightness(1.1); }
+
+    /* ---- sidebar & header ---- */
+    html body #appSidebar { background:var(--forest) !important; background-image:none !important; border-right:0 !important; box-shadow:8px 0 26px -10px rgba(5,30,27,.65) !important; }
+    html body #appSidebar .text-slate-400 { color:#9fc4b4 !important; }
+    html body #appSidebar .rounded-xl.p-2 { background:var(--accent) !important; background-image:none !important; box-shadow:none !important; }
+    html body #appSidebar .nav-btn { border:1px solid transparent; }
+    html body #appSidebar .nav-btn:hover { background:rgba(255,255,255,.10) !important; }
+    html body #nav-inspeksi-alergen { background-image:none !important; background-color:transparent !important; box-shadow:none !important; border-color:transparent !important; }
+    html body #appSidebar .nav-btn.nav-active { background:var(--accent) !important; color:#1c2a12 !important; box-shadow:0 6px 16px -6px rgba(0,0,0,.5) !important; border-color:#f6c768 !important; transform:none; font-weight:800; }
+    html body header.md\:hidden { background:var(--forest) !important; box-shadow:0 4px 14px -4px rgba(5,30,27,.6); }
+
+    /* ---- hero ---- */
+    html body #sec-overview > div:first-child { background:#0f4a42 !important; background-image:none !important; border-left:10px solid var(--accent); box-shadow:0 18px 36px -18px rgba(5,30,27,.7) !important; }
+    html body #sec-overview .bg-white.rounded-2xl.p-2 { background:#fff !important; }
+
+    /* ---- kartu ringkasan warna-warni ---- */
+    html body #sec-overview .border-t-indigo-500 { background:#d3dcf2 !important; }
+    html body #sec-overview .border-t-blue-500 { background:#c7e3f3 !important; }
+    html body #sec-overview .border-t-amber-500 { background:#f2dca6 !important; }
+    html body #sec-overview .border-t-emerald-500 { background:#b9e3ca !important; }
+
+    /* ---- container utama ---- */
+    html body main section div.rounded-3xl.bg-white { background-color:var(--panel) !important; border:1px solid var(--line) !important; }
+    html body main div.rounded-3xl { box-shadow:0 8px 20px -12px rgba(8,38,34,.40) !important; }
+    html body main div.rounded-2xl:not(.overflow-x-auto) { box-shadow:0 5px 14px -10px rgba(8,38,34,.40); }
+    html body main div.overflow-x-auto.rounded-2xl { box-shadow:0 5px 14px -10px rgba(8,38,34,.40); }
+
+    /* ---- input ---- */
+    html body input[type="text"], html body input[type="number"], html body input[type="date"], html body input[type="time"], html body select, html body textarea { background-color:#eef6f1; }
+    input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus, textarea:focus { box-shadow:0 0 0 3px rgba(233,169,59,.45) !important; border-color:#c9861a !important; }
+    html body tbody tr:hover { background-color:#c3dccf !important; }
+
+    /* ---- EFEK TIMBUL + SHADOW SAAT KURSOR DI ATAS BOX ---- */
+    @media (hover:hover) and (pointer:fine) {
+      html body main div.rounded-3xl,
+      html body main div.rounded-2xl:not(.overflow-x-auto):not(.sdlbl) { transition:transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease; }
+      html body main div.rounded-3xl:hover { transform:translateY(-3px); box-shadow:0 24px 44px -16px rgba(8,38,34,.60), 0 3px 0 rgba(8,38,34,.12) !important; }
+      html body main div.rounded-2xl:not(.overflow-x-auto):not(.sdlbl):hover { transform:translateY(-4px); box-shadow:0 18px 32px -12px rgba(8,38,34,.55), 0 3px 0 rgba(8,38,34,.10) !important; }
+      html body main div.overflow-x-auto.rounded-2xl:hover { box-shadow:0 18px 32px -12px rgba(8,38,34,.55) !important; }
+    }
+
+    /* =================== MOBILE (<768px) =================== */
+    @media (max-width: 767px) {
+      html, body { overflow-x:hidden !important; }
+      html body { height:100dvh; }
+      html body header.md\:hidden { height:60px; }
+
+      /* menu navigasi selalu ada di sisi KIRI (rail ikon); tombol hamburger membuka label */
+      html body #appSidebar { position:fixed !important; top:60px !important; bottom:0 !important; left:0 !important; height:auto !important; width:60px !important; padding:10px 6px !important; transform:none !important; z-index:50; transition:width .25s ease, padding .25s ease; }
+      html body #appSidebar.expanded { width:min(290px, 84vw) !important; padding:12px !important; }
+      html body #appSidebar > div { padding-right:0 !important; scrollbar-width:none; }
+      html body #appSidebar > div::-webkit-scrollbar { display:none; }
+      html body #appSidebar:not(.expanded) > div > div:first-child,
+      html body #appSidebar:not(.expanded) > div > div:last-child { display:none; }
+      html body #appSidebar .nav-btn { transform:none !important; }
+      html body #appSidebar:not(.expanded) .nav-btn { justify-content:center; padding:11px 0 !important; gap:0; }
+      html body #appSidebar:not(.expanded) .nav-btn span:nth-child(2) { display:none; }
+      html body #appSidebar.expanded .nav-btn { justify-content:flex-start; }
+      html body #sidebarBackdrop { top:60px; left:60px; }
+
+      html body main { margin-left:60px !important; width:calc(100% - 60px) !important; height:calc(100dvh - 60px) !important; min-width:0; padding:12px 10px 28px !important; overflow-x:hidden !important; overflow-y:auto !important; overflow-wrap:anywhere; }
+      html body main .grid > * { min-width:0; }
+      html body main .overflow-x-auto { overflow-x:visible !important; }
+      html body main .md\:hidden.italic { display:none !important; }
+      html body #sd_pager { flex-wrap:wrap; gap:8px; }
+
+      /* tabel menjadi kartu bertumpuk (tanpa geser kiri-kanan) */
+      html body main table { min-width:0 !important; width:100% !important; display:block; border-collapse:separate; }
+      html body main thead { position:absolute !important; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+      html body main tbody { display:block; }
+      html body main tbody tr { display:block; margin:0 0 12px; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--panel-2); box-shadow:0 5px 14px -10px rgba(8,38,34,.5); }
+      html body main tbody td { display:flex; align-items:center; justify-content:space-between; gap:10px; width:auto !important; padding:8px 12px !important; border:0 !important; border-bottom:1px dashed var(--line-2) !important; text-align:left; white-space:normal !important; }
+      html body main tbody td:last-child { border-bottom:0 !important; }
+      html body main tbody td::before { content:attr(data-label); flex:0 0 36%; max-width:36%; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#3d5e4f; }
+      html body main tbody td:not([data-label])::before, html body main tbody td[colspan]::before { display:none; }
+      html body main tbody td[colspan] { display:block; text-align:center; }
+      html body main tbody td > input, html body main tbody td > select, html body main tbody td > textarea { flex:1 1 auto; width:100% !important; min-width:0 !important; }
+      html body main tbody td > div { flex:1 1 auto; min-width:0; }
+    }
+    /* =================== /REVISI =================== */
+</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="bg-slate-50 font-sans text-slate-700 antialiased h-screen overflow-hidden flex flex-col md:flex-row selection:bg-indigo-200 selection:text-indigo-900">
 
@@ -4206,21 +4334,45 @@ function renderSuhuTable() {
 
     // ---------------------------------------------------------------- LABEL 5 x 7 CM
     const SD_LABEL_CSS = `
-      .sdlbl{box-sizing:border-box;width:5cm;height:7cm;border:0.5mm solid #000;border-radius:2mm;overflow:hidden;background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;display:flex;flex-direction:column;page-break-inside:avoid;break-inside:avoid}
-      .sdlbl .hd{background:#000;color:#fff;text-align:center;padding:1.6mm 1mm 1.4mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      .sdlbl .hd .w{font-size:8pt;font-weight:700;letter-spacing:.3mm}
-      .sdlbl .hd .a{font-size:17pt;font-weight:900;line-height:1.05;margin-top:.5mm;word-break:break-word}
+      .sdlbl{box-sizing:border-box;width:5cm;height:7cm;border:.7mm solid var(--c2);border-radius:3mm;overflow:hidden;background:var(--soft);color:#111;font-family:Arial,Helvetica,sans-serif;display:flex;flex-direction:column;page-break-inside:avoid;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .sdlbl *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      .sdlbl .hd{position:relative;background:linear-gradient(135deg,var(--c1) 0%,var(--c2) 100%);color:#fff;text-align:center;padding:2.4mm 1mm 1.5mm;overflow:hidden}
+      .sdlbl .hd:before{content:"";position:absolute;right:-6mm;top:-6mm;width:16mm;height:16mm;border-radius:50%;background:rgba(255,255,255,.16)}
+      .sdlbl .hd:after{content:"";position:absolute;left:-5mm;bottom:-7mm;width:13mm;height:13mm;border-radius:50%;background:rgba(255,255,255,.10)}
+      .sdlbl .hd > *{position:relative;z-index:1}
+      .sdlbl .hd .ic{font-size:14pt;line-height:1.15}
+      .sdlbl .hd .w{font-size:6pt;font-weight:800;letter-spacing:.55mm;margin-top:.7mm}
+      .sdlbl .hd .a{font-size:19pt;font-weight:900;line-height:1.02;margin-top:.6mm;word-break:break-word;text-shadow:0 .35mm 0 rgba(0,0,0,.28)}
       .sdlbl .hd .a.s2{font-size:13pt}.sdlbl .hd .a.s3{font-size:10pt}
-      .sdlbl .bd{flex:1;padding:2.2mm 2.6mm;display:flex;flex-direction:column;justify-content:flex-start;gap:.6mm;overflow:hidden}
-      .sdlbl .k{font-size:6.5pt;font-weight:700;color:#444;letter-spacing:.2mm;margin-top:1.4mm}
-      .sdlbl .nm{font-size:15pt;font-weight:900;line-height:1.1;word-break:break-word;text-transform:uppercase}
-      .sdlbl .nm.s2{font-size:12.5pt}.sdlbl .nm.s3{font-size:10.5pt}.sdlbl .nm.s4{font-size:9pt}
-      .sdlbl .v{font-size:10pt;font-weight:700;line-height:1.15;word-break:break-word}
-      .sdlbl .v.s2{font-size:8.5pt}`;
+      .sdlbl .strip{height:2.2mm;flex:none;background:repeating-linear-gradient(-45deg,var(--c2) 0,var(--c2) 1.5mm,#fff 1.5mm,#fff 3mm)}
+      .sdlbl .bd{flex:1;padding:2mm 2.6mm 1.2mm;display:flex;flex-direction:column;gap:1.3mm;overflow:hidden}
+      .sdlbl .k{font-size:5.4pt;font-weight:800;color:var(--c2);letter-spacing:.4mm}
+      .sdlbl .nm{font-size:14.5pt;font-weight:900;line-height:1.08;word-break:break-word;text-transform:uppercase;color:#0b0b0b;margin-top:.3mm}
+      .sdlbl .nm.s2{font-size:12pt}.sdlbl .nm.s3{font-size:10pt}.sdlbl .nm.s4{font-size:8.5pt}
+      .sdlbl .box{background:#fff;border-left:1.3mm solid var(--c1);border-radius:1mm;padding:.9mm 1.8mm 1mm;box-shadow:0 0 0 .2mm rgba(0,0,0,.08)}
+      .sdlbl .box .k{margin:0 0 .3mm}
+      .sdlbl .v{font-size:9pt;font-weight:800;line-height:1.15;word-break:break-word;color:#111}
+      .sdlbl .v.s2{font-size:7.6pt}
+      .sdlbl .ft{flex:none;background:var(--c2);color:#fff;text-align:center;font-size:5.2pt;font-weight:800;letter-spacing:.3mm;padding:1.3mm 1mm}`;
     function sdInjectLabelCss() {
       if (document.getElementById('sdLabelStyle')) return;
       const st = document.createElement('style'); st.id = 'sdLabelStyle'; st.textContent = SD_LABEL_CSS;
       document.head.appendChild(st);
+    }
+    const SD_LABEL_THEMES = [
+      ['TELUR',    '🥚', '#f59e0b', '#b45309', '#fff4d6'],
+      ['UDANG',    '🦐', '#f43f5e', '#9f1239', '#ffe4e8'],
+      ['KEPITING', '🦀', '#ef4444', '#991b1b', '#fee2e2'],
+      ['CUMI',     '🦑', '#a855f7', '#6b21a8', '#f3e8ff'],
+      ['SEAFOOD',  '🦞', '#14b8a6', '#115e59', '#d5f7f1'],
+      ['IKAN',     '🐟', '#0ea5e9', '#0c4a6e', '#dff2fd'],
+      ['SUSU',     '🥛', '#6366f1', '#3730a3', '#e3e6ff'],
+      ['KACANG',   '🥜', '#b07a4a', '#5b3a1e', '#f6e8d8']
+    ];
+    function sdLabelTheme(h) {
+      const u = String(h || '').toUpperCase();
+      for (let i = 0; i < SD_LABEL_THEMES.length; i++) if (u.indexOf(SD_LABEL_THEMES[i][0]) !== -1) return SD_LABEL_THEMES[i];
+      return ['', '⚠️', '#8b5cf6', '#5b21b6', '#ece6fd'];
     }
     function sdLabelHtml(o) {
       const a = String(o.heading || '').toUpperCase();
@@ -4228,10 +4380,16 @@ function renderSuhuTable() {
       const n = String(o.nama || '');
       const nCls = n.length > 40 ? 's4' : (n.length > 26 ? 's3' : (n.length > 14 ? 's2' : ''));
       const vCls = String(o.sekolah || '').length > 32 ? 's2' : '';
-      return `<div class="sdlbl"><div class="hd"><div class="w">⚠ ALERGI</div><div class="a ${aCls}">${sdEsc(a)}</div></div>
-        <div class="bd"><div class="k">NAMA</div><div class="nm ${nCls}">${sdEsc(n)}</div>
-        <div class="k">SEKOLAH</div><div class="v ${vCls}">${sdEsc(o.sekolah)}</div>
-        <div class="k">JENJANG</div><div class="v">${sdEsc(o.jenjang)}</div></div></div>`;
+      const t = sdLabelTheme(a);
+      return `<div class="sdlbl" style="--c1:${t[2]};--c2:${t[3]};--soft:${t[4]}">
+        <div class="hd"><div class="ic">${t[1]}</div><div class="w">PERINGATAN ALERGI</div><div class="a ${aCls}">${sdEsc(a)}</div></div>
+        <div class="strip"></div>
+        <div class="bd">
+          <div><div class="k">NAMA PESERTA DIDIK</div><div class="nm ${nCls}">${sdEsc(n)}</div></div>
+          <div class="box"><div class="k">ASAL SEKOLAH</div><div class="v ${vCls}">${sdEsc(o.sekolah)}</div></div>
+          <div class="box"><div class="k">JENJANG</div><div class="v">${sdEsc(o.jenjang)}</div></div>
+        </div>
+        <div class="ft">⚠ PERIKSA MENU SEBELUM DIBERIKAN</div></div>`;
     }
     // Daftar peserta untuk label sesuai pilihan panel
     function sdLabelTargets(kw) {
@@ -4278,7 +4436,7 @@ function renderSuhuTable() {
       const page = a4 ? '@page{size:A4 portrait;margin:8mm}' : '@page{size:5cm 7cm;margin:0}';
       const layout = a4
         ? '.sheet{display:flex;flex-wrap:wrap;width:15.2cm;margin:0 auto}.sheet .sdlbl{margin:0;border-style:solid}'
-        : '.sdlbl{border-radius:0;page-break-after:always;break-after:page}.sdlbl:last-child{page-break-after:auto;break-after:auto}';
+        : '.sdlbl{border-radius:0;border-width:.5mm;page-break-after:always;break-after:page}.sdlbl:last-child{page-break-after:auto;break-after:auto}';
       const body = a4 ? '<div class="sheet">' + labels.map(sdLabelHtml).join('') + '</div>' : labels.map(sdLabelHtml).join('');
       const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Label Alergi</title><style>' + page + 'html,body{margin:0;padding:0;background:#fff}' + SD_LABEL_CSS + layout + '</style></head><body>' + body + '</body></html>';
       const old = document.getElementById('sdPrintFrame'); if (old) old.remove();
@@ -4461,26 +4619,61 @@ function renderSuhuTable() {
 
     function toggleSidebar() {
       const sidebar = document.getElementById('appSidebar');
+      if (sidebar.classList.contains('expanded')) closeSidebar(); else openSidebar();
+    }
+
+    function openSidebar() {
+      const sidebar = document.getElementById('appSidebar');
       const backdrop = document.getElementById('sidebarBackdrop');
-      const isClosed = sidebar.classList.contains('-translate-x-full');
-      
-      if (isClosed) {
-        sidebar.classList.remove('-translate-x-full');
-        backdrop.classList.remove('hidden');
-        setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
-      } else {
-        closeSidebar();
-      }
+      sidebar.classList.add('expanded');
+      backdrop.classList.remove('hidden');
+      setTimeout(() => backdrop.classList.remove('opacity-0'), 10);
     }
 
     function closeSidebar() {
       const sidebar = document.getElementById('appSidebar');
       const backdrop = document.getElementById('sidebarBackdrop');
-      
-      sidebar.classList.add('-translate-x-full');
+      sidebar.classList.remove('expanded');
       backdrop.classList.add('opacity-0');
-      setTimeout(() => backdrop.classList.add('hidden'), 300);
+      setTimeout(() => { if (!sidebar.classList.contains('expanded')) backdrop.classList.add('hidden'); }, 300);
     }
+  </script>
+
+  <script>
+    // Revisi tampilan: menu aktif, tooltip rail mobile, label kolom tabel (mode kartu di HP)
+    (function () {
+      document.querySelectorAll('.nav-btn').forEach(function (b) {
+        var s = b.querySelectorAll('span');
+        if (s[1]) b.title = s[1].textContent.trim();
+      });
+      var base = window.switchTab;
+      window.switchTab = function (id) {
+        base(id);
+        document.querySelectorAll('.nav-btn').forEach(function (b) { b.classList.toggle('nav-active', b.id === 'nav-' + id); });
+        var m = document.querySelector('main'); if (m) m.scrollTop = 0;
+      };
+      var first = document.getElementById('nav-overview'); if (first) first.classList.add('nav-active');
+
+      function labelTables() {
+        document.querySelectorAll('main table').forEach(function (t) {
+          var hr = t.querySelector('thead tr'); if (!hr) return;
+          var heads = Array.prototype.map.call(hr.children, function (th) { return th.textContent.replace(/\s+/g, ' ').trim(); });
+          t.querySelectorAll('tbody tr').forEach(function (tr) {
+            Array.prototype.forEach.call(tr.children, function (td, i) {
+              if (td.colSpan > 1) return;
+              var l = heads[i];
+              if (l !== undefined && td.getAttribute('data-label') !== l) td.setAttribute('data-label', l);
+            });
+          });
+        });
+      }
+      var pending = false;
+      new MutationObserver(function () {
+        if (pending) return; pending = true;
+        requestAnimationFrame(function () { pending = false; labelTables(); });
+      }).observe(document.querySelector('main'), { childList: true, subtree: true });
+      labelTables();
+    })();
   </script>
 </body>
 </html>
