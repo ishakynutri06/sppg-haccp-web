@@ -1404,29 +1404,7 @@
             const input = p.input;
             window.pemorsianDirty = true;
             input.setAttribute('data-base64', p.b64);
-            const parent = input.parentElement;
-            let existingImg = parent.querySelector('img');
-            if (!existingImg) {
-                existingImg = document.createElement('img');
-                existingImg.style.width = '60px';
-                existingImg.style.height = '60px';
-                existingImg.style.objectFit = 'cover';
-                existingImg.style.borderRadius = '8px';
-                existingImg.style.marginTop = '4px';
-                parent.appendChild(existingImg);
-            }
-            existingImg.src = p.b64;
-            existingImg.style.cursor = 'pointer';
-            existingImg.title = 'Klik gambar untuk review';
-            existingImg.onclick = () => reviewPhoto(input.id);
-            if (!parent.querySelector('.btn-review-photo')) {
-                const rb = document.createElement('button');
-                rb.type = 'button';
-                rb.className = 'btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm';
-                rb.textContent = '👁️ Review';
-                rb.onclick = () => reviewPhoto(input.id);
-                parent.appendChild(rb);
-            }
+            input.parentElement.outerHTML = buildPemorsianUploadHtml(input.id, p.b64);   // sel foto dibangun ulang (ada Review + Hapus)
             const v = document.getElementById('imageConfirmTempInput').value;
             if (p.sampleInput && v !== '') {
                 p.sampleInput.value = v;
@@ -1438,6 +1416,14 @@
         closeImageConfirmModal();
     }
     
+    function deletePemorsianPhoto(id) {
+        if (!confirm('Apakah Anda yakin ingin menghapus bukti foto ini?')) return;
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.parentElement.outerHTML = buildPemorsianUploadHtml(id, '');
+        window.pemorsianDirty = true;
+    }
+
     function buildPemorsianUploadHtml(id, existingB64) {
         let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px; cursor:pointer;" class="mx-auto shadow-sm" onclick="reviewPhoto('${id}')" title="Klik gambar untuk review">` : '';
         return `<div class="flex flex-col items-center gap-1">
@@ -1446,7 +1432,7 @@
                         <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" aria-label="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
                     </div>
                     <input type="file" accept="image/*" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
-                    ${imgHtml}${existingB64 ? `<button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>` : ''}
+                    ${imgHtml}${existingB64 ? `<button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button><button type="button" onclick="deletePemorsianPhoto('${id}')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>` : ''}
                 </div>`;
     }
 
@@ -1612,7 +1598,9 @@
     // key = kunci EXPORT_MENU; photoMode: 'inline' | 'none' (hanya dipakai bila menu berfoto)
     function exportFileName(key, ext, photoMode) {
       const m = EXPORT_MENU[key] || { nama: String(key).toUpperCase() };
-      let name = m.nama + '_' + exportDocDateKey(key);
+      let nama = m.nama;
+      if (key === 'wrapper_suhu') nama = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', matang: 'SUHU MAKANAN MATANG', pemorsian: 'SUHU PEMORSIAN' })[activeSuhuCategory] || nama;
+      let name = nama + '_' + exportDocDateKey(key);
       if (m.foto) name += '_' + (photoMode === 'none' ? 'TANPA' : 'DENGAN') + ' GAMBAR';
       return name + '.' + ext;
     }
@@ -2036,6 +2024,7 @@
           }
         }
 
+        if (window.__printMode) { window.printWorkbook(wb, title); return; }
         const buffer = await wb.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         exportDownloadBlob(blob, exportFileName(wrapperId, 'xlsx', photoMode));
@@ -2201,6 +2190,7 @@
     }
 
     async function rptDownload(wb, fileName) {
+      if (window.__printMode) { window.printWorkbook(wb, fileName); return; }
       const buffer = await wb.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       exportDownloadBlob(blob, fileName);
@@ -5321,6 +5311,216 @@ function renderSuhuTable() {
       else if (shown('imageConfirmModal')){ e.preventDefault(); window.cancelImageConfirmation(); }
       else if (shown('customAlert'))      { e.preventDefault(); closeCustomAlert(); }
     }, true);
+  </script>
+  <script>
+
+// =====================================================================
+// CETAK LANGSUNG = HASIL EXPORT EXCEL
+// Cara kerja: tombol Cetak menjalankan fungsi export Excel yang SAMA (workbook ExcelJS dibuat
+// persis seperti saat export), tetapi workbook itu tidak diunduh melainkan digambar ulang
+// (kolom, tinggi baris, gabung sel, border, warna, kop+logo, foto) lalu dicetak.
+// Jadi tampilan cetak selalu identik dengan file Excel hasil export.
+// =====================================================================
+(function () {
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+  function a1(ref) {
+    var m = /^([A-Z]+)(\d+)$/.exec(String(ref).replace(/\$/g, ''));
+    if (!m) return { c: 1, r: 1 };
+    var c = 0; for (var i = 0; i < m[1].length; i++) c = c * 26 + m[1].charCodeAt(i) - 64;
+    return { c: c, r: parseInt(m[2], 10) };
+  }
+  function argb(a) { if (!a) return null; a = String(a); return '#' + (a.length === 8 ? a.slice(2) : a); }
+  function cellText(cell) {
+    var v = cell.value;
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'object') {
+      if (v.richText) return v.richText.map(function (t) { return t.text; }).join('');
+      if (v.result !== undefined) return String(v.result);
+      if (v.text !== undefined) return String(v.text);
+      return '';
+    }
+    if (typeof v === 'number' && cell.numFmt) {
+      var m = /^0\.(0+)$/.exec(cell.numFmt);
+      if (m) return v.toFixed(m[1].length);
+    }
+    return String(v);
+  }
+  function imgSrc(wb, id) {
+    var md = wb.getImage(Number(id));
+    if (!md) return null;
+    var ext = (md.extension || 'png').replace('jpg', 'jpeg');
+    if (md.base64) return 'data:image/' + ext + ';base64,' + String(md.base64).replace(/^data:[^,]+,/, '');
+    if (md.buffer) {
+      var bytes = new Uint8Array(md.buffer), bin = '';
+      for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+      return 'data:image/' + ext + ';base64,' + btoa(bin);
+    }
+    return null;
+  }
+
+  function sheetPages(wb, ws) {
+    var ps = ws.pageSetup || {};
+    var land = ps.orientation !== 'portrait';
+    var c1 = 1, c2 = ws.columnCount || 1, r1 = 1, r2 = ws.rowCount || 1;
+    if (ps.printArea) {
+      var pm = String(ps.printArea).split('!').pop().split(':');
+      var A = a1(pm[0]), B = a1(pm[1] || pm[0]);
+      c1 = A.c; r1 = A.r; c2 = B.c; r2 = B.r;
+    }
+    var PW = (land ? 285 : 198) / 25.4 * 96 * 0.97, PH = (land ? 198 : 285) / 25.4 * 96 * 0.97;
+
+    var cw = function (c) { return Math.floor((ws.getColumn(c).width || 8.43) * 7); };
+    var rh = function (r) { return Math.round((ws.getRow(r).height || 15) * 96 / 72); };
+    var absX = function (n) { var s = 0; for (var c = 1; c <= n; c++) s += cw(c); return s; };
+    var absY = function (n) { var s = 0; for (var r = 1; r <= n; r++) s += rh(r); return s; };
+
+    var W0 = absX(c2) - absX(c1 - 1), H0 = absY(r2) - absY(r1 - 1);
+    var zoom = Math.min(1, PW / W0);
+    if (Number(ps.fitToHeight) === 1) zoom = Math.min(zoom, PH / H0);
+    var avail = PH / zoom;
+
+    // sel gabungan
+    var mg = {}, skip = {}, noBreak = {};
+    ((ws.model && ws.model.merges) || []).forEach(function (rg) {
+      var p = rg.split(':'), s = a1(p[0]), e = a1(p[1] || p[0]);
+      mg[s.r + ',' + s.c] = { rs: e.r - s.r + 1, cs: e.c - s.c + 1 };
+      for (var r = s.r; r <= e.r; r++) {
+        for (var c = s.c; c <= e.c; c++) if (r !== s.r || c !== s.c) skip[r + ',' + c] = 1;
+        if (r > s.r) noBreak[r] = 1;     // tidak boleh potong halaman di tengah sel gabungan
+      }
+    });
+
+    // pembagian halaman (hanya bila isi lebih tinggi dari satu halaman)
+    var chunks = [], start = r1, acc = 0;
+    for (var r = r1; r <= r2; r++) {
+      var h = rh(r);
+      if (r > start && acc + h > avail && !noBreak[r]) { chunks.push([start, r - 1]); start = r; acc = 0; }
+      acc += h;
+    }
+    chunks.push([start, r2]);
+
+    var images = ws.getImages ? ws.getImages() : [];
+    var out = [];
+    chunks.forEach(function (ch) {
+      var rs0 = ch[0], re0 = ch[1];
+      var chunkH = absY(re0) - absY(rs0 - 1);
+      var html = '<table style="table-layout:fixed;border-collapse:collapse;width:' + W0 + 'px;border-spacing:0"><colgroup>';
+      for (var c = c1; c <= c2; c++) html += '<col style="width:' + cw(c) + 'px">';
+      html += '</colgroup>';
+      for (var r = rs0; r <= re0; r++) {
+        html += '<tr style="height:' + rh(r) + 'px">';
+        for (var c = c1; c <= c2; c++) {
+          if (skip[r + ',' + c]) continue;
+          var m = mg[r + ',' + c] || { rs: 1, cs: 1 };
+          var rs = Math.min(m.rs, re0 - r + 1), cs = Math.min(m.cs, c2 - c + 1);
+          var master = ws.getCell(r, c);
+          var top = 0, left = 0, bottom = 0, right = 0, fill = null;
+          for (var rr = r; rr < r + rs; rr++) for (var cc = c; cc < c + cs; cc++) {
+            var cl = ws.getCell(rr, cc), b = cl.border || {};
+            if (b.top) top = 1; if (b.left) left = 1; if (b.bottom) bottom = 1; if (b.right) right = 1;
+            if (!fill && cl.fill && cl.fill.fgColor && cl.fill.fgColor.argb) fill = argb(cl.fill.fgColor.argb);
+          }
+          var f = master.font || {}, al = master.alignment || {};
+          var hAl = al.horizontal === 'center' ? 'center' : (al.horizontal === 'right' ? 'right' : 'left');
+          var vAl = al.vertical === 'top' ? 'top' : (al.vertical === 'bottom' ? 'bottom' : 'middle');
+          var hh = 0; for (var q = r; q < r + rs; q++) hh += rh(q);
+          var st = 'padding:0;overflow:hidden;vertical-align:' + vAl + ';text-align:' + hAl + ';' +
+            'border-top:' + (top ? '1px solid #000' : '0') + ';border-left:' + (left ? '1px solid #000' : '0') + ';' +
+            'border-bottom:' + (bottom ? '1px solid #000' : '0') + ';border-right:' + (right ? '1px solid #000' : '0') + ';' +
+            (fill ? 'background:' + fill + ';' : '') +
+            'font-family:\'' + (f.name || 'Calibri') + '\',Calibri,Arial,sans-serif;font-size:' + (f.size || 11) + 'pt;' +
+            (f.bold ? 'font-weight:bold;' : '') + (f.italic ? 'font-style:italic;' : '') + 'color:#000;';
+          var wrap = al.wrapText !== false;
+          var txt = esc(cellText(master)).replace(/\n/g, '<br>');
+          html += '<td' + (rs > 1 ? ' rowspan="' + rs + '"' : '') + (cs > 1 ? ' colspan="' + cs + '"' : '') + ' style="' + st + '">' +
+            '<div style="box-sizing:border-box;padding:1px 3px;max-height:' + Math.max(1, hh - 1) + 'px;overflow:hidden;line-height:1.15;white-space:' + (wrap ? 'pre-wrap' : 'nowrap') + ';word-break:break-word">' + txt + '</div></td>';
+        }
+        html += '</tr>';
+      }
+      html += '</table>';
+
+      // foto & logo diletakkan di posisi yang sama dengan di Excel
+      images.forEach(function (im) {
+        var rg = im.range || {}, tl = rg.tl;
+        if (!tl) return;
+        var ncol = tl.nativeCol !== undefined ? tl.nativeCol : Math.floor(tl.col || 0);
+        var nrow = tl.nativeRow !== undefined ? tl.nativeRow : Math.floor(tl.row || 0);
+        if (nrow + 1 < rs0 || nrow + 1 > re0 || ncol + 1 < c1 || ncol + 1 > c2) return;
+        var x = absX(ncol) - absX(c1 - 1) + (tl.nativeColOff || 0) / 9525;
+        var y = absY(nrow) - absY(rs0 - 1) + (tl.nativeRowOff || 0) / 9525;
+        var w, h;
+        if (rg.br) {
+          var bc = rg.br.nativeCol !== undefined ? rg.br.nativeCol : Math.floor(rg.br.col || 0);
+          var brw = rg.br.nativeRow !== undefined ? rg.br.nativeRow : Math.floor(rg.br.row || 0);
+          w = absX(bc) - absX(c1 - 1) + (rg.br.nativeColOff || 0) / 9525 - x;
+          h = absY(brw) - absY(rs0 - 1) + (rg.br.nativeRowOff || 0) / 9525 - y;
+        } else if (rg.ext) { w = rg.ext.width; h = rg.ext.height; }
+        else return;
+        var src = imgSrc(wb, im.imageId);
+        if (!src) return;
+        html += '<img src="' + src + '" style="position:absolute;left:' + x.toFixed(2) + 'px;top:' + y.toFixed(2) + 'px;width:' + w.toFixed(2) + 'px;height:' + h.toFixed(2) + 'px">';
+      });
+
+      out.push('<div class="wrap ' + (land ? 'land' : 'port') + '"><div class="box" style="zoom:' + zoom.toFixed(4) + ';width:' + W0 + 'px;height:' + chunkH + 'px">' + html + '</div></div>');
+    });
+    return out;
+  }
+
+  window.printWorkbook = function (wb, title) {
+    var pages = [];
+    wb.eachSheet(function (ws) { pages = pages.concat(sheetPages(wb, ws)); });
+    if (!pages.length) { alert('Tidak ada data untuk dicetak.'); return; }
+    var css = '@page land{size:A4 landscape;margin:6mm}@page port{size:A4 portrait;margin:6mm}' +
+      'html,body{margin:0;padding:0;background:#fff}' +
+      '.wrap{text-align:center;page-break-after:always;break-after:page}.wrap:last-child{page-break-after:auto;break-after:auto}' +
+      '.wrap.land{page:land}.wrap.port{page:port}' +
+      '.box{display:inline-block;position:relative;text-align:left;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+      '.box img{max-width:none}';
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + esc(title || 'Cetak') + '</title><style>' + css + '</style></head><body>' + pages.join('') + '</body></html>';
+    var old = document.getElementById('rptPrintFrame'); if (old) old.remove();
+    var fr = document.createElement('iframe');
+    fr.id = 'rptPrintFrame';
+    fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+    document.body.appendChild(fr);
+    var doc = fr.contentWindow.document;
+    doc.open(); doc.write(html); doc.close();
+    setTimeout(function () {
+      try { fr.contentWindow.focus(); fr.contentWindow.print(); }
+      catch (e) { alert('Gagal membuka dialog cetak: ' + e.message); }
+    }, 700);
+  };
+
+  // Menjalankan fungsi export Excel dalam "mode cetak"
+  window.printExport = async function (fn) {
+    if (window.__printMode) return;
+    window.__printMode = true;
+    try { await fn(); }
+    catch (e) { console.error('Cetak gagal', e); alert('Cetak gagal: ' + (e && e.message ? e.message : e)); }
+    finally { window.__printMode = false; }
+  };
+
+  // Sisipkan tombol "Cetak" di samping tombol Excel pada setiap modul
+  function injectPrintButtons() {
+    document.querySelectorAll('main section.tab-content').forEach(function (sec) {
+      var excelBtn = Array.prototype.find.call(sec.querySelectorAll('button[onclick]'), function (b) {
+        return /\bexport\w*Excel\(/.test(b.getAttribute('onclick')) && !b.dataset.printAdded;
+      });
+      if (!excelBtn) return;
+      var code = excelBtn.getAttribute('onclick').replace(/;\s*$/, '');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.dataset.printBtn = '1';
+      btn.setAttribute('onclick', 'printExport(function(){ return ' + code + '; })');
+      btn.title = 'Cetak langsung - hasilnya sama dengan export Excel';
+      btn.className = 'flex-1 lg:flex-none bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center';
+      btn.innerHTML = '<span>🖨️</span> Cetak';
+      excelBtn.dataset.printAdded = '1';
+      excelBtn.insertAdjacentElement('afterend', btn);
+    });
+  }
+  injectPrintButtons();
+})();
+
   </script>
 </body>
 </html>
