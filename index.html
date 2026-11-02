@@ -338,7 +338,7 @@
              <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">📦 Master Bahan 20 Hari</h2>
           </div>
           <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-            <button onclick="exportGenericExcel('Master_Bahan', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
+            <button onclick="exportGenericExcel('Master Bahan', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
             <button onclick="exportGenericWord('Master Bahan 20 Hari', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
             <button onclick="saveMasterBahanManual()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Master</button>
           </div>
@@ -473,6 +473,8 @@
         </div>
 
         <div id="suhuSubViewInput" class="space-y-8">
+          <div class="export-toolbar flex flex-wrap gap-2 w-full"><button type="button" onclick="exportGenericExcel('SUHU RUANGAN','wrapper_suhu')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button><button type="button" onclick="exportGenericWord('Pemantauan Suhu (FM-SGR-SPPG-03.05)','wrapper_suhu')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button></div>
+
           <form id="formSuhuDoc" onsubmit="event.preventDefault(); saveGenericForm('formSuhuDoc', 'sppg_log_suhu', 'Data Pemantauan Suhu Area & Makanan berhasil disimpan!');" class="space-y-8">
             <!-- HEADER FORM (DIPERBAIKI: tidak ada lagi tag ganda / penutup berlebih) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -521,11 +523,7 @@
               </div>
             </div>
 
-            <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-2">
-              <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full lg:w-auto">
-                <button type="button" onclick="exportGenericExcel('Log_Suhu_Ruangan', 'wrapper_suhu')" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>📊</span> Export Excel</button>
-                <button type="button" onclick="exportGenericWord('Pemantauan Suhu (FM-SGR-SPPG-03.05)', 'wrapper_suhu')" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>📝</span> Export Word</button>
-              </div>
+            <div class="flex justify-end items-center gap-4 pt-2">
               <button type="button" onclick="saveGenericForm('formSuhuDoc', 'sppg_log_suhu', 'Data Pemantauan Suhu Area & Makanan berhasil disimpan!');" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg shadow-slate-800/40 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>💾</span> Simpan Log Data</button>
             </div>
           </form>
@@ -550,6 +548,7 @@
           </div>
         </div>
 
+        <div class="export-toolbar flex flex-wrap gap-2 w-full"><button type="button" onclick="exportGenericExcel('KONTAMINASI SILANG','wrapper_inspeksi_silang')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button><button type="button" onclick="exportGenericWord('Inspeksi Kontaminasi Silang (FM-SGR-SPPG-21.01)','wrapper_inspeksi_silang')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button></div>
         <form id="formInspeksiSilang" onsubmit="event.preventDefault(); saveGenericForm('formInspeksiSilang', 'sppg_log_silang', 'Data Inspeksi Kontaminasi Silang harian berhasil disimpan!');" class="space-y-8">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <div>
@@ -587,11 +586,7 @@
             </table>
           </div>
 
-          <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-2">
-            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full lg:w-auto">
-              <button type="button" onclick="exportGenericExcel('Kontaminasi_Silang', 'wrapper_inspeksi_silang')" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>📊</span> Export Excel</button>
-              <button type="button" onclick="exportGenericWord('Inspeksi Kontaminasi Silang (FM-SGR-SPPG-21.01)', 'wrapper_inspeksi_silang')" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>📝</span> Export Word</button>
-            </div>
+          <div class="flex justify-end items-center gap-4 pt-2">
             <button type="submit" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg shadow-slate-800/40 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>💾</span> Simpan Log Inspeksi</button>
           </div>
         </form>
@@ -614,6 +609,8 @@
             <p class="text-[11px] text-slate-500 font-medium mt-1">Data peserta didik beralergi &middot; impor Excel atau input manual &middot; label reminder 5 &times; 7 cm &middot; tersinkron dengan Inspeksi Manajemen Alergen (FM-SGR-SPPG-22.01).</p>
           </div>
         </div>
+
+        <div class="export-toolbar flex flex-wrap gap-2 w-full"><button type="button" onclick="exportSasaranExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button><button type="button" onclick="exportSasaranWord()" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button><button type="button" onclick="sdExportData()" class="flex-1 lg:flex-none bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex justify-center items-center gap-1.5">🗂️ Unduh Data Lengkap (format impor)</button></div>
 
         <!-- RINGKASAN -->
         <div id="sd_stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs"></div>
@@ -809,14 +806,6 @@
   </div>
   <!-- END EDIT KHUSUS PANEL CETAK LABEL -->
 
-        <!-- LAPORAN -->
-        <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-2 border-t border-slate-100">
-          <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full lg:w-auto pt-4">
-            <button type="button" onclick="exportSasaranExcel()" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2">📊 Export Laporan Excel (FM-SGR-SPPG-01.01)</button>
-            <button type="button" onclick="exportSasaranWord()" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2">📝 Export Laporan Word</button>
-            <button type="button" onclick="sdExportData()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-5 py-3 rounded-xl text-xs transition-all flex justify-center items-center gap-2">🗂️ Unduh Data Lengkap (format impor)</button>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -837,6 +826,7 @@
           </div>
         </div>
 
+        <div class="export-toolbar flex flex-wrap gap-2 w-full"><button type="button" onclick="exportAlergenExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button><button type="button" onclick="exportAlergenWord()" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button></div>
         <form id="formInspeksiAlergen" onsubmit="event.preventDefault(); saveGenericForm('formInspeksiAlergen', 'sppg_log_alergen', 'Data Inspeksi Manajemen Alergen berhasil disimpan!');" class="space-y-8">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <div>
@@ -876,11 +866,7 @@
             </table>
           </div>
 
-          <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-2">
-            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full lg:w-auto">
-              <button type="button" onclick="exportAlergenExcel()" class="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>📊</span> Export Excel</button>
-              <button type="button" onclick="exportAlergenWord()" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>📝</span> Export Word</button>
-            </div>
+          <div class="flex justify-end items-center gap-4 pt-2">
             <button type="submit" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg shadow-slate-800/40 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>💾</span> Simpan Log Alergen</button>
           </div>
         </form>
@@ -1297,15 +1283,6 @@
         }, 300);
     }
 
-    function closeImageConfirmModal() {
-        const modal = document.getElementById('imageConfirmModal');
-        modal.classList.add('opacity-0');
-        modal.children[0].classList.add('scale-95');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
-    }
-
     function deleteSuhuPhoto(fotoId) {
         if (confirm("Apakah Anda yakin ingin menghapus bukti foto ini?")) {
             if (window.suhuPhotosMap && window.suhuPhotosMap[fotoId]) {
@@ -1604,6 +1581,42 @@
       return new Date().toLocaleDateString('id-ID', opts);
     }
 
+
+    // =====================================================================
+    // PENAMAAN FILE EXPORT (satu tempat): NAMA MENU_TANGGAL[_DENGAN/TANPA GAMBAR].ext
+    // contoh: SUHU RUANGAN_2026-11-02_DENGAN GAMBAR.xlsx
+    // =====================================================================
+    const EXPORT_MENU = {
+      wrapper_suhu:                { nama: 'SUHU RUANGAN',            foto: true,  tgl: '#suhu_tanggal' },
+      wrapper_pemorsian:           { nama: 'PEMORSIAN',               foto: true,  siklus: 'selectSiklusPemorsian' },
+      wrapper_pendinginan:         { nama: 'PENDINGINAN MAKANAN',     foto: true,  siklus: 'selectSiklusPendinginan' },
+      wrapper_inspeksi_silang:     { nama: 'KONTAMINASI SILANG',      tgl: '#ks_tanggal' },
+      'sec-inspeksi-alergen':      { nama: 'MANAJEMEN ALERGEN',       tgl: '#al_tanggal' },
+      siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU 20 HARI' },
+      master_bahan_tables_wrapper: { nama: 'MASTER BAHAN 20 HARI' },
+      frekuensi:                   { nama: 'FREKUENSI BAHAN' },
+      sasaran:                     { nama: 'SASARAN PESERTA DIDIK' }
+    };
+    function exportDocDateKey(key) {
+      const m = EXPORT_MENU[key] || {};
+      try {
+        if (m.tgl) { const v = (document.querySelector(m.tgl) || {}).value; if (/^\d{4}-\d{2}-\d{2}$/.test(v || '')) return v; }
+        if (m.siklus) {
+          const sel = document.getElementById(m.siklus);
+          const k = sel ? getSuhuDateKeyForIdx(getSuhuWeeks(), parseInt(sel.value, 10)) : null;
+          if (k) return k;
+        }
+      } catch (e) {}
+      return getLocalDateKey();
+    }
+    // key = kunci EXPORT_MENU; photoMode: 'inline' | 'none' (hanya dipakai bila menu berfoto)
+    function exportFileName(key, ext, photoMode) {
+      const m = EXPORT_MENU[key] || { nama: String(key).toUpperCase() };
+      let name = m.nama + '_' + exportDocDateKey(key);
+      if (m.foto) name += '_' + (photoMode === 'none' ? 'TANPA' : 'DENGAN') + ' GAMBAR';
+      return name + '.' + ext;
+    }
+
     // Mengingat folder terakhir untuk jendela "Simpan Sebagai": (1) opsi id -> diingat browser,
     // (2) file handle terakhir disimpan di IndexedDB dan dipakai sebagai startIn (tetap ingat setelah halaman ditutup).
     function sppgIdb() {
@@ -1629,7 +1642,6 @@
     }
 
     async function exportDownloadBlob(blob, fileName) {
-      if (window.exportFileNameOverride) fileName = window.exportFileNameOverride;
       // Browser yang mendukung (Chrome/Edge desktop): tampilkan jendela "Simpan Sebagai" untuk memilih lokasi
       if (typeof window.showSaveFilePicker === 'function') {
         try {
@@ -1689,13 +1701,6 @@
       if (exportModeResolver) { const r = exportModeResolver; exportModeResolver = null; r(v); }
     }
     const EXPORT_PHOTO_WRAPPERS = ['wrapper_pemorsian', 'wrapper_suhu'];
-    // Akhiran nama file: membedakan hasil export DENGAN gambar dan TANPA gambar (semua modul berfoto)
-    function exportPhotoSuffix(mode) { return mode === 'none' ? '_TANPA_GAMBAR' : '_DENGAN_GAMBAR'; }
-    function exportPhotoWordName(wrapperId, mode) {
-      if (wrapperId === 'wrapper_suhu') return 'LAPORAN_EXPORT_PEMANTAUAN_SUHU_FM-SGR-SPPG-03.05' + exportPhotoSuffix(mode) + '.doc';
-      if (wrapperId === 'wrapper_pemorsian') return 'LAPORAN_EXPORT_Checklist_Pemorsian_FM-SGR-SPPG-06.01' + exportPhotoSuffix(mode) + '.doc';
-      return null;
-    }
     // Foto di Word: tetap 2x3 cm / 3x2 cm, tetapi sel dibuat lebih besar dengan ruang di tepi
     // sehingga foto berada DI DALAM garis tabel (tidak menempel / melewati garis).
     function exportWordPhotoImgStyle(n) {
@@ -1783,9 +1788,9 @@
       '06.01': 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', '03.05': 'PEMANTAUAN SUHU RUANGAN',
       '21.01': 'INSPEKSI KONTAMINASI SILANG', '22.01': 'CHECKLIST INSPEKSI HARIAN MANAJEMEN ALERGEN'
     };
-    function exportWordKop(code, docName, files) {
+    function exportWordKop(code, docName, files, judulOverride, revOverride) {
       const num = code.replace('FM-SGR-SPPG-', '');
-      const judul = WORD_KOP_JUDUL[num] || '';
+      const judul = judulOverride || WORD_KOP_JUDUL[num] || '';
       let logoHtml = '';
       const logo = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
       if (logo) {
@@ -1797,7 +1802,7 @@
         '<tr><td rowspan="3" style="' + b + 'width:18%;text-align:center;vertical-align:middle;">' + logoHtml + '</td>' +
         '<td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</td>' +
         '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">: ' + code + '</td></tr>' +
-        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (num === '01.01' ? '01' : '00') + '</td></tr>' +
+        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (revOverride || (num === '01.01' ? '01' : '00')) + '</td></tr>' +
         '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + WORD_KOP_TGL + '</td></tr>' +
         '</table>';
     }
@@ -1816,6 +1821,25 @@
       ];
     }
 
+    // Ganti penanda foto pada salinan tabel dengan <img> ukuran seragam 2x3 cm / 3x2 cm (dipakai semua export Word)
+    async function exportEmbedWordPhotos(clone, files, docName) {
+      const cache = new Map();
+      for (const m of Array.from(clone.querySelectorAll('img[data-export-b64]'))) {
+        const norm = await exportNormalizePhoto(m.getAttribute('data-export-b64'), cache);
+        const cell = m.closest('td, th');
+        if (!norm) { m.parentNode.replaceChild(document.createTextNode('-'), m); continue; }
+        const name = 'foto_' + (files.length + 1) + '.jpg';
+        files.push({ name: name, dataUrl: norm.dataUrl });
+        const wCm = norm.landscape ? 3 : 2, hCm = norm.landscape ? 2 : 3;
+        m.removeAttribute('data-export-b64');
+        m.setAttribute('src', docName + '_files/' + name);
+        m.setAttribute('width', Math.round(wCm * 37.795));
+        m.setAttribute('height', Math.round(hCm * 37.795));
+        m.setAttribute('style', exportWordPhotoImgStyle(norm));
+        if (cell) cell.setAttribute('style', exportWordPhotoCellStyle(norm));
+      }
+    }
+
     async function exportGenericWord(title, wrapperId, photoMode) {
       try {
         if (photoMode === undefined && EXPORT_PHOTO_WRAPPERS.indexOf(wrapperId) !== -1) {
@@ -1827,27 +1851,9 @@
         const clone = built.clone;
         const dateText = exportGetDocDateText(wrapperId);
         const docName = 'dokumen';
-        const cache = new Map();
         const files = [];
 
-        // Sisipkan foto: ukuran tepat 2x3 cm (portrait) atau 3x2 cm (landscape)
-        const markers = Array.from(clone.querySelectorAll('img[data-export-b64]'));
-        for (let i = 0; i < markers.length; i++) {
-          const m = markers[i];
-          const norm = await exportNormalizePhoto(m.getAttribute('data-export-b64'), cache);
-          const cell = m.closest('td, th');
-          if (!norm) { m.parentNode.replaceChild(document.createTextNode('-'), m); continue; }
-          const name = 'foto_' + (files.length + 1) + '.jpg';
-          files.push({ name: name, dataUrl: norm.dataUrl });
-          const wCm = norm.landscape ? 3 : 2, hCm = norm.landscape ? 2 : 3;
-          const wPx = Math.round(wCm * 37.795), hPx = Math.round(hCm * 37.795);
-          m.removeAttribute('data-export-b64');
-          m.setAttribute('src', docName + '_files/' + name);
-          m.setAttribute('width', wPx);
-          m.setAttribute('height', hPx);
-          m.setAttribute('style', exportWordPhotoImgStyle(norm));
-          if (cell) cell.setAttribute('style', exportWordPhotoCellStyle(norm));
-        }
+        await exportEmbedWordPhotos(clone, files, docName);
 
         const kopCode = (String(title).match(/FM-SGR-SPPG-[\d.]+/) || [])[0] || '';
         const html = `
@@ -1878,7 +1884,7 @@
       `;
         const mhtml = exportBuildMhtml(html, files, docName);
         const blob = new Blob([mhtml], { type: 'application/msword' });
-        exportDownloadBlob(blob, exportPhotoWordName(wrapperId, photoMode) || `${title.replace(/\s+/g, '_')}.doc`);
+        exportDownloadBlob(blob, exportFileName(wrapperId, 'doc', photoMode));
       } catch (e) {
         console.error('Export Word gagal', e);
         alert('Export Word gagal: ' + (e && e.message ? e.message : e));
@@ -2032,7 +2038,7 @@
 
         const buffer = await wb.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        exportDownloadBlob(blob, `${title.replace(/\s+/g, '_')}.xlsx`);
+        exportDownloadBlob(blob, exportFileName(wrapperId, 'xlsx', photoMode));
       } catch (e) {
         console.error('Export Excel gagal', e);
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
@@ -2252,7 +2258,7 @@
           rptBorder(ws, start, 2, row - 1, 4, 'box');
         });
         rptPage(ws, false, 'B1:I' + (row - 1));
-        await rptDownload(wb, 'LAPORAN_EXPORT_FORMULIR_FREKUENSI_BAHAN_FM-SGR-SPPG-01.03.xlsx');
+        await rptDownload(wb, exportFileName('frekuensi', 'xlsx'));
       } catch (e) {
         console.error('Export Excel Frekuensi gagal', e);
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
@@ -2313,7 +2319,7 @@
         row++;
       }
       rptPage(ws, true, 'B1:M' + (row - 2));
-      await rptDownload(wb, 'LAPORAN_EXPORT_Siklus_Menu_20_Hari_FM-SGR-SPPG-01.04.xlsx');
+      await rptDownload(wb, exportFileName('siklus_menu_tables_wrapper', 'xlsx'));
     }
 
     // ---------- FM-SGR-SPPG-06.01  CHECKLIST PEMORSIAN DAN BERAT PORSI MBG ----------
@@ -2420,8 +2426,7 @@
 
       rptPage(ws, true, 'B1:' + C.lastL + row);
       ws.pageSetup.fitToHeight = 1;
-      const suffix = inl ? '_DENGAN_GAMBAR' : '_TANPA_GAMBAR';
-      await rptDownload(wb, 'LAPORAN_EXPORT_Checklist_Pemorsian_FM-SGR-SPPG-06.01' + suffix + '.xlsx');
+      await rptDownload(wb, exportFileName('wrapper_pemorsian', 'xlsx', mode));
     }
 
     // ---------- Checklist inspeksi (FM-SGR-SPPG-21.01 Kontaminasi Silang & 22.01 Manajemen Alergen) ----------
@@ -2481,13 +2486,13 @@
       rptPut(ws, row, 6, '( ________________________ )', sg);
       rptPage(ws, true, 'A1:G' + row);
       ws.pageSetup.fitToHeight = 1; // satu lembar, sama seperti template
-      await rptDownload(wb, cfg.file);
+      await rptDownload(wb, exportFileName(cfg.menuKey, 'xlsx'));
     }
 
     function rptExportSilang() {
       return rptExportChecklist({
         sheet: 'FM-SGR-SPPG-21.01', noDoc: 'FM-SGR-SPPG-21.01', judul: ' INSPEKSI KONTAMINASI SILANG',
-        file: 'LAPORAN_EXPORT_INSPEKSI_KONTAMINASI_SILANG_FM-SGR-SPPG-21.01.xlsx',
+        menuKey: 'wrapper_inspeksi_silang',
         font: 'Quattrocento Sans', sz: 10, hdrFill: RPT_GREY, alt: null,
         widths: [4.2, 16, 38.3, 18.2, 18.2, 18.3, 20.7],
         head: ['NO', 'AREA / ELEMEN PEMERIKSAAN', 'STANDAR OPERASIONAL (GHP/HACCP)', 'HASIL INSPEKSI\n(Ya / Tidak / NA)', 'CATATAN KETIDAKSESUAIAN', 'TINDAKAN KOREKSI LANGSUNG', 'PARAF SUPERVISOR'],
@@ -2509,7 +2514,7 @@
     function rptExportAlergen() {
       return rptExportChecklist({
         sheet: 'FM-SGR-SPPG-22.01', noDoc: 'FM-SGR-SPPG-22.01', judul: 'CHECKLIST INSPEKSI HARIAN MANAJEMEN ALERGEN',
-        file: 'LAPORAN_EXPORT_INSPEKSI_MANAJEMEN_ALERGEN_FM-SGR-SPPG-22.01.xlsx',
+        menuKey: 'sec-inspeksi-alergen',
         font: 'Quattrocento Sans', sz: 10, rowSz: 9, hdrFill: 'FFB7B7B7', alt: 'FFF4F7F9',
         widths: [5.8, 18, 49.2, 15.7, 17.3, 18.2, 21.5],
         head: ['NO', 'TAHAPAN OPERASIONAL', 'STANDAR PENGENDALIAN ALERGEN (GHP/HACCP)', 'HASIL INSPEKSI\n(Ya / Tidak / NA)', 'CATATAN KETIDAKSESUAIAN', 'TINDAKAN KOREKSI LANGSUNG', 'PARAF SUPERVISOR'],
@@ -2539,13 +2544,10 @@
         if (wrapperId === 'wrapper_pemorsian') return await rptExportPemorsian(wrapperId, photoMode);
         if (wrapperId === 'wrapper_inspeksi_silang') return await rptExportSilang();
         if (wrapperId === 'sec-inspeksi-alergen') return await rptExportAlergen();
-        if (wrapperId === 'wrapper_suhu') window.exportFileNameOverride = 'LAPORAN_EXPORT_PEMANTAUAN_SUHU_FM-SGR-SPPG-03.05' + exportPhotoSuffix(photoMode) + '.xlsx';
         return await exportGenericExcelLegacy(title, wrapperId, photoMode);
       } catch (e) {
         console.error('Export Excel gagal', e);
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
-      } finally {
-        window.exportFileNameOverride = null;
       }
     }
 
@@ -2600,7 +2602,7 @@
         </body></html>
       `;
       const blob = new Blob([exportBuildMhtml(content, kopFiles, 'dokumen')], { type: 'application/msword' });
-      exportDownloadBlob(blob, `FM-SGR-SPPG-01.03_Frekuensi_Bahan_Baku.doc`);
+      exportDownloadBlob(blob, exportFileName('frekuensi', 'doc'));
     }
 
     const ALLERGEN_KEYWORDS = ['UDANG', 'TELUR', 'SUSU', 'IKAN', 'KACANG', 'SEAFOOD', 'KEPITING', 'CUMI'];
@@ -2843,7 +2845,10 @@
         if (tabId === 'inspeksi-alergen') initAlergenModule();
         if (tabId === 'inspeksi-silang') renderInspeksiSilangTable();
         if (tabId === 'sasaran-didik') renderSasaran();
+        if (tabId === 'pendinginan') initPendinginan();
       }
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('nav-active', b.id === 'nav-' + tabId));
+      const mainEl = document.querySelector('main'); if (mainEl) mainEl.scrollTop = 0;
       if(window.innerWidth < 768) closeSidebar();
     }
 
@@ -3933,17 +3938,6 @@ function renderSuhuTable() {
           });
       }
       
-      // Fallback dinamis jika matrix dari Firebase belum ter-load sempurna
-      if (!menuMatrix || Object.keys(menuMatrix).length === 0) {
-          menuMatrix = { KARBO: [], PH: [], PN: [], SAYUR: [], BUAH: [], SUSU: [] };
-          const wks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
-          wks.forEach(w => {
-              ["KARBO", "PH", "PN", "SAYUR", "BUAH", "SUSU"].forEach(k => {
-                  let colData = (w.items && w.items[k]) ? w.items[k] : ['', '', '', '', ''];
-                  menuMatrix[k] = menuMatrix[k].concat(colData);
-              });
-          });
-      }
 
       if (menuContainer) {
         let menuHtml = `<div class="font-bold text-xs text-amber-900 mb-2">🍱 Menu Hari Ini (Siklus Ke-${activeDayIdx + 1}):</div><div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">`;
@@ -4022,7 +4016,6 @@ function renderSuhuTable() {
     // dan laporan baku 01.01 (ringkasan per jenjang).
     // =====================================================================
     const SD_PATH = 'sppg_sasaran_didik';
-    const SD_REPORT_FILE = 'LAPORAN_EXPORT_PENDATAAN_SASARAN_PESERTA_DIDIK_FM-SGR-SPPG-01.01';
     const SD_JENJANG_ORDER = ['PAUD', 'TK', 'SD', 'MI', 'SMP', 'MTS', 'SMA', 'SMK', 'MA'];
     const SD_JENJANG_ALIAS = { 'SEKOLAH DASAR': 'SD', 'SEKOLAH MENENGAH PERTAMA': 'SMP', 'SEKOLAH MENENGAH ATAS': 'SMA', 'SEKOLAH MENENGAH KEJURUAN': 'SMK', 'TAMAN KANAK-KANAK': 'TK', 'TAMAN KANAK KANAK': 'TK', 'MADRASAH IBTIDAIYAH': 'MI', 'MADRASAH TSANAWIYAH': 'MTs', 'MADRASAH ALIYAH': 'MA' };
     const SD_ALERGI_DEFAULT = ['TELUR', 'UDANG', 'IKAN', 'SUSU', 'KACANG', 'SEAFOOD'];
@@ -4276,7 +4269,7 @@ function renderSuhuTable() {
       XLSX.utils.book_append_sheet(wb, wsData, 'DATA');
       XLSX.utils.book_append_sheet(wb, wsGuide, 'PETUNJUK & CONTOH');
       const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-      exportDownloadBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'FORMAT_IMPOR_PENDATAAN_SASARAN_PESERTA_DIDIK_FM-SGR-SPPG-01.01.xlsx');
+      exportDownloadBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'FORMAT IMPOR SASARAN PESERTA DIDIK.xlsx');
     }
 
     function sdHandleFile(input) {
@@ -4394,7 +4387,7 @@ function renderSuhuTable() {
       ws['!cols'] = [{ wch: 6 }, { wch: 34 }, { wch: 34 }, { wch: 22 }, { wch: 30 }];
       const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'DATA');
       const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-      exportDownloadBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'DATA_SASARAN_PESERTA_DIDIK_' + getLocalDateKey() + '.xlsx');
+      exportDownloadBlob(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'DATA SASARAN PESERTA DIDIK_' + getLocalDateKey() + '.xlsx');
     }
 
     // ---------------------------------------------------------------- MENU -> REMINDER & SINKRON
@@ -4645,7 +4638,7 @@ function renderSuhuTable() {
         const last = 5 + total;
         rptPage(ws, true, 'B1:J' + (last + 1));
         if (total <= 20) ws.pageSetup.fitToHeight = 1;
-        await rptDownload(wb, SD_REPORT_FILE + '.xlsx');
+        await rptDownload(wb, exportFileName('sasaran', 'xlsx'));
       } catch (e) {
         console.error('Export Excel 01.01 gagal', e);
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
@@ -4683,7 +4676,7 @@ function renderSuhuTable() {
           </table>
         </div></body></html>`;
         const blob = new Blob([exportBuildMhtml(content, kopFiles, 'dokumen')], { type: 'application/msword' });
-        exportDownloadBlob(blob, SD_REPORT_FILE + '.doc');
+        exportDownloadBlob(blob, exportFileName('sasaran', 'doc'));
       } catch (e) {
         console.error('Export Word 01.01 gagal', e);
         alert('Export Word gagal: ' + (e && e.message ? e.message : e));
@@ -4789,12 +4782,6 @@ function renderSuhuTable() {
         var s = b.querySelectorAll('span');
         if (s[1]) b.title = s[1].textContent.trim();
       });
-      var base = window.switchTab;
-      window.switchTab = function (id) {
-        base(id);
-        document.querySelectorAll('.nav-btn').forEach(function (b) { b.classList.toggle('nav-active', b.id === 'nav-' + id); });
-        var m = document.querySelector('main'); if (m) m.scrollTop = 0;
-      };
       var first = document.getElementById('nav-overview'); if (first) first.classList.add('nav-active');
 
       function labelTables() {
@@ -5129,8 +5116,6 @@ function renderSuhuTable() {
       window.cancelImageConfirmation = function () { if (pendingPendPhoto) return cancelPendPhoto(); return origCancel.apply(this, arguments); };
 
       // tab, realtime, dan backup
-      const baseSwitch = window.switchTab;
-      window.switchTab = function (id) { baseSwitch(id); if (id === 'pendinginan') initPendinginan(); };
       const baseRe = window.reRenderActiveTab;
       window.reRenderActiveTab = function () { if (baseRe) baseRe.apply(this, arguments); if (window.currentActiveTab === 'pendinginan') loadPendinginan(true); };
       const baseFirst = window.onItemFirstLoad;
@@ -5258,29 +5243,11 @@ function renderSuhuTable() {
 
         rptPage(ws, true, 'B1:' + ws.getColumn(last).letter + row);
         ws.pageSetup.fitToHeight = 1;
-        await rptDownload(wb, 'LAPORAN_EXPORT_PENDINGINAN_MAKANAN_' + PEND_DOC_CODE + (inl ? '_DENGAN_GAMBAR' : '_TANPA_GAMBAR') + '.xlsx');
+        await rptDownload(wb, exportFileName('wrapper_pendinginan', 'xlsx', mode));
       } catch (e) {
         console.error('Export Excel Pendinginan gagal', e);
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
       }
-    }
-
-    // Kop baku Word: logo | SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal (tetap)
-    function pendWordKop(files) {
-      let logoHtml = '';
-      const logo = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
-      if (logo) {
-        files.push({ name: 'logo.png', type: 'image/png', dataUrl: logo });
-        logoHtml = '<img src="dokumen_files/logo.png" width="136" height="62" style="width:3.6cm;height:1.63cm;">';
-      }
-      const b = 'border:1px solid black;padding:4px;';
-      return '<table style="width:100%;border-collapse:collapse;margin:0 0 12px 0;">' +
-        '<tr><td rowspan="3" style="' + b + 'width:18%;text-align:center;vertical-align:middle;">' + logoHtml + '</td>' +
-        '<td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + RPT_SPPG_NAME + '</td>' +
-        '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">: ' + PEND_DOC_CODE + '</td></tr>' +
-        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: 00</td></tr>' +
-        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">PENDINGINAN MAKANAN</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + KOP_TGL_BAKU + '</td></tr>' +
-        '</table>';
     }
 
     async function exportPendinginanWord() {
@@ -5292,25 +5259,9 @@ function renderSuhuTable() {
         const clone = built.clone;
         const info = pendDayInfo();
         const docName = 'dokumen';
-        const cache = new Map();
         const files = [];
 
-        // foto: 2x3 cm (portrait) atau 3x2 cm (landscape), sama seperti modul lain
-        const markers = Array.from(clone.querySelectorAll('img[data-export-b64]'));
-        for (const m of markers) {
-          const norm = await exportNormalizePhoto(m.getAttribute('data-export-b64'), cache);
-          const cell = m.closest('td, th');
-          if (!norm) { m.parentNode.replaceChild(document.createTextNode('-'), m); continue; }
-          const name = 'foto_' + (files.length + 1) + '.jpg';
-          files.push({ name: name, dataUrl: norm.dataUrl });
-          const wCm = norm.landscape ? 3 : 2, hCm = norm.landscape ? 2 : 3;
-          m.removeAttribute('data-export-b64');
-          m.setAttribute('src', docName + '_files/' + name);
-          m.setAttribute('width', Math.round(wCm * 37.795));
-          m.setAttribute('height', Math.round(hCm * 37.795));
-          m.setAttribute('style', exportWordPhotoImgStyle(norm));
-          if (cell) cell.setAttribute('style', exportWordPhotoCellStyle(norm));
-        }
+        await exportEmbedWordPhotos(clone, files, docName);
 
         const infoRow = (a, b) => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${a}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${pendEsc(b)}</td></tr>`;
         const html = `
@@ -5328,14 +5279,14 @@ function renderSuhuTable() {
         </head>
         <body>
           <div class="Section1">
-          ${pendWordKop(files)}
+          ${exportWordKop(PEND_DOC_CODE, docName, files, 'PENDINGINAN MAKANAN', '00')}
           <table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">${infoRow('Hari/Tanggal', info.tanggal)}${infoRow('Siklus Menu Hari ini', info.siklus)}</table>
           ${clone.innerHTML}
           <table style="width:100%;border:none;border-collapse:collapse;margin-top:18px;"><tr><td style="border:none;width:75%;"></td><td style="border:none;text-align:center;">Yang Memeriksa<br><br><br><br><br>(____________________________)</td></tr></table>
           </div>
         </body></html>`;
         const blob = new Blob([exportBuildMhtml(html, files, docName)], { type: 'application/msword' });
-        exportDownloadBlob(blob, 'LAPORAN_EXPORT_PENDINGINAN_MAKANAN_' + PEND_DOC_CODE + (mode === 'none' ? '_TANPA_GAMBAR' : '_DENGAN_GAMBAR') + '.doc');
+        exportDownloadBlob(blob, exportFileName('wrapper_pendinginan', 'doc', mode));
       } catch (e) {
         console.error('Export Word Pendinginan gagal', e);
         alert('Export Word gagal: ' + (e && e.message ? e.message : e));
