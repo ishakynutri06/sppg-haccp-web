@@ -771,7 +771,7 @@
             </label>
             <select id="sd_lbl_mode" class="w-full border-0 rounded-xl p-2.5 text-xs font-extrabold bg-slate-900 text-slate-100 cursor-pointer ring-1 ring-slate-700 focus:ring-2 focus:ring-indigo-500">
               <option value="label">🖨️ Printer Thermal Label (1 Label per Lembar - 5x7 cm)</option>
-              <option value="a4">📄 Kertas A4 Standar (12 Label per Lembar Grid)</option>
+              <option value="a4">📄 Kertas A4 Standar (12 Label per Lembar, ada jarak potong)</option>
             </select>
           </div>
 
@@ -1349,7 +1349,7 @@
         if (b64) {
             return `
             <div class="flex flex-col items-center justify-center gap-1.5 py-1">
-                <img src="${b64}" width="80" height="110" style="width:80px; height:110px; object-fit:cover; border-radius:8px; border:2px solid #10b981;" class="shadow-md">
+                <img src="${b64}" width="80" height="110" style="width:80px; height:110px; object-fit:cover; border-radius:8px; border:2px solid #10b981; cursor:pointer;" class="shadow-md" onclick="reviewPhoto('${fotoId}')" title="Klik gambar untuk review">
                 ${sourceButtons}
                 <button type="button" onclick="reviewPhoto('${fotoId}')" class="text-[10px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2 py-1 rounded-md transition-colors shadow-sm">👁️ Review</button>
                 <button type="button" onclick="deleteSuhuPhoto('${fotoId}')" class="text-[10px] font-bold text-red-700 bg-red-100 hover:bg-red-200 px-2 py-1 rounded-md transition-colors shadow-sm">🗑️ Hapus</button>
@@ -1439,6 +1439,9 @@
                 parent.appendChild(existingImg);
             }
             existingImg.src = p.b64;
+            existingImg.style.cursor = 'pointer';
+            existingImg.title = 'Klik gambar untuk review';
+            existingImg.onclick = () => reviewPhoto(input.id);
             if (!parent.querySelector('.btn-review-photo')) {
                 const rb = document.createElement('button');
                 rb.type = 'button';
@@ -1459,7 +1462,7 @@
     }
     
     function buildPemorsianUploadHtml(id, existingB64) {
-        let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px;" class="mx-auto shadow-sm">` : '';
+        let imgHtml = existingB64 ? `<img src="${existingB64}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-top:4px; cursor:pointer;" class="mx-auto shadow-sm" onclick="reviewPhoto('${id}')" title="Klik gambar untuk review">` : '';
         return `<div class="flex flex-col items-center gap-1">
                     <div class="flex flex-wrap items-center justify-center gap-1">
                         <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" aria-label="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
@@ -1601,6 +1604,30 @@
       return new Date().toLocaleDateString('id-ID', opts);
     }
 
+    // Mengingat folder terakhir untuk jendela "Simpan Sebagai": (1) opsi id -> diingat browser,
+    // (2) file handle terakhir disimpan di IndexedDB dan dipakai sebagai startIn (tetap ingat setelah halaman ditutup).
+    function sppgIdb() {
+      return new Promise((res, rej) => {
+        const rq = indexedDB.open('sppg_ui', 1);
+        rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+        rq.onsuccess = () => res(rq.result);
+        rq.onerror = () => rej(rq.error);
+      });
+    }
+    async function sppgLastSaveHandle() {
+      try {
+        const db = await sppgIdb();
+        return await new Promise(res => {
+          const r = db.transaction('kv').objectStore('kv').get('lastSaveHandle');
+          r.onsuccess = () => res(r.result || null);
+          r.onerror = () => res(null);
+        });
+      } catch (e) { return null; }
+    }
+    async function sppgRememberSaveHandle(handle) {
+      try { const db = await sppgIdb(); db.transaction('kv', 'readwrite').objectStore('kv').put(handle, 'lastSaveHandle'); } catch (e) {}
+    }
+
     async function exportDownloadBlob(blob, fileName) {
       if (window.exportFileNameOverride) fileName = window.exportFileNameOverride;
       // Browser yang mendukung (Chrome/Edge desktop): tampilkan jendela "Simpan Sebagai" untuk memilih lokasi
@@ -1611,12 +1638,21 @@
             xlsx: { description: 'Excel Workbook (.xlsx)', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } },
             doc: { description: 'Dokumen Word (.doc)', accept: { 'application/msword': ['.doc'] } }
           };
-          const opts = { suggestedName: fileName };
+          const opts = { suggestedName: fileName, id: 'sppg-export' };
           if (typeMap[ext]) opts.types = [typeMap[ext]];
-          const handle = await window.showSaveFilePicker(opts);
+          const last = await sppgLastSaveHandle();
+          if (last) opts.startIn = last;
+          let handle;
+          try { handle = await window.showSaveFilePicker(opts); }
+          catch (err) {
+            if ((err && err.name === 'AbortError') || !opts.startIn) throw err;
+            delete opts.startIn;                       // folder lama sudah tidak ada -> buka tanpa startIn
+            handle = await window.showSaveFilePicker(opts);
+          }
           const writable = await handle.createWritable();
           await writable.write(blob);
           await writable.close();
+          sppgRememberSaveHandle(handle);
           alert('File berhasil disimpan: ' + handle.name);
           return;
         } catch (e) {
@@ -1653,6 +1689,21 @@
       if (exportModeResolver) { const r = exportModeResolver; exportModeResolver = null; r(v); }
     }
     const EXPORT_PHOTO_WRAPPERS = ['wrapper_pemorsian', 'wrapper_suhu'];
+    // Akhiran nama file: membedakan hasil export DENGAN gambar dan TANPA gambar (semua modul berfoto)
+    function exportPhotoSuffix(mode) { return mode === 'none' ? '_TANPA_GAMBAR' : '_DENGAN_GAMBAR'; }
+    function exportPhotoWordName(wrapperId, mode) {
+      if (wrapperId === 'wrapper_suhu') return 'LAPORAN_EXPORT_PEMANTAUAN_SUHU_FM-SGR-SPPG-03.05' + exportPhotoSuffix(mode) + '.doc';
+      if (wrapperId === 'wrapper_pemorsian') return 'LAPORAN_EXPORT_Checklist_Pemorsian_FM-SGR-SPPG-06.01' + exportPhotoSuffix(mode) + '.doc';
+      return null;
+    }
+    // Foto di Word: tetap 2x3 cm / 3x2 cm, tetapi sel dibuat lebih besar dengan ruang di tepi
+    // sehingga foto berada DI DALAM garis tabel (tidak menempel / melewati garis).
+    function exportWordPhotoImgStyle(n) {
+      return 'width:' + (n.landscape ? 3 : 2) + 'cm;height:' + (n.landscape ? 2 : 3) + 'cm;display:block;margin:0 auto;';
+    }
+    function exportWordPhotoCellStyle(n) {
+      return 'text-align:center;vertical-align:middle;width:3.6cm;height:' + ((n.landscape ? 2 : 3) + 0.4).toFixed(1) + 'cm;padding:0.2cm;';
+    }
 
     // Hapus kolom foto (header mengandung "FOTO") dari salinan tabel
     function exportRemovePhotoColumns(root) {
@@ -1794,8 +1845,8 @@
           m.setAttribute('src', docName + '_files/' + name);
           m.setAttribute('width', wPx);
           m.setAttribute('height', hPx);
-          m.setAttribute('style', 'width:' + wCm + 'cm;height:' + hCm + 'cm;display:block;margin:0 auto;');
-          if (cell) cell.setAttribute('style', 'text-align:center;vertical-align:middle;width:3.4cm;padding:3px;');
+          m.setAttribute('style', exportWordPhotoImgStyle(norm));
+          if (cell) cell.setAttribute('style', exportWordPhotoCellStyle(norm));
         }
 
         const kopCode = (String(title).match(/FM-SGR-SPPG-[\d.]+/) || [])[0] || '';
@@ -1827,7 +1878,7 @@
       `;
         const mhtml = exportBuildMhtml(html, files, docName);
         const blob = new Blob([mhtml], { type: 'application/msword' });
-        exportDownloadBlob(blob, `${title.replace(/\s+/g, '_')}.doc`);
+        exportDownloadBlob(blob, exportPhotoWordName(wrapperId, photoMode) || `${title.replace(/\s+/g, '_')}.doc`);
       } catch (e) {
         console.error('Export Word gagal', e);
         alert('Export Word gagal: ' + (e && e.message ? e.message : e));
@@ -1850,8 +1901,8 @@
         // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
         const HDR_ROWS = isSuhu ? 5 + suhuHdr.length : 4;
         const PHOTO_COL_WIDTH = 18;         // ~131 px, cukup untuk foto 3 cm (113 px)
-        const PORTRAIT_ROW_PT = 96;         // foto 3 cm (85 pt) + ruang
-        const LANDSCAPE_ROW_PT = 67;        // foto 2 cm (57 pt) + ruang
+        const PORTRAIT_ROW_PT = 104;        // foto 3 cm (85 pt) + ruang atas/bawah
+        const LANDSCAPE_ROW_PT = 74;        // foto 2 cm (57 pt) + ruang atas/bawah
 
         let tIdx = 0;
         for (const table of tables) {
@@ -1952,20 +2003,18 @@
             }
           });
 
-          // 5) Sisipkan foto: tepat 2x3 cm / 3x2 cm, di tengah sel
-          cells.forEach(x => {
-            if (!x.norm) return;
+          // 5) Sisipkan foto: 2x3 cm / 3x2 cm di tengah sel, terkunci ke ukuran sel
+          if (isSuhu) {   // lebar kolom akhir ditetapkan SEBELUM foto dipasang agar ukuran sel sudah final
+            const lc = Math.max(maxCol, 6);
+            ws.getColumn(lc).width = Math.max(ws.getColumn(lc).width || 0, 20);
+            ws.getColumn(lc - 1).width = Math.max(ws.getColumn(lc - 1).width || 0, 14);
+          }
+          for (const x of cells) {
+            if (!x.norm) continue;
             try {
-              let imageId = imageIdCache.get(x.norm.dataUrl);
-              if (imageId === undefined) {
-                imageId = wb.addImage({ base64: x.norm.dataUrl.split(',')[1], extension: 'jpeg' });
-                imageIdCache.set(x.norm.dataUrl, imageId);
-              }
-              const wPx = x.norm.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT;
-              const hPx = x.norm.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG;
-              rptPlaceImage(ws, imageId, HDR_ROWS + x.r, x.c, HDR_ROWS + x.r + x.rs - 1, x.c + x.cs - 1, wPx, hPx);
+              await rptPlacePhoto(wb, ws, x.norm, HDR_ROWS + x.r, x.c, HDR_ROWS + x.r + x.rs - 1, x.c + x.cs - 1, imageIdCache);
             } catch (e) { console.error('Gagal menyisipkan foto ke Excel', e); }
-          });
+          }
 
           if (isSuhu) {
             // Kop baku: logo | SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal (tetap)
@@ -2055,6 +2104,10 @@
       let areaW = 0, areaH = 0;
       for (let c = c1; c <= c2; c++) areaW += rptColPx(ws, c);
       for (let r = r1; r <= r2; r++) areaH += rptRowPx(ws, r);
+      // Foto selalu berada DI DALAM sel (sisa 4 px di tiap tepi); bila sel terlalu kecil, foto diperkecil proporsional
+      const MARGIN = 4;
+      const fit = Math.min(1, (areaW - 2 * MARGIN) / wPx, (areaH - 2 * MARGIN) / hPx);
+      if (fit > 0 && fit < 1) { wPx = Math.floor(wPx * fit); hPx = Math.floor(hPx * fit); }
       let remX = Math.max(0, Math.round((areaW - wPx) / 2));
       let remY = Math.max(0, Math.round((areaH - hPx) / 2));
       let col = c1, row = r1;
@@ -2063,6 +2116,37 @@
       ws.addImage(imageId, {
         tl: { nativeCol: col - 1, nativeColOff: Math.round(remX * 9525), nativeRow: row - 1, nativeRowOff: Math.round(remY * 9525) },
         ext: { width: wPx, height: hPx }, editAs: 'oneCell'
+      });
+    }
+
+    // FOTO EXCEL: dibuat sebagai gambar seukuran SEL itu sendiri (latar transparan + foto 2x3 cm / 3x2 cm di tengah
+    // dengan ruang tepi), lalu dikaitkan ke sudut-sudut sel (two-cell anchor). Karena ukuran gambar mengikuti sel,
+    // foto tidak mungkin melewati garis -- di Excel, WPS, LibreOffice, zoom maupun DPI layar apa pun.
+    async function rptPlacePhoto(wb, ws, norm, r1, c1, r2, c2, cache) {
+      let aw = 0, ah = 0;
+      for (let c = c1; c <= c2; c++) aw += rptColPx(ws, c);
+      for (let r = r1; r <= r2; r++) ah += rptRowPx(ws, r);
+      const pw = norm.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT;
+      const ph = norm.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG;
+      const M = 10;                                            // ruang kosong minimal di tiap tepi (px)
+      const k = Math.min(1, (aw - 2 * M) / pw, (ah - 2 * M) / ph);
+      const w = pw * (k > 0 ? k : 1), hh = ph * (k > 0 ? k : 1);
+      const key = norm.dataUrl + '|' + aw + 'x' + ah;
+      let id = cache.get(key);
+      if (id === undefined) {
+        const img = await exportLoadImage(norm.dataUrl);
+        if (!img) return;
+        const S = 3;                                           // resolusi 3x agar tetap tajam
+        const cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(aw * S)); cv.height = Math.max(1, Math.round(ah * S));
+        cv.getContext('2d').drawImage(img, (aw - w) / 2 * S, (ah - hh) / 2 * S, w * S, hh * S);
+        id = wb.addImage({ base64: cv.toDataURL('image/png').split(',')[1], extension: 'png' });
+        cache.set(key, id);
+      }
+      ws.addImage(id, {
+        tl: { nativeCol: c1 - 1, nativeColOff: 0, nativeRow: r1 - 1, nativeRowOff: 0 },
+        br: { nativeCol: c2, nativeColOff: 0, nativeRow: r2, nativeRowOff: 0 },
+        editAs: 'twoCell'
       });
     }
 
@@ -2308,7 +2392,7 @@
         const hasPhoto = norms.some(n => n);
         const anyPortrait = norms.some(n => n && !n.landscape);
         const textH = Math.max(24.75, rptLines(d.label, 18.5, 11) * 15 + 6);
-        const rowPt = hasPhoto ? Math.max(textH, anyPortrait ? 96 : 67) : textH;
+        const rowPt = hasPhoto ? Math.max(textH, anyPortrait ? 104 : 74) : textH;
         ws.getRow(row).height = rowPt;
 
         rptPut(ws, row, 2, i + 1, { h: 'center' });
@@ -2320,14 +2404,10 @@
         rptBorder(ws, row, 2, row, C.last, 'grid');
 
         // foto di dalam sel, halaman yang sama dengan tabel (3 cm x 2 cm / 2 cm x 3 cm)
-        norms.forEach((n, k) => {
-          if (!n) return;
-          let id = idCache.get(n.dataUrl);
-          if (id === undefined) { id = wb.addImage({ base64: n.dataUrl.split(',')[1], extension: 'jpeg' }); idCache.set(n.dataUrl, id); }
-          const wPx = n.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT;
-          const hPx = n.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG;
-          rptPlaceImage(ws, id, row, C.fCols[k], row, C.fCols[k], wPx, hPx);
-        });
+        for (let k = 0; k < norms.length; k++) {
+          if (!norms[k]) continue;
+          await rptPlacePhoto(wb, ws, norms[k], row, C.fCols[k], row, C.fCols[k], idCache);
+        }
         row++;
       }
 
@@ -2459,7 +2539,7 @@
         if (wrapperId === 'wrapper_pemorsian') return await rptExportPemorsian(wrapperId, photoMode);
         if (wrapperId === 'wrapper_inspeksi_silang') return await rptExportSilang();
         if (wrapperId === 'sec-inspeksi-alergen') return await rptExportAlergen();
-        if (wrapperId === 'wrapper_suhu') window.exportFileNameOverride = 'LAPORAN_EXPORT_PEMANTAUAN_SUHU_FM-SGR-SPPG-03.05.xlsx';
+        if (wrapperId === 'wrapper_suhu') window.exportFileNameOverride = 'LAPORAN_EXPORT_PEMANTAUAN_SUHU_FM-SGR-SPPG-03.05' + exportPhotoSuffix(photoMode) + '.xlsx';
         return await exportGenericExcelLegacy(title, wrapperId, photoMode);
       } catch (e) {
         console.error('Export Excel gagal', e);
@@ -4490,11 +4570,17 @@ function renderSuhuTable() {
     }
     function sdPrintLabelDoc(labels, mode) {
       const a4 = mode === 'a4';
-      const page = a4 ? '@page{size:A4 portrait;margin:8mm}' : '@page{size:5cm 7cm;margin:0}';
+      const page = a4 ? '@page{size:A4 portrait;margin:3.5mm}' : '@page{size:5cm 7cm;margin:0}';
       const layout = a4
-        ? '.sheet{display:flex;flex-wrap:wrap;width:15.2cm;margin:0 auto}.sheet .sdlbl{margin:0;border-style:solid}'
+        ? // 3 kolom x 4 baris per lembar; jarak potong 5 mm (samping) dan 2,5 mm (atas-bawah) + garis bantu putus-putus
+          '.sheet{display:flex;flex-wrap:wrap;align-content:flex-start;width:16cm;margin:0 auto;gap:2.5mm 5mm}' +
+          '.cell{position:relative;flex:none;width:5cm;height:7cm;break-inside:avoid;page-break-inside:avoid}' +
+          '.cell:not(:nth-child(3n))::after{content:"";position:absolute;top:-1.25mm;bottom:-1.25mm;right:-2.5mm;border-right:.25mm dashed #8a8a8a}' +
+          '.cell::before{content:"";position:absolute;left:-2.5mm;right:-2.5mm;bottom:-1.25mm;border-bottom:.25mm dashed #8a8a8a}' +
+          '.cell:not(:nth-child(3n+1))::before{left:-2.5mm}' +
+          '.sheet .sdlbl{margin:0;border-style:solid}'
         : '.sdlbl{border-radius:0;border-width:.5mm;page-break-after:always;break-after:page}.sdlbl:last-child{page-break-after:auto;break-after:auto}';
-      const body = a4 ? '<div class="sheet">' + labels.map(sdLabelHtml).join('') + '</div>' : labels.map(sdLabelHtml).join('');
+      const body = a4 ? '<div class="sheet">' + labels.map(o => '<div class="cell">' + sdLabelHtml(o) + '</div>').join('') + '</div>' : labels.map(sdLabelHtml).join('');
       const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Label Alergi</title><style>' + page + 'html,body{margin:0;padding:0;background:#fff}' + SD_LABEL_CSS + layout + '</style></head><body>' + body + '</body></html>';
       const old = document.getElementById('sdPrintFrame'); if (old) old.remove();
       const fr = document.createElement('iframe');
@@ -4797,7 +4883,7 @@ function renderSuhuTable() {
 
     // ---------- sel foto ----------
     function buildPendPhotoHtml(id, kind, b64) {
-      const img = b64 ? `<img src="${b64}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #10b981;" class="mx-auto shadow-sm">` : '';
+      const img = b64 ? `<img src="${b64}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #10b981;cursor:pointer;" class="mx-auto shadow-sm" onclick="reviewPhoto('${id}')" title="Klik gambar untuk review">` : '';
       const extra = b64 ? `
         <button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>
         <button type="button" onclick="deletePendPhoto('${id}')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>` : '';
@@ -5149,7 +5235,7 @@ function renderSuhuTable() {
           const hasPhoto = norms.some(n => n);
           const anyPortrait = norms.some(n => n && !n.landscape);
           const textH = Math.max(24.75, rptLines(d.menu, 26, 11) * 15 + 6);
-          ws.getRow(row).height = hasPhoto ? Math.max(textH, anyPortrait ? 96 : 67) : textH;
+          ws.getRow(row).height = hasPhoto ? Math.max(textH, anyPortrait ? 104 : 74) : textH;
 
           const put = (k, v, o) => rptPut(ws, row, cx[k], v, Object.assign({ h: 'center' }, o || {}));
           put('no', parseInt(d.no, 10)); put('tahap', d.tahap); put('jenis', d.jenis, { h: 'left' }); put('menu', d.menu, { h: 'left' });
@@ -5157,13 +5243,10 @@ function renderSuhuTable() {
           put('js', d.js); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' });
           rptBorder(ws, row, first, row, last, 'grid');
 
-          [['fm', norms[0]], ['fs', norms[1]]].forEach(p => {
-            const n = p[1];
-            if (!n) return;
-            let id = idCache.get(n.dataUrl);
-            if (id === undefined) { id = wb.addImage({ base64: n.dataUrl.split(',')[1], extension: 'jpeg' }); idCache.set(n.dataUrl, id); }
-            rptPlaceImage(ws, id, row, cx[p[0]], row, cx[p[0]], n.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT, n.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG);
-          });
+          for (const p of [['fm', norms[0]], ['fs', norms[1]]]) {
+            if (!p[1]) continue;
+            await rptPlacePhoto(wb, ws, p[1], row, cx[p[0]], row, cx[p[0]], idCache);
+          }
           row++;
         }
 
@@ -5225,8 +5308,8 @@ function renderSuhuTable() {
           m.setAttribute('src', docName + '_files/' + name);
           m.setAttribute('width', Math.round(wCm * 37.795));
           m.setAttribute('height', Math.round(hCm * 37.795));
-          m.setAttribute('style', 'width:' + wCm + 'cm;height:' + hCm + 'cm;display:block;margin:0 auto;');
-          if (cell) cell.setAttribute('style', 'text-align:center;vertical-align:middle;width:3.4cm;padding:3px;');
+          m.setAttribute('style', exportWordPhotoImgStyle(norm));
+          if (cell) cell.setAttribute('style', exportWordPhotoCellStyle(norm));
         }
 
         const infoRow = (a, b) => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${a}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${pendEsc(b)}</td></tr>`;
@@ -5258,6 +5341,35 @@ function renderSuhuTable() {
         alert('Export Word gagal: ' + (e && e.message ? e.message : e));
       }
     }
+  </script>
+
+  <script>
+    // Pop-up "Konfirmasi Bukti Foto": tombol Enter = "Simpan & Lanjutkan"
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' || e.repeat || e.isComposing) return;
+      var m = document.getElementById('imageConfirmModal');
+      if (!m || m.classList.contains('hidden') || m.classList.contains('opacity-0')) return;   // tertutup / sedang menutup
+      var t = e.target;
+      if (t && t.tagName === 'BUTTON' && m.contains(t)) return;   // tombol di dalam pop-up bekerja seperti biasa (mis. Batal)
+      e.preventDefault();
+      e.stopPropagation();
+      window.confirmImageConfirmation();
+    }, true);
+  </script>
+
+  <script>
+    // Tombol Esc menutup / membatalkan pop-up yang sedang tampil (yang paling atas lebih dulu)
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || e.isComposing) return;
+      function shown(id) {
+        var m = document.getElementById(id);
+        return !!m && !m.classList.contains('hidden') && !m.classList.contains('opacity-0');
+      }
+      if (shown('photoReviewModal'))      { e.preventDefault(); closePhotoReview(); }
+      else if (shown('exportModeModal'))  { e.preventDefault(); resolveExportMode(null); }
+      else if (shown('imageConfirmModal')){ e.preventDefault(); window.cancelImageConfirmation(); }
+      else if (shown('customAlert'))      { e.preventDefault(); closeCustomAlert(); }
+    }, true);
   </script>
 </body>
 </html>
