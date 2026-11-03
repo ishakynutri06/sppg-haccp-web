@@ -6052,12 +6052,14 @@ function renderSuhuTable() {
         var opts = { body: msg, tag: 'sppg-' + Date.now(), icon: icon || undefined };
         try { new Notification(title, opts); }
         catch (e) {   // Android Chrome: harus lewat service worker
-          if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
-            navigator.serviceWorker.getRegistration().then(function (reg) { if (reg) reg.showNotification(title, opts); }).catch(function () {});
+          if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(function (reg) { reg.showNotification(title, opts); }).catch(function () {});
           }
         }
       }
       window.sppgToast = toast;
+      window.sppgRemind = function (title, body) { toast('🔔 ' + title + ': ' + body); browserNotify(body, title); };
+      try { if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {}
       window.sppgAskPerm = askPerm;
       // Pemberitahuan lengkap: toast di halaman + notifikasi browser (dipakai untuk simpan / unduh file)
       window.sppgNotify = function (title, body) { toast('✅ ' + title + (body ? ': ' + body : '')); browserNotify(body || '', title); };
@@ -6244,6 +6246,210 @@ function renderSuhuTable() {
         if (ae && sec && sec.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) && ae.type !== 'file' && EDIT_TABS.indexOf(tab) !== -1) return;
         return oRe.apply(this, arguments);
       };
+    })();
+  </script>
+  <script>
+    // =====================================================================
+    // REVISI v15 - PENGINGAT FOTO BELUM DIUNGGAH (hari ini)
+    // Memeriksa semua slot foto hari ini pada: Pemantauan Suhu, Pemorsian, Pendinginan Makanan.
+    // Mengingatkan lewat notifikasi browser + bunyi + getar + kartu di layar + lencana 📷 di bilah tanggal.
+    // =====================================================================
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var p2 = function (n) { return String(n).padStart(2, '0'); };
+      var HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      var BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      var LS = 'sppg_photo_rem_cfg', LSL = 'sppg_photo_rem_last';
+      var cfg = { on: true, every: 60, from: '06:00', to: '18:00' };
+      try { var sv = JSON.parse(localStorage.getItem(LS) || 'null'); if (sv) Object.assign(cfg, sv); } catch (e) {}
+      function saveCfg() { try { localStorage.setItem(LS, JSON.stringify(cfg)); } catch (e) {} }
+      var snoozeUntil = 0, lastStatus = null;
+      var lastRemind = 0; try { lastRemind = parseInt(localStorage.getItem(LSL) || '0', 10) || 0; } catch (e) {}
+      var baseTitle = document.title;
+
+      var has = function (v) { return typeof v === 'string' ? v.length > 20 : !!(v && v.base64); };
+      var arr = function (v) { return Array.isArray(v) ? v : (v ? Object.values(v) : []); };
+
+      // ---------- hitung slot foto hari ini ----------
+      function getStatus() {
+        var today = getLocalDateKey();
+        var overlay = $('loadingOverlay');
+        if (overlay && !overlay.classList.contains('hidden')) return null;
+        var weeks = getSuhuWeeks(), keys = getSuhuDateKeyList(weeks), idx = keys.indexOf(today);
+        if (window.subscribeItem) {
+          subscribeItem('sppg_log_suhu', today);
+          if (idx !== -1) { subscribeItem('sppg_pemorsian_data', today); subscribeItem('sppg_pendinginan_data', today); }
+        }
+        var L = window.dbLoaded || {};
+        if (!L['sppg_log_suhu/' + today]) return null;
+        if (idx !== -1 && !(L['sppg_pemorsian_data/' + today] && L['sppg_pendinginan_data/' + today])) return null;
+        var menuOf = function (key) { return idx === -1 ? 'x' : getSuhuMenuName(weeks, key, idx); };
+        var mods = [];
+
+        // Pemantauan Suhu
+        var entry = (window.dbCache['sppg_log_suhu'] || {})[today] || {};
+        var photos = (window.suhuRenderedDate === today) ? (window.suhuPhotosMap || {}) : (entry.photos || {});
+        var counters = entry.suhuBatchCounters || {};
+        var groupName = { ruang: 'Ruangan', penyimpanan: 'Penyimpanan', matang: 'Makanan Matang', pemorsian: 'Pemorsian' };
+        var sub = {}, sTotal = 0, sMiss = 0;
+        var count = function (g, id) { sub[g] = sub[g] || { t: 0, m: 0 }; sub[g].t++; sTotal++; if (!has(photos[id])) { sub[g].m++; sMiss++; } };
+        SUHU_ITEMS_CONFIG.forEach(function (c) {
+          if (c.groupKey === 'ruang' || c.groupKey === 'penyimpanan') { count(c.groupKey, 'suhu_foto_' + c.id); return; }
+          var nb = parseInt(counters[c.groupKey], 10) || 1;
+          for (var b = 1; b <= nb; b++) c.template.forEach(function (t) {
+            if (menuOf(t.key.toUpperCase()) === '-') return;
+            count(c.groupKey, 'suhu_foto_' + c.id + '_' + t.key + '_b' + b);
+          });
+        });
+        mods.push({ name: 'Pemantauan Suhu', tab: 'suhu-ruangan', total: sTotal, missing: sMiss,
+          detail: Object.keys(sub).filter(function (g) { return sub[g].m; }).map(function (g) { return groupName[g] + ' ' + sub[g].m; }).join(', ') });
+
+        if (idx !== -1) {
+          // Pemorsian
+          var pa = arr((window.dbCache['sppg_pemorsian_data'] || {})[today]), pT = 0, pM = 0;
+          KELOMPOK_LIST_MENU.forEach(function (k, i) {
+            if (menuOf(k) === '-') return;
+            ['fs1', 'fs2', 'fs3'].forEach(function (f) { pT++; if (!has(pa[i] && pa[i][f])) pM++; });
+          });
+          mods.push({ name: 'Pemorsian', tab: 'pemorsian', total: pT, missing: pM, detail: '' });
+
+          // Pendinginan Makanan
+          var da = arr((window.dbCache['sppg_pendinginan_data'] || {})[today]), rows = Math.max(4, da.length), dT = 0, dM = 0;
+          for (var r = 0; r < rows; r++) {
+            var j = PEND_JENIS[r % 4];
+            if (menuOf(j.key) === '-') continue;
+            ['fm', 'fs'].forEach(function (f) { dT++; if (!has(da[r] && da[r][f])) dM++; });
+          }
+          mods.push({ name: 'Pendinginan Makanan', tab: 'pendinginan', total: dT, missing: dM, detail: '' });
+        }
+        var total = mods.reduce(function (a, m) { return a + m.missing; }, 0);
+        return { today: today, mods: mods, total: total };
+      }
+
+      // ---------- lencana di bilah tanggal ----------
+      var st = document.createElement('style');
+      st.textContent = '#pinPhoto{background:#e9a93b !important;color:#1c2a12 !important;border-color:#f6c768 !important;animation:phPulse 1.6s ease-in-out infinite}@keyframes phPulse{50%{transform:scale(1.07)}}' +
+        '#photoRemCard{position:fixed;right:16px;bottom:16px;z-index:150;width:min(380px,calc(100vw - 32px));max-height:80vh;overflow:auto;background:#fff;color:#10241d;border-radius:18px;border:2px solid #e9a93b;box-shadow:0 20px 50px -10px rgba(0,0,0,.55);font:600 12px "Plus Jakarta Sans",Arial,sans-serif}' +
+        '#photoRemCard .hd{background:#0d3b36;color:#fff;padding:12px 14px;border-radius:15px 15px 0 0;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13px}' +
+        '#photoRemCard .bd{padding:12px 14px;display:flex;flex-direction:column;gap:8px}' +
+        '#photoRemCard .row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:#fef3c7;border:1px solid #f6c768}' +
+        '#photoRemCard .row.ok{background:#dcfce7;border-color:#86efac}' +
+        '#photoRemCard .row .t{flex:1;min-width:0}#photoRemCard .row small{display:block;font-weight:600;color:#555}' +
+        '#photoRemCard button{border:0;border-radius:10px;padding:7px 10px;font:800 11px Arial,sans-serif;cursor:pointer}' +
+        '#photoRemCard .go{background:#0d3b36;color:#fff}#photoRemCard .sn{background:#e9a93b;color:#1c2a12}#photoRemCard .cl{background:#e2e8f0;color:#334155}' +
+        '#photoRemCard .set{border-top:1px dashed #cbd5e1;padding-top:8px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:11px}' +
+        '#photoRemCard select,#photoRemCard input[type=time]{border:1px solid #94a3b8;border-radius:8px;padding:3px 5px;font:700 11px Arial}' +
+        '@media (max-width:767px){#photoRemCard{right:8px;left:8px;width:auto;bottom:8px}#pinPhoto .lbl{display:none}}';
+      document.head.appendChild(st);
+
+      var bar = $('datePin');
+      var badge = document.createElement('button');
+      badge.type = 'button'; badge.id = 'pinPhoto'; badge.style.display = 'none'; badge.title = 'Foto hari ini yang belum diunggah';
+      badge.innerHTML = '📷 <span id="pinPhotoN">0</span><span class="lbl"> foto belum diunggah</span>';
+      var sync = $('pinSync');
+      if (bar) bar.insertBefore(badge, sync || null);
+      badge.addEventListener('click', function () { openCard(); });
+
+      function updateBadge(stt) {
+        var n = stt ? stt.total : 0;
+        badge.style.display = n > 0 ? '' : 'none';
+        $('pinPhotoN').textContent = n;
+        document.title = n > 0 ? '(📷' + n + ') ' + baseTitle : baseTitle;
+      }
+
+      // ---------- kartu rincian + pengaturan ----------
+      var card = document.createElement('div');
+      card.id = 'photoRemCard'; card.style.display = 'none';
+      document.body.appendChild(card);
+      function dateLabel() { var d = new Date(); return HARI[d.getDay()] + ', ' + p2(d.getDate()) + ' ' + BLN[d.getMonth()] + ' ' + d.getFullYear(); }
+      function openCard() {
+        var stt = getStatus() || lastStatus;
+        var h = '<div class="hd"><span>📷 Pengingat Foto · ' + dateLabel() + '</span><button class="cl" data-a="close">✕</button></div><div class="bd">';
+        if (!stt) h += '<div>Memuat data hari ini dari server…</div>';
+        else {
+          if (stt.total === 0) h += '<div class="row ok"><span>🎉</span><div class="t">Semua foto hari ini sudah diunggah.</div></div>';
+          stt.mods.forEach(function (m) {
+            if (!m.total) return;
+            var ok = m.missing === 0;
+            h += '<div class="row ' + (ok ? 'ok' : '') + '"><span>' + (ok ? '✅' : '⚠️') + '</span><div class="t"><b>' + m.name + '</b><small>' +
+              (ok ? 'Lengkap (' + m.total + ' foto)' : m.missing + ' dari ' + m.total + ' foto belum diunggah' + (m.detail ? ' — ' + m.detail : '')) + '</small></div>' +
+              (ok ? '' : '<button class="go" data-a="go" data-tab="' + m.tab + '">Buka</button>') + '</div>';
+          });
+          if (stt.total > 0) h += '<div style="display:flex;gap:6px"><button class="sn" data-a="snooze">⏰ Ingatkan 30 menit lagi</button><button class="cl" data-a="close">Tutup</button></div>';
+        }
+        h += '<div class="set"><label><input type="checkbox" id="remOn"' + (cfg.on ? ' checked' : '') + '> Pengingat aktif</label>' +
+          '<label>Setiap <select id="remEvery">' + [30, 60, 90, 120].map(function (v) { return '<option value="' + v + '"' + (cfg.every === v ? ' selected' : '') + '>' + v + ' menit</option>'; }).join('') + '</select></label>' +
+          '<label>Jam <input type="time" id="remFrom" value="' + cfg.from + '"> – <input type="time" id="remTo" value="' + cfg.to + '"></label></div>' +
+          '<div style="font-size:10px;color:#64748b;font-weight:600">Pengingat hanya berbunyi selama halaman dashboard ini terbuka (boleh di tab latar belakang).</div></div>';
+        card.innerHTML = h; card.style.display = '';
+      }
+      card.addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-a]'); if (!b) return;
+        var a = b.dataset.a;
+        if (a === 'close') card.style.display = 'none';
+        else if (a === 'snooze') { snoozeUntil = Date.now() + 30 * 60000; card.style.display = 'none'; sppgToast('⏰ Diingatkan lagi 30 menit lagi'); }
+        else if (a === 'go') { card.style.display = 'none'; switchTab(b.dataset.tab); }
+      });
+      card.addEventListener('change', function (e) {
+        var t = e.target;
+        if (t.id === 'remOn') cfg.on = t.checked;
+        else if (t.id === 'remEvery') cfg.every = parseInt(t.value, 10) || 60;
+        else if (t.id === 'remFrom') cfg.from = t.value || '06:00';
+        else if (t.id === 'remTo') cfg.to = t.value || '18:00';
+        saveCfg();
+      });
+
+      // ---------- bunyi & getar ----------
+      function beep() {
+        try {
+          var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+          var ac = new AC();
+          [0, 0.28, 0.56].forEach(function (t) {
+            var o = ac.createOscillator(), g = ac.createGain();
+            o.type = 'sine'; o.frequency.value = 880; o.connect(g); g.connect(ac.destination);
+            g.gain.setValueAtTime(0.0001, ac.currentTime + t);
+            g.gain.exponentialRampToValueAtTime(0.35, ac.currentTime + t + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + t + 0.22);
+            o.start(ac.currentTime + t); o.stop(ac.currentTime + t + 0.25);
+          });
+          setTimeout(function () { try { ac.close(); } catch (e) {} }, 1200);
+        } catch (e) {}
+        try { if (navigator.vibrate) navigator.vibrate([250, 120, 250, 120, 250]); } catch (e) {}
+      }
+
+      function inHours(now) {
+        var m = now.getHours() * 60 + now.getMinutes();
+        var f = (cfg.from || '06:00').split(':'), t = (cfg.to || '18:00').split(':');
+        return m >= (+f[0]) * 60 + (+f[1]) && m <= (+t[0]) * 60 + (+t[1]);
+      }
+
+      function remind(stt) {
+        lastRemind = Date.now();
+        try { localStorage.setItem(LSL, String(lastRemind)); } catch (e) {}
+        var parts = stt.mods.filter(function (m) { return m.missing; }).map(function (m) { return m.name + ' ' + m.missing; }).join(', ');
+        var body = 'Hari ini (' + dateLabel() + ') masih ada ' + stt.total + ' foto belum diunggah: ' + parts + '.';
+        sppgRemind('Foto belum diunggah', body);
+        beep();
+        if (document.visibilityState === 'visible') openCard();
+      }
+
+      function run() {
+        var stt = getStatus();
+        if (!stt) return;
+        lastStatus = stt;
+        updateBadge(stt);
+        if (card.style.display !== 'none' && !card.contains(document.activeElement)) openCard();   // rincian ikut diperbarui
+        if (stt.total === 0 || !cfg.on) return;
+        var now = new Date();
+        if (!inHours(now) || Date.now() < snoozeUntil) return;
+        if (Date.now() - lastRemind >= cfg.every * 60000) remind(stt);
+      }
+      setInterval(run, 15000);
+      setTimeout(run, 3000); setTimeout(run, 8000);
+      // memeriksa ulang segera setelah foto diunggah / data tersimpan
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(run, 500); });
+      var oSw = window.switchTab;
+      window.switchTab = function () { var r = oSw.apply(this, arguments); setTimeout(run, 1500); return r; };
     })();
   </script>
 </body>
