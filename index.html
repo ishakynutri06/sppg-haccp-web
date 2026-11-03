@@ -344,20 +344,21 @@
           </div>
         </div>
         
-        <div class="bg-gradient-to-br from-indigo-50 to-white p-4 md:p-5 rounded-2xl border border-indigo-100 shadow-inner space-y-4">
-          <h3 class="font-extrabold text-indigo-900 text-xs flex items-center gap-2"><span class="text-base">📋</span> Paste Data Master Bahan Langsung (Blok 5 Hari)</h3>
-          <div class="flex flex-col md:flex-row gap-3">
-            <select id="masterQuickTargetWeek" class="border-2 border-indigo-100 rounded-xl p-2.5 text-xs bg-white font-bold w-full md:w-56 text-indigo-900 cursor-pointer shadow-sm">
-              <option value="0">Blok Hari 1 - 5</option>
-              <option value="1">Blok Hari 6 - 10</option>
-              <option value="2">Blok Hari 11 - 15</option>
-              <option value="3">Blok Hari 16 - 20</option>
-            </select>
-            <textarea id="masterQuickTextarea" rows="2" placeholder="Paste data copy-an dari Excel Master Bahan di sini..." class="w-full border-2 border-indigo-100 p-3 rounded-xl text-xs font-mono bg-white shadow-sm resize-y"></textarea>
-            <button onclick="processQuickMasterPaste()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-lg shadow-indigo-500/30 hover:-translate-y-0.5 transition-all shrink-0 w-full md:w-auto">Terapkan Data</button>
+        <div class="bg-gradient-to-br from-indigo-50 to-white p-4 md:p-5 rounded-2xl border border-indigo-200 shadow-inner space-y-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <h3 class="font-extrabold text-indigo-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Master Bahan 20 Hari</h3>
+            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-indigo-200 text-indigo-900">FORMAT: MASTER_BAHAN_20_HARI</span>
           </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>MASTER_BAHAN_20_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="impDownloadTemplate('master', false)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template Kosong (.xlsx)</button>
+            <button onclick="impDownloadTemplate('master', true)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Data Saat Ini (format import)</button>
+            <label class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer text-center">📂 Pilih File Excel<input type="file" accept=".xlsx" class="hidden" onchange="impLoadFile('master', this)"></label>
+          </div>
+          <textarea id="imp_master_text" rows="3" spellcheck="false" placeholder="Atau paste isi template dari Excel di sini (blok-blok yang diawali #FORMAT dan #BLOK)..." class="w-full border-2 border-indigo-200 p-3 rounded-xl text-xs font-mono bg-white shadow-sm resize-y"></textarea>
+          <button onclick="impRun('master')" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 shadow-indigo-500/30 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-lg hover:-translate-y-0.5 transition-all w-full md:w-auto">✅ Validasi &amp; Terapkan Data</button>
+          <div id="imp_master_result" class="hidden text-xs rounded-xl px-4 py-3 border leading-relaxed"></div>
         </div>
-
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
         <div id="master_bahan_tables_wrapper" class="space-y-8 w-full"></div>
       </div>
@@ -383,20 +384,21 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-blue-50 to-white p-4 md:p-5 rounded-2xl border border-blue-100 shadow-inner space-y-4">
-          <h3 class="font-extrabold text-blue-900 text-xs flex items-center gap-2"><span class="text-base">📋</span> Paste Data Siklus Menu Langsung (Blok 5 Hari)</h3>
-          <div class="flex flex-col md:flex-row gap-3">
-            <select id="menuQuickTargetWeek" class="border-2 border-blue-100 rounded-xl p-2.5 text-xs bg-white font-bold w-full md:w-56 text-blue-900 cursor-pointer shadow-sm">
-              <option value="0">Blok Hari 1 - 5</option>
-              <option value="1">Blok Hari 6 - 10</option>
-              <option value="2">Blok Hari 11 - 15</option>
-              <option value="3">Blok Hari 16 - 20</option>
-            </select>
-            <textarea id="menuQuickTextarea" rows="2" placeholder="Paste data copy-an dari Excel Siklus Menu di sini..." class="w-full border-2 border-blue-100 p-3 rounded-xl text-xs font-mono bg-white shadow-sm resize-y"></textarea>
-            <button onclick="processQuickMenuPaste()" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all shrink-0 w-full md:w-auto">Terapkan Data</button>
+        <div class="bg-gradient-to-br from-blue-50 to-white p-4 md:p-5 rounded-2xl border border-blue-200 shadow-inner space-y-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <h3 class="font-extrabold text-blue-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</h3>
+            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-blue-200 text-blue-900">FORMAT: SIKLUS_MENU_20_HARI</span>
           </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>SIKLUS_MENU_20_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="impDownloadTemplate('menu', false)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template Kosong (.xlsx)</button>
+            <button onclick="impDownloadTemplate('menu', true)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Data Saat Ini (format import)</button>
+            <label class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer text-center">📂 Pilih File Excel<input type="file" accept=".xlsx" class="hidden" onchange="impLoadFile('menu', this)"></label>
+          </div>
+          <textarea id="imp_menu_text" rows="3" spellcheck="false" placeholder="Atau paste isi template dari Excel di sini (blok-blok yang diawali #FORMAT dan #BLOK)..." class="w-full border-2 border-blue-200 p-3 rounded-xl text-xs font-mono bg-white shadow-sm resize-y"></textarea>
+          <button onclick="impRun('menu')" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-blue-500/30 text-white font-bold py-2.5 px-6 rounded-xl text-xs shadow-lg hover:-translate-y-0.5 transition-all w-full md:w-auto">✅ Validasi &amp; Terapkan Data</button>
+          <div id="imp_menu_result" class="hidden text-xs rounded-xl px-4 py-3 border leading-relaxed"></div>
         </div>
-
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
         <div id="siklus_menu_tables_wrapper" class="space-y-8 w-full"></div>
       </div>
@@ -1222,6 +1224,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
+                stampPhoto(img, canvas, fileInput);
                 const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
                 let expW = 76, expH = 114; 
@@ -1333,6 +1336,7 @@
             return;
         }
 
+        input.dataset.src = source;
         if (source === 'camera') {
             input.setAttribute('capture', 'environment');
         } else {
@@ -1393,6 +1397,7 @@
                 canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
+                stampPhoto(img, canvas, input);
                 const b64 = canvas.toDataURL('image/jpeg', 0.6);
 
                 // cari kolom nilai sampel (S1/S2/S3) pada baris yang sama
@@ -2836,25 +2841,251 @@
       updateDashboardSummary();
     }
 
-    function processQuickMasterPaste() {
-      const txt = document.getElementById('masterQuickTextarea').value;
-      const targetWeek = parseInt(document.getElementById('masterQuickTargetWeek').value) || 0;
-      if (!txt.trim()) { alert('Tempelkan data Master Bahan terlebih dahulu!'); return; }
-      processTextToWeekData(txt, targetWeek, true);
-      alert('Berhasil menerapkan Master Bahan!');
-      renderMasterBahan20Table();
-      renderFrekuensiBahanTable();
+    // =====================================================================
+    // IMPORT TERPISAH & TERVALIDASI: MASTER BAHAN  vs  SIKLUS MENU
+    // Setiap format punya penanda sendiri (#FORMAT) dan daftar baris sendiri.
+    // Salah modul / format tidak lengkap  => DITOLAK, tidak ada data yang diubah.
+    // =====================================================================
+    const IMP_CFG = {
+      master: {
+        code: 'MASTER_BAHAN_20_HARI', title: 'Master Bahan 20 Hari', sheet: 'IMPORT_MASTER_BAHAN', color: 'FFC7D2FE', head: 'FF3730A3',
+        key: 'sppg_master_bahan_weeks', groups: KELOMPOK_LIST_MASTER,
+        label: k => String(KELOMPOK_LABELS_MASTER[k]).toUpperCase(), other: 'menu'
+      },
+      menu: {
+        code: 'SIKLUS_MENU_20_HARI', title: 'Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)', sheet: 'IMPORT_SIKLUS_MENU', color: 'FFBFDBFE', head: 'FF1E3A8A',
+        key: 'sppg_siklus_menu_weeks', groups: KELOMPOK_LIST_MENU,
+        label: k => String(KELOMPOK_LABELS_MENU[k]).toUpperCase(), other: 'master'
+      }
+    };
+    const IMP_DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const IMP_MON = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    function impEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+    function impNorm(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim().toUpperCase(); }
+    function impUnquote(c) {
+      c = String(c == null ? '' : c).trim();
+      if (c.length > 1 && c[0] === '"' && c[c.length - 1] === '"') c = c.slice(1, -1).replace(/""/g, '"').trim();
+      return c;
+    }
+    function impShow(t, kind, title, lines) {
+      const el = document.getElementById('imp_' + t + '_result');
+      if (!el) return;
+      const col = kind === 'ok' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' : kind === 'err' ? 'bg-red-50 text-red-900 border-red-200' : 'bg-slate-50 text-slate-700 border-slate-200';
+      el.className = 'text-xs rounded-xl px-4 py-3 border leading-relaxed ' + col;
+      el.innerHTML = '<div class="font-extrabold">' + impEsc(title) + '</div>' +
+        (lines && lines.length ? '<ul class="list-disc pl-5 mt-1 space-y-0.5">' + lines.map(l => '<li>' + impEsc(l) + '</li>').join('') + '</ul>' : '');
     }
 
-    function processQuickMenuPaste() {
-      const txt = document.getElementById('menuQuickTextarea').value;
-      const targetWeek = parseInt(document.getElementById('menuQuickTargetWeek').value) || 0;
-      if (!txt.trim()) { alert('Tempelkan data Siklus Menu terlebih dahulu!'); return; }
-      processTextToWeekData(txt, targetWeek, false);
-      alert('Berhasil menerapkan Siklus Menu!');
-      renderSiklusMenu20Table();
-      initSuhuModule();
-      initAlergenModule();
+    // ---- PARSER + VALIDASI (tidak menyentuh data sama sekali) ----
+    function impParse(t, raw) {
+      const cfg = IMP_CFG[t], oth = IMP_CFG[cfg.other];
+      const errors = [];
+      const rows = String(raw || '').replace(/\r/g, '').split('\n')
+        .map((l, i) => ({ n: i + 1, c: l.split('\t').map(impUnquote) }))
+        .filter(r => r.c.some(x => x !== ''));
+      if (!rows.length) return { errors: ['Tidak ada data. Tempelkan isi template terlebih dahulu.'], blocks: {} };
+
+      // 1. penanda format harus ada & sesuai modul
+      const first = rows[0];
+      if (impNorm(first.c[0]) !== '#FORMAT') {
+        const labels = rows.map(r => impNorm(r.c[0]));
+        const hint = labels.includes('SAYUR 2') ? ' (isi data tampak seperti Master Bahan)' : '';
+        return { errors: ['Data tidak memiliki penanda format "#FORMAT" di baris pertama' + hint + '. Data lama / tanpa template tidak diterima. Unduh template ' + cfg.title + ' lalu isi.'], blocks: {} };
+      }
+      const code = impNorm(first.c[1]);
+      if (code === oth.code) return { errors: ['SALAH MODUL: data ini berformat ' + oth.code + ' (' + oth.title + '), sedangkan Anda berada di modul ' + cfg.title + '. Ditolak.'], blocks: {} };
+      if (code !== cfg.code) return { errors: ['Format "' + (first.c[1] || '(kosong)') + '" tidak dikenali. Modul ini hanya menerima format ' + cfg.code + '.'], blocks: {} };
+
+      // 2. baca blok demi blok
+      const labelToKey = {}; cfg.groups.forEach(k => { labelToKey[cfg.label(k)] = k; });
+      const blocks = {}; let cur = null;
+      const closeBlock = () => {
+        if (!cur) return;
+        const tag = 'Blok ' + cur.n + ': ';
+        if (!cur.dates) errors.push(tag + 'baris TANGGAL tidak ada.');
+        cfg.groups.forEach(k => { if (!cur.items[k]) errors.push(tag + 'baris "' + cfg.label(k) + '" tidak ada.'); });
+        if (cur.dates) {
+          const keys = cur.dates.map(parseSiklusDateToKey);
+          keys.forEach((kk, i) => { if (!kk) errors.push(tag + 'tanggal hari ke-' + (i + 1) + ' ("' + cur.dates[i] + '") tidak valid. Contoh benar: Senin, 09 Nov 2026'); });
+          if (keys.every(Boolean)) for (let i = 1; i < 5; i++) if (keys[i] <= keys[i - 1]) { errors.push(tag + 'tanggal harus berurutan naik (hari ke-' + i + ' dan ke-' + (i + 1) + ').'); break; }
+        }
+        blocks[cur.n] = cur; cur = null;
+      };
+      for (let ri = 1; ri < rows.length; ri++) {
+        const r = rows[ri], head = impNorm(r.c[0]);
+        if (head === '#FORMAT') {
+          if (impNorm(r.c[1]) !== cfg.code) errors.push('Baris ' + r.n + ': penanda #FORMAT berbeda di tengah data (' + (r.c[1] || 'kosong') + '). Satu tempelan hanya boleh satu jenis format.');
+          continue;
+        }
+        if (head === '#BLOK') {
+          closeBlock();
+          const n = parseInt(r.c[1], 10);
+          if (!(n >= 1 && n <= 4)) { errors.push('Baris ' + r.n + ': nomor #BLOK harus 1 sampai 4.'); cur = { n: 'x' + r.n, items: {}, bad: true }; continue; }
+          if (blocks[n]) errors.push('Baris ' + r.n + ': Blok ' + n + ' muncul dua kali.');
+          cur = { n: n, items: {}, dates: null };
+          continue;
+        }
+        if (head.charAt(0) === '#') { errors.push('Baris ' + r.n + ': penanda "' + r.c[0] + '" tidak dikenal.'); continue; }
+        if (!cur) { errors.push('Baris ' + r.n + ': data muncul sebelum penanda #BLOK.'); continue; }
+        const extra = r.c.slice(6).some(x => x !== '');
+        if (extra) errors.push('Baris ' + r.n + ' (' + r.c[0] + '): lebih dari 5 kolom hari.');
+        const vals = [0, 1, 2, 3, 4].map(i => r.c[1 + i] || '');
+        if (head === 'TANGGAL') {
+          if (cur.dates) errors.push('Baris ' + r.n + ': baris TANGGAL ganda pada Blok ' + cur.n + '.');
+          cur.dates = vals; continue;
+        }
+        const k = labelToKey[head];
+        if (!k) {
+          const otherKeys = IMP_CFG[cfg.other].groups.map(g => IMP_CFG[cfg.other].label(g));
+          errors.push('Baris ' + r.n + ': label "' + r.c[0] + '" tidak dikenal di modul ini' + (otherKeys.includes(head) ? ' (label milik modul ' + oth.title + ')' : '') + '. Label yang benar: ' + cfg.groups.map(cfg.label).join(', ') + '.');
+          continue;
+        }
+        if (cur.items[k]) { errors.push('Baris ' + r.n + ': baris "' + r.c[0] + '" ganda pada Blok ' + cur.n + '.'); continue; }
+        cur.items[k] = vals.map(v => { v = v.toUpperCase(); return (v === '0' || v === '-') ? '' : v; });
+      }
+      closeBlock();
+      if (!Object.keys(blocks).length) errors.push('Tidak ada blok data (#BLOK) yang ditemukan.');
+      return { errors: errors, blocks: blocks };
+    }
+
+    // ---- TERAPKAN (hanya menulis ke kunci milik modul ini) ----
+    function impApply(t, blocks) {
+      const cfg = IMP_CFG[t];
+      const weeks = JSON.parse(JSON.stringify(window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_20_DAYS));
+      Object.keys(blocks).forEach(n => {
+        const b = blocks[n], idx = Number(n) - 1;
+        const w = weeks[idx] || { dates: [], items: {} };
+        w.dates = b.dates.slice();
+        w.items = w.items || {};
+        cfg.groups.forEach(k => { w.items[k] = b.items[k].slice(); });
+        weeks[idx] = w;
+      });
+      window.dbCache[cfg.key] = weeks;
+      window.fbSet(cfg.key, weeks);
+      if (t === 'master') {
+        syncMasterBahanData(weeks);
+        renderMasterBahan20Table();
+        renderFrekuensiBahanTable();
+      } else {
+        syncSiklusMenuData(weeks);
+        renderSiklusMenu20Table();
+        initSuhuModule();
+        initAlergenModule();
+      }
+      updateDashboardSummary();
+    }
+
+    function impRun(t) {
+      const cfg = IMP_CFG[t];
+      const ta = document.getElementById('imp_' + t + '_text');
+      const res = impParse(t, ta.value);
+      if (res.errors.length) {
+        const shown = res.errors.slice(0, 10);
+        if (res.errors.length > 10) shown.push('... dan ' + (res.errors.length - 10) + ' kesalahan lain.');
+        impShow(t, 'err', '❌ DITOLAK: data tidak diubah sama sekali (' + cfg.title + ')', shown);
+        alert('Import ditolak. Tidak ada data yang diubah. Lihat rincian kesalahan di bawah kotak import.');
+        return;
+      }
+      const oldWeeks = window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_20_DAYS;
+      const lines = Object.keys(res.blocks).map(Number).sort((a, b) => a - b).map(n => {
+        const b = res.blocks[n];
+        const filled = cfg.groups.reduce((s, k) => s + b.items[k].filter(Boolean).length, 0);
+        const had = oldWeeks[n - 1] && oldWeeks[n - 1].items && cfg.groups.some(k => (oldWeeks[n - 1].items[k] || []).some(Boolean));
+        return 'Blok ' + n + ' (Hari ' + ((n - 1) * 5 + 1) + '-' + (n * 5) + '): ' + b.dates[0] + ' s.d. ' + b.dates[4] + ', ' + filled + ' sel terisi' + (had ? ' (MENGGANTI data lama)' : '');
+      });
+      if (!confirm('Terapkan import ke modul ' + cfg.title + '?\n\n' + lines.join('\n') + '\n\nBlok lain yang tidak ada di data ini tidak diubah.')) {
+        impShow(t, 'info', 'Dibatalkan. Tidak ada data yang diubah.', []);
+        return;
+      }
+      impApply(t, res.blocks);
+      impShow(t, 'ok', '✅ Berhasil diterapkan ke ' + cfg.title, lines);
+      ta.value = '';
+    }
+
+    // ---- BACA FILE EXCEL -> teks tab (lalu masuk jalur validasi yang sama) ----
+    function impCellText(cell) {
+      let v = cell.value;
+      if (v == null) return '';
+      if (v instanceof Date) return IMP_DAYS[v.getUTCDay()] + ', ' + String(v.getUTCDate()).padStart(2, '0') + ' ' + IMP_MON[v.getUTCMonth()] + ' ' + v.getUTCFullYear();
+      if (typeof v === 'object') {
+        if (v.richText) return v.richText.map(x => x.text).join('');
+        if (v.result !== undefined) return String(v.result == null ? '' : v.result);
+        if (v.text !== undefined) return String(v.text);
+        return '';
+      }
+      return String(v);
+    }
+    async function impLoadFile(t, input) {
+      const f = input.files && input.files[0];
+      if (!f) return;
+      try {
+        const wb = new ExcelJS.Workbook();
+        await wb.xlsx.load(await f.arrayBuffer());
+        const ws = wb.worksheets[0];
+        if (!ws) throw new Error('File Excel kosong.');
+        const lines = [];
+        ws.eachRow({ includeEmpty: true }, row => {
+          const cells = [];
+          for (let c = 1; c <= 8; c++) cells.push(impCellText(row.getCell(c)).replace(/[\t\n\r]+/g, ' '));
+          lines.push(cells.join('\t'));
+        });
+        document.getElementById('imp_' + t + '_text').value = lines.join('\n');
+        impShow(t, 'info', 'File "' + f.name + '" dimuat. Tekan "Validasi & Terapkan Data" untuk memeriksa dan menerapkan.', []);
+      } catch (e) {
+        impShow(t, 'err', '❌ File tidak bisa dibaca', [String(e && e.message ? e.message : e)]);
+      }
+      input.value = '';
+    }
+
+    // ---- TEMPLATE EXCEL ----
+    async function impDownloadTemplate(t, withData) {
+      const cfg = IMP_CFG[t];
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet(cfg.sheet);
+      ws.columns = [{ width: 22 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 }];
+      const weeks = withData ? (window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_20_DAYS) : null;
+      const thin = { style: 'thin', color: { argb: 'FF94A3B8' } };
+      const addRow = (vals, style) => {
+        const r = ws.addRow(vals);
+        for (let c = 1; c <= 6; c++) {
+          const cell = r.getCell(c);
+          cell.numFmt = '@';
+          cell.alignment = { vertical: 'middle', wrapText: true };
+          if (style === 'dir') { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cfg.color } }; cell.font = { bold: true, color: { argb: cfg.head } }; }
+          if (style === 'tgl') { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } }; cell.font = { bold: true }; cell.border = { top: thin, left: thin, bottom: thin, right: thin }; }
+          if (style === 'dat') { cell.border = { top: thin, left: thin, bottom: thin, right: thin }; if (c === 1) cell.font = { bold: true }; }
+        }
+        return r;
+      };
+      for (let b = 0; b < 4; b++) {
+        const w = weeks ? weeks[b] : null;
+        addRow(['#FORMAT', cfg.code], 'dir');
+        addRow(['#BLOK', String(b + 1)], 'dir');
+        const dts = [0, 1, 2, 3, 4].map(i => (w && w.dates && w.dates[i]) || '');
+        addRow(['TANGGAL'].concat(dts), 'tgl');
+        cfg.groups.forEach(k => {
+          const arr = [0, 1, 2, 3, 4].map(i => (w && w.items && w.items[k] && w.items[k][i]) || '');
+          addRow([cfg.label(k)].concat(arr), 'dat');
+        });
+        ws.addRow([]);
+      }
+      const gd = wb.addWorksheet('PETUNJUK');
+      gd.getColumn(1).width = 110;
+      [
+        'PETUNJUK IMPORT - ' + cfg.title,
+        '',
+        '1. Template ini KHUSUS untuk modul ' + cfg.title + ' (format ' + cfg.code + ').',
+        '2. Jangan mengubah baris #FORMAT, #BLOK, TANGGAL, dan nama kelompok di kolom A. Isi hanya kolom B sampai F (5 hari per blok).',
+        '3. Tanggal ditulis lengkap dengan tahun, contoh: Senin, 09 Nov 2026. Tanggal harus berurutan naik dalam satu blok.',
+        '4. Ada 4 blok (Hari 1-5, 6-10, 11-15, 16-20). Blok yang tidak ingin diubah boleh dihapus dari file / tidak ditempel.',
+        '5. Cara pakai: unggah file lewat tombol "Pilih File Excel", ATAU blok semua isi sheet IMPORT, salin, lalu tempel ke kotak import di dashboard.',
+        '6. Salah modul, format tidak lengkap, atau nama baris berbeda = DITOLAK otomatis dan tidak ada data yang diubah.'
+      ].forEach((tx, i) => { const r = gd.addRow([tx]); if (i === 0) r.font = { bold: true, size: 13 }; r.alignment = { wrapText: true }; });
+      const buf = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const nm = withData ? ('DATA_' + cfg.sheet + '_' + getLocalDateKey() + '.xlsx') : ('TEMPLATE_' + cfg.sheet + '.xlsx');
+      exportDownloadBlob(blob, nm);
     }
 
     function switchTab(tabId) {
@@ -5227,6 +5458,7 @@ function renderSuhuTable() {
           const canvas = document.createElement('canvas');
           canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          stampPhoto(img, canvas, input);
           const b64 = canvas.toDataURL('image/jpeg', 0.6);
 
           const tr = input.closest('tr');
@@ -5704,6 +5936,126 @@ function renderSuhuTable() {
   injectPrintButtons();
 })();
 
+  </script>
+  <script>
+    // =====================================================================
+    // REVISI v13
+    // 1) Stempel evidence (hari, tanggal, jam realtime) pada foto yang diambil lewat KAMERA - semua menu.
+    // 2) Foto kamera otomatis disalin ke perangkat (galeri/unduhan).
+    // 3) Notifikasi browser setiap data/file selesai disimpan.
+    // =====================================================================
+    (function () {
+      var HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      var BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      function p2(n) { return String(n).padStart(2, '0'); }
+      function tzName(d) {
+        var off = -d.getTimezoneOffset();
+        if (off === 420) return 'WIB';
+        if (off === 480) return 'WITA';
+        if (off === 540) return 'WIT';
+        return 'UTC' + (off >= 0 ? '+' : '-') + p2(Math.floor(Math.abs(off) / 60));
+      }
+      function stampText(d) {
+        return HARI[d.getDay()] + ', ' + p2(d.getDate()) + ' ' + BLN[d.getMonth()] + ' ' + d.getFullYear() +
+               ' | ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds()) + ' ' + tzName(d);
+      }
+      function drawStamp(canvas, text) {
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext('2d');
+        var fs = Math.max(11, Math.round(Math.min(w, h) * 0.04));
+        ctx.save();
+        ctx.font = 'bold ' + fs + 'px Arial, sans-serif';
+        // kecilkan font bila teks lebih lebar dari foto
+        while (ctx.measureText(text).width > w - fs && fs > 8) { fs--; ctx.font = 'bold ' + fs + 'px Arial, sans-serif'; }
+        var barH = Math.round(fs * 1.9);
+        ctx.fillStyle = 'rgba(0,0,0,0.62)';
+        ctx.fillRect(0, h - barH, w, barH);
+        ctx.fillStyle = '#ffffff';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.fillText(text, w / 2, h - barH / 2);
+        ctx.restore();
+      }
+
+      var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      window.__camShot = null;
+
+      // Dipanggil dari 3 handler foto setelah foto digambar ke canvas (ukuran kompres untuk disimpan di server).
+      window.stampPhoto = function (img, canvas, input) {
+        window.__camShot = null;
+        if (!input || input.dataset.src !== 'camera') return;      // galeri: tidak diberi stempel (bukan waktu pengambilan)
+        var now = new Date(), text = stampText(now);
+        drawStamp(canvas, text);
+        try {
+          // salinan resolusi penuh (maks 2000 px) untuk perangkat
+          var sc = Math.min(1, 2000 / Math.max(img.width, img.height));
+          var full = document.createElement('canvas');
+          full.width = Math.round(img.width * sc); full.height = Math.round(img.height * sc);
+          full.getContext('2d').drawImage(img, 0, 0, full.width, full.height);
+          drawStamp(full, text);
+          var name = 'SPPG_' + now.getFullYear() + p2(now.getMonth() + 1) + p2(now.getDate()) + '_' + p2(now.getHours()) + p2(now.getMinutes()) + p2(now.getSeconds()) + '.jpg';
+          full.toBlob(function (blob) {
+            if (!blob) return;
+            window.__camShot = { blob: blob, name: name };
+            if (!isIOS) saveShotToDevice();                        // Android/PC: unduh otomatis saat foto diambil
+          }, 'image/jpeg', 0.92);
+        } catch (e) { console.warn('Salinan foto ke perangkat gagal', e); }
+      };
+
+      function saveShotToDevice() {
+        var s = window.__camShot; if (!s || s.saved) return;
+        s.saved = true;
+        var url = URL.createObjectURL(s.blob), a = document.createElement('a');
+        a.href = url; a.download = s.name; a.style.display = 'none';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+        toast('📷 Foto + stempel waktu disalin ke perangkat (' + s.name + ')');
+      }
+      // iOS: tidak ada unduh senyap; lembar "Bagikan" (Simpan Gambar) dibuka saat pengguna menekan Simpan & Lanjutkan.
+      function shareShotIOS() {
+        var s = window.__camShot; if (!s || s.saved || !isIOS) return;
+        try {
+          var f = new File([s.blob], s.name, { type: 'image/jpeg' });
+          if (navigator.canShare && navigator.canShare({ files: [f] })) { s.saved = true; navigator.share({ files: [f] }).catch(function () {}); }
+        } catch (e) {}
+      }
+      var oc = window.confirmImageConfirmation, ox = window.cancelImageConfirmation;
+      window.confirmImageConfirmation = function () { shareShotIOS(); var r = oc.apply(this, arguments); window.__camShot = null; return r; };
+      window.cancelImageConfirmation = function () { window.__camShot = null; return ox.apply(this, arguments); };
+
+      // ---------- toast di halaman + notifikasi browser ----------
+      function toast(msg) {
+        var el = document.createElement('div');
+        el.textContent = msg;
+        el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:300;max-width:90vw;background:#0d3b36;color:#fff;font:600 12px Arial,sans-serif;padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:opacity .4s';
+        document.body.appendChild(el);
+        setTimeout(function () { el.style.opacity = '0'; }, 3200);
+        setTimeout(function () { el.remove(); }, 3700);
+      }
+      function askPerm() {
+        if (!('Notification' in window) || Notification.permission !== 'default') return;
+        try { var r = Notification.requestPermission(); if (r && r.catch) r.catch(function () {}); } catch (e) {}
+      }
+      ['click', 'touchend', 'keydown'].forEach(function (ev) { document.addEventListener(ev, askPerm, { once: true, capture: true }); });
+
+      function browserNotify(msg) {
+        var title = 'Dashboard HACCP SPPG', opts = { body: msg, tag: 'sppg-saved', renotify: true };
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+        try { new Notification(title, opts); }
+        catch (e) {   // Android Chrome: harus lewat service worker
+          if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
+            navigator.serviceWorker.getRegistration().then(function (reg) { if (reg) reg.showNotification(title, opts); }).catch(function () {});
+          }
+        }
+      }
+      var baseAlert = window.alert;
+      window.alert = function (message) {
+        var m = String(message == null ? '' : message);
+        if (/berhasil|tersimpan|terekam/i.test(m) && !/gagal|belum|ditolak|tidak ada data/i.test(m)) {
+          browserNotify(m.replace(/\s*\(Tersimpan Real-Time di Server\)/i, '').slice(0, 160));
+        }
+        return baseAlert.apply(this, arguments);
+      };
+    })();
   </script>
 </body>
 </html>
