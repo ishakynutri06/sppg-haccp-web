@@ -1704,6 +1704,7 @@
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 4000);
+      if (window.sppgNotify) sppgNotify('File diunduh', fileName + ' — cek folder Download / bilah unduhan browser.');
     }
 
     // ===== Pilihan export: dengan / tanpa gambar =====
@@ -4311,6 +4312,7 @@ function renderSuhuTable() {
       a.href = url; a.download = fileName;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
+      if (window.sppgNotify) sppgNotify('File diunduh', fileName);
     }
     function bkMeta() {
       return { aplikasi: 'SPPG HACCP Dashboard', format: 1, dibuat: new Date().toISOString(), tanggal: getLocalDateKey() };
@@ -6037,9 +6039,17 @@ function renderSuhuTable() {
       }
       ['click', 'touchend', 'keydown'].forEach(function (ev) { document.addEventListener(ev, askPerm, { once: true, capture: true }); });
 
-      function browserNotify(msg) {
-        var title = 'Dashboard HACCP SPPG', opts = { body: msg, tag: 'sppg-saved', renotify: true };
-        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      var deniedHinted = false;
+      function browserNotify(msg, title) {
+        title = title || 'Dashboard HACCP SPPG';
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'denied') {
+          if (!deniedHinted) { deniedHinted = true; toast('🔕 Notifikasi browser diblokir. Klik ikon gembok di address bar → Notifikasi → Izinkan.'); }
+          return;
+        }
+        if (Notification.permission !== 'granted') { askPerm(); return; }
+        var icon = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
+        var opts = { body: msg, tag: 'sppg-' + Date.now(), icon: icon || undefined };
         try { new Notification(title, opts); }
         catch (e) {   // Android Chrome: harus lewat service worker
           if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
@@ -6047,13 +6057,192 @@ function renderSuhuTable() {
           }
         }
       }
+      window.sppgToast = toast;
+      window.sppgAskPerm = askPerm;
+      // Pemberitahuan lengkap: toast di halaman + notifikasi browser (dipakai untuk simpan / unduh file)
+      window.sppgNotify = function (title, body) { toast('✅ ' + title + (body ? ': ' + body : '')); browserNotify(body || '', title); };
       var baseAlert = window.alert;
       window.alert = function (message) {
         var m = String(message == null ? '' : message);
         if (/berhasil|tersimpan|terekam/i.test(m) && !/gagal|belum|ditolak|tidak ada data/i.test(m)) {
-          browserNotify(m.replace(/\s*\(Tersimpan Real-Time di Server\)/i, '').slice(0, 160));
+          browserNotify(m.replace(/\s*\(Tersimpan Real-Time di Server\)/i, '').slice(0, 160), 'Berhasil disimpan');
         }
         return baseAlert.apply(this, arguments);
+      };
+    })();
+  </script>
+  <script>
+    // =====================================================================
+    // REVISI v14
+    // A) Bilah PIN tanggal: tanggal & jam realtime selalu terlihat + peringatan bila tanggal input BEDA dengan hari ini.
+    // B) Simpan online OTOMATIS (realtime) untuk semua modul yang sebelumnya harus simpan manual.
+    // C) Notifikasi (desktop & HP) saat file diunduh / data disimpan.
+    // =====================================================================
+    (function () {
+      var HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      var BLN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      var p2 = function (n) { return String(n).padStart(2, '0'); };
+      function tz(d) { var o = -d.getTimezoneOffset(); return o === 420 ? 'WIB' : o === 480 ? 'WITA' : o === 540 ? 'WIT' : ''; }
+      function longDate(d) { return HARI[d.getDay()] + ', ' + p2(d.getDate()) + ' ' + BLN[d.getMonth()] + ' ' + d.getFullYear(); }
+      function keyToDate(k) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+      var $ = function (id) { return document.getElementById(id); };
+      var val = function (id) { var e = $(id); return e ? e.value : ''; };
+
+      // ---------- CSS ----------
+      var st = document.createElement('style');
+      st.textContent =
+        '#datePin{position:fixed;top:0;left:256px;right:0;height:40px;z-index:35;display:flex;align-items:center;gap:10px;padding:0 16px;background:#0d3b36;color:#fff;font:700 12px "Plus Jakarta Sans",Arial,sans-serif;border-bottom:3px solid #e9a93b;box-shadow:0 6px 16px -8px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;transition:background .3s}' +
+        '#datePin.bad{background:#b91c1c;border-bottom-color:#fecaca;animation:pinPulse 1.4s ease-in-out infinite}' +
+        '@keyframes pinPulse{50%{background:#dc2626}}' +
+        '#datePin .pd{flex:none}#datePin .sp{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}' +
+        '#datePin button{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;font:800 11px Arial,sans-serif;padding:4px 8px;border-radius:8px;cursor:pointer;flex:none}' +
+        '#datePin button:hover{background:rgba(255,255,255,.3)}' +
+        '#datePin .sync{flex:none;opacity:.9;font-weight:600}' +
+        'html body main{padding-top:64px !important}' +
+        '@media (max-width:767px){#datePin{top:60px;left:60px;padding:0 8px;gap:6px;font-size:11px;height:38px}#datePin .sec,#datePin .sync{display:none}html body main{padding-top:54px !important}}';
+      document.head.appendChild(st);
+
+      // ---------- bilah PIN ----------
+      var bar = document.createElement('div');
+      bar.id = 'datePin';
+      bar.innerHTML = '<span class="pd">📌 <span id="pinDate">-</span> · <span id="pinTime">--:--</span></span><span class="sp" id="pinMsg"></span>' +
+        '<button type="button" id="pinFix" style="display:none">📍 Ke hari ini</button><span class="sync" id="pinSync">☁️ Online</span>' +
+        '<button type="button" id="pinBell" title="Aktifkan notifikasi browser">🔔</button>';
+      document.body.appendChild(bar);
+      $('pinBell').addEventListener('click', function () {
+        if (!('Notification' in window)) { sppgToast('Browser ini tidak mendukung notifikasi.'); return; }
+        var go = function () { sppgNotify('Notifikasi aktif', 'Anda akan diberi tahu saat data disimpan atau file diunduh.'); };
+        if (Notification.permission === 'granted') go();
+        else if (Notification.permission === 'denied') sppgToast('🔕 Diblokir. Klik ikon gembok di address bar → Notifikasi → Izinkan.');
+        else { var r = Notification.requestPermission(); (r && r.then ? r : Promise.resolve()).then(function () { if (Notification.permission === 'granted') go(); }); }
+      });
+
+      // tanggal kerja (tanggal yang sedang diinput) pada modul aktif
+      function working() {
+        var tab = window.currentActiveTab, k = null, name = '';
+        if (tab === 'suhu-ruangan') { k = val('suhu_tanggal'); name = 'Suhu'; }
+        else if (tab === 'inspeksi-silang') { k = val('ks_tanggal'); name = 'Kontaminasi Silang'; }
+        else if (tab === 'inspeksi-alergen') { k = val('al_tanggal'); name = 'Alergen'; }
+        else if (tab === 'pemorsian' || tab === 'pendinginan') {
+          var sel = $(tab === 'pemorsian' ? 'selectSiklusPemorsian' : 'selectSiklusPendinginan');
+          var o = sel && sel.selectedOptions && sel.selectedOptions[0];
+          if (o && typeof parseSiklusDateToKey === 'function') k = parseSiklusDateToKey(o.text);
+          name = tab === 'pemorsian' ? 'Pemorsian' : 'Pendinginan';
+        } else return null;
+        return k ? { key: k, name: name } : null;
+      }
+      function tick() {
+        var now = new Date(), todayKey = getLocalDateKey(now);
+        $('pinDate').textContent = longDate(now);
+        $('pinTime').innerHTML = p2(now.getHours()) + ':' + p2(now.getMinutes()) + '<span class="sec">:' + p2(now.getSeconds()) + ' ' + tz(now) + '</span>';
+        var w = working(), msg = $('pinMsg'), fix = $('pinFix');
+        if (!w) { bar.classList.remove('bad'); msg.textContent = ''; fix.style.display = 'none'; }
+        else if (w.key === todayKey) { bar.classList.remove('bad'); msg.textContent = '✅ Tanggal input ' + w.name + ' = hari ini'; fix.style.display = 'none'; }
+        else {
+          var d = keyToDate(w.key);
+          bar.classList.add('bad');
+          msg.textContent = '⚠️ ' + w.name + ': tanggal input ' + (d ? longDate(d) : w.key) + ' ≠ HARI INI';
+          fix.style.display = '';
+        }
+        refreshSync();
+      }
+      $('pinFix').addEventListener('click', function () {
+        var tab = window.currentActiveTab, today = getLocalDateKey();
+        var fire = function (id) { var e = $(id); if (e) { e.value = today; e.dispatchEvent(new Event('change', { bubbles: true })); } };
+        if (tab === 'suhu-ruangan') fire('suhu_tanggal');
+        else if (tab === 'inspeksi-silang') fire('ks_tanggal');
+        else if (tab === 'inspeksi-alergen') fire('al_tanggal');
+        else if (tab === 'pemorsian' || tab === 'pendinginan') {
+          var sel = $(tab === 'pemorsian' ? 'selectSiklusPemorsian' : 'selectSiklusPendinginan');
+          var keys = getSuhuDateKeyList(getSuhuWeeks()), i = keys.indexOf(today);
+          if (i === -1) { alert('Tanggal hari ini tidak ada dalam Siklus Menu 20 Hari.'); return; }
+          sel.value = i;
+          if (tab === 'pemorsian') onPemorsianDayChange(sel); else onPendDayChange(sel);
+        }
+        tick();
+      });
+
+      // =================================================================
+      // SIMPAN ONLINE OTOMATIS
+      // =================================================================
+      var dirty = { silang: false, alergen: false, menu: false, master: false };
+      var lastInput = 0, saving = false, lastSavedAt = null;
+      var NAV_IDS = { ks_tanggal: 1, al_tanggal: 1, al_siklus_active: 1 };
+      ['input', 'change'].forEach(function (ev) {
+        document.addEventListener(ev, function (e) {
+          if (!e.isTrusted) return;
+          lastInput = Date.now();
+          var t = e.target; if (!t || t.type === 'file' || NAV_IDS[t.id]) return;
+          var sec = t.closest && t.closest('section.tab-content'); if (!sec) return;
+          if (sec.id === 'sec-inspeksi-silang') dirty.silang = true;
+          else if (sec.id === 'sec-inspeksi-alergen') dirty.alergen = true;
+          else if (sec.id === 'sec-siklus-menu-20' && /^sm_cell_/.test(t.id)) dirty.menu = true;
+          else if (sec.id === 'sec-master-bahan-20' && /^mb_cell_/.test(t.id)) dirty.master = true;
+        }, true);
+      });
+
+      // jalankan fungsi simpan lama tanpa dialog (konfirmasi otomatis "ya", alert diganti penanda sukses)
+      function silently(fn) {
+        var a = window.alert, c = window.confirm, ok = false;
+        window.alert = function (m) { if (/berhasil|tersimpan|terekam/i.test(String(m)) && !/gagal|belum/i.test(String(m))) ok = true; };
+        window.confirm = function () { return true; };
+        try { fn(); } catch (e) { console.error('Simpan otomatis gagal', e); ok = false; }
+        finally { window.alert = a; window.confirm = c; }
+        return ok;
+      }
+      function anyDirty() {
+        var sd = window.suhuDirty || {};
+        return dirty.silang || dirty.alergen || dirty.menu || dirty.master || !!window.pemorsianDirty || !!window.pendDirty || Object.keys(sd).some(function (k) { return sd[k]; });
+      }
+      function refreshSync() {
+        var el = $('pinSync'); if (!el) return;
+        if (saving) el.textContent = '⏳ Menyimpan…';
+        else if (anyDirty()) el.textContent = '✏️ Menyimpan otomatis…';
+        else if (lastSavedAt) el.textContent = '☁️ Tersimpan ' + p2(lastSavedAt.getHours()) + ':' + p2(lastSavedAt.getMinutes());
+        else el.textContent = '☁️ Online';
+      }
+      function saved(label) {
+        lastSavedAt = new Date();
+        var d = (function () { var w = working(); return w ? ' (' + w.key + ')' : ''; })();
+        sppgToast('☁️ ' + label + ' tersimpan online otomatis' + d);
+      }
+      function saveDirty() {
+        if (saving) return;
+        saving = true;
+        try {
+          var db = window.dbLoaded || {};
+          var k;
+          if (dirty.silang && (k = val('ks_tanggal')) && db['sppg_log_silang/' + k]) {
+            if (silently(function () { saveGenericForm('formInspeksiSilang', 'sppg_log_silang', 'Data Inspeksi Kontaminasi Silang berhasil disimpan!'); })) { dirty.silang = false; saved('Kontaminasi Silang'); }
+          }
+          if (dirty.alergen && (k = val('al_tanggal')) && db['sppg_log_alergen/' + k]) {
+            if (silently(function () { saveGenericForm('formInspeksiAlergen', 'sppg_log_alergen', 'Data Inspeksi Manajemen Alergen berhasil disimpan!'); })) { dirty.alergen = false; saved('Manajemen Alergen'); }
+          }
+          if (window.pemorsianDirty && silently(function () { savePemorsianLog(); })) saved('Pemorsian');
+          if (window.pendDirty && silently(function () { savePendinginanLog(); })) saved('Pendinginan');
+          var d = window.suhuRenderedDate;
+          if (d && window.suhuDirty && window.suhuDirty[d]) { autoSaveCurrentSuhuToCache(); if (!window.suhuDirty[d]) saved('Pemantauan Suhu'); }
+          if (dirty.menu && silently(function () { saveSiklusMenuManual(); })) { dirty.menu = false; saved('Siklus Menu'); }
+          if (dirty.master && silently(function () { saveMasterBahanManual(); })) { dirty.master = false; saved('Master Bahan'); }
+        } finally { saving = false; refreshSync(); }
+      }
+      setInterval(function () { if (Date.now() - lastInput > 1500 && anyDirty()) saveDirty(); }, 1000);
+      setInterval(tick, 1000);
+      tick();
+
+      // simpan seketika saat pindah menu / menutup tab
+      var oSw = window.switchTab;
+      window.switchTab = function () { if (anyDirty()) saveDirty(); return oSw.apply(this, arguments); };
+      document.addEventListener('visibilitychange', function () { if (document.hidden && anyDirty()) saveDirty(); });
+      window.addEventListener('beforeunload', function (e) { if (anyDirty()) { saveDirty(); if (anyDirty()) { e.preventDefault(); e.returnValue = ''; } } });
+
+      // update realtime dari server tidak boleh membongkar kolom yang sedang diketik
+      var EDIT_TABS = ['siklus-menu-20', 'master-bahan-20', 'inspeksi-silang', 'inspeksi-alergen', 'pemorsian', 'pendinginan', 'suhu-ruangan'];
+      var oRe = window.reRenderActiveTab;
+      window.reRenderActiveTab = function () {
+        var tab = window.currentActiveTab, ae = document.activeElement, sec = $('sec-' + tab);
+        if (ae && sec && sec.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) && ae.type !== 'file' && EDIT_TABS.indexOf(tab) !== -1) return;
+        return oRe.apply(this, arguments);
       };
     })();
   </script>
