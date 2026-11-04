@@ -903,7 +903,7 @@
 
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
         <div id="wrapper_pendinginan" class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm w-full">
-          <table class="w-full text-xs text-left min-w-[1500px]">
+          <table class="w-full text-xs text-left min-w-[1750px]">
             <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold tracking-wider text-[11px]">
               <tr>
                 <th class="p-3 text-center border-b border-slate-600 w-12">No.</th>
@@ -919,6 +919,7 @@
                 <th class="p-3 text-center border-b border-slate-600 w-36">FOTO SELESAI</th>
                 <th class="p-3 text-center border-b border-slate-600 w-24">Total Durasi (menit)</th>
                 <th class="p-3 text-center border-b border-slate-600 w-24">Suhu Ruang (°C)</th>
+                <th class="p-3 border-b border-slate-600 w-48">Keterangan</th>
               </tr>
             </thead>
             <tbody id="tbody_pendinginan" class="divide-y divide-slate-100"></tbody>
@@ -3344,7 +3345,9 @@
         const std = stdInput ? parseFloat(stdInput.value) : 0;
         const statusCell = tr.querySelector('.status-cell');
         
-        if (statusCell && count > 0 && !isNaN(std) && std > 0) {
+        if (statusCell && tr.dataset.nomenu === '1') {
+            statusCell.innerHTML = '<span class="text-slate-500 font-bold">TIDAK TERSEDIA MENU</span>';
+        } else if (statusCell && count > 0 && !isNaN(std) && std > 0) {
             if (avg > std * 1.10) {
                 statusCell.innerHTML = '<span class="text-red-600 font-bold">Melebihi Standar</span>';
             } else if (avg < std * 0.90) {
@@ -3412,19 +3415,20 @@
 
       KELOMPOK_LIST_MENU.forEach((k, i) => {
         let item = getSuhuMenuName(weeks, k, idx);
+        const noMenu = (item === '-');   // komponen ini tidak ada pada Siklus Menu hari tsb
 
-        let std = dayData[i] ? dayData[i].std : 200;
-        let s1 = dayData[i] ? dayData[i].s1 : 200;
-        let s2 = dayData[i] ? dayData[i].s2 : 200;
-        let s3 = dayData[i] ? dayData[i].s3 : 200;
+        let std = dayData[i] ? dayData[i].std : (noMenu ? '' : 200);
+        let s1 = dayData[i] ? dayData[i].s1 : (noMenu ? '' : 200);
+        let s2 = dayData[i] ? dayData[i].s2 : (noMenu ? '' : 200);
+        let s3 = dayData[i] ? dayData[i].s3 : (noMenu ? '' : 200);
 
         let fs1 = dayData[i] ? (dayData[i].fs1 || '') : '';
         let fs2 = dayData[i] ? (dayData[i].fs2 || '') : '';
         let fs3 = dayData[i] ? (dayData[i].fs3 || '') : '';
 
-        html += `<tr class="border-b border-slate-100">
+        html += `<tr class="border-b border-slate-100"${noMenu ? ' data-nomenu="1"' : ''}>
             <td class="p-3 text-center font-bold text-slate-500">${no++}</td>
-            <td class="p-3 font-semibold text-slate-600">${KELOMPOK_LABELS_MENU[k]}: <br><span class="text-blue-700 font-bold uppercase">${item}</span></td>
+            <td class="p-3 font-semibold text-slate-600">${KELOMPOK_LABELS_MENU[k]}: <br><span class="text-blue-700 font-bold uppercase">${noMenu ? 'TIDAK TERSEDIA MENU' : item}</span></td>
             <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl p-2 font-black text-slate-700 std-val bg-slate-50 text-center" value="${std}" oninput="calcAvgPemorsian(this)"></td>
             <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600 sample-val" value="${s1}" oninput="calcAvgPemorsian(this)"></td>
             <td class="p-2 text-center">${buildPemorsianUploadHtml(`pemorsian_foto_s1_${idx}_${i}`, fs1)}</td>
@@ -3823,6 +3827,8 @@ function initSuhuModule() {
     function evalSuhuStatusSingle(id, min, max) {
       const statusElem = document.getElementById(`suhu_status_${id}`);
       if (!statusElem) return;
+      const catEl = document.getElementById(`suhu_cat_${id}`);
+      if (catEl && catEl.dataset.menu === '-') { statusElem.innerHTML = '<span class="text-slate-500 font-bold">-</span>'; return; }
       const val = parseFloat(String(document.getElementById(`suhu_val_${id}`)?.value).replace(',', '.'));
       const limit = parseSuhuLimit(document.getElementById(`suhu_std_${id}`)?.value);
       setSuhuStatusHtml(statusElem, suhuValueOk(val, limit, min, max));
@@ -3977,7 +3983,7 @@ function renderSuhuTable() {
             <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
             <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
             <td class="p-3 text-center font-bold text-sm" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
-            <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
+            <td class="p-2"><input type="text" id="suhu_cat_${uniqueId}" data-menu="${menuName}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>
           </tr>`;
         });
       });
@@ -4008,6 +4014,12 @@ function renderSuhuTable() {
       if (el && el.type !== 'file' && id !== 'suhu_siklus_active') el.value = savedData[id];
     });
   }
+  // Keterangan otomatis: komponen yang tidak ada pada Siklus Menu hari ini
+  document.querySelectorAll('#tbody_suhu_monitoring input[data-menu]').forEach(el => {
+    const AUTO = 'TIDAK TERSEDIA MENU';
+    if (el.dataset.menu === '-') { if (!el.value || el.value === AUTO) el.value = AUTO; }
+    else if (el.value === AUTO) el.value = '';
+  });
   // Hitung ulang status semua baris memakai nilai suhu & batas suhu yang tampil
   document.querySelectorAll('#tbody_suhu_monitoring input[type="number"]').forEach(inp => {
     inp.dispatchEvent(new Event('input'));
@@ -5331,6 +5343,9 @@ function renderSuhuTable() {
         const menu = getSuhuMenuName(weeks, r.key, idx);       // SINKRON dengan Siklus Menu 20 Hari
         const idM = `pend_foto_m_${idx}_${i}`, idS = `pend_foto_s_${idx}_${i}`;
         const cls = 'w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600';
+        const AUTO_KET = 'TIDAK TERSEDIA MENU';
+        let ketVal = d.ket || '';
+        if (menu === '-') { if (!ketVal) ketVal = AUTO_KET; } else if (ketVal === AUTO_KET) ketVal = '';
         html += `<tr class="border-b border-slate-100" data-no="${i + 1}" data-tahap="${r.tahap}" data-jenis="${r.label}">
           <td class="p-3 text-center font-bold text-slate-500">${i + 1}</td>
           <td class="p-3 text-center font-black text-slate-700">${r.tahap}</td>
@@ -5345,6 +5360,7 @@ function renderSuhuTable() {
           <td class="p-2 text-center">${buildPendPhotoHtml(idS, 's', d.fs || '')}</td>
           <td class="p-3 text-center font-black text-slate-800 bg-slate-50/50 pend-dur">-</td>
           <td class="p-2 text-center"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sr" value="${pendEsc(d.sr || '')}" placeholder="°C"></td>
+          <td class="p-2"><input type="text" class="w-full border-2 border-slate-200 rounded-xl p-2 font-bold text-slate-700 pend-ket" data-menu="${pendEsc(menu)}" value="${pendEsc(ketVal)}" placeholder="Keterangan..."></td>
         </tr>`;
       });
       tbody.innerHTML = html;
@@ -5414,7 +5430,8 @@ function renderSuhuTable() {
           js: tr.querySelector('.pend-js').value,
           ss: tr.querySelector('.pend-ss').value,
           fs: (files[1] && files[1].getAttribute('data-base64')) || '',
-          sr: tr.querySelector('.pend-sr').value
+          sr: tr.querySelector('.pend-sr').value,
+          ket: tr.querySelector('.pend-ket').value
         });
       });
       return rows;
@@ -5570,6 +5587,7 @@ function renderSuhuTable() {
           js: tr.querySelector('.pend-js').value, ss: num(tr.querySelector('.pend-ss').value),
           dur: dur === '-' ? '' : parseInt(dur, 10),
           sr: num(tr.querySelector('.pend-sr').value),
+          ket: tr.querySelector('.pend-ket').value,
           fm: (files[0] && files[0].getAttribute('data-base64')) || '',
           fs: (files[1] && files[1].getAttribute('data-base64')) || ''
         });
@@ -5593,7 +5611,7 @@ function renderSuhuTable() {
         if (inl) cols.push({ k: 'fm', w: 18, h: 'Foto Mulai Resting' });
         cols.push({ k: 'js', w: 12, h: 'Pukul Selesai Resting' }, { k: 'ss', w: 11, h: 'Suhu Makanan (°C)' });
         if (inl) cols.push({ k: 'fs', w: 18, h: 'Foto Selesai Resting' });
-        cols.push({ k: 'dur', w: 14, h: 'Total Durasi (menit)' }, { k: 'sr', w: 22, h: 'Suhu Ruang (°C)' });
+        cols.push({ k: 'dur', w: 14, h: 'Total Durasi (menit)' }, { k: 'sr', w: 14, h: 'Suhu Ruang (°C)' }, { k: 'ket', w: 26, h: 'Keterangan' });
 
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet(PEND_DOC_CODE);
@@ -5603,7 +5621,7 @@ function renderSuhuTable() {
         const first = 2, last = cols.length + 1;
 
         ws.getRow(1).height = 21;
-        rptKop(wb, ws, { r: 2, rowH: 19.5, logo: [first, cx.jenis], title: [cx.menu, cx.dur - 1], lab: cx.dur, val: cx.sr,
+        rptKop(wb, ws, { r: 2, rowH: 19.5, logo: [first, cx.jenis], title: [cx.menu, cx.dur], lab: cx.sr, val: cx.ket,
           judul: 'PENDINGINAN MAKANAN', noDoc: PEND_DOC_CODE, rev: '00', colon: false });
 
         ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
@@ -5632,7 +5650,7 @@ function renderSuhuTable() {
           const put = (k, v, o) => rptPut(ws, row, cx[k], v, Object.assign({ h: 'center' }, o || {}));
           put('no', parseInt(d.no, 10)); put('tahap', d.tahap); put('jenis', d.jenis, { h: 'left' }); put('menu', d.menu, { h: 'left' });
           put('jml', d.jml); put('jm', d.jm); put('sm', d.sm, { numFmt: '0.0' });
-          put('js', d.js); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' });
+          put('js', d.js); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' }); put('ket', d.ket, { h: 'left' });
           rptBorder(ws, row, first, row, last, 'grid');
 
           for (const p of [['fm', norms[0]], ['fs', norms[1]]]) {
@@ -5643,10 +5661,10 @@ function renderSuhuTable() {
         }
 
         row += 1;
-        rptMerge(ws, row, cx.dur, row, cx.sr); rptPut(ws, row, cx.dur, 'Yang Memeriksa', { h: 'center' });
+        rptMerge(ws, row, cx.sr, row, cx.ket); rptPut(ws, row, cx.sr, 'Yang Memeriksa', { h: 'center' });
         row++;
         ws.getRow(row).height = 69.75;
-        rptMerge(ws, row, cx.dur, row, cx.sr); rptPut(ws, row, cx.dur, '(____________________________) ', { h: 'center', v: 'bottom' });
+        rptMerge(ws, row, cx.sr, row, cx.ket); rptPut(ws, row, cx.sr, '(____________________________) ', { h: 'center', v: 'bottom' });
 
         rptPage(ws, true, 'B1:' + ws.getColumn(last).letter + row);
         ws.pageSetup.fitToHeight = 1;
