@@ -14,6 +14,17 @@
   <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
   <style>
+        /* MEMAKSA GARIS TABEL SUHU MUNCUL SEMUA */
+    #wrapper_suhu table, 
+    #wrapper_suhu th, 
+    #wrapper_suhu td {
+        border: 1px solid #64748b !important;
+    }
+    #wrapper_suhu th {
+        background-color: #0f172a !important; /* Warna biru gelap header */
+        color: #ffffff !important;
+        padding: 12px 8px !important;
+    }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 6px; }
@@ -1834,9 +1845,7 @@
         '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (revOverride || (num === '01.01' ? '01' : '00')) + '</td></tr>' +
         '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + WORD_KOP_TGL + '</td></tr>' +
         '</table>' +
-(code === 'FM-SGR-SPPG-03.05'
-  ? '<p style="margin:0 0 8px 0;font-weight:bold;font-size:11pt;">Tanggal Pemantauan : ' + rptLongDate(suhuDocDateKey()) + '</p>'
-  : '');
+'';
     }
 
     // Blok keterangan laporan Pemantauan Suhu (FM-SGR-SPPG-03.05) - dipakai Export Word & Excel
@@ -2083,7 +2092,6 @@
             rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 2], title: [3, lastC - 2], lab: lastC - 1, val: lastC,
               judul: 'PEMANTAUAN SUHU RUANGAN', noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
             ws.getRow(4).height = 20; rptMerge(ws, 4, 1, 4, lastC);
-            rptPut(ws, 4, 1, 'Tanggal Pemantauan : ' + rptLongDate(suhuDocDateKey()), { bold: true, h: 'left' });
           } else {
             ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
             ws.getCell('A2').font = { name: 'Calibri', bold: true, size: 11 };
@@ -2512,10 +2520,39 @@
     async function rptExportChecklist(cfg) {
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet(cfg.sheet);
-      cfg.widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
-      ws.getColumn(8).width = 8.66;
-      const F = cfg.font, SZ = cfg.sz;
+      const F = cfg.font;
       const val = id => { const el = document.getElementById(id); return el ? String(el.value || '') : ''; };
+
+      // Perkiraan jumlah baris teks dalam sel (lebar kolom u dalam satuan Excel, huruf f pt)
+      const linesOf = (txt, u, f) => {
+        const per = Math.max(1, Math.floor((u * 7 - 8) / (f * 1.333 * 0.52)));
+        return String(txt == null ? '' : txt).split('\n').reduce((s, l) => s + Math.max(1, Math.ceil(l.length / per)), 0);
+      };
+      let widths = cfg.widths, SZ = cfg.sz, rowSz = cfg.rowSz || cfg.sz, land = true;
+      if (cfg.auto) {
+        // Pilih orientasi A4 + ukuran huruf (11 / 12 pt) yang paling besar tampil pada 1 halaman, kolom dilebarkan memenuhi lebar kertas
+        let best = null;
+        [true, false].forEach(L => [12, 11].forEach(f => {
+          const pwPx = (L ? 285 : 198) / 25.4 * 96 * 0.97;
+          const sum = cfg.auto.reduce((a, b) => a + b, 0);
+          const w = cfg.auto.map(x => x * (pwPx / 7) / sum);
+          const lh = f * 1.3;
+          let rows = 0;
+          cfg.items.forEach(it => {
+            const hasil = '[ ✓ ] Ya  [    ] Tdk';
+            const n = Math.max(linesOf(it[cfg.stdKey], w[2], f), linesOf(it[cfg.areaKey], w[1], f), linesOf(hasil, w[3], f),
+                               linesOf(val(cfg.prefix + 'cat_' + it.id), w[4], f), linesOf(val(cfg.prefix + 'kor_' + it.id), w[5], f));
+            rows += Math.max(24, n * lh + 8);
+          });
+          const H = 100 + 8 + 2 * (lh * 2 + 6) + 15 + (lh * 3 + 6) + rows + 105;
+          const eff = f * Math.min(1, ((L ? 198 : 285) / 25.4 * 72 * 0.97) / H);
+          if (!best || eff > best.eff + 0.05) best = { L: L, f: f, w: w, eff: eff };
+        }));
+        widths = best.w; SZ = best.f; rowSz = best.f; land = best.L;
+      }
+      const lineH = cfg.auto ? SZ * 1.3 : 13;
+      widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+      ws.getColumn(8).width = 8.66;
       const dKey = val(cfg.dateId);
       const tglKop = rptLongDate(dKey) || rptToday();
 
@@ -2524,12 +2561,13 @@
       rptDateLine(ws, 4, 1, 7);
 
       // data isian (tanggal, shift/lokasi, petugas)
-      ws.getRow(5).height = 20.25; ws.getRow(6).height = 20.25;
-      cfg.meta(ws, { val: val, tgl: rptLongDate(dKey), put: (r, c, v, o) => rptPut(ws, r, c, v, Object.assign({ font: F, size: 9 }, o || {})) });
+      const metaH = cfg.auto ? lineH * 2 + 6 : 20.25;
+      ws.getRow(5).height = metaH; ws.getRow(6).height = metaH;
+      cfg.meta(ws, { val: val, tgl: rptLongDate(dKey), put: (r, c, v, o) => rptPut(ws, r, c, v, Object.assign({ font: F, size: cfg.auto ? SZ - 1 : 9 }, o || {})) });
 
       // header tabel
-      ws.getRow(8).height = 42;
-      cfg.head.forEach((h, i) => rptPut(ws, 8, i + 1, h, { font: F, size: 10, bold: true, h: 'center' }));
+      ws.getRow(8).height = cfg.auto ? lineH * 3 + 6 : 42;
+      cfg.head.forEach((h, i) => rptPut(ws, 8, i + 1, h, { font: F, size: cfg.auto ? SZ : 10, bold: true, h: 'center' }));
       rptFill(ws, 8, 1, 8, 7, cfg.hdrFill);
       rptBorder(ws, 8, 1, 8, 7, 'grid');
 
@@ -2539,10 +2577,13 @@
         const ya = cfg.isYa(res);
         const hasil = ya ? '[ ✓ ] Ya  [    ] Tdk' : '[    ] Ya  [ ✓ ] Tdk';
         const cat = val(cfg.prefix + 'cat_' + it.id), kor = val(cfg.prefix + 'kor_' + it.id), paraf = val(cfg.prefix + 'paraf_' + it.id);
-        const lines = Math.max(rptLines(it[cfg.stdKey], cfg.widths[2], SZ), rptLines(it[cfg.areaKey], cfg.widths[1], SZ),
-                               rptLines(cat, cfg.widths[4], SZ), rptLines(kor, cfg.widths[5], SZ));
-        ws.getRow(row).height = Math.max(24, lines * 13 + 8);
-        const o = { font: F, size: cfg.rowSz || SZ };
+        const lines = cfg.auto
+          ? Math.max(linesOf(it[cfg.stdKey], widths[2], SZ), linesOf(it[cfg.areaKey], widths[1], SZ), linesOf(hasil, widths[3], SZ),
+                     linesOf(cat, widths[4], SZ), linesOf(kor, widths[5], SZ))
+          : Math.max(rptLines(it[cfg.stdKey], widths[2], SZ), rptLines(it[cfg.areaKey], widths[1], SZ),
+                     rptLines(cat, widths[4], SZ), rptLines(kor, widths[5], SZ));
+        ws.getRow(row).height = Math.max(24, lines * lineH + 8);
+        const o = { font: F, size: rowSz };
         rptPut(ws, row, 1, it.id, Object.assign({ h: 'center' }, o));
         rptPut(ws, row, 2, it[cfg.areaKey], o);
         rptPut(ws, row, 3, it[cfg.stdKey], o);
@@ -2557,13 +2598,13 @@
 
       // tanda tangan
       row += 2;
-      const sg = { font: F, size: 9, bold: true, wrap: false };
+      const sg = { font: F, size: cfg.auto ? SZ - 1 : 9, bold: true, wrap: false };
       rptPut(ws, row, 2, cfg.sigLeft, sg);
       rptPut(ws, row, 6, 'Disetujui Oleh (Kepala Dapur SPPG):', sg);
       row += 4;
       rptPut(ws, row, 2, '( ' + (val(cfg.nameId) || '________________________') + ' )', sg);
       rptPut(ws, row, 6, '( ________________________ )', sg);
-      rptPage(ws, true, 'A1:G' + row);
+      rptPage(ws, land, 'A1:G' + row);
       ws.pageSetup.fitToHeight = 1; // satu lembar, sama seperti template
       await rptDownload(wb, exportFileName(cfg.menuKey, 'xlsx'));
     }
@@ -2574,6 +2615,7 @@
         menuKey: 'wrapper_inspeksi_silang',
         font: 'Quattrocento Sans', sz: 10, hdrFill: RPT_GREY, alt: null,
         widths: [4.2, 16, 38.3, 18.2, 18.2, 18.3, 20.7],
+        auto: [3.5, 14, 46, 16, 14, 15, 14],   // proporsi kolom; ukuran huruf 11-12 pt & orientasi dipilih otomatis agar 1 halaman A4 terpakai maksimal
         head: ['NO', 'AREA / ELEMEN PEMERIKSAAN', 'STANDAR OPERASIONAL (GHP/HACCP)', 'HASIL INSPEKSI\n(Ya / Tidak / NA)', 'CATATAN KETIDAKSESUAIAN', 'TINDAKAN KOREKSI LANGSUNG', 'PARAF SUPERVISOR'],
         items: INSPEKSI_SILANG_ITEMS, areaKey: 'area', stdKey: 'std', prefix: 'ks_', dateId: 'ks_tanggal', nameId: 'ks_auditor',
         sigLeft: 'Diperiksa Oleh (Supervisor K3/QC):',
@@ -3969,6 +4011,7 @@ function renderSuhuTable() {
           <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
           <td class="p-2 text-center"><input type="date" id="suhu_tgl_${cfg.id}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
           <td class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap">${cfg.area}</td>
+          <td class="p-2 text-center">${fotoHtml}</td>
           ${dynamicCells}
           <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
           <td class="p-3 text-center font-bold text-sm" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
@@ -6528,5 +6571,15 @@ function renderSuhuTable() {
       window.switchTab = function () { var r = oSw.apply(this, arguments); setTimeout(run, 1500); return r; };
     })();
   </script>
+  <style>
+  /* PERBAIKAN GARIS TABEL SUHU & KETERANGAN */
+  #wrapper_suhu table th, #wrapper_suhu table td {
+    border: 1px solid #7fa793 !important;
+  }
+  #wrapper_suhu table th {
+    background-color: #0d3b36 !important;
+    color: #ffffff !important;
+  }
+</style>
 </body>
 </html>
