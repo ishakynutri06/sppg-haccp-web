@@ -1776,8 +1776,13 @@
           } else {
             inp.parentNode.replaceChild(document.createTextNode('-'), inp);
           }
-        } else {
-          inp.parentNode.replaceChild(document.createTextNode(orig ? (orig.value || '') : ''), inp);
+                } else {
+          let v = orig ? (orig.value || '') : '';
+          if (orig && orig.type === 'date' && v && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+            const p = v.split('-');
+            v = new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          }
+          inp.parentNode.replaceChild(document.createTextNode(v), inp);
         }
       });
       if (noPhotos) exportRemovePhotoColumns(clone);
@@ -1829,7 +1834,9 @@
         '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (revOverride || (num === '01.01' ? '01' : '00')) + '</td></tr>' +
         '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + WORD_KOP_TGL + '</td></tr>' +
         '</table>' +
-        '<p style="margin:0 0 8px 0;font-weight:bold;font-size:11pt;">' + (code === 'FM-SGR-SPPG-03.05' ? 'Tanggal Pemantauan : ' + rptLongDate(suhuDocDateKey()) : 'Tanggal Cetak : ' + rptRealDate()) + '</p>';
+(code === 'FM-SGR-SPPG-03.05'
+  ? '<p style="margin:0 0 8px 0;font-weight:bold;font-size:11pt;">Tanggal Pemantauan : ' + rptLongDate(suhuDocDateKey()) + '</p>'
+  : '');
     }
 
     // Blok keterangan laporan Pemantauan Suhu (FM-SGR-SPPG-03.05) - dipakai Export Word & Excel
@@ -1842,16 +1849,12 @@
       }
       return key || getLocalDateKey();
     }
-    function suhuReportHeaderLines() {
+        function suhuReportHeaderLines() {
       const names = g => SUHU_ITEMS_CONFIG.filter(c => c.groupKey === g).map(c => c.area).join(', ');
-      // Tanggal dokumen = tanggal pada Siklus Menu yang dipilih
-      const key = suhuDocDateKey();
       const lines = [['NAMA SPPG/ID SPPG', 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI-SEGERI']];
-      // JENIS RUANGAN / JENIS PENYIMPANAN hanya tampil pada menu masing-masing
       if (activeSuhuCategory === 'ruang') lines.push(['JENIS RUANGAN', names('ruang')]);
       if (activeSuhuCategory === 'penyimpanan') lines.push(['JENIS PENYIMPANAN', names('penyimpanan')]);
-      lines.push(['PENANGGUNG JAWAB', 'ISHAK YUNUS (PATEN)'], ['JENIS PASOKAN', ''], ['PETUGAS PENERIMA', ''], ['ID SPPG', ''],
-                 ['TANGGAL DOKUMEN', rptLongDate(key) || rptToday()]);
+      lines.push(['PENANGGUNG JAWAB', 'ISHAK YUNUS'], ['JENIS PASOKAN', ''], ['PETUGAS PENERIMA', ''], ['ID SPPG', '']);
       return lines;
     }
 
@@ -1939,7 +1942,7 @@
         const suhuHdr = wrapperId === 'wrapper_suhu' ? suhuReportHeaderLines() : [];
         const isSuhu = suhuHdr.length > 0;
         // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
-        const HDR_ROWS = isSuhu ? 5 + suhuHdr.length : 4;
+                const HDR_ROWS = isSuhu ? 4 + suhuHdr.length : 4;
         const PHOTO_COL_WIDTH = 18;         // ~131 px, cukup untuk foto 3 cm (113 px)
         const PORTRAIT_ROW_PT = 104;        // foto 3 cm (85 pt) + ruang atas/bawah
         const LANDSCAPE_ROW_PT = 74;        // foto 2 cm (57 pt) + ruang atas/bawah
@@ -1951,8 +1954,8 @@
           ws.views = [{ showGridLines: true }];
           ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
 
-          if (isSuhu) {
-            ws.addRow([]); ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (diisi setelah lebar kolom diketahui)
+                    if (isSuhu) {
+            ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (3 baris)
             suhuHdr.forEach(l => {
               const row = ws.addRow([l[0] + (l[0].length < 18 ? ' '.repeat(18 - l[0].length) : '') + ': ' + l[1]]);
               row.getCell(1).font = { name: 'Calibri', size: 11, bold: true };
@@ -1984,10 +1987,18 @@
               while (occupied.has(r + ',' + c)) c++;
               const cs = Math.max(1, td.colSpan || 1), rs = Math.max(1, td.rowSpan || 1);
               const photoB64 = exportGetPhotoB64(td);
-              let value = '';
+                            let value = '';
               if (photoB64 === undefined) {
                 const other = td.querySelector('input:not([type="file"]), select, textarea');
-                value = other ? other.value : td.innerText.trim();
+                if (other) {
+                  value = other.value;
+                  if (other.type === 'date' && value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                    const p = value.split('-');
+                    value = new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                  }
+                } else {
+                  value = td.innerText.trim();
+                }
               }
               cells.push({ r: r, c: c, rs: rs, cs: cs, value: value, header: td.tagName === 'TH', b64: photoB64 || null, norm: null });
               for (let i = 0; i < rs; i++) for (let j = 0; j < cs; j++) if (i || j) occupied.add((r + i) + ',' + (c + j));
@@ -2046,7 +2057,7 @@
           // 5) Sisipkan foto: 2x3 cm / 3x2 cm di tengah sel, terkunci ke ukuran sel
           if (isSuhu) {   // lebar kolom akhir ditetapkan SEBELUM foto dipasang agar ukuran sel sudah final
             const lc = Math.max(maxCol, 6);
-            ws.getColumn(lc).width = Math.max(ws.getColumn(lc).width || 0, 20);
+            ws.getColumn(lc).width = Math.max(ws.getColumn(lc).width || 0, 35);
             ws.getColumn(lc - 1).width = Math.max(ws.getColumn(lc - 1).width || 0, 14);
             // area judul kop dilebarkan agar nama SPPG tampil 1 baris penuh (dilakukan sebelum foto dipasang)
             const NEED = 82; let have = 0;
@@ -2118,8 +2129,10 @@
     // Baris "Tanggal Cetak" (tanggal real hari ini) tepat di bawah kop, di atas tabel
     function rptDateLine(ws, row, c1, c2) {
       ws.getRow(row).height = 20;
-      rptMerge(ws, row, c1, row, c2);
-      rptPut(ws, row, c1, 'Tanggal Cetak : ' + rptRealDate(), { bold: true, h: 'left' });
+      function rptDateLine(ws, row, c1, c2) {
+  // "Tanggal Cetak" dihilangkan atas permintaan; baris tetap ada sebagai jarak kecil antar kop dan tabel
+  ws.getRow(row).height = 8;
+}
     }
     function rptTitleCase(s) {
       return String(s || '').toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase());
@@ -2415,8 +2428,7 @@
 
       ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
       rptMerge(ws, 5, 2, 5, 4); rptPut(ws, 5, 2, 'Hari/Tanggal ', { bold: true });
-      rptMerge(ws, 5, 5, 5, C.sig[0] - 1); rptPut(ws, 5, 5, ': ' + (dateTxt || '….....................'), { bold: true });
-      rptMerge(ws, 5, C.sig[0], 5, C.last); rptPut(ws, 5, C.sig[0], 'Tanggal Cetak : ' + rptRealDate(), { bold: true, h: 'left' });
+      rptMerge(ws, 5, 5, 5, C.last); rptPut(ws, 5, 5, ': ' + (dateTxt || '….....................'), { bold: true });
       rptMerge(ws, 6, 2, 6, 4); rptPut(ws, 6, 2, 'Siklus Menu Hari ini ', { bold: true });
       rptMerge(ws, 6, 5, 6, C.last); rptPut(ws, 6, 5, ': ' + (siklusTxt || '….....................'), { bold: true });
 
@@ -3920,18 +3932,19 @@ function renderSuhuTable() {
   const realtimeNowTime = getRealtimeTimeString();
 
   if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
-    let dynamicHeaders = '';
+            let dynamicHeaders = '';
     for (let c = 1; c <= suhuRuangColumns; c++) {
-      dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU ${c}</th>
-                         <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU ${c}</th>`;
+      dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
+                         <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU</th>`;
     }
 
     htmlHead = `
-      <tr>
-        <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-        <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
-        <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
-        ${dynamicHeaders}
+  <tr>
+    <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
+    <th class="p-3 border-b border-slate-600 w-32 text-center">TANGGAL</th>
+    <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
+    <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+    ${dynamicHeaders}
         <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
         <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
         <th class="p-3 border-b border-slate-600">KETERANGAN</th>
@@ -3951,11 +3964,11 @@ function renderSuhuTable() {
 
       let fotoHtml = getPhotoCellHtml(`suhu_foto_${cfg.id}`, `suhu_val_1_${cfg.id}`, `suhu_waktu_1_${cfg.id}`);
 
-      htmlBody += `
+            htmlBody += `
         <tr class="hover:bg-slate-50 border-b border-slate-100">
           <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
+          <td class="p-2 text-center"><input type="date" id="suhu_tgl_${cfg.id}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
           <td class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap">${cfg.area}</td>
-          <td class="p-2 text-center">${fotoHtml}</td>
           ${dynamicCells}
           <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
           <td class="p-3 text-center font-bold text-sm" id="suhu_status_${cfg.id}"><span class="text-emerald-600">Sesuai</span></td>
@@ -3963,7 +3976,7 @@ function renderSuhuTable() {
         </tr>`;
     });
 
-    let totalCols = 6 + (2 * suhuRuangColumns);
+        let totalCols = 7 + (2 * suhuRuangColumns);   // +1 kolom TANGGAL
     htmlBody += `
       <tr class="hidden-print border-t border-slate-200">
         <td colspan="${totalCols}" class="p-5 text-center bg-slate-50/80">
@@ -3975,9 +3988,10 @@ function renderSuhuTable() {
     `;
 
   } else if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
-    htmlHead = `
+        htmlHead = `
       <tr>
         <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
+        <th class="p-3 border-b border-slate-600 w-32 text-center">TANGGAL</th>
         <th class="p-3 border-b border-slate-600 w-[1%]">KOMPONEN & MENU HARI INI</th>
         <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
         <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
@@ -4000,9 +4014,10 @@ function renderSuhuTable() {
           let defTime = realtimeNowTime;
           let fotoHtml = getPhotoCellHtml(`suhu_foto_${uniqueId}`, `suhu_val_${uniqueId}`, `suhu_waktu_${uniqueId}`);
 
-          htmlBody += `
+                    htmlBody += `
           <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
             <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
+            <td class="p-2 text-center"><input type="date" id="suhu_tgl_${uniqueId}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
             <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 w-[1%] whitespace-nowrap">
               <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
               ${menuName}
@@ -4019,9 +4034,9 @@ function renderSuhuTable() {
     }
 
     let nextBatchNum = maxBatches + 1;
-    htmlBody += `
+        htmlBody += `
       <tr class="hidden-print border-t border-slate-200">
-        <td colspan="8" class="p-5 text-center bg-slate-50/80">
+        <td colspan="9" class="p-5 text-center bg-slate-50/80">
           <button type="button" onclick="addSuhuBatch()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
             <span>➕</span> Tambah Form Input Untuk Batch ${nextBatchNum}
           </button>
@@ -5655,8 +5670,7 @@ function renderSuhuTable() {
 
         ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
         rptMerge(ws, 5, first, 5, cx.jenis); rptPut(ws, 5, first, 'Hari/Tanggal ', { bold: true });
-        rptMerge(ws, 5, cx.menu, 5, cx.dur - 1); rptPut(ws, 5, cx.menu, ': ' + (info.tanggal || '….....................'), { bold: true });
-        rptMerge(ws, 5, cx.dur, 5, last); rptPut(ws, 5, cx.dur, 'Tanggal Cetak : ' + rptRealDate(), { bold: true, h: 'left' });
+        rptMerge(ws, 5, cx.menu, 5, last); rptPut(ws, 5, cx.menu, ': ' + (info.tanggal || '….....................'), { bold: true });
         rptMerge(ws, 6, first, 6, cx.jenis); rptPut(ws, 6, first, 'Siklus Menu Hari ini ', { bold: true });
         rptMerge(ws, 6, cx.menu, 6, last); rptPut(ws, 6, cx.menu, ': ' + (info.siklus || '….....................'), { bold: true });
 
