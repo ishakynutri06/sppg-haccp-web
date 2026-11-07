@@ -208,7 +208,7 @@
         <button id="nav-siklus-menu-20" onclick="switchTab('siklus-menu-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍱</span> <span>Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</span></button>
         <button id="nav-pemorsian" onclick="switchTab('pemorsian')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">⚖️</span> <span>Pemorsian & Berat (FM-SGR-SPPG-06.01)</span></button>
         <button id="nav-suhu-ruangan" onclick="switchTab('suhu-ruangan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🌡️</span> <span>Pemantauan Suhu (FM-SGR-SPPG-03.05)</span></button>
-        <button id="nav-pendinginan" onclick="switchTab('pendinginan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">❄️</span> <span>Pendinginan Makanan (IK-SGR-SPPG-.04.01)</span></button>
+        <button id="nav-pendinginan" onclick="switchTab('pendinginan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">❄️</span> <span>Pemantauan di Cooling Area (FM-SGR-SPPG-05.03)</span></button>
         <button id="nav-inspeksi-silang" onclick="switchTab('inspeksi-silang')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🛡️</span> <span>Kontaminasi Silang (FM-SGR-SPPG-21.01)</span></button>
         <button id="nav-inspeksi-alergen" onclick="switchTab('inspeksi-alergen')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white shadow-lg shadow-amber-900/40 hover:-translate-y-0.5 transition-all duration-300 border border-amber-500/50"><span class="text-base drop-shadow-md">⚠️</span> <span>Manajemen Alergen (FM-SGR-SPPG-22.01)</span></button>
         <button id="nav-backup-data" onclick="switchTab('backup-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">💾</span> <span>Backup & Restore Data</span></button>
@@ -625,6 +625,109 @@
 
         <div class="export-toolbar flex flex-wrap gap-2 w-full"><button type="button" onclick="exportSasaranExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button><button type="button" onclick="exportSasaranWord()" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button><button type="button" onclick="sdExportData()" class="flex-1 lg:flex-none bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex justify-center items-center gap-1.5">🗂️ Unduh Data Lengkap (format impor)</button></div>
 
+        <!-- DATABASE PENERIMA MANFAAT (sekolah & posyandu) -->
+        <div id="pmb_box" class="bg-gradient-to-br from-indigo-50 to-white p-5 rounded-2xl border border-indigo-200 shadow-inner space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div>
+              <div class="font-extrabold text-indigo-900 text-xs uppercase tracking-wider">📊 Database Penerima Manfaat (Sekolah &amp; Posyandu)</div>
+              <p class="text-[11px] text-indigo-800/80 font-medium mt-0.5">Jumlah siswa (laki-laki/perempuan), tendik, uji organoleptik, balita, ibu hamil &amp; menyusui &middot; porsi kecil/besar dihitung otomatis &middot; terhubung ke data alergi di bawah dan ke Inspeksi Manajemen Alergen (22.01).</p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-end">
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Tanggal Data:</label>
+                <input type="date" id="pmb_tanggal" onchange="pmbSetTanggal(this.value)" class="border-2 border-indigo-200 rounded-xl p-2 text-sm font-bold bg-white text-slate-800">
+              </div>
+              <button type="button" onclick="pmbSeed()" class="bg-white hover:bg-indigo-100 border border-indigo-300 text-indigo-700 font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition-all">📥 Muat Data Awal (lampiran)</button>
+              <button type="button" onclick="pmbExportExcel()" class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 transition-all">📊 Export Excel</button>
+            </div>
+          </div>
+
+          <div id="pmb_stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs"></div>
+          <div id="pmb_stats2" class="text-[11px] font-bold text-slate-600"></div>
+
+          <form id="pmb_form" onsubmit="event.preventDefault(); pmbSubmit();" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div id="pmb_form_title" class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">✍️ Tambah Sekolah / Posyandu</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Jenis:</label>
+                <select id="pmb_f_jenis" onchange="pmbOnJenis()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
+                  <option value="PAUD">PAUD / TK / KB / RA</option>
+                  <option value="SD">SD / MI</option>
+                  <option value="SMP">SMP / MTs</option>
+                  <option value="POSYANDU">Posyandu (3B)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Nama Satuan / Posyandu:</label>
+                <input type="text" id="pmb_f_nama" placeholder="Nama..." autocomplete="off" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800">
+              </div>
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Alamat (Desa/Kelurahan):</label>
+                <input type="text" id="pmb_f_alamat" placeholder="Alamat..." autocomplete="off" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
+              <div id="pmb_g_kecil" class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1.5">
+                <div class="pmb-lab font-extrabold text-emerald-800 text-[10px] uppercase tracking-wider"></div>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" min="0" id="pmb_f_kl" placeholder="Laki-laki" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                  <input type="number" min="0" id="pmb_f_kp" placeholder="Perempuan" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                </div>
+                <input type="number" min="0" id="pmb_f_kj" placeholder="Jumlah PM (kosong = L+P)" title="Jumlah penerima manfaat. Kosongkan bila sama dengan laki-laki + perempuan" class="pmb-jm w-full border-2 border-emerald-300 rounded-lg p-2 text-sm font-bold text-center bg-white">
+              </div>
+              <div id="pmb_g_besar" class="p-3 rounded-xl border border-orange-200 bg-orange-50/50 space-y-1.5">
+                <div class="pmb-lab font-extrabold text-orange-800 text-[10px] uppercase tracking-wider"></div>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" min="0" id="pmb_f_bl" placeholder="Laki-laki" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                  <input type="number" min="0" id="pmb_f_bp" placeholder="Perempuan" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                </div>
+                <input type="number" min="0" id="pmb_f_bj" placeholder="Jumlah PM (kosong = L+P)" title="Jumlah penerima manfaat. Kosongkan bila sama dengan laki-laki + perempuan" class="pmb-jm w-full border-2 border-orange-300 rounded-lg p-2 text-sm font-bold text-center bg-white">
+              </div>
+              <div id="pmb_g_td" class="p-3 rounded-xl border border-orange-200 bg-orange-50/50 space-y-1.5">
+                <div class="font-extrabold text-orange-800 text-[10px] uppercase tracking-wider">Pendidik &amp; Tendik — Porsi Besar</div>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" min="0" id="pmb_f_tl" placeholder="Laki-laki" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                  <input type="number" min="0" id="pmb_f_tp" placeholder="Perempuan" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                </div>
+              </div>
+              <div id="pmb_g_org" class="p-3 rounded-xl border border-orange-200 bg-orange-50/50 space-y-1.5">
+                <div class="font-extrabold text-orange-800 text-[10px] uppercase tracking-wider">Uji Organoleptik — Porsi Besar</div>
+                <input type="number" min="0" id="pmb_f_org" placeholder="Jumlah porsi" class="w-full border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+              </div>
+              <div id="pmb_g_ibu" class="p-3 rounded-xl border border-orange-200 bg-orange-50/50 space-y-1.5">
+                <div class="font-extrabold text-orange-800 text-[10px] uppercase tracking-wider">Ibu Hamil &amp; Menyusui — Porsi Besar</div>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="number" min="0" id="pmb_f_bumil" placeholder="Ibu Hamil" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                  <input type="number" min="0" id="pmb_f_busui" placeholder="Ibu Menyusui" class="border-2 border-slate-200 rounded-lg p-2 text-sm font-bold text-center bg-white">
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <button type="submit" class="bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-lg transition-all">💾 Simpan</button>
+              <button type="button" id="pmb_btn_cancel" onclick="pmbReset()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-6 py-2.5 rounded-xl text-xs transition-all">Batal Ubah</button>
+            </div>
+          </form>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <input type="text" id="pmb_q" oninput="pmbRenderTable()" placeholder="🔎 Cari nama / alamat..." class="md:col-span-2 border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold bg-white text-slate-800">
+            <select id="pmb_filter" onchange="pmbRenderTable()" class="border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold bg-white text-slate-800 cursor-pointer">
+              <option value="">Semua Jenis</option><option value="PAUD">PAUD / TK / KB / RA</option><option value="SD">SD / MI</option><option value="SMP">SMP / MTs</option><option value="POSYANDU">Posyandu (3B)</option>
+            </select>
+          </div>
+          <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white w-full">
+            <table class="w-full text-xs text-left border-collapse min-w-[980px]">
+              <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold text-[11px] tracking-wider">
+                <tr>
+                  <th class="p-3 text-center w-12">NO</th><th class="p-3">NAMA</th><th class="p-3 w-24">JENIS</th><th class="p-3">ALAMAT</th>
+                  <th class="p-3">RINCIAN</th><th class="p-3 text-center w-20">PORSI KECIL</th><th class="p-3 text-center w-20">PORSI BESAR</th>
+                  <th class="p-3 text-center w-20">TOTAL</th><th class="p-3 text-center w-20">ANAK ALERGI</th><th class="p-3 text-center w-28">AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="pmb_tbody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- RINGKASAN -->
         <div id="sd_stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs"></div>
 
@@ -886,9 +989,15 @@
       </div>
     </section>
 
-    <!-- PENDINGINAN MAKANAN (IK-SGR-SPPG-.04.01) -->
+        <!-- PEMANTAUAN DI COOLING AREA (FM-SGR-SPPG-05.03) -->
+            <!-- MANAJEMEN ALERGEN (FM-SGR-SPPG-22.01) -->
+    <section id="sec-inspeksi-alergen" class="tab-content hidden space-y-6">
+        ...
+    </section>
+
+    <!-- PEMANTAUAN DI COOLING AREA (FM-SGR-SPPG-05.03) -->
     <section id="sec-pendinginan" class="tab-content hidden space-y-6">
-      <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between">
         <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
           <span>←</span> Kembali ke Dashboard
         </button>
@@ -897,48 +1006,89 @@
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
             <div class="text-[10px] font-extrabold text-cyan-600 tracking-widest uppercase bg-cyan-50 w-fit px-2 py-0.5 rounded">Keamanan Pangan</div>
-            <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">❄️ PENDINGINAN MAKANAN (IK-SGR-SPPG-.04.01)</h2>
+            <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">❄️ PEMANTAUAN DI COOLING AREA (FM-SGR-SPPG-05.03)</h2>
           </div>
           <div class="flex flex-wrap gap-2 w-full lg:w-auto">
             <button type="button" onclick="exportPendinginanExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button>
             <button type="button" onclick="exportPendinginanWord()" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button>
-            <button type="button" onclick="savePendinginanLog()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">💾 Simpan Pendinginan</button>
+            <button type="button" onclick="savePendinginanLog()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">💾 Simpan Cooling Area</button>
           </div>
         </div>
 
-        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 mb-4">
           <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider">Pilih Hari Siklus Menu Aktif (Otomatis Tanggal Realtime):</label>
           <select id="selectSiklusPendinginan" onchange="onPendDayChange(this)" class="border-2 border-slate-200 p-3 rounded-xl text-sm font-bold w-full lg:w-1/2 bg-white text-slate-800 cursor-pointer shadow-sm"></select>
-          <p class="text-[11px] text-slate-500">Kolom <b>Nama Menu / Olahan</b> otomatis mengikuti Siklus Menu 20 Hari. Tekan 📷 / 🖼️ pada kolom FOTO, lalu isi <b>waktu</b> dan <b>suhu aktual</b> pada pop-up konfirmasi.</p>
+        </div>
+
+        <!-- INPUT TANGGAL PRODUKSI & PETUGAS SESUAI GAMBAR -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-4">
+            <div>
+              <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Produksi</label>
+              <input type="date" id="pend_tanggal_produksi" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800">
+            </div>
+            <div>
+              <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Petugas</label>
+              <input type="text" id="pend_petugas" placeholder="Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800">
+            </div>
         </div>
 
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+        
+        <!-- STRUKTUR TABEL BARU SESUAI GAMBAR -->
         <div id="wrapper_pendinginan" class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm w-full">
-          <table class="w-full text-xs text-left min-w-[1750px]">
-            <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold tracking-wider text-[11px]">
+          <table class="w-full text-xs text-left min-w-[1500px] border-collapse">
+            <thead class="bg-slate-300 text-slate-800 uppercase font-bold tracking-wider text-[11px]">
               <tr>
-                <th class="p-3 text-center border-b border-slate-600 w-12">No.</th>
-                <th class="p-3 text-center border-b border-slate-600 w-16">Tahap</th>
-                <th class="p-3 border-b border-slate-600 w-32">Jenis Menu</th>
-                <th class="p-3 border-b border-slate-600 w-48">Nama Menu / Olahan</th>
-                <th class="p-3 text-center border-b border-slate-600 w-28">Jumlah Produksi</th>
-                <th class="p-3 text-center border-b border-slate-600 w-32">Pukul Mulai Resting</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">Suhu Makanan (°C)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-36">FOTO MULAI</th>
-                <th class="p-3 text-center border-b border-slate-600 w-32">Pukul Selesai Resting</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">Suhu Makanan (°C)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-36">FOTO SELESAI</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">Total Durasi (menit)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">Suhu Ruang (°C)</th>
-                <th class="p-3 border-b border-slate-600 w-48">Keterangan</th>
+                <th rowspan="2" class="p-3 text-center border border-slate-500 w-12">No</th>
+                <th rowspan="2" class="p-3 text-center border border-slate-500 w-16">Tahap</th>
+                <th rowspan="2" class="p-3 border border-slate-500 w-32">Jenis Menu</th>
+                <th rowspan="2" class="p-3 border border-slate-500 w-48">Nama Menu/Olahan</th>
+                <th rowspan="2" class="p-3 text-center border border-slate-500 w-28">Jumlah Produksi</th>
+                <th colspan="3" data-pend-grp="1" class="p-3 text-center border border-slate-500">Mulai Resting</th>
+                <th colspan="3" data-pend-grp="1" class="p-3 text-center border border-slate-500">Selesai Resting</th>
+                <th rowspan="2" class="p-3 text-center border border-slate-500 w-24">Total Durasi Resting (menit)</th>
+                <th rowspan="2" class="p-3 text-center border border-slate-500 w-24">Suhu Ruang</th>
+                <th rowspan="2" class="p-3 border border-slate-500 w-48">Keterangan</th>
+              </tr>
+              <tr>
+                <th class="p-3 text-center border border-slate-500 w-24">Pukul</th>
+                <th class="p-3 text-center border border-slate-500 w-24">Suhu</th>
+                <th class="pend-foto p-3 text-center border border-slate-500 w-36">Foto</th>
+                <th class="p-3 text-center border border-slate-500 w-24">Pukul</th>
+                <th class="p-3 text-center border border-slate-500 w-24">Suhu</th>
+                <th class="pend-foto p-3 text-center border border-slate-500 w-36">Foto</th>
               </tr>
             </thead>
-            <tbody id="tbody_pendinginan" class="divide-y divide-slate-100"></tbody>
+            <tbody id="tbody_pendinginan" class="divide-y divide-slate-300">
+              <!-- Diisi oleh JavaScript: 12 baris statis -->
+            </tbody>
           </table>
         </div>
-        <div class="flex flex-wrap gap-2">
-          <button type="button" id="btnPendAddBatch" onclick="pendAddBatch()" class="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-cyan-500/30 hover:-translate-y-0.5 transition-all">➕ Tambah Batch (T02)</button>
-          <button type="button" id="btnPendDelBatch" onclick="pendDelBatch()" class="hidden bg-red-100 hover:bg-red-200 text-red-700 font-bold px-5 py-2.5 rounded-xl text-xs shadow-sm transition-all">🗑️ Hapus Batch</button>
+
+        <!-- BAGIAN TANDA TANGAN SESUAI GAMBAR -->
+        <div class="mt-8 overflow-x-auto">
+          <table class="w-full text-xs text-center border-collapse min-w-[800px]">
+            <thead>
+              <tr class="bg-slate-100 font-bold text-slate-700">
+                <th class="p-3 border border-slate-300 w-1/3">Koordinator Pemorsian</th>
+                <th class="p-3 border border-slate-300 w-1/3">Ahli Gizi</th>
+                <th class="p-3 border border-slate-300 w-1/3">Kepala SPPG</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="p-3 border border-slate-300 h-28 align-bottom">
+                  <input type="text" id="pend_ttd_koordinator" placeholder="Nama & Tanda Tangan..." class="w-full text-center border-0 bg-transparent focus:ring-0 font-bold">
+                </td>
+                <td class="p-3 border border-slate-300 h-28 align-bottom">
+                  <input type="text" id="pend_ttd_ahli_gizi" placeholder="Nama & Tanda Tangan..." class="w-full text-center border-0 bg-transparent focus:ring-0 font-bold">
+                </td>
+                <td class="p-3 border border-slate-300 h-28 align-bottom">
+                  <input type="text" id="pend_ttd_kepala_sppg" placeholder="Nama & Tanda Tangan..." class="w-full text-center border-0 bg-transparent focus:ring-0 font-bold">
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -1080,7 +1230,7 @@
     // DATA RINGAN (menu, bahan, frekuensi, alergen) -> dimuat di awal, layar loading menunggu ini saja.
     const keys = [
       'sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map',
-      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik'
+      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat'
     ];
 
     let loadedCount = 0;
@@ -1621,7 +1771,7 @@
     const EXPORT_MENU = {
       wrapper_suhu:                { nama: 'SUHU RUANGAN',            foto: true,  tgl: '#suhu_tanggal' },
       wrapper_pemorsian:           { nama: 'PEMORSIAN',               foto: true,  siklus: 'selectSiklusPemorsian' },
-      wrapper_pendinginan:         { nama: 'PENDINGINAN MAKANAN',     foto: true,  siklus: 'selectSiklusPendinginan' },
+      wrapper_pendinginan:         { nama: 'PEMANTAUAN COOLING AREA', foto: true, siklus: 'selectSiklusPendinginan' },
       wrapper_inspeksi_silang:     { nama: 'KONTAMINASI SILANG',      tgl: '#ks_tanggal' },
       'sec-inspeksi-alergen':      { nama: 'MANAJEMEN ALERGEN',       tgl: '#al_tanggal' },
       siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU 20 HARI' },
@@ -1735,7 +1885,7 @@
       m.classList.remove('flex');
       if (exportModeResolver) { const r = exportModeResolver; exportModeResolver = null; r(v); }
     }
-    const EXPORT_PHOTO_WRAPPERS = ['wrapper_pemorsian', 'wrapper_suhu'];
+    const EXPORT_PHOTO_WRAPPERS = ['wrapper_pemorsian', 'wrapper_suhu', 'wrapper_pendinginan'];
     // Foto di Word: tetap 2x3 cm / 3x2 cm, tetapi sel dibuat lebih besar dengan ruang di tepi
     // sehingga foto berada DI DALAM garis tabel (tidak menempel / melewati garis).
     function exportWordPhotoImgStyle(n) {
@@ -4361,12 +4511,12 @@ function renderSuhuTable() {
     // =====================================================================
     // BACKUP / RESTORE DATABASE
     // =====================================================================
-    const BK_LIGHT = ['sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map', 'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik'];
+    const BK_LIGHT = ['sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map', 'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat'];
     const BK_HEAVY = ['sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen', 'sppg_pendinginan_data'];
     const BK_LABEL = {
       sppg_master_bahan_weeks: 'Master Bahan', sppg_siklus_menu_weeks: 'Siklus Menu', sppg_frequency_map: 'Frekuensi Bahan (ringkas)',
       sppg_frequency_details: 'Frekuensi Bahan (detail)', sppg_allergens_found: 'Daftar Alergen', sppg_siklus_menu_matrix: 'Matriks Siklus Menu',
-      sppg_sasaran_didik: 'Sasaran Peserta Didik', sppg_pemorsian_data: 'Log Pemorsian', sppg_log_suhu: 'Log Suhu Ruangan',
+      sppg_sasaran_didik: 'Sasaran Peserta Didik', sppg_penerima_manfaat: 'Database Penerima Manfaat', sppg_pemorsian_data: 'Log Pemorsian', sppg_log_suhu: 'Log Suhu Ruangan',
       sppg_log_silang: 'Log Kontaminasi Silang', sppg_log_alergen: 'Log Inspeksi Alergen', sppg_pendinginan_data: 'Log Pendinginan'
     };
     const BK_LS = 'sppg_last_backup';
@@ -5310,33 +5460,30 @@ function renderSuhuTable() {
     })();
   </script>
   <script>
+        // =====================================================================
+    // MODUL BARU: PEMANTAUAN DI COOLING AREA (FM-SGR-SPPG-05.03)
     // =====================================================================
-    // MODUL BARU: PENDINGINAN MAKANAN (IK-SGR-SPPG-.04.01)
-    // Berdiri sendiri -- tidak mengubah fungsi modul lain. Memakai ulang helper yang sudah ada:
-    // getSuhuWeeks / getSuhuMenuName (sinkron Siklus Menu), imageConfirmModal (foto + waktu + suhu),
-    // askExportPhotoMode, rptKop (kop baku), exportNormalizePhoto, exportBuildMhtml, exportDownloadBlob.
-    // Data tersimpan di Firebase: sppg_pendinginan_data/<YYYY-MM-DD>
-    // =====================================================================
-    const PEND_DOC_CODE = 'IK-SGR-SPPG-.04.01';
+    const PEND_DOC_CODE = 'FM-SGR-SPPG-05.03';
     const PEND_PATH = 'sppg_pendinginan_data';
-    const PEND_JENIS = [
-      { label: 'Karbohidrat', key: 'KARBO' },
-      { label: 'Protein Hewani', key: 'PH' },
-      { label: 'Protein Nabati', key: 'PN' },
-      { label: 'Sayur', key: 'SAYUR' }
+    
+    // 12 Baris Statis sesuai gambar
+    const PEND_STATIC_ROWS = [
+      { no: 1, tahap: 'T01', jenis: 'Karbohidrat', key: 'KARBO' },
+      { no: 2, tahap: 'T01', jenis: 'Protein Hewani', key: 'PH' },
+      { no: 3, tahap: 'T01', jenis: 'Protein Nabati', key: 'PN' },
+      { no: 4, tahap: 'T01', jenis: 'Sayur', key: 'SAYUR' },
+      { no: 5, tahap: 'T02', jenis: 'Karbohidrat', key: 'KARBO' },
+      { no: 6, tahap: 'T02', jenis: 'Protein Hewani', key: 'PH' },
+      { no: 7, tahap: 'T02', jenis: 'Protein Nabati', key: 'PN' },
+      { no: 8, tahap: 'T02', jenis: 'Sayur', key: 'SAYUR' },
+      { no: 9, tahap: 'T03', jenis: 'Karbohidrat', key: 'KARBO' },
+      { no: 10, tahap: 'T03', jenis: 'Protein Hewani', key: 'PH' },
+      { no: 11, tahap: 'T03', jenis: 'Protein Nabati', key: 'PN' },
+      { no: 12, tahap: 'T03', jenis: 'Sayur', key: 'SAYUR' }
     ];
-    const PEND_MAX_BATCH = 10;
-    window.pendBatches = 1;   // jumlah tahap/batch yang tampil (T01 selalu ada; T02, T03, ... lewat tombol Tambah Batch)
-    function pendRowsFor(n) {
-      const rows = [];
-      for (let b = 1; b <= n; b++) PEND_JENIS.forEach(j => rows.push({ tahap: 'T' + String(b).padStart(2, '0'), label: j.label, key: j.key }));
-      return rows;
-    }
-    function pendRowHasData(d) { return !!d && ['jml', 'jm', 'sm', 'fm', 'js', 'ss', 'fs', 'sr'].some(k => String(d[k] || '') !== ''); }
 
     window.pendDirty = false;
     window.pendCurrentIdx = undefined;
-    let pendingPendPhoto = null;
 
     function pendEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
@@ -5345,7 +5492,6 @@ function renderSuhuTable() {
       return dk || ('idx_' + idx);
     }
 
-    // ---------- tab dibuka: isi pilihan hari siklus ----------
     function initPendinginan() {
       const sel = document.getElementById('selectSiklusPendinginan');
       if (!sel) return;
@@ -5358,7 +5504,7 @@ function renderSuhuTable() {
       const prev = sel.value;
       sel.innerHTML = html;
       if (prev !== '' && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
-      else sel.value = getTodayCycleIndex(weeks);   // otomatis tanggal realtime hari ini
+      else sel.value = getTodayCycleIndex(weeks);
       window.pendDirty = false;
       loadPendinginan();
     }
@@ -5366,134 +5512,99 @@ function renderSuhuTable() {
     function onPendDayChange(sel) {
       const prev = window.pendCurrentIdx;
       if (prev !== undefined && String(prev) !== String(sel.value) && window.pendDirty) {
-        if (!confirm('Ada perubahan Pendinginan Makanan yang belum disimpan.\n\nYakin pindah ke hari lain? Perubahan akan hilang.')) { sel.value = prev; return; }
+        if (!confirm('Ada perubahan Pemantauan Cooling Area yang belum disimpan.\n\nYakin pindah ke hari lain? Perubahan akan hilang.')) { sel.value = prev; return; }
       }
       window.pendDirty = false;
       loadPendinginan();
     }
 
-    // ---------- sel foto ----------
-    function buildPendPhotoHtml(id, kind, b64) {
-      const img = b64 ? `<img src="${b64}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #10b981;cursor:pointer;" class="mx-auto shadow-sm" onclick="reviewPhoto('${id}')" title="Klik gambar untuk review">` : '';
-      const extra = b64 ? `
-        <button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>
-        <button type="button" onclick="deletePendPhoto('${id}')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>` : '';
-      return `<div class="flex flex-col items-center gap-1">
-        <div class="flex flex-wrap items-center justify-center gap-1">
-          <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
-          <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
-        </div>
-        <input type="file" accept="image/*" id="${id}" class="hidden" data-kind="${kind}" data-base64="${pendEsc(b64 || '')}" onchange="handlePendinginanPhoto(this)">
-        ${img}${extra}
-      </div>`;
-    }
-
-    function deletePendPhoto(id) {
-      if (!confirm('Apakah Anda yakin ingin menghapus bukti foto ini?')) return;
-      const input = document.getElementById(id);
-      if (!input) return;
-      const cell = input.closest('td');
-      cell.innerHTML = buildPendPhotoHtml(id, input.dataset.kind, '');
-      window.pendDirty = true;
-    }
-
-    // ---------- tabel ----------
     function loadPendinginan(fromRealtime) {
       const sel = document.getElementById('selectSiklusPendinginan');
       const tbody = document.getElementById('tbody_pendinginan');
       if (!sel || !tbody) return;
-      if (fromRealtime === true && window.pendDirty) return;   // jangan hapus isian yang belum disimpan
+      if (fromRealtime === true && window.pendDirty) return;
       if (fromRealtime !== true) window.pendDirty = false;
 
       const idx = parseInt(sel.value) || 0;
       const storeKey = pendStoreKey(idx);
       window.pendCurrentIdx = idx;
       if (window.subscribeItem) window.subscribeItem(PEND_PATH, storeKey);
-      const weeks = getSuhuWeeks();
+      
       const saved = (window.dbCache[PEND_PATH] || {})[storeKey];
-      const dayData = Array.isArray(saved) ? saved : (saved ? Object.values(saved) : []);
-      // jumlah batch = batch terakhir yang berisi data (minimal 1)
-      let n = 1;
-      for (let b = PEND_MAX_BATCH; b >= 2; b--) {
-        if (dayData.slice((b - 1) * 4, b * 4).some(pendRowHasData)) { n = b; break; }
+      let dayData = [], metaData = { tanggal_produksi: '', petugas: '', ttd_koordinator: '', ttd_ahli_gizi: '', ttd_kepala_sppg: '' };
+      
+      if (saved) {
+          if (Array.isArray(saved)) {
+              dayData = saved; // backwards compatibility
+          } else {
+              dayData = saved.rows || [];
+              metaData = Object.assign(metaData, saved.meta || {});
+          }
       }
-      pendRender(dayData, idx, n);
+      
+      document.getElementById('pend_tanggal_produksi').value = metaData.tanggal_produksi || '';
+      document.getElementById('pend_petugas').value = metaData.petugas || '';
+      document.getElementById('pend_ttd_koordinator').value = metaData.ttd_koordinator || '';
+      document.getElementById('pend_ttd_ahli_gizi').value = metaData.ttd_ahli_gizi || '';
+      document.getElementById('pend_ttd_kepala_sppg').value = metaData.ttd_kepala_sppg || '';
+
+      pendRender(dayData, idx);
     }
 
-    function pendRender(dayData, idx, n) {
+    function pendRender(dayData, idx) {
       const tbody = document.getElementById('tbody_pendinginan');
       const weeks = getSuhuWeeks();
-      window.pendBatches = n;
       let html = '';
-      pendRowsFor(n).forEach((r, i) => {
+      
+      PEND_STATIC_ROWS.forEach((r, i) => {
         const d = dayData[i] || {};
-        const menu = getSuhuMenuName(weeks, r.key, idx);       // SINKRON dengan Siklus Menu 20 Hari
-        const idM = `pend_foto_m_${idx}_${i}`, idS = `pend_foto_s_${idx}_${i}`;
+        const menu = getSuhuMenuName(weeks, r.key, idx);
         const cls = 'w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600';
         const AUTO_KET = 'TIDAK TERSEDIA MENU';
         let ketVal = d.ket || '';
         if (menu === '-') { if (!ketVal) ketVal = AUTO_KET; } else if (ketVal === AUTO_KET) ketVal = '';
-        html += `<tr class="border-b border-slate-100" data-no="${i + 1}" data-tahap="${r.tahap}" data-jenis="${r.label}">
-          <td class="p-3 text-center font-bold text-slate-500">${i + 1}</td>
-          <td class="p-3 text-center font-black text-slate-700">${r.tahap}</td>
-          <td class="p-3 font-semibold text-slate-600">${r.label}</td>
-          <td class="p-3 font-bold uppercase text-blue-700 pend-menu">${pendEsc(menu)}</td>
-          <td class="p-2 text-center"><input type="number" min="0" inputmode="numeric" class="${cls} pend-jml" value="${pendEsc(d.jml || '')}" placeholder="porsi"></td>
-          <td class="p-2 text-center"><input type="time" class="${cls} pend-jm" value="${pendEsc(d.jm || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
-          <td class="p-2 text-center"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sm" value="${pendEsc(d.sm || '')}" placeholder="°C"></td>
-          <td class="p-2 text-center">${buildPendPhotoHtml(idM, 'm', d.fm || '')}</td>
-          <td class="p-2 text-center"><input type="time" class="${cls} pend-js" value="${pendEsc(d.js || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
-          <td class="p-2 text-center"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-ss" value="${pendEsc(d.ss || '')}" placeholder="°C"></td>
-          <td class="p-2 text-center">${buildPendPhotoHtml(idS, 's', d.fs || '')}</td>
-          <td class="p-3 text-center font-black text-slate-800 bg-slate-50/50 pend-dur">-</td>
-          <td class="p-2 text-center"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sr" value="${pendEsc(d.sr || '')}" placeholder="°C"></td>
+        
+        html += `<tr class="border-b border-slate-200 hover:bg-slate-50" data-no="${r.no}" data-tahap="${r.tahap}" data-jenis="${r.jenis}">
+          <td class="p-3 text-center font-bold text-slate-500 border-r border-slate-200">${r.no}</td>
+          <td class="p-3 text-center font-black text-slate-700 border-r border-slate-200">${r.tahap}</td>
+          <td class="p-3 font-semibold text-slate-600 border-r border-slate-200">${r.jenis}</td>
+          <td class="p-3 font-bold uppercase text-blue-700 border-r border-slate-200 pend-menu">${pendEsc(menu)}</td>
+          <td class="p-2 text-center border-r border-slate-200"><input type="number" min="0" inputmode="numeric" class="${cls} pend-jml" value="${pendEsc(d.jml || '')}" placeholder="porsi"></td>
+          <td class="p-2 text-center border-r border-slate-200"><input type="time" class="${cls} pend-jm" value="${pendEsc(d.jm || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
+          <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sm" value="${pendEsc(d.sm || '')}" placeholder="°C"></td>
+          <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_m_${idx}_${i}`, 'm', d.fm || '')}</td>
+          <td class="p-2 text-center border-r border-slate-200"><input type="time" class="${cls} pend-js" value="${pendEsc(d.js || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
+          <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-ss" value="${pendEsc(d.ss || '')}" placeholder="°C"></td>
+          <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_s_${idx}_${i}`, 's', d.fs || '')}</td>
+          <td class="p-3 text-center font-black text-slate-800 bg-slate-100 border-r border-slate-200 pend-dur">-</td>
+          <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sr" value="${pendEsc(d.sr || '')}" placeholder="°C"></td>
           <td class="p-2"><input type="text" class="w-full border-2 border-slate-200 rounded-xl p-2 font-bold text-slate-700 pend-ket" data-menu="${pendEsc(menu)}" value="${pendEsc(ketVal)}" placeholder="Keterangan..."></td>
         </tr>`;
       });
       tbody.innerHTML = html;
+      
       if (tbody.dataset.dirtyBound !== '1') {
         tbody.dataset.dirtyBound = '1';
         tbody.addEventListener('input', e => { if (e.isTrusted) window.pendDirty = true; }, true);
       }
+      
+      // Bind dirty tracking to signature inputs
+      ['pend_tanggal_produksi', 'pend_petugas', 'pend_ttd_koordinator', 'pend_ttd_ahli_gizi', 'pend_ttd_kepala_sppg'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.dataset.dirtyBound) {
+            el.dataset.dirtyBound = '1';
+            el.addEventListener('input', () => { window.pendDirty = true; });
+        }
+      });
+
       tbody.querySelectorAll('tr').forEach(tr => pendCalcRow(tr));
-      pendUpdateBatchButtons();
     }
 
-    function pendUpdateBatchButtons() {
-      const n = window.pendBatches;
-      const add = document.getElementById('btnPendAddBatch'), del = document.getElementById('btnPendDelBatch');
-      if (add) {
-        add.textContent = n >= PEND_MAX_BATCH ? 'Batas batch tercapai' : '➕ Tambah Batch (T' + String(n + 1).padStart(2, '0') + ')';
-        add.disabled = n >= PEND_MAX_BATCH;
-      }
-      if (del) {
-        del.textContent = '🗑️ Hapus Batch T' + String(n).padStart(2, '0');
-        del.classList.toggle('hidden', n <= 1);
-      }
-    }
-
-    function pendAddBatch() {
-      if (window.pendBatches >= PEND_MAX_BATCH) return;
-      const cur = pendCollectRows();                 // isian & foto yang sudah ada dipertahankan
-      window.pendDirty = true;
-      pendRender(cur, window.pendCurrentIdx, window.pendBatches + 1);
-    }
-
-    function pendDelBatch() {
-      const n = window.pendBatches;
-      if (n <= 1) return;
-      const cur = pendCollectRows();
-      const last = cur.slice((n - 1) * 4, n * 4);
-      if (last.some(pendRowHasData) && !confirm('Batch T' + String(n).padStart(2, '0') + ' berisi data. Yakin ingin menghapus batch ini?')) return;
-      window.pendDirty = true;
-      pendRender(cur.slice(0, (n - 1) * 4), window.pendCurrentIdx, n - 1);
-    }
-
-    // Total durasi (menit) = selesai - mulai. Bila selesai lebih kecil dari mulai dianggap lewat tengah malam.
     function pendMinutes(t) {
       const m = String(t || '').match(/^(\d{1,2}):(\d{2})/);
       return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null;
     }
+    
     function pendCalcRow(tr) {
       if (!tr) return;
       const a = pendMinutes(tr.querySelector('.pend-jm').value);
@@ -5530,19 +5641,56 @@ function renderSuhuTable() {
       const idx = parseInt(sel.value) || 0;
       const storeKey = pendStoreKey(idx);
       const all = window.dbCache[PEND_PATH] || {};
+      
       if (window.dbLoaded && !window.dbLoaded[PEND_PATH + '/' + storeKey]) {
         alert('Data hari ini masih dimuat dari server. Mohon tunggu sebentar lalu simpan kembali.');
         return;
       }
-      if (all[storeKey] && Object.keys(all[storeKey]).length > 0) {
-        if (!confirm('⚠️ PERHATIAN: Data Pendinginan Makanan untuk Hari ke-' + (idx + 1) + ' ini sudah pernah disimpan.\n\nApakah Anda yakin ingin memperbarui dan menimpa data yang lama?')) return;
+      if (all[storeKey] && (Array.isArray(all[storeKey]) ? all[storeKey].length : Object.keys(all[storeKey].rows || {}).length > 0)) {
+        if (!confirm('⚠️ PERHATIAN: Data Pemantauan Cooling Area untuk Hari ke-' + (idx + 1) + ' ini sudah pernah disimpan.\n\nApakah Anda yakin ingin memperbarui dan menimpa data yang lama?')) return;
       }
-      const rows = pendCollectRows();
-      all[storeKey] = rows;
+      
+      const meta = {
+        tanggal_produksi: document.getElementById('pend_tanggal_produksi').value,
+        petugas: document.getElementById('pend_petugas').value,
+        ttd_koordinator: document.getElementById('pend_ttd_koordinator').value,
+        ttd_ahli_gizi: document.getElementById('pend_ttd_ahli_gizi').value,
+        ttd_kepala_sppg: document.getElementById('pend_ttd_kepala_sppg').value
+      };
+      const payload = { meta: meta, rows: pendCollectRows() };
+      
+      all[storeKey] = payload;
       window.dbCache[PEND_PATH] = all;
-      window.fbSet(PEND_PATH + '/' + storeKey, rows);   // hanya tanggal ini, tidak menimpa hari lain
+      window.fbSet(PEND_PATH + '/' + storeKey, payload);
       window.pendDirty = false;
-      alert('Data Pendinginan Makanan berhasil disimpan di Server Real-Time!');
+      alert('Data Pemantauan di Cooling Area berhasil disimpan di Server Real-Time!');
+    }
+
+    let pendingPendPhoto = null;
+
+    // ---------- sel foto ----------
+    function buildPendPhotoHtml(id, kind, b64) {
+      const img = b64 ? `<img src="${b64}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #10b981;cursor:pointer;" class="mx-auto shadow-sm" onclick="reviewPhoto('${id}')" title="Klik gambar untuk review">` : '';
+      const extra = b64 ? `
+        <button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>
+        <button type="button" onclick="deletePendPhoto('${id}')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>` : '';
+      return `<div class="flex flex-col items-center gap-1">
+        <div class="flex flex-wrap items-center justify-center gap-1">
+          <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
+          <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
+        </div>
+        <input type="file" accept="image/*" id="${id}" class="hidden" data-kind="${kind}" data-base64="${pendEsc(b64 || '')}" onchange="handlePendinginanPhoto(this)">
+        ${img}${extra}
+      </div>`;
+    }
+
+    function deletePendPhoto(id) {
+      if (!confirm('Apakah Anda yakin ingin menghapus bukti foto ini?')) return;
+      const input = document.getElementById(id);
+      if (!input) return;
+      const cell = input.closest('td');
+      cell.innerHTML = buildPendPhotoHtml(id, input.dataset.kind, '');
+      window.pendDirty = true;
     }
 
     // ---------- foto -> pop-up konfirmasi (waktu + suhu aktual) ----------
@@ -5624,8 +5772,11 @@ function renderSuhuTable() {
       const origCancel = window.cancelImageConfirmation;
       window.confirmImageConfirmation = function () { if (pendingPendPhoto) return confirmPendPhoto(); return origConfirm.apply(this, arguments); };
       window.cancelImageConfirmation = function () { if (pendingPendPhoto) return cancelPendPhoto(); return origCancel.apply(this, arguments); };
+    })();
 
-      // tab, realtime, dan backup
+
+    // Realtime & Backup hooks
+    (function () {
       const baseRe = window.reRenderActiveTab;
       window.reRenderActiveTab = function () { if (baseRe) baseRe.apply(this, arguments); if (window.currentActiveTab === 'pendinginan') loadPendinginan(true); };
       const baseFirst = window.onItemFirstLoad;
@@ -5633,7 +5784,6 @@ function renderSuhuTable() {
         if (baseFirst) baseFirst.apply(this, arguments);
         if (path === PEND_PATH && window.currentActiveTab === 'pendinginan') loadPendinginan(true);
       };
-      // Backup JSON lengkap ikut memuat data Pendinginan (gagal membaca tidak membatalkan backup lama)
       function hookBackup() {
         if (!window.fbGetHeavyAll || window.fbGetHeavyAll.__pend) return !!(window.fbGetHeavyAll && window.fbGetHeavyAll.__pend);
         const orig = window.fbGetHeavyAll;
@@ -5649,9 +5799,9 @@ function renderSuhuTable() {
       (function wait() { if (!hookBackup() && tries++ < 50) setTimeout(wait, 200); })();
     })();
 
+
     // =====================================================================
-    // EXPORT (Excel & Word) -- kop baku, no. dokumen IK-SGR-SPPG-.04.01, tanggal tetap 26 Oktober 2026
-    // Pilihan "Dengan Gambar" / "Tanpa Gambar" memakai pop-up yang sama dengan modul lain.
+    // EXPORT (Excel & Word) - PEMANTAUAN DI COOLING AREA
     // =====================================================================
     function pendDayInfo() {
       const sel = document.getElementById('selectSiklusPendinginan');
@@ -5687,76 +5837,103 @@ function renderSuhuTable() {
         const mode = await askExportPhotoMode();
         if (!mode) return;
         const inl = mode === 'inline';
-        const info = pendDayInfo();
         const rows = pendReadRows();
+        const tglProd = document.getElementById('pend_tanggal_produksi')?.value || '';
+        const petugas = document.getElementById('pend_petugas')?.value || '';
+        const ttdKoor = document.getElementById('pend_ttd_koordinator')?.value || '';
+        const ttdGizi = document.getElementById('pend_ttd_ahli_gizi')?.value || '';
+        const ttdKepala = document.getElementById('pend_ttd_kepala_sppg')?.value || '';
 
         const cols = [
-          { k: 'no', w: 5, h: 'No.' }, { k: 'tahap', w: 8, h: 'Tahap' }, { k: 'jenis', w: 15, h: 'Jenis Menu' },
-          { k: 'menu', w: 26, h: 'Nama Menu / Olahan' }, { k: 'jml', w: 12, h: 'Jumlah Produksi' },
-          { k: 'jm', w: 12, h: 'Pukul Mulai Resting' }, { k: 'sm', w: 11, h: 'Suhu Makanan (°C)' }
+          { k: 'no', w: 6 }, { k: 'tahap', w: 8 }, { k: 'jenis', w: 16 }, { k: 'menu', w: 26 }, { k: 'jml', w: 14 },
+          { k: 'jm', w: 11 }, { k: 'sm', w: 10 }
         ];
-        if (inl) cols.push({ k: 'fm', w: 18, h: 'Foto Mulai Resting' });
-        cols.push({ k: 'js', w: 12, h: 'Pukul Selesai Resting' }, { k: 'ss', w: 11, h: 'Suhu Makanan (°C)' });
-        if (inl) cols.push({ k: 'fs', w: 18, h: 'Foto Selesai Resting' });
-        cols.push({ k: 'dur', w: 14, h: 'Total Durasi (menit)' }, { k: 'sr', w: 14, h: 'Suhu Ruang (°C)' }, { k: 'ket', w: 26, h: 'Keterangan' });
+        if (inl) cols.push({ k: 'fm', w: 18 });
+        cols.push({ k: 'js', w: 11 }, { k: 'ss', w: 10 });
+        if (inl) cols.push({ k: 'fs', w: 18 });
+        cols.push({ k: 'dur', w: 16 }, { k: 'sr', w: 14 }, { k: 'ket', w: 26 });
 
         const wb = new ExcelJS.Workbook();
-        const ws = wb.addWorksheet(PEND_DOC_CODE);
-        ws.getColumn(1).width = 3.8;
+        const ws = wb.addWorksheet('COOLING AREA');
         const cx = {};
-        cols.forEach((c, i) => { cx[c.k] = i + 2; ws.getColumn(i + 2).width = c.w; });
-        const first = 2, last = cols.length + 1;
+        cols.forEach((c, i) => { cx[c.k] = i + 1; ws.getColumn(i + 1).width = c.w; });
+        const lastCol = cols.length;
 
-        ws.getRow(1).height = 21;
-        rptKop(wb, ws, { r: 2, rowH: 19.5, logo: [first, cx.jenis], title: [cx.menu, cx.dur], lab: cx.sr, val: cx.ket,
-          judul: 'PENDINGINAN MAKANAN', noDoc: PEND_DOC_CODE, rev: '00', colon: false });
+        // --- KOP BAKU (sama seperti modul lain) ---
+        rptKop(wb, ws, { r: 1, rowH: 22, logo: [1, 2], title: [3, lastCol - 2], lab: lastCol - 1, val: lastCol,
+          judul: 'PEMANTAUAN DI COOLING AREA', noDoc: PEND_DOC_CODE, rev: '00', colon: true });
 
-        ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
-        rptMerge(ws, 5, first, 5, cx.jenis); rptPut(ws, 5, first, 'Hari/Tanggal ', { bold: true });
-        rptMerge(ws, 5, cx.menu, 5, last); rptPut(ws, 5, cx.menu, ': ' + (info.tanggal || '….....................'), { bold: true });
-        rptMerge(ws, 6, first, 6, cx.jenis); rptPut(ws, 6, first, 'Siklus Menu Hari ini ', { bold: true });
-        rptMerge(ws, 6, cx.menu, 6, last); rptPut(ws, 6, cx.menu, ': ' + (info.siklus || '….....................'), { bold: true });
+        // --- INFO TANGGAL & PETUGAS ---
+        ws.getRow(5).height = 20; ws.getRow(6).height = 20;
+        rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Produksi', { size: 10, h: 'left' });
+        rptMerge(ws, 5, 4, 5, 5); rptPut(ws, 5, 4, ': ' + (rptLongDate(tglProd) || ''), { size: 10, h: 'left' });
+        rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Petugas', { size: 10, h: 'left' });
+        rptMerge(ws, 6, 4, 6, 5); rptPut(ws, 6, 4, ': ' + petugas, { size: 10, h: 'left' });
 
-        ws.getRow(7).height = 50.25;
-        cols.forEach(c => rptPut(ws, 7, cx[c.k], c.h, { bold: true, h: 'center' }));
-        rptFill(ws, 7, first, 7, last, RPT_GREY);
-        rptBorder(ws, 7, first, 7, last, 'grid');
+        // --- HEADER TABEL (2 baris) ---
+        ws.getRow(8).height = 25; ws.getRow(9).height = 30;
+        const H = { bold: true, h: 'center', size: 10 };
+        [['no', 'No'], ['tahap', 'Tahap'], ['jenis', 'Jenis Menu'], ['menu', 'Nama Menu/Olahan'], ['jml', 'Jumlah Produksi'],
+         ['dur', 'Total Durasi Resting (menit)'], ['sr', 'Suhu Ruang'], ['ket', 'Keterangan']].forEach(p => {
+          rptMerge(ws, 8, cx[p[0]], 9, cx[p[0]]); rptPut(ws, 8, cx[p[0]], p[1], H);
+        });
+        const grp = (title, k1, k2, kf) => {
+          const last = kf ? cx[kf] : cx[k2];
+          rptMerge(ws, 8, cx[k1], 8, last); rptPut(ws, 8, cx[k1], title, H);
+          rptPut(ws, 9, cx[k1], 'Pukul', H); rptPut(ws, 9, cx[k2], 'Suhu', H);
+          if (kf) rptPut(ws, 9, cx[kf], 'Foto', H);
+        };
+        grp('Mulai Resting', 'jm', 'sm', inl ? 'fm' : null);
+        grp('Selesai Resting', 'js', 'ss', inl ? 'fs' : null);
+        rptFill(ws, 8, 1, 9, lastCol, RPT_GREY);
+        rptBorder(ws, 8, 1, 9, lastCol, 'grid');
 
+        // --- ISI TABEL ---
         const cache = new Map(), idCache = new Map();
-        let row = 8;
+        const startRow = 10;
         for (let i = 0; i < rows.length; i++) {
           const d = rows[i];
+          const r = startRow + i;
           const norms = [];
           if (inl) { norms.push(d.fm ? await exportNormalizePhoto(d.fm, cache) : null); norms.push(d.fs ? await exportNormalizePhoto(d.fs, cache) : null); }
           const hasPhoto = norms.some(n => n);
           const anyPortrait = norms.some(n => n && !n.landscape);
-          const textH = Math.max(24.75, rptLines(d.menu, 26, 11) * 15 + 6);
-          ws.getRow(row).height = hasPhoto ? Math.max(textH, anyPortrait ? 104 : 74) : textH;
+          const textH = Math.max(24.75, rptLines(d.menu, 26, 10) * 15 + 6);
+          ws.getRow(r).height = hasPhoto ? Math.max(textH, anyPortrait ? 104 : 74) : textH;
 
-          const put = (k, v, o) => rptPut(ws, row, cx[k], v, Object.assign({ h: 'center' }, o || {}));
+          const put = (k, v, o) => rptPut(ws, r, cx[k], v, Object.assign({ h: 'center', size: 10 }, o || {}));
           put('no', parseInt(d.no, 10)); put('tahap', d.tahap); put('jenis', d.jenis, { h: 'left' }); put('menu', d.menu, { h: 'left' });
           put('jml', d.jml); put('jm', d.jm); put('sm', d.sm, { numFmt: '0.0' });
           put('js', d.js); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' }); put('ket', d.ket, { h: 'left' });
-          rptBorder(ws, row, first, row, last, 'grid');
+          rptBorder(ws, r, 1, r, lastCol, 'grid');
 
           for (const p of [['fm', norms[0]], ['fs', norms[1]]]) {
             if (!p[1]) continue;
-            await rptPlacePhoto(wb, ws, p[1], row, cx[p[0]], row, cx[p[0]], idCache);
+            await rptPlacePhoto(wb, ws, p[1], r, cx[p[0]], r, cx[p[0]], idCache);
           }
-          row++;
         }
 
-        row += 1;
-        rptMerge(ws, row, cx.sr, row, cx.ket); rptPut(ws, row, cx.sr, 'Yang Memeriksa', { h: 'center' });
-        row++;
-        ws.getRow(row).height = 69.75;
-        rptMerge(ws, row, cx.sr, row, cx.ket); rptPut(ws, row, cx.sr, '(____________________________) ', { h: 'center', v: 'bottom' });
+        // --- TANDA TANGAN (3 kotak, dibagi rata mulai kolom Nama Menu s/d kolom terakhir) ---
+        let sigRow = startRow + rows.length + 2;
+        const total = lastCol - 3, per = Math.floor(total / 3);
+        const g = [[4, 3 + per], [4 + per, 3 + 2 * per], [4 + 2 * per, lastCol]];
+        const names = ['Koordinator Pemorsian', 'Ahli Gizi', 'Kepala SPPG'];
+        const vals = [ttdKoor, ttdGizi, ttdKepala];
+        g.forEach((c, n) => { rptMerge(ws, sigRow, c[0], sigRow, c[1]); rptPut(ws, sigRow, c[0], names[n], { bold: true, h: 'center' }); });
+        rptBorder(ws, sigRow, 4, sigRow, lastCol, 'grid');
+        sigRow++;
+        ws.getRow(sigRow).height = 70;
+        g.forEach(c => rptMerge(ws, sigRow, c[0], sigRow, c[1]));
+        rptBorder(ws, sigRow, 4, sigRow, lastCol, 'grid');
+        sigRow++;
+        g.forEach((c, n) => { rptMerge(ws, sigRow, c[0], sigRow, c[1]); rptPut(ws, sigRow, c[0], vals[n], { h: 'center' }); });
+        rptBorder(ws, sigRow, 4, sigRow, lastCol, 'grid');
 
-        rptPage(ws, true, 'B1:' + ws.getColumn(last).letter + row);
+        rptPage(ws, true, 'A1:' + ws.getColumn(lastCol).letter + sigRow);
         ws.pageSetup.fitToHeight = 1;
         await rptDownload(wb, exportFileName('wrapper_pendinginan', 'xlsx', mode));
       } catch (e) {
-        console.error('Export Excel Pendinginan gagal', e);
+        console.error('Export Excel Cooling Area gagal', e);
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
       }
     }
@@ -5765,19 +5942,28 @@ function renderSuhuTable() {
       try {
         const mode = await askExportPhotoMode();
         if (!mode) return;
-        const built = getCleanTableHtml('wrapper_pendinginan', mode === 'none');
+        const built = getCleanTableHtml('wrapper_pendinginan', false);
         if (!built.clone) return alert('Data tidak ditemukan');
         const clone = built.clone;
-        const info = pendDayInfo();
+        if (mode === 'none') {
+          clone.querySelectorAll('.pend-foto').forEach(el => el.remove());
+          clone.querySelectorAll('th[data-pend-grp]').forEach(el => el.setAttribute('colspan', '2'));
+        }
+        const tglProd = document.getElementById('pend_tanggal_produksi')?.value || '';
+        const petugas = document.getElementById('pend_petugas')?.value || '';
+        const ttdKoor = document.getElementById('pend_ttd_koordinator')?.value || '';
+        const ttdGizi = document.getElementById('pend_ttd_ahli_gizi')?.value || '';
+        const ttdKepala = document.getElementById('pend_ttd_kepala_sppg')?.value || '';
         const docName = 'dokumen';
         const files = [];
 
         await exportEmbedWordPhotos(clone, files, docName);
 
         const infoRow = (a, b) => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${a}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${pendEsc(b)}</td></tr>`;
+
         const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset='utf-8'><title>Pendinginan Makanan (${PEND_DOC_CODE})</title>
+        <head><meta charset='utf-8'><title>Pemantauan di Cooling Area (${PEND_DOC_CODE})</title>
         <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
           @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm; }
@@ -5785,24 +5971,405 @@ function renderSuhuTable() {
           body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
           table { width: 100%; border-collapse: collapse; margin-top: 10px; }
           th, td { border: 1px solid black; padding: 6px; font-size: 10pt; text-align: left; vertical-align: middle; }
-          th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+          th { background-color: #e2e8f0; text-align: center; font-weight: bold; }
         </style>
         </head>
         <body>
           <div class="Section1">
-          ${exportWordKop(PEND_DOC_CODE, docName, files, 'PENDINGINAN MAKANAN', '00')}
-          <table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">${infoRow('Hari/Tanggal', info.tanggal)}${infoRow('Siklus Menu Hari ini', info.siklus)}</table>
+          ${exportWordKop(PEND_DOC_CODE, docName, files, 'PEMANTAUAN DI COOLING AREA', '00')}
+          <table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">
+            ${infoRow('Tanggal Produksi', tglProd)}
+            ${infoRow('Petugas', petugas)}
+          </table>
           ${clone.innerHTML}
-          <table style="width:100%;border:none;border-collapse:collapse;margin-top:18px;"><tr><td style="border:none;width:75%;"></td><td style="border:none;text-align:center;">Yang Memeriksa<br><br><br><br><br>(____________________________)</td></tr></table>
+          <table style="width:100%;border:none;border-collapse:collapse;margin-top:18px; text-align:center;">
+            <tr>
+              <td style="border:none;width:33%;">Koordinator Pemorsian<br><br><br><br><br><b>${pendEsc(ttdKoor)}</b></td>
+              <td style="border:none;width:33%;">Ahli Gizi<br><br><br><br><br><b>${pendEsc(ttdGizi)}</b></td>
+              <td style="border:none;width:33%;">Kepala SPPG<br><br><br><br><br><b>${pendEsc(ttdKepala)}</b></td>
+            </tr>
+          </table>
           </div>
         </body></html>`;
         const blob = new Blob([exportBuildMhtml(html, files, docName)], { type: 'application/msword' });
         exportDownloadBlob(blob, exportFileName('wrapper_pendinginan', 'doc', mode));
       } catch (e) {
-        console.error('Export Word Pendinginan gagal', e);
+        console.error('Export Word Cooling Area gagal', e);
         alert('Export Word gagal: ' + (e && e.message ? e.message : e));
       }
     }
+  </script>
+
+  <script>
+    // =====================================================================
+    // DATABASE PENERIMA MANFAAT (sekolah & posyandu) -- bagian dari modul Pendataan Sasaran (01.01)
+    // Firebase: 'sppg_penerima_manfaat' = { tanggal: 'YYYY-MM-DD', items: [ {id,jenis,nama,alamat,kl,kp,bl,bp,tl,tp,org,bumil,busui} ] }
+    // kl/kp = siswa/balita PORSI KECIL (L/P) | bl/bp = siswa PORSI BESAR (L/P) | tl/tp = tendik | org = uji organoleptik
+    // Porsi kecil = kl+kp | Porsi besar = bl+bp+tl+tp+org+bumil+busui
+    // Terhubung ke: data alergi per anak (kolom Anak Alergi, daftar sekolah, panel Inspeksi Alergen 22.01, ringkasan laporan 01.01)
+    // =====================================================================
+    const PMB_PATH = 'sppg_penerima_manfaat';
+    const PMB_RANK = { PAUD: 0, SD: 1, SMP: 2, POSYANDU: 3 };
+    const PMB_LABEL = { PAUD: 'PAUD/TK', SD: 'SD/MI', SMP: 'SMP/MTs', POSYANDU: 'Posyandu' };
+    const PMB_FIELDS = ['kl', 'kp', 'bl', 'bp', 'tl', 'tp', 'org', 'bumil', 'busui'];
+    const PMB_JM = ['kj', 'bj'];   // Jumlah PM (opsional) porsi kecil / besar siswa; kosong = pakai L+P
+    const PMB_GROUPS = { kecil: ['kl', 'kp'], besar: ['bl', 'bp'], td: ['tl', 'tp'], org: ['org'], ibu: ['bumil', 'busui'] };
+    const PMB_CFG = {
+      PAUD:     { kecil: 'Siswa — Porsi Kecil',     besar: null,                        td: 1, org: 1, ibu: 0 },
+      SD:       { kecil: 'Kelas 1–3 — Porsi Kecil', besar: 'Kelas 4–6 — Porsi Besar',  td: 1, org: 1, ibu: 0 },
+      SMP:      { kecil: null,                      besar: 'Kelas 7–9 — Porsi Besar',  td: 1, org: 1, ibu: 0 },
+      POSYANDU: { kecil: 'Balita — Porsi Kecil',    besar: null,                        td: 0, org: 0, ibu: 1 }
+    };
+    let pmbEditId = null;
+
+    const pmbN = v => { const n = parseInt(v, 10); return isNaN(n) || n < 0 ? 0 : n; };
+    const pmbEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const pmbKey = (nama, alamat) => String(nama || '').trim().replace(/\s+/g, ' ').toUpperCase() + '|' + String(alamat || '').trim().replace(/\s+/g, ' ').toUpperCase();
+    const pmbNorm = s => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').toUpperCase();
+
+    function pmbData() {
+      const v = window.dbCache && window.dbCache[PMB_PATH];
+      if (!v) return { tanggal: '', items: [] };
+      const items = v.items ? (Array.isArray(v.items) ? v.items : Object.values(v.items)) : [];
+      return { tanggal: v.tanggal || '', items: items.filter(x => x && x.nama) };
+    }
+    function pmbSave(d) {
+      window.dbCache[PMB_PATH] = d;
+      if (typeof window.fbSet === 'function') window.fbSet(PMB_PATH, (d.items.length || d.tanggal) ? d : null);
+    }
+    function pmbCalc(it) {
+      const kl = pmbN(it.kl), kp = pmbN(it.kp), bl = pmbN(it.bl), bp = pmbN(it.bp), tl = pmbN(it.tl), tp = pmbN(it.tp);
+      const org = pmbN(it.org), bumil = pmbN(it.bumil), busui = pmbN(it.busui);
+      const pos = it.jenis === 'POSYANDU';
+      const has = v => v !== undefined && v !== null && v !== '';
+      const kecil = (!pos && has(it.kj)) ? pmbN(it.kj) : kl + kp;     // Jumlah PM porsi kecil (bila diisi) menggantikan L+P
+      const bs = (!pos && has(it.bj)) ? pmbN(it.bj) : bl + bp;        // Jumlah PM porsi besar (siswa)
+      const td = tl + tp;
+      return {
+        kl, kp, bl, bp, tl, tp, org, bumil, busui, td, kecil, bs, lpKecil: kl + kp, lpBesar: bl + bp,
+        siswa: pos ? 0 : kecil + bs, siswaL: pos ? 0 : kl + bl, siswaP: pos ? 0 : kp + bp,
+        balita: pos ? kecil : 0,
+        porsiKecil: kecil, porsiBesar: bs + td + org + bumil + busui,
+        total: kecil + bs + td + org + bumil + busui
+      };
+    }
+    function pmbDetail(it) {
+      const c = pmbCalc(it);
+      if (it.jenis === 'POSYANDU') return 'Balita ' + c.porsiKecil + ' (L ' + c.kl + ' / P ' + c.kp + ') · Bumil ' + c.bumil + ' · Busui ' + c.busui;
+      const warn = (pm, lp) => pm !== lp ? ' ⚠L+P=' + lp : '';
+      if (it.jenis === 'SD') return 'Kls 1–3: ' + c.kecil + ' (L ' + c.kl + '/P ' + c.kp + ')' + warn(c.kecil, c.lpKecil) + ' · Kls 4–6: ' + c.bs + ' (L ' + c.bl + '/P ' + c.bp + ')' + warn(c.bs, c.lpBesar) + ' · Tendik ' + c.td + ' · Organo ' + c.org;
+      if (it.jenis === 'SMP') return 'Kls 7–9: ' + c.bs + ' (L ' + c.bl + '/P ' + c.bp + ')' + warn(c.bs, c.lpBesar) + ' · Tendik ' + c.td + ' · Organo ' + c.org;
+      return 'Siswa ' + c.kecil + ' (L ' + c.kl + '/P ' + c.kp + ')' + warn(c.kecil, c.lpKecil) + ' · Tendik ' + c.td + ' · Organo ' + c.org;
+    }
+    function pmbSorted(items) {
+      return items.map((x, i) => ({ x, i })).sort((a, b) => (PMB_RANK[a.x.jenis] - PMB_RANK[b.x.jenis]) || (a.i - b.i)).map(o => o.x);
+    }
+    function pmbAlergiCount(nama) {
+      if (typeof sdGetAll !== 'function') return 0;
+      const k = pmbNorm(nama);
+      return sdGetAll().filter(s => pmbNorm(s.sekolah) === k && sdTokens(s.alergi).length).length;
+    }
+    function pmbTotals(items) {
+      const t = { n: items.length, sekolah: 0, posyandu: 0, siswa: 0, tendik: 0, org: 0, balita: 0, bumil: 0, busui: 0, kecil: 0, besar: 0, total: 0 };
+      items.forEach(it => {
+        const c = pmbCalc(it);
+        if (it.jenis === 'POSYANDU') t.posyandu++; else t.sekolah++;
+        t.siswa += c.siswa; t.tendik += c.td; t.org += c.org; t.balita += c.balita; t.bumil += c.bumil; t.busui += c.busui;
+        t.kecil += c.porsiKecil; t.besar += c.porsiBesar; t.total += c.total;
+      });
+      return t;
+    }
+
+    // ---------- tampilan ----------
+    function pmbRender() {
+      if (!document.getElementById('pmb_box')) return;
+      const d = pmbData();
+      const tg = document.getElementById('pmb_tanggal');
+      if (tg && document.activeElement !== tg) tg.value = d.tanggal || '';
+      const t = pmbTotals(d.items);
+      const card = (lab, val, cls) => `<div class="p-4 rounded-2xl border ${cls} shadow-sm"><div class="text-[10px] font-extrabold uppercase tracking-wider opacity-70">${lab}</div><div class="text-2xl font-black mt-1">${val}</div></div>`;
+      document.getElementById('pmb_stats').innerHTML =
+        card('Total Porsi', t.total, 'bg-slate-50 border-slate-200 text-slate-800') +
+        card('Porsi Kecil', t.kecil, 'bg-emerald-50 border-emerald-200 text-emerald-800') +
+        card('Porsi Besar', t.besar, 'bg-orange-50 border-orange-200 text-orange-800') +
+        card('Satuan Terdata', t.sekolah + ' sekolah · ' + t.posyandu + ' posyandu', 'bg-indigo-50 border-indigo-200 text-indigo-800').replace('text-2xl', 'text-base');
+      document.getElementById('pmb_stats2').textContent = 'Siswa ' + t.siswa + ' · Tendik ' + t.tendik + ' · Uji organoleptik ' + t.org + ' · Balita ' + t.balita + ' · Ibu hamil ' + t.bumil + ' · Ibu menyusui ' + t.busui;
+      pmbRenderTable();
+    }
+    function pmbRenderTable() {
+      const tb = document.getElementById('pmb_tbody');
+      if (!tb) return;
+      const d = pmbData();
+      const q = (document.getElementById('pmb_q')?.value || '').trim().toUpperCase();
+      const fj = document.getElementById('pmb_filter')?.value || '';
+      const all = pmbSorted(d.items);
+      const rows = all.filter(it => (!fj || it.jenis === fj) && (!q || pmbNorm(it.nama).includes(q) || pmbNorm(it.alamat).includes(q)));
+      let html = '', sk = 0, sb = 0, st = 0;
+      rows.forEach((it, i) => {
+        const c = pmbCalc(it), al = it.jenis === 'POSYANDU' ? 0 : pmbAlergiCount(it.nama);
+        sk += c.porsiKecil; sb += c.porsiBesar; st += c.total;
+        html += `<tr class="hover:bg-slate-50 border-b border-slate-100">
+          <td class="p-3 text-center font-bold text-slate-400">${i + 1}</td>
+          <td class="p-3 font-extrabold text-slate-800">${pmbEsc(it.nama)}</td>
+          <td class="p-3 font-bold text-slate-600">${PMB_LABEL[it.jenis] || ''}</td>
+          <td class="p-3 text-slate-600 font-medium">${pmbEsc(it.alamat) || '<span class="text-slate-300">-</span>'}</td>
+          <td class="p-3 text-[11px] text-slate-500 font-medium">${pmbEsc(pmbDetail(it))}</td>
+          <td class="p-3 text-center font-black text-emerald-700">${c.porsiKecil}</td>
+          <td class="p-3 text-center font-black text-orange-700">${c.porsiBesar}</td>
+          <td class="p-3 text-center font-black text-slate-800">${c.total}</td>
+          <td class="p-3 text-center">${al ? '<span class="inline-block bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md font-bold">' + al + '</span>' : '<span class="text-slate-300">-</span>'}</td>
+          <td class="p-2 text-center whitespace-nowrap">
+            <button type="button" title="Ubah" onclick="pmbEdit('${it.id}')" class="px-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 font-bold">✏️</button>
+            <button type="button" title="Hapus" onclick="pmbDelete('${it.id}')" class="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button>
+          </td></tr>`;
+      });
+      if (rows.length) html += `<tr class="bg-slate-100 font-black text-slate-800"><td class="p-3 text-center" colspan="5">TOTAL (${rows.length} data)</td><td class="p-3 text-center text-emerald-700">${sk}</td><td class="p-3 text-center text-orange-700">${sb}</td><td class="p-3 text-center">${st}</td><td colspan="2"></td></tr>`;
+      tb.innerHTML = html || `<tr><td colspan="10" class="p-8 text-center text-slate-400 font-medium">${all.length ? 'Tidak ada data yang cocok.' : 'Database masih kosong. Tambahkan lewat form di atas atau klik "Muat Data Awal".'}</td></tr>`;
+    }
+
+    // ---------- form ----------
+    function pmbOnJenis() {
+      const j = document.getElementById('pmb_f_jenis').value, cfg = PMB_CFG[j];
+      Object.keys(PMB_GROUPS).forEach(g => {
+        const box = document.getElementById('pmb_g_' + g);
+        const on = g === 'kecil' || g === 'besar' ? !!cfg[g] : !!cfg[g];
+        box.classList.toggle('hidden', !on);
+        const lab = box.querySelector('.pmb-lab'); if (lab && cfg[g]) lab.textContent = cfg[g];
+      });
+      const org = document.getElementById('pmb_f_org');
+      if (cfg.org && org.value === '' && !pmbEditId) org.value = '2';
+      const ph = j === 'POSYANDU';
+      document.querySelectorAll('.pmb-jm').forEach(e => e.classList.toggle('hidden', ph));
+      document.getElementById('pmb_f_kl').placeholder = ph ? 'Balita L' : 'Laki-laki';
+      document.getElementById('pmb_f_kp').placeholder = ph ? 'Balita P' : 'Perempuan';
+    }
+    function pmbReset() {
+      pmbEditId = null;
+      ['pmb_f_nama', 'pmb_f_alamat'].concat(PMB_FIELDS.concat(PMB_JM).map(k => 'pmb_f_' + k)).forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('pmb_form_title').textContent = '✍️ Tambah Sekolah / Posyandu';
+      document.getElementById('pmb_btn_cancel').classList.add('hidden');
+      pmbOnJenis();
+    }
+    function pmbSubmit() {
+      const jenis = document.getElementById('pmb_f_jenis').value, cfg = PMB_CFG[jenis];
+      const nama = document.getElementById('pmb_f_nama').value.trim().replace(/\s+/g, ' ');
+      const alamat = document.getElementById('pmb_f_alamat').value.trim().replace(/\s+/g, ' ');
+      if (!nama) { alert('Nama wajib diisi.'); return; }
+      const d = pmbData(), list = d.items.slice();
+      const it = { id: pmbEditId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7)), jenis: jenis, nama: nama, alamat: alamat };
+      PMB_FIELDS.forEach(k => { it[k] = 0; });
+      Object.keys(PMB_GROUPS).forEach(g => { if (cfg[g]) PMB_GROUPS[g].forEach(k => { it[k] = pmbN(document.getElementById('pmb_f_' + k).value); }); });
+      PMB_JM.forEach(k => { const g = k === 'kj' ? 'kecil' : 'besar', v = document.getElementById('pmb_f_' + k).value; it[k] = (cfg[g] && jenis !== 'POSYANDU' && v !== '') ? pmbN(v) : null; });
+      const dup = list.findIndex(x => pmbKey(x.nama, x.alamat) === pmbKey(nama, alamat) && x.id !== it.id);
+      if (dup !== -1) { alert('"' + nama + '"' + (alamat ? ' (' + alamat + ')' : '') + ' sudah ada di database. Gunakan tombol ✏️ untuk mengubahnya.'); return; }
+      const i = list.findIndex(x => x.id === it.id);
+      const wasEdit = !!pmbEditId;
+      if (i !== -1) list[i] = it; else list.push(it);
+      pmbSave({ tanggal: d.tanggal, items: list });
+      pmbReset();
+      pmbRender();
+      if (typeof renderSasaran === 'function') { try { sdRenderLists(sdGetAll()); } catch (e) {} }
+      if (wasEdit) alert('Data berhasil diperbarui!');
+    }
+    function pmbEdit(id) {
+      const it = pmbData().items.find(x => x.id === id);
+      if (!it) return;
+      pmbEditId = id;
+      document.getElementById('pmb_f_jenis').value = it.jenis;
+      document.getElementById('pmb_f_nama').value = it.nama;
+      document.getElementById('pmb_f_alamat').value = it.alamat || '';
+      PMB_FIELDS.forEach(k => { document.getElementById('pmb_f_' + k).value = it[k] ? it[k] : ''; });
+      PMB_JM.forEach(k => { document.getElementById('pmb_f_' + k).value = (it[k] !== undefined && it[k] !== null) ? it[k] : ''; });
+      pmbOnJenis();
+      document.getElementById('pmb_form_title').textContent = '✏️ Ubah Data';
+      document.getElementById('pmb_btn_cancel').classList.remove('hidden');
+      document.getElementById('pmb_form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    function pmbDelete(id) {
+      const d = pmbData(), it = d.items.find(x => x.id === id);
+      if (!it || !confirm('Hapus "' + it.nama + '" dari database?')) return;
+      pmbSave({ tanggal: d.tanggal, items: d.items.filter(x => x.id !== id) });
+      if (pmbEditId === id) pmbReset();
+      pmbRender();
+    }
+    function pmbSetTanggal(v) { const d = pmbData(); pmbSave({ tanggal: v, items: d.items }); }
+
+    // ---------- data awal dari file PENERIMA MANFAAT TANGGAL 12 OCT 2026 ----------
+    function pmbSeed() {
+      const d = pmbData();
+      if (d.items.length && !confirm('Database sudah berisi ' + d.items.length + ' data.\n\nMuat data awal akan MENGGANTI seluruh isi database. Lanjutkan?')) return;
+      // Sumber: PENERIMA MANFAAT TANGGAL 12 OCT 2026.xlsx (sheet sekolah & posyandu); kj/bj = kolom "Jumlah Siswa yang Mendapat MBG"
+      const raw = [{"jenis": "PAUD", "nama": "KB AN NUR", "alamat": "Mangkaca", "tl": 0, "tp": 5, "org": 2, "kl": 13, "kp": 16, "kj": 29}, {"jenis": "PAUD", "nama": "KB NUR SUCI", "alamat": "Maccope", "tl": 0, "tp": 4, "org": 2, "kl": 20, "kp": 20, "kj": 40}, {"jenis": "PAUD", "nama": "KB JIRANA", "alamat": "Amputtang", "tl": 0, "tp": 4, "org": 2, "kl": 7, "kp": 8, "kj": 15}, {"jenis": "PAUD", "nama": "KB AL IKHLAS I", "alamat": "Bontomatene", "tl": 1, "tp": 4, "org": 2, "kl": 9, "kp": 16, "kj": 25}, {"jenis": "PAUD", "nama": "KB AL MUKHLISIN", "alamat": "Panritae", "tl": 0, "tp": 3, "org": 2, "kl": 12, "kp": 19, "kj": 31}, {"jenis": "PAUD", "nama": "KB BERSATU", "alamat": "Paccinongan", "tl": 1, "tp": 2, "org": 2, "kl": 11, "kp": 3, "kj": 14}, {"jenis": "PAUD", "nama": "KB AL IKHLAS II", "alamat": "", "tl": 1, "tp": 3, "org": 2, "kl": 5, "kp": 12, "kj": 17}, {"jenis": "PAUD", "nama": "KB AL AMIN", "alamat": "Mangkaca", "tl": 0, "tp": 4, "org": 2, "kl": 11, "kp": 8, "kj": 19}, {"jenis": "PAUD", "nama": "KB SAHABAT CERIA", "alamat": "Baring", "tl": 0, "tp": 4, "org": 2, "kl": 11, "kp": 9, "kj": 20}, {"jenis": "PAUD", "nama": "KB NURUL AMIRULLAH", "alamat": "", "tl": 1, "tp": 3, "org": 2, "kl": 0, "kp": 10, "kj": 10}, {"jenis": "PAUD", "nama": "RA AL DJIBRAN", "alamat": "Takku", "tl": 0, "tp": 0, "org": 0, "kl": 0, "kp": 0, "kj": 0}, {"jenis": "SD", "nama": "UPT SDN 34 CITTA", "alamat": "Citta", "tl": 2, "tp": 7, "org": 2, "kl": 31, "kp": 27, "kj": 60, "bl": 23, "bp": 25, "bj": 46}, {"jenis": "SD", "nama": "SD NEGERI 26 MANGKACA", "alamat": "Mangkaca", "tl": 3, "tp": 9, "org": 2, "kl": 32, "kp": 33, "kj": 65, "bl": 33, "bp": 31, "bj": 64}, {"jenis": "SD", "nama": "UPT SDN 25 PARENRENG", "alamat": "Parenreng", "tl": 3, "tp": 10, "org": 2, "kl": 45, "kp": 41, "kj": 86, "bl": 42, "bp": 43, "bj": 85}, {"jenis": "SD", "nama": "SD NEGERI 36 PARENRENG", "alamat": "Panritae", "tl": 3, "tp": 10, "org": 2, "kl": 13, "kp": 16, "kj": 29, "bl": 26, "bp": 19, "bj": 45}, {"jenis": "SD", "nama": "UPT SDN 5 AMPUTTANG", "alamat": "Amputtang", "tl": 2, "tp": 8, "org": 2, "kl": 18, "kp": 13, "kj": 31, "bl": 20, "bp": 14, "bj": 34}, {"jenis": "SD", "nama": "SDN 1 SEGERI", "alamat": "Bontomatene", "tl": 2, "tp": 10, "org": 2, "kl": 27, "kp": 27, "kj": 54, "bl": 28, "bp": 33, "bj": 61}, {"jenis": "SD", "nama": "MI AL DJIBRAN", "alamat": "Takku", "tl": 0, "tp": 0, "org": 0, "kl": 0, "kp": 0, "kj": 0, "bl": 0, "bp": 0, "bj": 0}, {"jenis": "SMP", "nama": "SMPN 2 SEGERI", "alamat": "Baring", "tl": 10, "tp": 8, "org": 2, "bl": 66, "bp": 59, "bj": 125}, {"jenis": "SMP", "nama": "SMP NEGERI 1 SEGERI", "alamat": "Bontomatene", "tl": 13, "tp": 24, "org": 2, "bl": 199, "bp": 245, "bj": 444}, {"jenis": "POSYANDU", "nama": "KAMBOJA", "alamat": "Bontomatene", "bumil": 4, "busui": 20, "kl": 23, "kp": 28}, {"jenis": "POSYANDU", "nama": "TERATAI", "alamat": "Bontomatene", "bumil": 5, "busui": 24, "kl": 12, "kp": 14}, {"jenis": "POSYANDU", "nama": "MAWAR", "alamat": "Bontomatene", "bumil": 8, "busui": 32, "kl": 20, "kp": 18}, {"jenis": "POSYANDU", "nama": "MELATI", "alamat": "Bontomatene", "bumil": 2, "busui": 20, "kl": 8, "kp": 6}, {"jenis": "POSYANDU", "nama": "ANGGREK", "alamat": "Bontomatene", "bumil": 3, "busui": 23, "kl": 29, "kp": 20}, {"jenis": "POSYANDU", "nama": "TULIP", "alamat": "Bontomatene", "bumil": 2, "busui": 12, "kl": 7, "kp": 9}, {"jenis": "POSYANDU", "nama": "MELATI 1", "alamat": "Parenreng", "bumil": 1, "busui": 8, "kl": 18, "kp": 4}, {"jenis": "POSYANDU", "nama": "MELATI 2", "alamat": "Parenreng", "bumil": 6, "busui": 20, "kl": 21, "kp": 17}, {"jenis": "POSYANDU", "nama": "MELATI 3", "alamat": "Parenreng", "bumil": 4, "busui": 13, "kl": 10, "kp": 14}, {"jenis": "POSYANDU", "nama": "MELATI 4", "alamat": "Parenreng", "bumil": 2, "busui": 19, "kl": 15, "kp": 11}, {"jenis": "POSYANDU", "nama": "MELATI 5", "alamat": "Parenreng", "bumil": 1, "busui": 3, "kl": 7, "kp": 5}, {"jenis": "POSYANDU", "nama": "MELATI 6", "alamat": "Parenreng", "bumil": 2, "busui": 5, "kl": 8, "kp": 4}];
+      const items = raw.map((r, i) => {
+        const it = { id: 'seed' + i + Math.random().toString(36).slice(2, 6) };
+        PMB_FIELDS.forEach(k => { it[k] = 0; });
+        return Object.assign(it, r);
+      });
+      pmbSave({ tanggal: '2026-10-12', items: items });
+      pmbRender();
+      try { sdRenderLists(sdGetAll()); } catch (e) {}
+      alert('Data dimuat dari file PENERIMA MANFAAT (12 Okt 2026): ' + items.length + ' satuan (20 sekolah/PAUD + 12 posyandu).');
+    }
+
+    // ---------- export Excel (format seperti lampiran + kolom porsi) ----------
+    async function pmbExportExcel() {
+      try {
+        if (typeof ExcelJS === 'undefined') { alert('Library Excel belum termuat. Tunggu beberapa detik lalu coba lagi.'); return; }
+        const d = pmbData();
+        if (!d.items.length) { alert('Database masih kosong.'); return; }
+        const tgl = (rptLongDate(d.tanggal) || rptToday()).toUpperCase();
+        const sorted = pmbSorted(d.items);
+        const HDR = 'FFDDEBF7', YEL = 'FFFFFF00';
+        const wb = new ExcelJS.Workbook();
+        const C = { h: 'center', size: 11 }, CB = { h: 'center', size: 11, bold: true }, L = { h: 'left', size: 11 };
+
+        // ----- Sheet 1: satuan pendidikan -----
+        const sk = sorted.filter(i => i.jenis !== 'POSYANDU');
+        const ws = wb.addWorksheet('Satuan Pendidikan');
+        [5, 30, 10, 16, 14, 11, 12, 13, 13, 10, 12, 10, 11, 15, 10, 10].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+        rptMerge(ws, 1, 1, 1, 16); rptPut(ws, 1, 1, 'PESERTA DIDIK DAN GURU/TENDIK (' + tgl + ')', { h: 'center', size: 13, bold: true });
+        rptFill(ws, 1, 1, 1, 16, YEL); ws.getRow(1).height = 24;
+        const heads = ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Alamat Satuan Pendidikan', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Jumlah Pendidik dan Tenaga', 'Jumlah Laki-Laki', 'Jumlah Perempuan', 'Total Jumlah', 'Uji Organoleptik', 'Jumlah Siswa dan Guru/Tendik', 'Porsi Kecil', 'Porsi Besar'];
+        heads.forEach((h, i) => rptPut(ws, 2, i + 1, h, { h: 'center', bold: true, size: 11 }));
+        rptFill(ws, 2, 1, 2, 16, HDR); rptBorder(ws, 2, 1, 2, 16, 'grid'); ws.getRow(2).height = 62;
+        let r = 3; const T = new Array(17).fill(0);
+        sk.forEach((it, idx) => {
+          const c = pmbCalc(it);
+          const lines = it.jenis === 'SD' ? [['1,2,3', c.kl, c.kp, c.kecil], ['4,5,6', c.bl, c.bp, c.bs]] : it.jenis === 'SMP' ? [['7,8,9', c.bl, c.bp, c.bs]] : [['', c.kl, c.kp, c.kecil]];
+          const r2 = r + lines.length - 1;
+          lines.forEach((ln, k) => {
+            rptPut(ws, r + k, 3, ln[0], C); rptPut(ws, r + k, 5, ln[3], C); rptPut(ws, r + k, 6, ln[1], C); rptPut(ws, r + k, 7, ln[2], C);
+            ws.getRow(r + k).height = 24;
+          });
+          rptPut(ws, r, 1, idx + 1, C); rptPut(ws, r, 2, it.nama, L); rptPut(ws, r, 4, it.alamat, C);
+          rptPut(ws, r, 8, c.siswa, CB); rptPut(ws, r, 9, c.td, C); rptPut(ws, r, 10, c.tl, C); rptPut(ws, r, 11, c.tp, C);
+          rptPut(ws, r, 12, c.td, CB); rptPut(ws, r, 13, c.org, C); rptPut(ws, r, 14, c.siswa + c.td + c.org, CB);
+          rptPut(ws, r, 15, c.porsiKecil, C); rptPut(ws, r, 16, c.porsiBesar, C);
+          [1, 2, 4, 8, 9, 10, 11, 12, 13, 14, 15, 16].forEach(col => rptMerge(ws, r, col, r2, col));
+          rptBorder(ws, r, 1, r2, 16, 'grid');
+          T[5] += c.siswa; T[6] += c.siswaL; T[7] += c.siswaP; T[8] += c.siswa; T[9] += c.td; T[10] += c.tl; T[11] += c.tp; T[12] += c.td; T[13] += c.org; T[14] += c.siswa + c.td + c.org; T[15] += c.porsiKecil; T[16] += c.porsiBesar;
+          r = r2 + 1;
+        });
+        rptMerge(ws, r, 1, r, 4); rptPut(ws, r, 1, 'TOTAL', CB);
+        for (let col = 5; col <= 16; col++) rptPut(ws, r, col, T[col], CB);
+        rptBorder(ws, r, 1, r, 16, 'grid'); ws.getRow(r).height = 24;
+        rptPage(ws, true, null); ws.pageSetup.fitToHeight = 1;
+
+        // ----- Sheet 2: posyandu 3B -----
+        const po = sorted.filter(i => i.jenis === 'POSYANDU');
+        const w2 = wb.addWorksheet('Posyandu 3B');
+        [5, 24, 18, 12, 14, 16, 16, 18, 11, 11].forEach((w, i) => { w2.getColumn(i + 1).width = w; });
+        rptMerge(w2, 1, 1, 1, 10); rptPut(w2, 1, 1, 'NON PESERTA DIDIK (3B), (' + tgl + ')', { h: 'center', size: 13, bold: true });
+        rptFill(w2, 1, 1, 1, 10, YEL); w2.getRow(1).height = 24;
+        [[1, 'No.'], [2, 'Nama Posyandu'], [3, 'Alamat Posyandu'], [4, 'Ibu Hamil'], [5, 'Ibu Menyusui'], [8, 'Total Jumlah Peserta 3B'], [9, 'Porsi Kecil'], [10, 'Porsi Besar']].forEach(h => {
+          rptMerge(w2, 2, h[0], 3, h[0]); rptPut(w2, 2, h[0], h[1], { h: 'center', bold: true, size: 11 });
+        });
+        rptMerge(w2, 2, 6, 2, 7); rptPut(w2, 2, 6, 'Anak dibawah 5 Tahun mulai Usia 6 Bulan', { h: 'center', bold: true, size: 11 });
+        rptPut(w2, 3, 6, 'Jumlah Laki-Laki', { h: 'center', bold: true, size: 11 }); rptPut(w2, 3, 7, 'Jumlah Perempuan', { h: 'center', bold: true, size: 11 });
+        rptFill(w2, 2, 1, 3, 10, HDR); rptBorder(w2, 2, 1, 3, 10, 'grid'); w2.getRow(2).height = 36; w2.getRow(3).height = 32;
+        let r3 = 4; const T2 = new Array(11).fill(0);
+        po.forEach((it, idx) => {
+          const c = pmbCalc(it);
+          const vals = [idx + 1, it.nama, it.alamat, c.bumil, c.busui, c.kl, c.kp, c.total, c.porsiKecil, c.porsiBesar];
+          vals.forEach((v, k) => rptPut(w2, r3, k + 1, v, k === 1 ? L : (k === 7 ? CB : C)));
+          rptBorder(w2, r3, 1, r3, 10, 'grid'); w2.getRow(r3).height = 22;
+          T2[4] += c.bumil; T2[5] += c.busui; T2[6] += c.kl; T2[7] += c.kp; T2[8] += c.total; T2[9] += c.porsiKecil; T2[10] += c.porsiBesar;
+          r3++;
+        });
+        rptMerge(w2, r3, 1, r3, 3); rptPut(w2, r3, 1, 'TOTAL', CB);
+        for (let col = 4; col <= 10; col++) rptPut(w2, r3, col, T2[col], CB);
+        rptBorder(w2, r3, 1, r3, 10, 'grid'); w2.getRow(r3).height = 24;
+        rptPage(w2, true, null); w2.pageSetup.fitToHeight = 1;
+
+        await rptDownload(wb, 'DATABASE PENERIMA MANFAAT_' + (d.tanggal || getLocalDateKey()) + '.xlsx');
+      } catch (e) {
+        console.error('Export database penerima manfaat gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    // ---------- integrasi dengan data alergi (modul 01.01) & Inspeksi Alergen (22.01) ----------
+    (function () {
+      // 1) render database setiap modul Sasaran dibuka / data realtime berubah
+      const origRender = window.renderSasaran;
+      window.renderSasaran = function () {
+        if (origRender) origRender.apply(this, arguments);
+        pmbOnJenisOnce(); pmbRender();
+      };
+      let formReady = false;
+      function pmbOnJenisOnce() { if (!formReady && document.getElementById('pmb_f_jenis')) { formReady = true; pmbOnJenis(); } }
+
+      // 2) daftar "Asal Sekolah" pada form alergi ikut memuat nama sekolah dari database
+      const origLists = window.sdRenderLists;
+      window.sdRenderLists = function (list) {
+        if (origLists) origLists.apply(this, arguments);
+        try {
+          const dl = document.getElementById('sd_dl_sekolah');
+          if (!dl) return;
+          const have = {};
+          Array.from(dl.options).forEach(o => { have[pmbNorm(o.value)] = true; });
+          pmbData().items.filter(i => i.jenis !== 'POSYANDU').forEach(i => { if (!have[pmbNorm(i.nama)]) { have[pmbNorm(i.nama)] = true; dl.insertAdjacentHTML('beforeend', '<option value="' + pmbEsc(i.nama) + '">'); } });
+        } catch (e) {}
+      };
+      // 3) memilih sekolah dari database mengisi jenjang otomatis (bila masih kosong)
+      document.addEventListener('change', function (e) {
+        if (!e.target || e.target.id !== 'sd_f_sekolah') return;
+        const jj = document.getElementById('sd_f_jenjang');
+        if (!jj || jj.value.trim()) return;
+        const m = pmbData().items.find(i => i.jenis !== 'POSYANDU' && pmbNorm(i.nama) === pmbNorm(e.target.value));
+        if (m) jj.value = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP' }[m.jenis];
+      });
+
+      // 4) panel sinkron di Inspeksi Manajemen Alergen: ringkasan porsi + rasio anak alergi per sekolah
+      const origSync = window.renderAlergenSasaranSync;
+      window.renderAlergenSasaranSync = function (activeDayIdx) {
+        if (origSync) origSync.apply(this, arguments);
+        try {
+          const box = document.getElementById('al_sasaran_sync');
+          if (!box) return;
+          const db = pmbData();
+          if (!db.items.length) return;
+          const t = pmbTotals(db.items);
+          let h = '<div class="mt-3 pt-3 border-t border-rose-200 space-y-2">' +
+            '<div class="font-extrabold text-[11px] text-indigo-800 uppercase">📊 Penerima Manfaat (Database)</div>' +
+            '<div class="text-[11px] text-slate-600 font-medium">Total <b>' + t.total + '</b> porsi — kecil <b>' + t.kecil + '</b> · besar <b>' + t.besar + '</b> &middot; ' + t.sekolah + ' sekolah, ' + t.posyandu + ' posyandu &middot; siswa ' + t.siswa + ', tendik ' + t.tendik + '</div>';
+          const found = (typeof sdDetectAllergens === 'function') ? sdDetectAllergens(sdMenuItemsForIdx(activeDayIdx)) : [];
+          const students = sdGetAll();
+          found.forEach(f => {
+            const m = students.filter(s => sdMatches(s, f));
+            if (!m.length) return;
+            const per = {};
+            m.forEach(s => { const k = sdNorm(s.sekolah); per[k] = (per[k] || 0) + 1; });
+            const lines = Object.keys(per).sort((a, b) => per[b] - per[a]).map(k => {
+              const it = db.items.find(i => i.jenis !== 'POSYANDU' && pmbNorm(i.nama) === pmbNorm(k));
+              const sw = it ? pmbCalc(it).siswa : 0;
+              return pmbEsc(k) + ': <b>' + per[k] + '</b> anak' + (sw ? ' dari ' + sw + ' siswa (' + (per[k] * 100 / sw).toFixed(1).replace('.0', '') + '%)' : ' <span class="text-slate-400">(sekolah belum ada di database)</span>');
+            });
+            h += '<div class="bg-white p-2.5 rounded-xl border border-rose-200 text-[11px] text-slate-600 font-medium leading-snug"><div class="font-extrabold text-rose-700 uppercase mb-1">Porsi pengganti ' + pmbEsc(f) + ': ' + m.length + ' dari ' + t.siswa + ' siswa (' + (m.length * 100 / (t.siswa || 1)).toFixed(1).replace('.0', '') + '%)</div>' + lines.join('<br>') + '</div>';
+          });
+          box.insertAdjacentHTML('beforeend', h + '</div>');
+        } catch (e) { console.error('Sinkron database penerima manfaat gagal', e); }
+      };
+
+      // 5) laporan baku 01.01: "Jumlah Peserta Didik" memakai total siswa dari database (bila database terisi)
+      const origSummary = window.sdSummaryRows;
+      window.sdSummaryRows = function () {
+        const db = pmbData().items.filter(i => i.jenis !== 'POSYANDU');
+        if (!db.length) return origSummary.apply(this, arguments);
+        const keyOf = j => ({ PAUD: 'PAUD', TK: 'PAUD', KB: 'PAUD', RA: 'PAUD', SD: 'SD', MI: 'SD', SMP: 'SMP', MTS: 'SMP' })[sdNormJenjang(j).toUpperCase()] || sdNormJenjang(j).toUpperCase();
+        const rows = [];
+        [['PAUD', 'PAUD / TK'], ['SD', 'SD / MI'], ['SMP', 'SMP / MTs']].forEach(g => {
+          const its = db.filter(i => i.jenis === g[0]);
+          if (!its.length) return;
+          const c = {};
+          sdGetAll().forEach(s => { if (keyOf(s.jenjang) === g[0]) sdTokens(s.alergi).forEach(t => { c[t] = (c[t] || 0) + 1; }); });
+          const lines = Object.keys(c).sort((a, b) => c[b] - c[a] || a.localeCompare(b)).map(t => 'Alergi ' + sdTitle(t) + ': ' + c[t] + ' anak');
+          rows.push({ jenjang: g[1], jumlah: its.reduce((a, i) => a + pmbCalc(i).siswa, 0), kondisi: lines.join('\n') || '-' });
+        });
+        origSummary.apply(this, arguments).forEach(r => { if (['PAUD', 'SD', 'SMP'].indexOf(keyOf(r.jenjang)) === -1) rows.push(r); });
+        return rows;
+      };
+    })();
   </script>
 
   <script>
@@ -6433,9 +7000,9 @@ function renderSuhuTable() {
           mods.push({ name: 'Pemorsian', tab: 'pemorsian', total: pT, missing: pM, detail: '' });
 
           // Pendinginan Makanan
-          var da = arr((window.dbCache['sppg_pendinginan_data'] || {})[today]), rows = Math.max(4, da.length), dT = 0, dM = 0;
+          var rawP = (window.dbCache['sppg_pendinginan_data'] || {})[today], da = arr(rawP && !Array.isArray(rawP) && rawP.rows ? rawP.rows : rawP), rows = PEND_STATIC_ROWS.length, dT = 0, dM = 0;
           for (var r = 0; r < rows; r++) {
-            var j = PEND_JENIS[r % 4];
+            var j = PEND_STATIC_ROWS[r];
             if (menuOf(j.key) === '-') continue;
             ['fm', 'fs'].forEach(function (f) { dT++; if (!has(da[r] && da[r][f])) dM++; });
           }
