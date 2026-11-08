@@ -8042,5 +8042,69 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       window.switchTab = function () { var r = oSw.apply(this, arguments); setTimeout(run, 1500); return r; };
     })();
   </script>
+
+<!-- ===== STICKY HORIZONTAL SCROLLBAR (PC/Desktop, semua modul) ===== -->
+<style>
+  #stickyHBar{position:fixed;bottom:0;height:18px;z-index:60;display:none;overflow-x:scroll;overflow-y:hidden;
+    background:var(--surface-3,#e6efe9);border-top:1px solid #9dbcaa;box-shadow:0 -4px 12px rgba(15,60,45,.18);border-radius:10px 10px 0 0}
+  #stickyHBar>div{height:1px}
+  #stickyHBar::-webkit-scrollbar{height:14px}
+  #stickyHBar::-webkit-scrollbar-thumb{background:#3f8f6a;border-radius:8px;border:2px solid var(--surface-3,#e6efe9)}
+  #stickyHBar::-webkit-scrollbar-thumb:hover{background:#0f3d2e}
+  @media (max-width:767px){#stickyHBar{display:none !important}}
+</style>
+<div id="stickyHBar"><div></div></div>
+<script>
+(function () {
+  var bar = document.getElementById('stickyHBar'), spacer = bar.firstElementChild;
+  var active = null, lock = false, raf = 0;
+
+  function candidates() {
+    var list = document.querySelectorAll('main .overflow-x-auto, main [id^="wrapper_"]');
+    return Array.prototype.filter.call(list, function (el) { return el.querySelector('table'); });
+  }
+  function pick() {
+    if (window.innerWidth < 768) return null;
+    var vh = window.innerHeight, best = null;
+    candidates().forEach(function (el) {
+      if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return;
+      var cs = getComputedStyle(el);
+      if (cs.overflowX !== 'auto' && cs.overflowX !== 'scroll') return;
+      if (el.scrollWidth <= el.clientWidth + 2) return;
+      var r = el.getBoundingClientRect();
+      // tabel terlihat sebagian di layar, tetapi scrollbar aslinya (di dasar tabel) di luar layar
+      if (r.height > 0 && r.top < vh - 60 && r.bottom > vh - 2 && !best) best = el;
+    });
+    return best;
+  }
+  function update() {
+    raf = 0;
+    var el = pick();
+    if (!el) { bar.style.display = 'none'; active = null; return; }
+    active = el;
+    var r = el.getBoundingClientRect();
+    bar.style.display = 'block';
+    bar.style.left = Math.max(r.left, 0) + 'px';
+    bar.style.width = Math.min(r.width, window.innerWidth - Math.max(r.left, 0)) + 'px';
+    spacer.style.width = el.scrollWidth + 'px';
+    if (Math.abs(bar.scrollLeft - el.scrollLeft) > 1) { lock = true; bar.scrollLeft = el.scrollLeft; }
+  }
+  function sched() { if (!raf) raf = requestAnimationFrame(update); }
+
+  bar.addEventListener('scroll', function () {
+    if (lock) { lock = false; return; }
+    if (active) { lock = true; active.scrollLeft = bar.scrollLeft; }
+  });
+  document.addEventListener('scroll', function (e) {
+    if (active && e.target === active) {
+      if (Math.abs(bar.scrollLeft - active.scrollLeft) > 1) { lock = true; bar.scrollLeft = active.scrollLeft; }
+    } else sched();
+  }, true);
+  window.addEventListener('resize', sched);
+  new MutationObserver(sched).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+  setInterval(sched, 1000);
+  sched();
+})();
+</script>
 </body>
 </html>
