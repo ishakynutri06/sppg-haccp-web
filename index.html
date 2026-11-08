@@ -7398,23 +7398,30 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     });
 
     // pembagian halaman (hanya bila isi lebih tinggi dari satu halaman)
+    // baris judul tabel yang diulang di tiap halaman (ws.pageSetup.printTitlesRow = 'a:b')
+    var titles = [], th = 0, tm = String(ps.printTitlesRow || '').match(/^(\d+):(\d+)$/);
+    if (tm) for (var tr = +tm[1]; tr <= +tm[2]; tr++) { titles.push(tr); th += rh(tr); }
     var chunks = [], start = r1, acc = 0;
     for (var r = r1; r <= r2; r++) {
       var h = rh(r);
-      if (r > start && acc + h > avail && !noBreak[r]) { chunks.push([start, r - 1]); start = r; acc = 0; }
+      var lim = chunks.length ? avail - th : avail;
+      if (r > start && acc + h > lim && !noBreak[r]) { chunks.push([start, r - 1]); start = r; acc = 0; }
       acc += h;
     }
     chunks.push([start, r2]);
 
     var images = ws.getImages ? ws.getImages() : [];
     var out = [];
-    chunks.forEach(function (ch) {
+    chunks.forEach(function (ch, chIdx) {
       var rs0 = ch[0], re0 = ch[1];
-      var chunkH = absY(re0) - absY(rs0 - 1);
+      var rowList = (chIdx > 0 ? titles.slice() : []);
+      for (var rq = rs0; rq <= re0; rq++) rowList.push(rq);
+      var chunkH = absY(re0) - absY(rs0 - 1) + (chIdx > 0 ? th : 0);
       var html = '<table style="table-layout:fixed;border-collapse:collapse;width:' + W0 + 'px;border-spacing:0"><colgroup>';
       for (var c = c1; c <= c2; c++) html += '<col style="width:' + cw(c) + 'px">';
       html += '</colgroup>';
-      for (var r = rs0; r <= re0; r++) {
+      for (var ri = 0; ri < rowList.length; ri++) {
+        var r = rowList[ri];
         html += '<tr style="height:' + rh(r) + 'px">';
         for (var c = c1; c <= c2; c++) {
           if (skip[r + ',' + c]) continue;
@@ -7477,6 +7484,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     var pages = [];
     wb.eachSheet(function (ws) { pages = pages.concat(sheetPages(wb, ws)); });
     if (!pages.length) { alert('Tidak ada data untuk dicetak.'); return; }
+    if (window.__pdfHook) { var hk = window.__pdfHook; window.__pdfHook = null; hk(pages, title); return; }
     var css = '@page land{size:A4 landscape;margin:6mm}@page port{size:A4 portrait;margin:6mm}' +
       'html,body{margin:0;padding:0;background:#fff}' +
       '.wrap{text-align:center;page-break-after:always;break-after:page}.wrap:last-child{page-break-after:auto;break-after:auto}' +
@@ -8104,6 +8112,307 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
   new MutationObserver(sched).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
   setInterval(sched, 1000);
   sched();
+})();
+</script>
+
+<!-- ===== TOMBOL BAGIKAN (WhatsApp, Email, dll) DI SETIAP MODUL ===== -->
+<script>
+(function () {
+  var orig = window.exportDownloadBlob;
+  var cap = null, cur = null;
+  window.exportDownloadBlob = function (blob, name) {
+    if (cap) { cap.blob = blob; cap.name = name; var d = cap.done; cap = null; d(); return Promise.resolve(); }
+    return orig.apply(this, arguments);
+  };
+
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function sizeText(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function mimeOf(name, blob) {
+    var e = (name.split('.').pop() || '').toLowerCase();
+    return blob.type || ({ xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', pdf: 'application/pdf' }[e] || 'application/octet-stream');
+  }
+
+  function modal() {
+    var m = document.getElementById('shareModal');
+    if (m) return m;
+    m = document.createElement('div');
+    m.id = 'shareModal';
+    m.style.cssText = 'position:fixed;inset:0;z-index:105;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.6);backdrop-filter:blur(3px);padding:16px';
+    m.innerHTML = '<div id="shareBox" style="background:#fff;border-radius:20px;max-width:440px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-height:92vh;overflow:auto;font-family:inherit"></div>';
+    m.addEventListener('click', function (e) { if (e.target === m) close(); });
+    document.body.appendChild(m);
+    return m;
+  }
+  function open(html) { var m = modal(); document.getElementById('shareBox').innerHTML = html; m.style.display = 'flex'; }
+  function close() { var m = document.getElementById('shareModal'); if (m) m.style.display = 'none'; }
+  window.shareClose = close;
+
+  var BTN = 'display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-radius:14px;padding:12px 14px;margin-top:8px;font-weight:800;font-size:13px;color:#fff;cursor:pointer;';
+  function head(title, sub) {
+    return '<div style="display:flex;justify-content:space-between;align-items:start;gap:8px"><div><div style="font-weight:900;font-size:16px;color:#0f172a">' + title + '</div>' +
+      '<div style="font-size:11px;color:#64748b;margin-top:2px">' + sub + '</div></div>' +
+      '<button type="button" onclick="shareClose()" style="border:0;background:#f1f5f9;border-radius:10px;width:30px;height:30px;font-weight:900;cursor:pointer">✕</button></div>';
+  }
+
+  // ---- Langkah 1: pilih format ----
+  window.shareStart = function (id) {
+    cur = window.__shareItems[id]; window.cur_id = id;
+    if (cur.btn) {
+      cur.excel = (cur.btn.getAttribute('onclick') || '').replace(/;\s*$/, '');
+      cur.word = (cur.wordBtn && cur.wordBtn.style.display !== 'none') ? (cur.wordBtn.getAttribute('onclick') || '').replace(/;\s*$/, '') : null;
+      if (cur.subTitle) cur.module = cur.baseTitle + ' - ' + cur.subTitle();
+    }
+    var h = head('📤 Bagikan File', esc(cur.module)) +
+      '<div style="font-size:12px;color:#334155;margin-top:12px">Pilih jenis file yang akan dibagikan:</div>' +
+      '<button type="button" onclick="shareMake(\'pdf\')" style="' + BTN + 'background:linear-gradient(90deg,#dc2626,#b91c1c)"><span style="font-size:20px">📄</span><span>File PDF — siap cetak (disarankan)<br><span style="font-weight:500;font-size:11px;opacity:.9">Paling mudah: langsung terlampir di WhatsApp / Email</span></span></button>' +
+      '<button type="button" onclick="shareMake(\'excel\')" style="' + BTN + 'background:linear-gradient(90deg,#10b981,#059669)"><span style="font-size:20px">📊</span><span>File Excel (.xlsx)<br><span style="font-weight:500;font-size:11px;opacity:.9">Data lengkap, bisa dicetak dari Excel</span></span></button>';
+    if (cur.word) h += '<button type="button" onclick="shareMake(\'word\')" style="' + BTN + 'background:linear-gradient(90deg,#2563eb,#1d4ed8)"><span style="font-size:20px">📝</span><span>File Word (.doc) — siap cetak<br><span style="font-weight:500;font-size:11px;opacity:.9">Format formulir resmi, siap dicetak</span></span></button>';
+    open(h);
+  };
+
+  // ---- Buat file (memakai fungsi export modul yang sama) ----
+  window.shareMake = async function (kind) {
+    var code = kind === 'word' ? cur.word : cur.excel;
+    close();
+    var c = { blob: null, name: '', done: null };
+    var wait = new Promise(function (res) { c.done = res; });
+    toast('⏳ Menyiapkan file…');
+    try {
+      if (kind === 'pdf') {
+        window.__printMode = true;
+        window.__pdfHook = function (pages, title) {
+          buildPdf(pages).then(function (blob) {
+            c.blob = blob;
+            c.name = String(cur.module).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) + ' ' + new Date().toISOString().slice(0, 10) + '.pdf';
+            c.done();
+          }, function (e) { c.done(); alert('Gagal membuat PDF: ' + (e && e.message || e)); });
+        };
+        try { var r0 = new Function('return ' + code)(); if (r0 && r0.then) await r0; } finally { window.__printMode = false; }
+        if (!c.blob) await Promise.race([wait, new Promise(function (r) { setTimeout(r, 90000); })]);
+        window.__pdfHook = null;
+      } else {
+        cap = c;
+        var r = new Function('return ' + code)(); if (r && r.then) await r;
+      }
+    } catch (e) { cap = null; window.__pdfHook = null; toast(''); alert('Gagal membuat file: ' + (e && e.message || e)); return; }
+    if (!c.blob) await Promise.race([wait, new Promise(function (r) { setTimeout(r, 15000); })]);
+    if (cap === c) cap = null;
+    toast('');
+    if (!c.blob) return;                         // dibatalkan (mis. pilihan gambar ditutup)
+    cur.file = { blob: c.blob, name: c.name || ('SPPG_' + Date.now() + (kind === 'word' ? '.doc' : '.xlsx')) };
+    step2();
+  };
+
+  function toast(t) {
+    var el = document.getElementById('shareToast');
+    if (!t) { if (el) el.remove(); return; }
+    if (!el) { el = document.createElement('div'); el.id = 'shareToast'; el.style.cssText = 'position:fixed;left:50%;bottom:70px;transform:translateX(-50%);z-index:106;background:#0f172a;color:#fff;padding:10px 18px;border-radius:12px;font-size:12px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.3)'; document.body.appendChild(el); }
+    el.textContent = t;
+  }
+
+
+  // ---- PDF dari halaman cetak (sama dengan hasil tombol Cetak) ----
+  function loadScript(src) {
+    return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = function () { rej(new Error('Gagal memuat ' + src + ' (cek koneksi internet)')); }; document.head.appendChild(s); });
+  }
+  async function ensurePdfLibs() {
+    if (!window.html2canvas) await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+    if (!(window.jspdf && window.jspdf.jsPDF)) await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
+  }
+  async function buildPdf(pages) {
+    await ensurePdfLibs();
+    var host = document.createElement('div');
+    host.style.cssText = 'position:fixed;left:-20000px;top:0;background:#fff;z-index:-1';
+    host.innerHTML = pages.join('');
+    document.body.appendChild(host);
+    var PX = 25.4 / 96, M = 6, pdf = null;
+    try {
+      var wraps = host.querySelectorAll('.wrap');
+      for (var i = 0; i < wraps.length; i++) {
+        var wrap = wraps[i], land = wrap.classList.contains('land'), box = wrap.querySelector('.box');
+        var z = parseFloat(box.style.zoom) || 1;
+        var bw = parseFloat(box.style.width), bh = parseFloat(box.style.height);
+        box.style.zoom = '';
+        box.style.display = 'block'; box.style.transform = 'scale(' + z + ')'; box.style.transformOrigin = '0 0';
+        var cell = document.createElement('div');
+        cell.style.cssText = 'position:relative;overflow:hidden;background:#fff;width:' + (bw * z) + 'px;height:' + (bh * z) + 'px';
+        box.parentNode.insertBefore(cell, box); cell.appendChild(box);
+        wrap.style.cssText = 'display:inline-block;background:#fff';
+        var canvas = await window.html2canvas(cell, { scale: 2, backgroundColor: '#fff', useCORS: true, logging: false });
+        var pw = land ? 297 : 210, ph = land ? 210 : 297;
+        if (!pdf) pdf = new window.jspdf.jsPDF({ orientation: land ? 'l' : 'p', unit: 'mm', format: 'a4', compress: true });
+        else pdf.addPage('a4', land ? 'l' : 'p');
+        var w = bw * z * PX, h = bh * z * PX, k = Math.min(1, (pw - 2 * M) / w, (ph - 2 * M) / h);
+        w *= k; h *= k;
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', (pw - w) / 2, M, w, h);
+        await new Promise(function (r) { setTimeout(r, 0); });
+      }
+    } finally { host.remove(); }
+    if (!pdf) throw new Error('Tidak ada halaman untuk dibuat PDF.');
+    return pdf.output('blob');
+  }
+
+  function msg() {
+    return 'SPPG Pangkajene dan Kepulauan\n' + cur.module + '\nTanggal: ' + new Date().toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) + '\nFile: ' + cur.file.name + (cur.file.link ? '\n\nUnduh file (klik tautan):\n' + cur.file.link : '');
+  }
+  function makeFile() { var f = cur.file; return new File([f.blob], f.name, { type: mimeOf(f.name, f.blob) }); }
+  function canNative() { try { return !!(navigator.share && (!navigator.canShare || navigator.canShare({ files: [makeFile()] }))); } catch (e) { return false; } }
+  function saveLocal() {
+    var u = URL.createObjectURL(cur.file.blob), a = document.createElement('a');
+    a.href = u; a.download = cur.file.name; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 5000);
+  }
+
+  function step2() {
+    var f = cur.file, native = canNative();
+    var h = head('✅ File siap dibagikan', esc(f.name) + ' · ' + sizeText(f.blob.size));
+    if (f.link) {
+      h += '<div style="margin-top:10px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;padding:10px;font-size:11px;color:#065f46;word-break:break-all"><b>🔗 Tautan unduh sudah dibuat</b> dan otomatis ikut di pesan. Penerima tinggal klik tautan untuk mengunduh file.<br>' + esc(f.link) + '</div>';
+    } else {
+      h += '<button type="button" onclick="shareUpload()" style="' + BTN + 'background:linear-gradient(90deg,#7c3aed,#6d28d9)"><span style="font-size:20px">☁️</span><span>Kirim otomatis (tanpa lampir manual)<br><span style="font-weight:500;font-size:11px;opacity:.9">File diunggah ke cloud, tautan unduh ikut di pesan WhatsApp / Email</span></span></button>';
+    }
+    if (native) h += '<button type="button" onclick="shareNative()" style="' + BTN + 'background:linear-gradient(90deg,#16a34a,#15803d)"><span style="font-size:20px">📲</span><span>Bagikan ke aplikasi<br><span style="font-weight:500;font-size:11px;opacity:.9">WhatsApp, Email, Telegram, dll — file langsung terlampir</span></span></button>';
+    h += '<div style="font-size:11px;color:#64748b;margin-top:12px;line-height:1.5">' + (native ? 'Atau pilih langsung (file akan terunduh dulu, lalu <b>lampirkan</b> di aplikasi yang terbuka):' : (/\.pdf$/i.test(f.name) ? 'Browser ini belum bisa melampirkan file otomatis (coba Chrome/Edge terbaru atau HP). Pilih aplikasi — file akan terunduh lalu <b>lampirkan</b> manual:' : 'Browser ini tidak mengizinkan file ' + esc(f.name.split('.').pop().toUpperCase()) + ' dilampirkan otomatis. <b>Gunakan file PDF</b> (tombol di bawah) agar langsung terlampir, atau pilih aplikasi — file akan terunduh lalu <b>lampirkan</b> manual:')) + '</div>' +
+      '<button type="button" onclick="shareVia(\'wa\')" style="' + BTN + 'background:#25D366"><span style="font-size:20px">💬</span><span>WhatsApp</span></button>' +
+      '<button type="button" onclick="shareVia(\'mail\')" style="' + BTN + 'background:#ea580c"><span style="font-size:20px">✉️</span><span>Email</span></button>' +
+      '<button type="button" onclick="shareVia(\'tg\')" style="' + BTN + 'background:#0ea5e9"><span style="font-size:20px">✈️</span><span>Telegram</span></button>' +
+      '<div style="display:flex;gap:8px;margin-top:8px"><button type="button" onclick="shareVia(\'save\')" style="' + BTN + 'margin-top:0;background:#334155;justify-content:center">💾 Simpan</button>' +
+      '<button type="button" onclick="shareVia(\'copy\')" style="' + BTN + 'margin-top:0;background:#64748b;justify-content:center">📋 Salin pesan</button></div>';
+    if (!native && !/\.pdf$/i.test(f.name)) h += '<button type="button" onclick="shareClose();shareStart(cur_id)" style="' + BTN + 'background:linear-gradient(90deg,#dc2626,#b91c1c)"><span style="font-size:20px">📄</span><span>Buat sebagai PDF (bisa langsung terlampir)</span></button>';
+    open(h);
+  }
+
+    // ---- Unggah ke Firebase Storage -> tautan unduh (otomatis ikut di pesan) ----
+  window.shareUpload = async function () {
+    var f = cur.file;
+    toast('☁️ Mengunggah file…');
+    try {
+      var A = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+      var S = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
+      var app = A.getApps()[0]; if (!app) throw new Error('Koneksi database belum siap, coba lagi sebentar.');
+      var st = S.getStorage(app);
+      var rnd = Array.prototype.map.call(crypto.getRandomValues(new Uint8Array(12)), function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+      var r = S.ref(st, 'bagikan/' + rnd + '/' + f.name.replace(/[^\w.\- ]+/g, '_'));
+      await S.uploadBytes(r, f.blob, { contentType: mimeOf(f.name, f.blob) });
+      f.link = await S.getDownloadURL(r);
+      toast('');
+      step2();
+    } catch (e) {
+      toast('');
+      var m = String(e && (e.code || e.message) || e);
+      alert('Unggah gagal: ' + m + (/unauthorized|permission|403|storage\//i.test(m) ? '\n\nFirebase Storage belum mengizinkan unggah. Buka Firebase Console > Storage > Rules, lalu izinkan tulis/baca pada folder "bagikan/" (lihat petunjuk dari Claude).' : '\n\nPeriksa koneksi internet lalu coba lagi.'));
+    }
+  };
+
+  window.shareNative = async function () {
+    try { await navigator.share({ files: [makeFile()], title: cur.module, text: msg() }); close(); }
+    catch (e) { if (e && e.name !== 'AbortError') { alert('Gagal membuka menu bagikan: ' + e.message + '\nGunakan tombol WhatsApp / Email di bawah.'); } }
+  };
+  window.shareVia = function (how) {
+    var m = msg(), enc = encodeURIComponent;
+    if (how === 'copy') { (navigator.clipboard ? navigator.clipboard.writeText(m) : Promise.reject()).then(function () { toast('Pesan disalin'); setTimeout(function () { toast(''); }, 1800); }, function () { prompt('Salin pesan ini:', m); }); return; }
+    if (how === 'save') { try { orig.call(window, cur.file.blob, cur.file.name); } catch (e) { saveLocal(); } return; }
+    if (!cur.file.link) saveLocal();
+    if (how === 'wa') window.open('https://wa.me/?text=' + enc(cur.file.link ? m : m + '\n\n(File terlampir — mohon lampirkan file yang baru diunduh)'), '_blank');
+    if (how === 'mail') window.location.href = 'mailto:?subject=' + enc(cur.module + ' - SPPG Pangkajene') + '&body=' + enc(m + '\n\n' + (cur.file.link ? '' : '(Lampirkan file yang baru diunduh: ' + cur.file.name + ')'));
+    if (how === 'tg') window.open('https://t.me/share/url?url=' + enc(' ') + '&text=' + enc(m), '_blank');
+    if (!cur.file.link) { toast('File terunduh: ' + cur.file.name + ' — lampirkan di aplikasi yang terbuka'); setTimeout(function () { toast(''); }, 6000); }
+  };
+
+  // ---- Sisipkan tombol "Bagikan" di samping tombol Excel pada setiap modul ----
+  window.__shareItems = window.__shareItems || {};
+  var seq = 0;
+  function inject() {
+    document.querySelectorAll('main section.tab-content').forEach(function (sec) {
+      var title = ((sec.querySelector('h2, h3') || {}).textContent || sec.id).replace(/\s+/g, ' ').trim();
+      sec.querySelectorAll('button[onclick]').forEach(function (b) {
+        var oc = b.dataset.orig || b.getAttribute('onclick') || '';
+        if (b.dataset.shareAdded || b.dataset.printBtn || !/\bexport\w*Excel\(/.test(oc) || /printExport/.test(oc)) return;
+        var scope = b.parentElement, word = null, wordBtn = null;
+        for (var i = 0; i < 3 && scope && !word; i++, scope = scope.parentElement) {
+          var w = Array.prototype.find.call(scope.querySelectorAll('button[onclick]'), function (x) { return /\bexport\w*Word\(/.test(x.getAttribute('onclick')) && !/printExport/.test(x.getAttribute('onclick')); });
+          if (w) { word = w.getAttribute('onclick').replace(/;\s*$/, ''); wordBtn = w; }
+        }
+        var id = 's' + (++seq);
+        window.__shareItems[id] = { module: title, baseTitle: title, excel: oc.replace(/;\s*$/, ''), word: word, btn: b, wordBtn: wordBtn,
+          subTitle: (sec.id === 'sec-sasaran-didik' && !b.closest('[id^="pm_view_"]')) ? function () { return window.__pmViewName ? window.__pmViewName() : ''; } : null };
+        var btn = document.createElement('button');
+        btn.type = 'button'; btn.dataset.shareBtn = '1';
+        btn.setAttribute('onclick', "shareStart('" + id + "')");
+        btn.title = 'Bagikan file export ke WhatsApp, Email, dll';
+        btn.className = 'flex-1 lg:flex-none text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5';
+        btn.style.background = 'linear-gradient(90deg,#16a34a,#15803d)';
+        btn.innerHTML = '<span>📤</span> Bagikan';
+        b.dataset.shareAdded = '1';
+        var anchor = b.nextElementSibling && b.nextElementSibling.dataset.printBtn ? b.nextElementSibling : b;
+        anchor.insertAdjacentElement('afterend', btn);
+      });
+    });
+  }
+  inject(); setInterval(inject, 1500);
+})();
+</script>
+
+<!-- ===== MODUL 01.01: Tombol Excel/Cetak/Bagikan di header mengikuti menu yang sedang dibuka ===== -->
+<script>
+(function () {
+  // ---- Export Excel "Data Alergi" (mengikuti pencarian & filter di menu, SEMUA halaman) ----
+  window.exportAlergiExcel = async function () {
+    try {
+      if (typeof ExcelJS === 'undefined') { alert('Library Excel belum termuat. Tunggu beberapa detik lalu coba lagi.'); return; }
+      var rows = sdFiltered();
+      if (!rows.length) { alert('Tidak ada data alergi untuk dicetak/diexport (cek pencarian/filter).'); return; }
+      var wb = new ExcelJS.Workbook(), ws = wb.addWorksheet('Data Alergi');
+      var NC = 5, HDR = 'FFDDEBF7', YEL = 'FFFFFF00';
+      [6, 34, 36, 20, 36].forEach(function (w, i) { ws.getColumn(i + 1).width = w; });
+      var fj = (document.getElementById('sd_filter_jenjang') || {}).value || '', fa = (document.getElementById('sd_filter_alergi') || {}).value || '', q = ((document.getElementById('sd_q') || {}).value || '').trim();
+      var ket = [fj && ('Jenjang: ' + fj), fa && ('Alergi: ' + fa), q && ('Pencarian: ' + q)].filter(Boolean).join(' | ');
+      rptMerge(ws, 1, 1, 1, NC); rptPut(ws, 1, 1, 'DATA ALERGI PESERTA DIDIK (' + rptToday().toUpperCase() + ')' + (ket ? ' - ' + ket : ''), { h: 'center', size: 13, bold: true });
+      rptFill(ws, 1, 1, 1, NC, YEL); ws.getRow(1).height = 24;
+      ['NO', 'NAMA', 'ASAL SEKOLAH', 'JENJANG PENDIDIKAN', 'JENIS ALERGI'].forEach(function (h, i) { rptPut(ws, 2, i + 1, h, { h: 'center', bold: true, size: 11 }); });
+      rptFill(ws, 2, 1, 2, NC, HDR); rptBorder(ws, 2, 1, 2, NC, 'grid'); ws.getRow(2).height = 26;
+      rows.forEach(function (x, i) {
+        var r = 3 + i;
+        [i + 1, x.nama, x.sekolah || '', x.jenjang || '', sdAlergiText(sdTokens(x.alergi))].forEach(function (v, k) { rptPut(ws, r, k + 1, v, { h: (k === 0 || k === 3) ? 'center' : 'left', size: 11, bold: k === 1 }); });
+        rptBorder(ws, r, 1, r, NC, 'grid'); ws.getRow(r).height = 22;
+      });
+      var tot = 3 + rows.length;
+      rptMerge(ws, tot, 1, tot, 4); rptPut(ws, tot, 1, 'TOTAL DATA ALERGI', { h: 'center', bold: true }); rptPut(ws, tot, 5, rows.length, { h: 'center', bold: true });
+      rptBorder(ws, tot, 1, tot, NC, 'grid'); ws.getRow(tot).height = 24;
+      rptPage(ws, false, null);
+      ws.pageSetup.printTitlesRow = '2:2';
+      await rptDownload(wb, 'DATA ALERGI_' + getLocalDateKey() + '.xlsx');
+    } catch (e) { console.error(e); alert('Export Data Alergi gagal: ' + (e && e.message ? e.message : e)); }
+  };
+
+  var VIEWS = { data: 'Data Sekolah & Posyandu', rincian: 'Rincian Penerima Manfaat', alergi: 'Data Alergi', laporan: 'Laporan Baku' };
+  function curView() {
+    for (var k in VIEWS) { var v = document.getElementById('pm_view_' + k); if (v && !v.classList.contains('hidden')) return k; }
+    return 'data';
+  }
+  window.__pmViewName = function () { return VIEWS[curView()]; };
+
+  function sync() {
+    var sec = document.getElementById('sec-sasaran-didik'); if (!sec) return;
+    var v = curView();
+    var map = {
+      data: { x: 'pmbExportExcel()', hideWord: true },
+      alergi: { x: 'exportAlergiExcel()', hideWord: true }
+    }[v];
+    sec.querySelectorAll('button[onclick]').forEach(function (b) {
+      if (b.closest('[id^="pm_view_"]')) return;               // hanya tombol di header modul
+      var oc = b.dataset.orig || b.getAttribute('onclick');
+      var isX = /^exportSasaranExcel\(\)/.test(oc), isP = /^printExport\(function\(\)\{ return exportSasaranExcel\(\); \}\)$/.test(oc), isW = /^exportSasaranWord\(\)/.test(oc);
+      if (!isX && !isP && !isW) return;
+      if (!b.dataset.orig) b.dataset.orig = oc;
+      var want = oc;
+      if (map && isX) want = map.x;
+      if (map && isP) want = 'printExport(function(){ return ' + map.x + '; })';
+      if (b.getAttribute('onclick') !== want) b.setAttribute('onclick', want);
+      if (isW) b.style.display = (map && map.hideWord) ? 'none' : '';
+    });
+  }
+  sync(); setInterval(sync, 400);
 })();
 </script>
 </body>
