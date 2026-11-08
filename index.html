@@ -3394,6 +3394,19 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     // ---- PARSER + VALIDASI (tidak menyentuh data sama sekali) ----
+    // Ubah berbagai bentuk tanggal menjadi "Senin, 09 Nov 2026"
+    function impNormDate(v) {
+      v = String(v == null ? '' : v).trim();
+      if (!v) return v;
+      if (parseSiklusDateToKey(v)) return v;                       // sudah format benar
+      let m = v.match(/^[A-Za-z]{3}\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);  // "Tue Nov 10 2026 08:00:00 GMT+0800 ..."
+      if (m) { const mo = SUHU_MONTH_MAP[m[1].toLowerCase()]; if (mo) return impDateToText(new Date(Date.UTC(+m[3], mo - 1, +m[2]))); }
+      m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);                  // 2026-11-10
+      if (m) return impDateToText(new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])));
+      m = v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);          // 10/11/2026 (hari/bulan/tahun)
+      if (m) return impDateToText(new Date(Date.UTC(+m[3], +m[2] - 1, +m[1])));
+      return v;
+    }
     function impParse(t, raw) {
       const cfg = IMP_CFG[t], oth = IMP_CFG[cfg.other];
       const errors = [];
@@ -3449,7 +3462,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         const vals = [0, 1, 2, 3, 4].map(i => r.c[1 + i] || '');
         if (head === 'TANGGAL') {
           if (cur.dates) errors.push('Baris ' + r.n + ': baris TANGGAL ganda pada Blok ' + cur.n + '.');
-          cur.dates = vals; continue;
+          cur.dates = vals.map(impNormDate); continue;
         }
         const k = labelToKey[head];
         if (!k) {
@@ -3520,13 +3533,22 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     // ---- BACA FILE EXCEL -> teks tab (lalu masuk jalur validasi yang sama) ----
+    function impDateToText(v) {
+      return IMP_DAYS[v.getUTCDay()] + ', ' + String(v.getUTCDate()).padStart(2, '0') + ' ' + IMP_MON[v.getUTCMonth()] + ' ' + v.getUTCFullYear();
+    }
     function impCellText(cell) {
       let v = cell.value;
       if (v == null) return '';
-      if (v instanceof Date) return IMP_DAYS[v.getUTCDay()] + ', ' + String(v.getUTCDate()).padStart(2, '0') + ' ' + IMP_MON[v.getUTCMonth()] + ' ' + v.getUTCFullYear();
+      if (v instanceof Date) return impDateToText(v);
       if (typeof v === 'object') {
         if (v.richText) return v.richText.map(x => x.text).join('');
-        if (v.result !== undefined) return String(v.result == null ? '' : v.result);
+        if (v.result !== undefined) {           // sel berisi RUMUS (mis. =B3+1): pakai hasilnya
+          const r = v.result;
+          if (r == null) return '';
+          if (r instanceof Date) return impDateToText(r);
+          if (typeof r === 'number' && r > 20000 && r < 80000 && cell.numFmt && /[dmy]/i.test(String(cell.numFmt).replace(/\[[^\]]*\]/g, ''))) return impDateToText(new Date(Math.round((r - 25569) * 86400000)));
+          return String(r);
+        }
         if (v.text !== undefined) return String(v.text);
         return '';
       }
