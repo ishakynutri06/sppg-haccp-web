@@ -1314,7 +1314,16 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         </div>
 
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
-        
+
+        <!-- KONTROL JUMLAH BATCH (TAHAP) -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div id="pend_batch_info" class="text-[11px] font-bold text-slate-500">2 batch (T01–T02) · 8 baris</div>
+          <div class="flex flex-wrap gap-2 hidden-print">
+            <button type="button" onclick="pendAddBatch()" class="text-[11px] font-bold px-3 py-2 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors shadow-sm">+ Tambah Batch</button>
+            <button type="button" onclick="pendDelBatch()" class="text-[11px] font-bold px-3 py-2 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 transition-colors shadow-sm">− Hapus Batch</button>
+          </div>
+        </div>
+
         <!-- STRUKTUR TABEL BARU SESUAI GAMBAR -->
         <div id="wrapper_pendinginan" class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm w-full">
           <table class="w-full text-xs text-left min-w-[1500px] border-collapse">
@@ -1341,7 +1350,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               </tr>
             </thead>
             <tbody id="tbody_pendinginan" class="divide-y divide-slate-300">
-              <!-- Diisi oleh JavaScript: 12 baris statis -->
+              <!-- Diisi oleh JavaScript: 4 baris menu x jumlah batch -->
             </tbody>
           </table>
         </div>
@@ -5977,21 +5986,29 @@ function renderSuhuTable() {
     const PEND_DOC_CODE = 'FM-SGR-SPPG-05.03';
     const PEND_PATH = 'sppg_pendinginan_data';
     
-    // 12 Baris Statis sesuai gambar
-    const PEND_STATIC_ROWS = [
-      { no: 1, tahap: 'T01', jenis: 'Karbohidrat', key: 'KARBO' },
-      { no: 2, tahap: 'T01', jenis: 'Protein Hewani', key: 'PH' },
-      { no: 3, tahap: 'T01', jenis: 'Protein Nabati', key: 'PN' },
-      { no: 4, tahap: 'T01', jenis: 'Sayur', key: 'SAYUR' },
-      { no: 5, tahap: 'T02', jenis: 'Karbohidrat', key: 'KARBO' },
-      { no: 6, tahap: 'T02', jenis: 'Protein Hewani', key: 'PH' },
-      { no: 7, tahap: 'T02', jenis: 'Protein Nabati', key: 'PN' },
-      { no: 8, tahap: 'T02', jenis: 'Sayur', key: 'SAYUR' },
-      { no: 9, tahap: 'T03', jenis: 'Karbohidrat', key: 'KARBO' },
-      { no: 10, tahap: 'T03', jenis: 'Protein Hewani', key: 'PH' },
-      { no: 11, tahap: 'T03', jenis: 'Protein Nabati', key: 'PN' },
-      { no: 12, tahap: 'T03', jenis: 'Sayur', key: 'SAYUR' }
+    // Batch (tahap) = grup 4 baris jenis menu. Default 2 batch (T01-T02), bisa ditambah/dihapus.
+    const PEND_JENIS = [
+      { jenis: 'Karbohidrat', key: 'KARBO' },
+      { jenis: 'Protein Hewani', key: 'PH' },
+      { jenis: 'Protein Nabati', key: 'PN' },
+      { jenis: 'Sayur', key: 'SAYUR' }
     ];
+    const PEND_DEFAULT_BATCH = 2;
+    const PEND_MIN_BATCH = 1;
+    const PEND_MAX_BATCH = 20;
+
+    function pendTahap(n) { return 'T' + String(n).padStart(2, '0'); }
+
+    function pendStaticRows(n) {
+      n = parseInt(n, 10);
+      if (isNaN(n)) n = PEND_DEFAULT_BATCH;
+      n = Math.max(PEND_MIN_BATCH, Math.min(PEND_MAX_BATCH, n));
+      const rows = [];
+      for (let b = 0; b < n; b++) {
+        PEND_JENIS.forEach(j => rows.push({ no: rows.length + 1, tahap: pendTahap(b + 1), jenis: j.jenis, key: j.key }));
+      }
+      return rows;
+    }
 
     window.pendDirty = false;
     window.pendCurrentIdx = undefined;
@@ -6059,15 +6076,45 @@ function renderSuhuTable() {
       document.getElementById('pend_ttd_ahli_gizi').value = metaData.ttd_ahli_gizi || '';
       document.getElementById('pend_ttd_kepala_sppg').value = metaData.ttd_kepala_sppg || '';
 
-      pendRender(dayData, idx);
+      // Jumlah batch: ikuti meta tersimpan; data lama tanpa meta -> panjang baris (12 baris = 3 batch), default 2.
+      let nBatches = parseInt(metaData.batches, 10);
+      if (isNaN(nBatches) || nBatches < PEND_MIN_BATCH) {
+        nBatches = dayData.length ? Math.ceil(dayData.length / PEND_JENIS.length) : PEND_DEFAULT_BATCH;
+        // Batch tambahan lama yang seluruh barisnya kosong tidak perlu ditampilkan.
+        while (nBatches > PEND_DEFAULT_BATCH) {
+          const block = dayData.slice((nBatches - 1) * PEND_JENIS.length, nBatches * PEND_JENIS.length);
+          if (block.some(pendRowHasData)) break;
+          nBatches--;
+        }
+      }
+      pendRender(dayData, idx, nBatches);
     }
 
-    function pendRender(dayData, idx) {
+    function pendRowHasData(d) {
+      if (!d) return false;
+      return ['jml', 'jm', 'sm', 'js', 'ss', 'sr', 'ket', 'fm', 'fs'].some(k => String(d[k] == null ? '' : d[k]).trim() !== '');
+    }
+
+    function pendBatchCount() {
+      const n = Math.round(document.querySelectorAll('#tbody_pendinginan tr').length / PEND_JENIS.length);
+      return n > 0 ? n : (window.pendBatches || PEND_DEFAULT_BATCH);
+    }
+
+    function pendUpdateBatchInfo() {
+      const el = document.getElementById('pend_batch_info');
+      if (!el) return;
+      const n = pendBatchCount();
+      el.textContent = n + ' batch (T01' + (n > 1 ? '–' + pendTahap(n) : '') + ') · ' + (n * PEND_JENIS.length) + ' baris';
+    }
+
+    function pendRender(dayData, idx, nBatches) {
       const tbody = document.getElementById('tbody_pendinginan');
       const weeks = getSuhuWeeks();
+      const staticRows = pendStaticRows(nBatches);
+      window.pendBatches = Math.round(staticRows.length / PEND_JENIS.length);
       let html = '';
-      
-      PEND_STATIC_ROWS.forEach((r, i) => {
+
+      staticRows.forEach((r, i) => {
         const d = dayData[i] || {};
         const menu = getSuhuMenuName(weeks, r.key, idx);
         const cls = 'w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600';
@@ -6093,7 +6140,8 @@ function renderSuhuTable() {
         </tr>`;
       });
       tbody.innerHTML = html;
-      
+      pendUpdateBatchInfo();
+
       if (tbody.dataset.dirtyBound !== '1') {
         tbody.dataset.dirtyBound = '1';
         tbody.addEventListener('input', e => { if (e.isTrusted) window.pendDirty = true; }, true);
@@ -6109,6 +6157,29 @@ function renderSuhuTable() {
       });
 
       tbody.querySelectorAll('tr').forEach(tr => pendCalcRow(tr));
+    }
+
+    function pendAddBatch() {
+      const n = pendBatchCount();
+      if (n >= PEND_MAX_BATCH) { alert('Maksimal ' + PEND_MAX_BATCH + ' batch.'); return; }
+      const data = pendCollectRows();
+      pendRender(data, window.pendCurrentIdx, n + 1);
+      window.pendDirty = true;
+      const trs = document.querySelectorAll('#tbody_pendinginan tr');
+      const last = trs[trs.length - 1];
+      if (last) { try { last.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} }
+    }
+
+    function pendDelBatch() {
+      const n = pendBatchCount();
+      if (n <= PEND_MIN_BATCH) { alert('Minimal ' + PEND_MIN_BATCH + ' batch.'); return; }
+      const data = pendCollectRows();
+      const start = (n - 1) * PEND_JENIS.length;
+      const lastBlock = data.slice(start);
+      const hasData = lastBlock.some(pendRowHasData);
+      if (hasData && !confirm('Hapus batch ' + pendTahap(n) + ' beserta isinya?')) return;
+      pendRender(data.slice(0, start), window.pendCurrentIdx, n - 1);
+      window.pendDirty = true;
     }
 
     function pendMinutes(t) {
@@ -6166,7 +6237,8 @@ function renderSuhuTable() {
         petugas: document.getElementById('pend_petugas').value,
         ttd_koordinator: document.getElementById('pend_ttd_koordinator').value,
         ttd_ahli_gizi: document.getElementById('pend_ttd_ahli_gizi').value,
-        ttd_kepala_sppg: document.getElementById('pend_ttd_kepala_sppg').value
+        ttd_kepala_sppg: document.getElementById('pend_ttd_kepala_sppg').value,
+        batches: pendBatchCount()
       };
       const payload = { meta: meta, rows: pendCollectRows() };
       
@@ -9029,9 +9101,11 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
           mods.push({ name: 'Pemorsian', tab: 'pemorsian', total: pT, missing: pM, detail: '' });
 
           // Pendinginan Makanan
-          var rawP = (window.dbCache['sppg_pendinginan_data'] || {})[today], da = arr(rawP && !Array.isArray(rawP) && rawP.rows ? rawP.rows : rawP), rows = PEND_STATIC_ROWS.length, dT = 0, dM = 0;
+          var rawP = (window.dbCache['sppg_pendinginan_data'] || {})[today], da = arr(rawP && !Array.isArray(rawP) && rawP.rows ? rawP.rows : rawP);
+          var pBatches = (rawP && !Array.isArray(rawP) && rawP.meta && parseInt(rawP.meta.batches, 10)) || (da.length ? Math.ceil(da.length / PEND_JENIS.length) : PEND_DEFAULT_BATCH);
+          var pRows = pendStaticRows(pBatches), rows = pRows.length, dT = 0, dM = 0;
           for (var r = 0; r < rows; r++) {
-            var j = PEND_STATIC_ROWS[r];
+            var j = pRows[r];
             if (menuOf(j.key) === '-') continue;
             ['fm', 'fs'].forEach(function (f) { dT++; if (!has(da[r] && da[r][f])) dM++; });
           }
