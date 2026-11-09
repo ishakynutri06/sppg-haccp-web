@@ -419,6 +419,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <button id="nav-pemorsian" onclick="switchTab('pemorsian')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">⚖️</span> <span>Pemorsian & Berat (FM-SGR-SPPG-06.01)</span></button>
         <button id="nav-suhu-ruangan" onclick="switchTab('suhu-ruangan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🌡️</span> <span>Pemantauan Suhu (FM-SGR-SPPG-03.05)</span></button>
         <button id="nav-pendinginan" onclick="switchTab('pendinginan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">❄️</span> <span>Pemantauan di Cooling Area (FM-SGR-SPPG-05.03)</span></button>
+        <button id="nav-uji-organoleptik" onclick="switchTab('uji-organoleptik')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍽️</span> <span>Uji Organoleptik &amp; Suhu Masak (FM-SGR-SPPG-05.01)</span></button>
         <button id="nav-inspeksi-silang" onclick="switchTab('inspeksi-silang')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🛡️</span> <span>Kontaminasi Silang (FM-SGR-SPPG-21.01)</span></button>
         <button id="nav-inspeksi-alergen" onclick="switchTab('inspeksi-alergen')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white shadow-lg shadow-amber-900/40 hover:-translate-y-0.5 transition-all duration-300 border border-amber-500/50"><span class="text-base drop-shadow-md">⚠️</span> <span>Manajemen Alergen (FM-SGR-SPPG-22.01)</span></button>
         <button id="nav-backup-data" onclick="switchTab('backup-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">💾</span> <span>Backup & Restore Data</span></button>
@@ -1027,9 +1028,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               <input type="text" id="sd_f_nama" placeholder="Nama peserta didik..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" autocomplete="off">
             </div>
             <div>
-              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Asal Sekolah:</label>
-              <input type="text" id="sd_f_sekolah" list="sd_dl_sekolah" placeholder="Nama sekolah..." class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" autocomplete="off">
-              <datalist id="sd_dl_sekolah"></datalist>
+              <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Asal Sekolah / Posyandu:</label>
+              <select id="sd_f_sekolah" onchange="sdOnSekolahPick(this.value)" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer"></select>
+              <div id="sd_sekolah_sync" class="mt-1 text-[9px] font-semibold leading-snug text-slate-500"></div>
             </div>
             <div>
               <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Jenjang / Kelompok:</label>
@@ -1373,6 +1374,79 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       </div>
     </section>
 
+    <!-- UJI ORGANOLEPTIK DAN SUHU MEMASAK (FM-SGR-SPPG-05.01) -->
+    <section id="sec-uji-organoleptik" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
+      <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
+          <div>
+            <div class="text-[10px] font-extrabold text-emerald-600 tracking-widest uppercase bg-emerald-50 w-fit px-2 py-0.5 rounded border border-emerald-200">Keamanan Pangan · HACCP</div>
+            <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">🍽️ UJI ORGANOLEPTIK DAN SUHU MEMASAK (FM-SGR-SPPG-05.01)</h2>
+            <p class="text-[11px] font-bold text-slate-500 mt-1">No. Dokumen <span class="text-slate-700">FM-SGR-SPPG-05.01</span> · No. Revisi <span class="text-slate-700">00</span> · Tanggal <span class="text-slate-700">26 Oktober 2026</span></p>
+          </div>
+          <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+            <button type="button" onclick="exportUjiOrganoleptikExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button>
+            <button type="button" onclick="exportUjiOrganoleptikWord()" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button>
+            <button type="button" onclick="saveUjiOrganoleptik()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">💾 Simpan Uji Organoleptik</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div>
+            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Uji:</label>
+            <input type="date" id="uji_tanggal" onchange="onUjiDateChange()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Menu Otomatis dari Siklus Menu 20 Hari:</label>
+            <div id="uji_siklus_info" class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-[11px] font-semibold text-emerald-900 leading-snug">Pilih tanggal uji.</div>
+            <p class="text-[10px] text-slate-400 mt-2">Produk, Warna, Tekstur, Rasa, dan Aroma terisi otomatis dari siklus menu. Anda cukup mengisi <b>Waktu</b>, <b>Suhu Inti</b>, dan <b>Keterangan</b>. Bukti foto diunggah langsung pada kolom <b>Bukti Foto</b> di setiap baris. Semua kolom tetap bisa diedit.</p>
+            <datalist id="uji_produk_list"></datalist>
+          </div>
+        </div>
+
+        <div class="md:hidden text-[10px] text-slate-400 italic flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+
+        <div id="wrapper_uji_organoleptik" class="space-y-6">
+          <div id="uji_menus_wrapper" class="space-y-5"></div>
+
+          <div class="mt-8 overflow-x-auto">
+            <table class="w-full text-xs border-collapse min-w-[700px]">
+              <thead>
+                <tr class="bg-slate-100 font-bold text-slate-700">
+                  <th class="p-3 border border-slate-300 w-1/2" colspan="2">RELAWAN PENGOLAHAN</th>
+                  <th class="p-3 border border-slate-300 w-1/2" colspan="2">PENGAWAS GIZI</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-3 border border-slate-300 w-28 font-bold text-slate-600">Nama</td>
+                  <td class="p-2 border border-slate-300"><input type="text" id="uji_relawan_nama" placeholder="Nama..." class="w-full text-center border-0 bg-transparent font-bold focus:ring-0"></td>
+                  <td class="p-3 border border-slate-300 w-28 font-bold text-slate-600">Nama</td>
+                  <td class="p-2 border border-slate-300"><input type="text" id="uji_pengawas_nama" placeholder="Nama..." class="w-full text-center border-0 bg-transparent font-bold focus:ring-0"></td>
+                </tr>
+                <tr>
+                  <td class="p-3 border border-slate-300 font-bold text-slate-600">Tanda Tangan</td>
+                  <td class="p-2 border border-slate-300 h-24 align-bottom"><input type="text" id="uji_relawan_ttd" placeholder="Tanda tangan..." class="w-full text-center border-0 bg-transparent font-bold focus:ring-0"></td>
+                  <td class="p-3 border border-slate-300 font-bold text-slate-600">Tanda Tangan</td>
+                  <td class="p-2 border border-slate-300 h-24 align-bottom"><input type="text" id="uji_pengawas_ttd" placeholder="Tanda tangan..." class="w-full text-center border-0 bg-transparent font-bold focus:ring-0"></td>
+                </tr>
+                <tr>
+                  <td class="p-3 border border-slate-300 font-bold text-slate-600">Tanggal</td>
+                  <td class="p-2 border border-slate-300"><input type="date" id="uji_relawan_tgl" class="w-full text-center border-0 bg-transparent font-bold focus:ring-0"></td>
+                  <td class="p-3 border border-slate-300 font-bold text-slate-600">Tanggal</td>
+                  <td class="p-2 border border-slate-300"><input type="date" id="uji_pengawas_tgl" class="w-full text-center border-0 bg-transparent font-bold focus:ring-0"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- BACKUP DATA -->
     <section id="sec-backup-data" class="tab-content hidden space-y-6">
       <div class="flex items-center justify-between">
@@ -1510,7 +1584,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     // DATA RINGAN (menu, bahan, frekuensi, alergen) -> dimuat di awal, layar loading menunggu ini saja.
     const keys = [
       'sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map',
-      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat'
+      'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat',
+      'sppg_organoleptik_ref'
     ];
 
     let loadedCount = 0;
@@ -1557,7 +1632,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     // Ambil SEMUA data berat sekali (dipakai untuk Backup lengkap)
     window.fbGetHeavyAll = async () => {
         const out = {};
-        for (const k of ['sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen']) out[k] = await get(ref(db, k)).then(x => x.val());
+        for (const k of ['sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen', 'sppg_uji_organoleptik']) out[k] = await get(ref(db, k)).then(x => x.val());
         return out;
     };
   </script>
@@ -2052,6 +2127,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       wrapper_suhu:                { nama: 'SUHU RUANGAN',            foto: true,  tgl: '#suhu_tanggal' },
       wrapper_pemorsian:           { nama: 'PEMORSIAN',               foto: true,  siklus: 'selectSiklusPemorsian' },
       wrapper_pendinginan:         { nama: 'PEMANTAUAN COOLING AREA', foto: true, siklus: 'selectSiklusPendinginan' },
+      wrapper_uji_organoleptik:    { nama: 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', foto: true, tgl: '#uji_tanggal' },
       wrapper_inspeksi_silang:     { nama: 'KONTAMINASI SILANG',      tgl: '#ks_tanggal' },
       'sec-inspeksi-alergen':      { nama: 'MANAJEMEN ALERGEN',       tgl: '#al_tanggal' },
       siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU 20 HARI' },
@@ -2166,7 +2242,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       m.classList.remove('flex');
       if (exportModeResolver) { const r = exportModeResolver; exportModeResolver = null; r(v); }
     }
-    const EXPORT_PHOTO_WRAPPERS = ['wrapper_pemorsian', 'wrapper_suhu', 'wrapper_pendinginan'];
+    const EXPORT_PHOTO_WRAPPERS = ['wrapper_pemorsian', 'wrapper_suhu', 'wrapper_pendinginan', 'wrapper_uji_organoleptik'];
     // Foto di Word: tetap 2x3 cm / 3x2 cm, tetapi sel dibuat lebih besar dengan ruang di tepi
     // sehingga foto berada DI DALAM garis tabel (tidak menempel / melewati garis).
     function exportWordPhotoImgStyle(n) {
@@ -3646,6 +3722,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         if (tabId === 'inspeksi-silang') renderInspeksiSilangTable();
         if (tabId === 'sasaran-didik') renderSasaran();
         if (tabId === 'pendinginan') initPendinginan();
+        if (tabId === 'uji-organoleptik') initUjiOrganoleptik();
       }
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('nav-active', b.id === 'nav-' + tabId));
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.scrollTop = 0;
@@ -4814,13 +4891,14 @@ function renderSuhuTable() {
     // =====================================================================
     // BACKUP / RESTORE DATABASE
     // =====================================================================
-    const BK_LIGHT = ['sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map', 'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat'];
-    const BK_HEAVY = ['sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen', 'sppg_pendinginan_data'];
+    const BK_LIGHT = ['sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map', 'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat', 'sppg_organoleptik_ref'];
+    const BK_HEAVY = ['sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen', 'sppg_pendinginan_data', 'sppg_uji_organoleptik'];
     const BK_LABEL = {
       sppg_master_bahan_weeks: 'Master Bahan', sppg_siklus_menu_weeks: 'Siklus Menu', sppg_frequency_map: 'Frekuensi Bahan (ringkas)',
       sppg_frequency_details: 'Frekuensi Bahan (detail)', sppg_allergens_found: 'Daftar Alergen', sppg_siklus_menu_matrix: 'Matriks Siklus Menu',
       sppg_sasaran_didik: 'Sasaran Peserta Didik', sppg_penerima_manfaat: 'Database Penerima Manfaat', sppg_pemorsian_data: 'Log Pemorsian', sppg_log_suhu: 'Log Suhu Ruangan',
-      sppg_log_silang: 'Log Kontaminasi Silang', sppg_log_alergen: 'Log Inspeksi Alergen', sppg_pendinginan_data: 'Log Pendinginan'
+      sppg_log_silang: 'Log Kontaminasi Silang', sppg_log_alergen: 'Log Inspeksi Alergen', sppg_pendinginan_data: 'Log Pendinginan',
+      sppg_uji_organoleptik: 'Log Uji Organoleptik & Suhu Masak', sppg_organoleptik_ref: 'Database Acuan Organoleptik (49 Produk)'
     };
     const BK_LS = 'sppg_last_backup';
 
@@ -5769,6 +5847,17 @@ function renderSuhuTable() {
         window.fbSet('sppg_siklus_menu_weeks', DEFAULT_SIKLUS_MENU_20_DAYS);
         syncSiklusMenuData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS)));
       }
+
+      // Database acuan uji organoleptik (49 produk) - diunggah sekali ke Firebase bila belum ada
+      const ujiRefNow = window.dbCache['sppg_organoleptik_ref'];
+      if (!ujiRefNow || !Object.keys(ujiRefNow).length) {
+        const seed = (window.UJI_REF_DEFAULT || []).slice();
+        if (seed.length) {
+          window.dbCache['sppg_organoleptik_ref'] = seed;
+          window.fbSet('sppg_organoleptik_ref', seed);
+        }
+      }
+      if (typeof window.initUjiOrganoleptik === 'function') window.initUjiOrganoleptik();
       
       initSuhuModule();
       
@@ -6424,6 +6513,941 @@ function renderSuhuTable() {
 
   <script>
     // =====================================================================
+    // MODUL: UJI ORGANOLEPTIK DAN SUHU MEMASAK (FM-SGR-SPPG-05.01)
+    // Acuan produk : sppg_organoleptik_ref (49 produk dari UJI ORGANOLEPTIK.xlsx)
+    // Log formulir : sppg_uji_organoleptik/{YYYY-MM-DD} = { meta, menus:{KARBO,PH,PN,SAYUR,BUAH,SUSU}, fotos }
+    // =====================================================================
+    const UJI_DOC_CODE = 'FM-SGR-SPPG-05.01';
+    const UJI_PATH = 'sppg_uji_organoleptik';
+    const UJI_REF_PATH = 'sppg_organoleptik_ref';
+    const UJI_REF_DEFAULT = [{"no":"1","nama":"NASI PUTIH","warna":"PUTIH HINGGA PUTIH KEKUNINGAN","tekstur":"PULEN, LEMBUT ATAU PERA TERGANTUNG JENIS BERAS","rasa":"TAWAR","aroma":"AROMA KHAS BERAS MATANG"},{"no":"2","nama":"NASI KUNING","warna":"KUNING","tekstur":"BUTIRAN NASI TERPISAH, TIDAK LEMBEK, SEDIKIT BERMINYAK","rasa":"GURIH","aroma":"HARUM KHAS AROMATIK"},{"no":"3","nama":"NASI UDUK","warna":"PUTIH","tekstur":"PULEN","rasa":"GURIH, ASIN, MANIS","aroma":"HARUM KHAS AROMATIK"},{"no":"4","nama":"TAHU GORENG","warna":"KUNING KEEMASAN","tekstur":"RENYAH","rasa":"GURIH","aroma":"KETUMBAR"},{"no":"5","nama":"TAHU KARI","warna":"KUNING KEMERAH MERAHAN","tekstur":"TAHU LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KARI"},{"no":"6","nama":"TAHU KECAP","warna":"COKELAT MENGKILAP","tekstur":"KENYAL SEDIKIT,LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"7","nama":"TAHU KRISPI","warna":"KUNING KEEMASAN MERATA PADA PERMUKAAN","tekstur":"RENYAH DAN KRISPI DI BAGIAN LUAR, LEMBUT DAN JUICY DI BAGIAN DALAM","rasa":"GURIH","aroma":"HARUM BAWANG PUTIH DAN KETUMBAR"},{"no":"8","nama":"TAHU GORENG MARINASI","warna":"KUNING KEEMASANMERATA PADA PERMUKAAN","tekstur":"RENYAH DAN KRISPI DI BAGIAN LUAR, LEMBUT DAN JUICY DI BAGIAN DALAM","rasa":"GURIH ALAMI DARI REMPAH","aroma":"HARUM TAHU"},{"no":"9","nama":"SEMUR TAHU","warna":"KUNING KE MERAH MERAHAN","tekstur":"TAHU LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"10","nama":"TEMPE KRISPI","warna":"KUNING KEEMASAN MERATA PADA PERMUKAAN","tekstur":"SUPER KRISPI","rasa":"GURIH DENGAN AROMA BAWANG PUTIH","aroma":"AROMA BAWANG PUTIH DAN KETUMBAR"},{"no":"11","nama":"TEMPE KECAP","warna":"COKELAT MENGKILAP","tekstur":"KENYAL SEDIKIT,LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"12","nama":"TEMPE MENDOANG","warna":"KUNING KEEMASAN","tekstur":"LEMBUT,LEMBEK, TIDAK KERING DAN KRISPI","rasa":"GURIH, ASIN","aroma":"KHAS TEMPE MENDOANG"},{"no":"13","nama":"TEMPE GORENG ORIGINAL","warna":"KUNING  KECOKLATAN","tekstur":"RENYAH DI LUAR,LEMBUT DAN EMPUK DI DALAM","rasa":"GURIH, KHAS TEMPE","aroma":"HARUM KHAS TEMPE GORENG"},{"no":"14","nama":"Tempe Goreng Ungkep","warna":"Kuning keemasan (golden yellow)","tekstur":"Sedikit remah di luar, lembut dan empuk di dalam","rasa":"Gurih, berbumbu hingga ke dalam","aroma":"Harum khas rempah ungkep (bawang, ketumbar, kunyit)"},{"no":"15","nama":"Saus Kacang Tanah","warna":"Coklat muda / Coklat kekuningan","tekstur":"Kental, halus (creamy)","rasa":"Gurih, manis, legit","aroma":"Harum khas kacang tanah sangrai"},{"no":"16","nama":"Ikan Goreng Tepung","warna":"Kuning keemasan (golden brown)","tekstur":"Renyah dan garing di luar, lembut dan empuk di dalam","rasa":"Gurih, asin, khas ikan","aroma":"Harum khas ikan goreng dan bumbu rempah"},{"no":"17","nama":"Ayam Goreng","warna":"Kuning keemasan (golden brown)","tekstur":"Daging empuk, lembut, dan tidak kering","rasa":"Gurih, asin, dan berbumbu hingga ke dalam","aroma":"Harum khas rempah (kunyit, bawang, dan salam)"},{"no":"18","nama":"Ayam Goreng Kecap","warna":"Coklat tua","tekstur":"Juicy","rasa":"Manis, asin, gurih","aroma":"Harum kecap manis"},{"no":"19","nama":"Ayam Gulai","warna":"Kuning kecoklatan dengan kuah kental berwarna oranye/kuning","tekstur":"Daging empuk, kuah kental dan creamy","rasa":"Gurih, sedikit pedas, kaya rempah","aroma":"Harum khas rempah gulai (serai, daun jeruk, kayu manis)"},{"no":"20","nama":"Ayam Goreng Kremes","warna":"Kuning keemasan/golden brown merata pada permukaan","tekstur":"Juicy dan tekstur luar nya crispy","rasa":"Gurih, asam, manis","aroma":"Khas ayam goreng"},{"no":"21","nama":"Ayam Kripspi","warna":"Kuning keemasan/golden brown merata pada permukaan","tekstur":"Renyah dan crispy di bagian luar, lembut dan juicy di bagian dalam","rasa":"Gurih, asin","aroma":"Khas ayam goreng berbumbu dan tepung goreng"},{"no":"22","nama":"Ayam Palekko","warna":"Kuning keemasan","tekstur":"Juicy","rasa":"Gurih, asam, manis","aroma":"Khas aromatik"},{"no":"23","nama":"Ayam Lada Hitam","warna":"Coklat tua kehitaman mengkilap","tekstur":"Daging empuk, saus kental dan licin","rasa":"Gurih, sedikit pedas, ada sensasi hangat dari lada","aroma":"Harum khas lada hitam dan bawang bombay"},{"no":"24","nama":"Ayam Popcorn","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, lembut di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ayam goreng tepung dan rempah"},{"no":"25","nama":"Ayam Serundeng","warna":"Ayam kuning keemasan, serundeng coklat keemasan","tekstur":"Daging ayam empuk dan juicy, serundeng kering dan renyah","rasa":"Gurih, manis, dan kaya rempah","aroma":"Harum khas kelapa sangrai dan rempah (serai, daun jeruk, lengkuas)"},{"no":"26","nama":"Nuget Ayam","warna":"Kuning keemasan (golden brown)","tekstur":"Renyah dan garing di luar, lembut dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ayam goreng dan tepung panir"},{"no":"27","nama":"Sempol Ayam","warna":"Kuning keemasan (golden brown)","tekstur":"Kenyal, lembut, dan tidak keras","rasa":"Gurih, asin, dengan aroma bawang dan ayam yang khas","aroma":"Harum khas gorengan telur dan bawang putih"},{"no":"28","nama":"Ayam Suir","warna":"Kuning kecoklatan merata pada serat ayam","tekstur":"Empuk, berserat halus, mudah dikunyah, tidak kering (sedikit berminyak/lembap)","rasa":"Gurih, manis, dan berbumbu hingga ke dalam serat","aroma":"Harum khas rempah (daun jeruk, serai, dan kunyit)"},{"no":"29","nama":"Telur Ayam Balado","warna":"Merah cerah mengkilap dari cabai merah, merata seluruh permukaan telur","tekstur":"Telur kenyal","rasa":"Manis, asin, gurih","aroma":"Harum cabai merah yang ditumis matang, bawang, dan tomat khas balado"},{"no":"30","nama":"Telur Ayam Kecap","warna":"Coklat tua kehitaman mengkilap","tekstur":"Telur empuk, kuah kental dan lengket","rasa":"Manis, gurih, dan sedikit asin","aroma":"Harum khas kecap manis dan rempah (daun salam, serai)"},{"no":"31","nama":"Telur Ceplok","warna":"Putih telur putih kekuningan, kuning telur kuning keemasan","tekstur":"Putih telur lembut dengan tepi sedikit garing, kuning telur padat dan matang","rasa":"Gurih alami, asin (berbumbu)","aroma":"Harum khas telur goreng"},{"no":"32","nama":"Telur Goreng Saus Tomat","warna":"Merah kecoklatan mengkilap (dari saus tomat)","tekstur":"Telur empuk, saus kental dan licin","rasa":"Gurih, manis, dan sedikit asam segar khas tomat","aroma":"Harum khas saus tomat dan tumisan bawang"},{"no":"33","nama":"Dimsum","warna":"Putih kekuningan dengan bintik oranye (dari wortel)","tekstur":"Lembut, kenyal, dan tidak keras","rasa":"Gurih, manis alami dari wortel, dan berbumbu","aroma":"Harum khas ayam, bawang putih, dan sedikit aroma minyak wijen"},{"no":"34","nama":"Ayam Goreng Mentega","warna":"Coklat keemasan dengan balutan saus coklat mengkilap","tekstur":"Daging empuk, saus kental dan licin, sedikit renyah di bagian luar","rasa":"Gurih, manis, dan rich (kaya) aroma mentega","aroma":"Harum khas mentega/margarin dan tumisan bawang bombay"},{"no":"35","nama":"Udang Asam Manis","warna":"Merah kecoklatan atau oranye mengkilap","tekstur":"Udang kenyal dan empuk (tidak alot), saus kental, sayuran sedikit renyah (crunchy)","rasa":"Dominan manis dan asam segar, gurih, pedas sangat ringan atau tidak pedas","aroma":"Harum khas saus tomat dan tumisan bawang"},{"no":"36","nama":"Udang Krispi","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, daging udang kenyal dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas udang goreng tepung dan bawang putih"},{"no":"37","nama":"Udang Rebus Biasa","warna":"Orange kemerahan atau merah muda cerah (tidak pucat/keabu-abuan)","tekstur":"Daging kenyal, padat, dan empuk (tidak lembek atau hancur)","rasa":"Gurih alami, manis, dan segar","aroma":"Harum segar khas udang rebus dan rempah (serai, daun salam)"},{"no":"38","nama":"Ikan Goreng","warna":"Kuning keemasan","tekstur":"Daging empuk, lembut, dan mudah lepas dari tulang","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ikan goreng dan bumbu rempah"},{"no":"39","nama":"Ikan Bandeng","warna":"Putih kekuningan atau coklat keemasan (tergantung metode masak)","tekstur":"Daging empuk, lembut, dan halus","rasa":"Gurih, manis alami, dan tidak amis","aroma":"Harum segar khas ikan, tidak berbau amis"},{"no":"40","nama":"Ikan Rebus","warna":"Putih kekuningan atau sesuai jenis ikan","tekstur":"Daging sangat empuk, lembut, dan mudah hancur","rasa":"Gurih alami, segar, dan tidak amis","aroma":"Harum segar khas rempah (serai, daun salam, jahe)"},{"no":"41","nama":"Ikan Goreng Krispi","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, daging ikan lembut dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ikan goreng tepung dan bawang putih"},{"no":"42","nama":"Tumis Wortel Sawi Putih","warna":"Oranye cerah (wortel) dan hijau tua mengkilap (sawi hijau)","tekstur":"Wortel sedikit renyah, sawi hijau layu namun tidak lembek","rasa":"Gurih, manis alami wortel, dan sedikit segar pahit khas sawi","aroma":"Harum khas tumisan bawang dan sayuran"},{"no":"43","nama":"Lalapan Selada Timun","warna":"Hijau segar (selada) dan hijau muda (timun)","tekstur":"Sangat renyah, segar, dan berair","rasa":"Segar, manis alami, dan sedikit sepat (timun)","aroma":"Harum segar khas sayuran mentah"},{"no":"44","nama":"Tumis Jagung Sawi Putih","warna":"Kuning cerah (jagung) dan putih kehijauan (sawi putih)","tekstur":"Jagung sedikit renyah dan juicy (berair), sawi putih lembut","rasa":"Manis alami dari jagung, gurih, dan segar","aroma":"Harum khas tumisan bawang dan jagung manis"},{"no":"45","nama":"Mix Vegetables","warna":"Warna-warni (orange, hijau, kuning, putih) yang cerah dan menarik","tekstur":"Bervariasi (wortel dan buncis sedikit renyah, kentang lembut)","rasa":"Gurih, manis alami dari sayuran, dan segar","aroma":"Harum khas sayuran segar dan tumisan bawang"},{"no":"46","nama":"Tumis Wortel Labu Siam","warna":"Oranye (wortel) dan putih kehijauan (labu siam) yang cerah","tekstur":"Lembut dan sedikit renyah, tidak lemek","rasa":"Gurih, manis alami, dan segar","aroma":"Harum khas tumisan bawang dan sayuran segar"},{"no":"47","nama":"Sayur Sop","warna":"Sayuran masih segar","tekstur":"Sayuran empuk namun tetap renyah saat dikunyah","rasa":"Gurih, sedikit manis, dan segar khas sayuran","aroma":"Aroma segar khas sayuran"},{"no":"48","nama":"Tumis Kembang Kol Buncis","warna":"Kuah bening kekuningan dengan warna sayuran yang tetap cerah","tekstur":"Sayuran empuk namun tetap segar dan tidak terlalu lunak","rasa":"Gurih, ringan, dan segar dengan cita rasa khas sayuran dan kaldu","aroma":"Harum dari kaldu dan bumbu yang berpadu dengan aroma segar sayuran"},{"no":"49","nama":"AYAM BAKAR","warna":"Cokelat tua mengkilap dengan rona keemasan merata hasil karamelisasi kecap manis, gula merah, dan margarin. Bebas dari bercak hitam gosong berlebih (karbonisasi)","tekstur":"Daging bagian dalam ayam empuk, matang sempurna, dan berserat utuh. Permukaan luar terkaramelisasi dan sedikit lengket, tidak alot maupun terlalu kering","rasa":"Gurih dan manis yang seimbang dari paduan kaldu Knorr, garam, kecap manis, dan gula merah","aroma":"Dominan wangi khas ayam panggang dan gurih margarin, diperkaya aroma volatil rempah yang kuat dari serai, lengkuas, kunyit basah, dan jahe. Tidak terdeteksi bau amis"}];
+
+    window.UJI_REF_DEFAULT = UJI_REF_DEFAULT;
+    window.ujiDirty = false;
+    window.ujiSubscribedDate = null;
+    window.ujiLoadedRecordKey = null;
+    window.ujiInitialized = false;
+
+    function ujiEsc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function ujiNorm(s) {
+      return String(s == null ? '' : s).trim().replace(/\s+/g, ' ').toUpperCase();
+    }
+    function ujiProductKey(name) {
+      return ujiNorm(name).replace(/[.#$\[\]\/]/g, '_');
+    }
+    function ujiRefList() {
+      const v = window.dbCache && window.dbCache[UJI_REF_PATH];
+      let list = [];
+      if (Array.isArray(v)) list = v;
+      else if (v && typeof v === 'object') list = Object.values(v);
+      if (!list.length) list = UJI_REF_DEFAULT;
+      return list.filter(r => r && r.nama);
+    }
+    function ujiFindRef(name) {
+      const n = ujiNorm(name);
+      if (!n) return null;
+      const list = ujiRefList();
+      return list.find(r => ujiNorm(r.nama) === n)
+        || list.find(r => ujiNorm(r.nama).startsWith(n))
+        || list.find(r => ujiNorm(r.nama).includes(n))
+        || null;
+    }
+    function ujiSuggest(q) {
+      const n = ujiNorm(q);
+      const list = ujiRefList();
+      if (!n) return list.slice(0, 8);
+      const start = list.filter(r => ujiNorm(r.nama).startsWith(n));
+      const inc = list.filter(r => !ujiNorm(r.nama).startsWith(n) && ujiNorm(r.nama).includes(n));
+      return start.concat(inc).slice(0, 8);
+    }
+
+    // ---------- tanggal / menu aktif ----------
+    const UJI_MENU_BASE = [
+      { key: 'KARBO', label: 'Karbohidrat (Makanan Pokok)' },
+      { key: 'PH', label: 'Protein Hewani (Lauk Hewani)' },
+      { key: 'PN', label: 'Protein Nabati (Lauk Nabati)' },
+      { key: 'SAYUR', label: 'Sayur' },
+      { key: 'BUAH', label: 'Buah' }
+    ];
+    const UJI_MENU_ALL = UJI_MENU_BASE.concat([{ key: 'SUSU', label: 'Susu' }]);
+    const UJI_CAT_FALLBACK = {
+      KARBO: { warna: 'PUTIH HINGGA KEKUNINGAN', tekstur: 'PULEN / LEMBUT SESUAI JENIS', rasa: 'TAWAR / GURIH SESUAI MENU', aroma: 'KHAS BERAS / BAHAN UTAMA' },
+      PH: { warna: 'KUNING KEEMASAN / COKELAT SESUAI BUMBU', tekstur: 'EMPUK, TIDAK KERING', rasa: 'GURIH, BERBUMBU', aroma: 'HARUM KHAS REMPAH' },
+      PN: { warna: 'KUNING KEEMASAN / COKELAT', tekstur: 'RENYAH DI LUAR, LEMBUT DI DALAM', rasa: 'GURIH', aroma: 'HARUM KEDELAI / REMPAH' },
+      SAYUR: { warna: 'HIJAU / ORANYE SEGAR', tekstur: 'RENYAH / LEMBUT, TIDAK LEMBEK', rasa: 'GURIH, SEGAR', aroma: 'HARUM SAYURAN SEGAR' },
+      BUAH: { warna: 'SEGAR SESUAI JENIS BUAH', tekstur: 'RENYAH / BERAIR', rasa: 'MANIS / ASAM SEGAR', aroma: 'HARUM BUAH SEGAR' },
+      SUSU: { warna: 'PUTIH', tekstur: 'CAIR / LEMBUT', rasa: 'MANIS / GURIH', aroma: 'KHAS SUSU' }
+    };
+    window.ujiActiveCat = 'KARBO';
+
+    function ujiDateKey() {
+      const el = document.getElementById('uji_tanggal');
+      return el && /^\d{4}-\d{2}-\d{2}$/.test(el.value) ? el.value : '';
+    }
+    function ujiCatLabel(key) {
+      const m = UJI_MENU_ALL.find(x => x.key === key);
+      return m ? m.label : key;
+    }
+    function ujiCatFallback(key) {
+      return UJI_CAT_FALLBACK[key] || UJI_CAT_FALLBACK.KARBO;
+    }
+    function ujiRowArray(rows) {
+      if (Array.isArray(rows)) return rows;
+      if (rows && typeof rows === 'object') return Object.values(rows);
+      return [];
+    }
+
+    // ---------- siklus menu 20 hari ----------
+    function ujiSiklusInfo(dateKey) {
+      const weeks = (typeof getSuhuWeeks === 'function') ? getSuhuWeeks() : [];
+      const list = (typeof getSuhuDateKeyList === 'function') ? getSuhuDateKeyList(weeks) : [];
+      const idx = dateKey ? list.indexOf(dateKey) : -1;
+      return { weeks, list, idx, inCycle: idx !== -1 };
+    }
+    function ujiSiklusProducts(dateKey) {
+      const info = ujiSiklusInfo(dateKey);
+      const out = {};
+      if (!info.inCycle) return out;
+      UJI_MENU_ALL.forEach(m => {
+        let v = (typeof getSuhuMenuName === 'function') ? getSuhuMenuName(info.weeks, m.key, info.idx) : '';
+        v = String(v == null ? '' : v).trim();
+        out[m.key] = (v === '-' || v === '0') ? '' : v;
+      });
+      let s2 = (typeof getSuhuMenuName === 'function') ? String(getSuhuMenuName(info.weeks, 'SAYUR_2', info.idx) || '').trim() : '';
+      if (s2 === '-' || s2 === '0') s2 = '';
+      if (s2) out.SAYUR = out.SAYUR ? (out.SAYUR + ' + ' + s2) : s2;
+      return out;
+    }
+    function ujiSiklusText(dateKey) {
+      const info = ujiSiklusInfo(dateKey);
+      if (!info.inCycle) return '-';
+      const ds = info.list[info.idx];
+      const lbl = (typeof rptLongDate === 'function' && rptLongDate(ds)) || ds;
+      return 'Hari ke-' + (info.idx + 1) + ' (' + lbl + ')';
+    }
+    function ujiRenderSiklusInfo(dateKey) {
+      const el = document.getElementById('uji_siklus_info');
+      if (!el) return;
+      if (!dateKey) { el.textContent = 'Pilih tanggal uji.'; return; }
+      const info = ujiSiklusInfo(dateKey);
+      if (info.inCycle) {
+        const produk = ujiSiklusProducts(dateKey);
+        const filled = UJI_MENU_BASE.filter(m => produk[m.key]).length;
+        el.innerHTML = '<span class="font-black text-emerald-700">Siklus Menu Hari ke-' + (info.idx + 1) + '</span> · ' + ujiEsc(info.list[info.idx]) + ' · ' + filled + ' menu terisi otomatis';
+      } else {
+        el.innerHTML = '<span class="font-black text-amber-700">Tanggal di luar 20 hari siklus menu.</span> Pilih produk manual pada tiap menu, atau pilih tanggal di rentang siklus.';
+      }
+    }
+    function ujiRefForProduct(produk, catKey) {
+      const ref = ujiFindRef(produk);
+      if (ref) return Object.assign({}, ref, { _generic: false });
+      const f = ujiCatFallback(catKey);
+      return { nama: produk, warna: f.warna, tekstur: f.tekstur, rasa: f.rasa, aroma: f.aroma, _generic: true };
+    }
+    function ujiMenuKeysFor(products) {
+      const keys = UJI_MENU_BASE.map(m => m.key);
+      if (products && String(products.SUSU || '').trim()) keys.push('SUSU');
+      return keys;
+    }
+
+    // ---------- tampilan acuan ----------
+    function ujiFillDatalist() {
+      const dl = document.getElementById('uji_produk_list');
+      if (!dl) return;
+      dl.innerHTML = ujiRefList().map(r => '<option value="' + ujiEsc(r.nama) + '"></option>').join('');
+    }
+    function ujiRenderChips(cat) {
+      const box = document.getElementById('uji_chips_' + cat);
+      if (!box) return;
+      if (window.ujiActiveCat !== cat) { box.innerHTML = ''; return; }
+      const inp = document.getElementById('uji_produk_' + cat);
+      const items = ujiSuggest(inp ? inp.value : '').slice(0, 4);
+      box.innerHTML = items.map(r => '<button type="button" data-nama="' + ujiEsc(r.nama) + '" onclick="ujiPickProduct(\'' + cat + '\', this.dataset.nama)" class="text-[9px] font-bold px-2 py-1 rounded-lg bg-white border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition-colors">' + ujiEsc(r.nama) + '</button>').join('');
+    }
+    function ujiUpdateCatRef(cat) {
+      const inp = document.getElementById('uji_produk_' + cat);
+      const produk = inp ? inp.value.trim() : '';
+      const ref = ujiRefForProduct(produk, cat);
+      const put = (suffix, val) => { const el = document.getElementById('uji_ref_' + cat + '_' + suffix); if (el) el.textContent = val || '-'; };
+      put('warna', ref.warna); put('tekstur', ref.tekstur);
+      put('rasa', ref.rasa); put('aroma', ref.aroma);
+      const st = document.getElementById('uji_ref_status_' + cat);
+      if (st) st.textContent = !produk ? 'Acuan kategori' : (ref._generic ? 'Acuan kategori (produk belum ada di DB acuan)' : 'Acuan: ' + ref.nama + ' · ' + ujiRefList().length + ' produk');
+      ujiRenderChips(cat);
+      return ref;
+    }
+
+    // ---------- kartu menu & baris tabel ----------
+    const UJI_INP = 'w-full border-2 border-slate-200 rounded-lg p-2 text-[11px] font-semibold text-slate-700 bg-white';
+    function ujiRowHtml(i, d, cat) {
+      d = d || {};
+      const kep = d.keputusan || '';
+      const manual = kep ? ' data-manual="1"' : '';
+      const fotoId = 'uji_foto_' + cat + '_' + i;
+      return '<tr data-idx="' + i + '" class="hover:bg-emerald-50/40">'
+        + '<td data-label="No" class="uji-no p-2 text-center font-black text-slate-500 bg-slate-50 border border-slate-200">' + (i + 1) + '</td>'
+        + '<td data-label="Waktu (Jam)" class="p-1.5 border border-slate-200"><input type="time" class="' + UJI_INP + ' uji-jam" value="' + ujiEsc(d.jam || '') + '"></td>'
+        + '<td data-label="Batch/Panci Ke" class="p-1.5 border border-slate-200"><input type="number" min="1" inputmode="numeric" class="' + UJI_INP + ' uji-batch text-center" value="' + ujiEsc(d.batch || '') + '" placeholder="Ke-"></td>'
+        + '<td data-label="Suhu Inti (°C)" class="p-1.5 border border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="' + UJI_INP + ' uji-suhu text-center" value="' + ujiEsc(d.suhu || '') + '" placeholder="°C" oninput="ujiRowCalc(this.closest(\'tr\'))"></td>'
+        + '<td data-label="Tekstur" class="p-1.5 border border-slate-200"><textarea rows="2" class="' + UJI_INP + ' uji-tekstur resize-y min-h-[54px]" placeholder="Tekstur...">' + ujiEsc(d.tekstur || '') + '</textarea></td>'
+        + '<td data-label="Rasa" class="p-1.5 border border-slate-200"><textarea rows="2" class="' + UJI_INP + ' uji-rasa resize-y min-h-[54px]" placeholder="Rasa...">' + ujiEsc(d.rasa || '') + '</textarea></td>'
+        + '<td data-label="Aroma" class="p-1.5 border border-slate-200"><textarea rows="2" class="' + UJI_INP + ' uji-aroma resize-y min-h-[54px]" placeholder="Aroma...">' + ujiEsc(d.aroma || '') + '</textarea></td>'
+        + '<td data-label="Warna" class="p-1.5 border border-slate-200"><textarea rows="2" class="' + UJI_INP + ' uji-warna resize-y min-h-[54px]" placeholder="Warna...">' + ujiEsc(d.warna || '') + '</textarea></td>'
+        + '<td data-label="Keputusan" class="p-1.5 border border-slate-200"><select class="' + UJI_INP + ' uji-keputusan text-center font-black"' + manual + ' onchange="this.dataset.manual=\'1\';ujiRowCalc(this.closest(\'tr\'))"><option value="">-</option><option value="LAYAK"' + (kep === 'LAYAK' ? ' selected' : '') + '>LAYAK</option><option value="DITOLAK"' + (kep === 'DITOLAK' ? ' selected' : '') + '>DITOLAK</option></select></td>'
+        + '<td data-label="Bukti Foto" class="uji-foto-cell p-1.5 border border-slate-200 text-center align-middle"><div class="uji-foto-slot">' + buildUjiPhotoHtml(fotoId, d.foto || '') + '</div></td>'
+        + '<td data-label="Keterangan" class="p-1.5 border border-slate-200"><input type="text" class="' + UJI_INP + ' uji-ket" value="' + ujiEsc(d.ket || '') + '" placeholder="Keterangan..."></td>'
+        + '</tr>';
+    }
+    function ujiRenderCatRows(cat, rows) {
+      const tbody = document.getElementById('tbody_uji_' + cat);
+      if (!tbody) return;
+      let arr = ujiRowArray(rows);
+      if (!arr.length) arr = [{}, {}];
+      tbody.innerHTML = arr.map((d, i) => ujiRowHtml(i, d, cat)).join('');
+      if (tbody.dataset.dirtyBound !== '1') {
+        tbody.dataset.dirtyBound = '1';
+        tbody.addEventListener('input', e => { if (e.isTrusted) window.ujiDirty = true; }, true);
+        tbody.addEventListener('change', e => { if (e.isTrusted) window.ujiDirty = true; }, true);
+      }
+      ujiNumberRows(cat);
+      tbody.querySelectorAll('tr').forEach(tr => ujiRowCalc(tr));
+    }
+    function ujiRenderMenus(menus) {
+      const wrap = document.getElementById('uji_menus_wrapper');
+      if (!wrap) return;
+      menus = menus || {};
+      const keys = ujiMenuKeysFor(menus);
+      let html = '';
+      keys.forEach((key, n) => {
+        const d = menus[key] || {};
+        html += '<div class="uji-menu-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" data-uji-menu="' + key + '">'
+          + '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200">'
+          + '<div class="flex items-center gap-2">'
+          + '<span class="w-7 h-7 rounded-full bg-emerald-600 text-white text-[11px] font-black flex items-center justify-center shrink-0">' + (n + 1) + '</span>'
+          + '<div><div class="text-[11px] font-black text-slate-800 uppercase tracking-wider">' + ujiEsc(ujiCatLabel(key)) + '</div>'
+          + '<div class="text-[9px] text-slate-400">Menu otomatis dari Siklus Menu 20 Hari</div></div></div>'
+          + '<div class="flex items-center gap-1.5 hidden-print">'
+          + '<button type="button" onclick="ujiAddRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors">+ Tambah Batch</button>'
+          + '<button type="button" onclick="ujiDelRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 transition-colors">− Hapus Batch</button>'
+          + '</div></div>'
+          + '<div class="px-4 py-3 grid grid-cols-1 lg:grid-cols-2 gap-3">'
+          + '<div>'
+          + '<label class="block font-extrabold text-slate-600 mb-1 uppercase tracking-wider text-[9px]">Nama Produk / Masakan</label>'
+          + '<input type="text" id="uji_produk_' + key + '" data-cat="' + key + '" list="uji_produk_list" autocomplete="off" onfocus="ujiActivateCat(\'' + key + '\')" oninput="onUjiCatInput(\'' + key + '\')" onchange="onUjiCatChange(\'' + key + '\')" placeholder="Ketik nama produk..." class="uji-produk w-full border-2 border-emerald-200 rounded-lg p-2 text-xs font-bold bg-emerald-50 text-emerald-900 uppercase" value="' + ujiEsc(d.produk || '') + '">'
+          + '<div id="uji_chips_' + key + '" class="flex flex-wrap gap-1 mt-1"></div>'
+          + '</div>'
+          + '<div class="uji-ref-panel hidden-print rounded-xl border border-emerald-200 bg-emerald-50/60 p-2">'
+          + '<div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] leading-tight text-slate-700">'
+          + '<div><span class="font-black text-amber-600">Warna:</span> <span id="uji_ref_' + key + '_warna">-</span></div>'
+          + '<div><span class="font-black text-blue-600">Tekstur:</span> <span id="uji_ref_' + key + '_tekstur">-</span></div>'
+          + '<div><span class="font-black text-rose-600">Rasa:</span> <span id="uji_ref_' + key + '_rasa">-</span></div>'
+          + '<div><span class="font-black text-emerald-600">Aroma:</span> <span id="uji_ref_' + key + '_aroma">-</span></div>'
+          + '</div>'
+          + '<div id="uji_ref_status_' + key + '" class="text-[9px] font-bold text-emerald-700 mt-1">-</div>'
+          + '</div></div>'
+          + '<div class="overflow-x-auto border-t border-slate-200">'
+          + '<table class="w-full text-xs text-left border-collapse" style="min-width:1480px">'
+          + '<thead class="bg-slate-300 text-slate-800 uppercase font-bold tracking-wider text-[10px]"><tr>'
+          + '<th class="p-2 text-center border border-slate-400 w-12">No</th>'
+          + '<th class="p-2 text-center border border-slate-400 w-24">Waktu (Jam)</th>'
+          + '<th class="p-2 text-center border border-slate-400 w-28">Batch/Panci Ke</th>'
+          + '<th class="p-2 text-center border border-slate-400 w-32">Suhu Inti (°C) (Min 60°C)</th>'
+          + '<th class="p-2 text-center border border-slate-400 min-w-[190px]">Tekstur</th>'
+          + '<th class="p-2 text-center border border-slate-400 min-w-[150px]">Rasa</th>'
+          + '<th class="p-2 text-center border border-slate-400 min-w-[190px]">Aroma</th>'
+          + '<th class="p-2 text-center border border-slate-400 min-w-[170px]">Warna</th>'
+          + '<th class="p-2 text-center border border-slate-400 w-32">Keputusan Layak/Ditolak</th>'
+          + '<th class="p-2 text-center border border-slate-400 w-32">Bukti Foto</th>'
+          + '<th class="p-2 text-center border border-slate-400 min-w-[150px]">Keterangan</th>'
+          + '</tr></thead><tbody id="tbody_uji_' + key + '" class="divide-y divide-slate-200"></tbody>'
+          + '</table></div></div>';
+      });
+      wrap.innerHTML = html;
+      keys.forEach(key => {
+        ujiRenderCatRows(key, (menus[key] || {}).rows);
+        ujiUpdateCatRef(key);
+        ujiMarkApplied(key);
+        const inp = document.getElementById('uji_produk_' + key);
+        if (inp && !inp.dataset.enterBound) {
+          inp.dataset.enterBound = '1';
+          inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
+        }
+      });
+    }
+    function ujiNumberRows(cat) {
+      const tbody = document.getElementById('tbody_uji_' + cat);
+      if (!tbody) return;
+      tbody.querySelectorAll('tr').forEach((tr, i) => {
+        const cell = tr.querySelector('.uji-no');
+        if (cell) cell.textContent = String(i + 1);
+      });
+    }
+    function ujiRowCalc(tr) {
+      if (!tr) return;
+      const suhuInp = tr.querySelector('.uji-suhu');
+      const sel = tr.querySelector('.uji-keputusan');
+      if (!suhuInp || !sel) return;
+      const s = parseFloat(suhuInp.value);
+      const below = !isNaN(s) && s < 60;
+      suhuInp.classList.toggle('border-rose-400', below);
+      suhuInp.classList.toggle('bg-rose-50', below);
+      suhuInp.classList.toggle('text-rose-700', below);
+      if (isNaN(s)) return;
+      if (sel.dataset.manual === '1') return;
+      sel.value = below ? 'DITOLAK' : 'LAYAK';
+    }
+    function ujiApplyRefToCat(cat, ref) {
+      if (!ref) return;
+      document.querySelectorAll('#tbody_uji_' + cat + ' tr').forEach(tr => {
+        const set = (cls, val) => { const el = tr.querySelector(cls); if (el) el.value = val || ''; };
+        set('.uji-tekstur', ref.tekstur);
+        set('.uji-rasa', ref.rasa);
+        set('.uji-aroma', ref.aroma);
+        set('.uji-warna', ref.warna);
+      });
+    }
+    function ujiMarkApplied(cat) {
+      const inp = document.getElementById('uji_produk_' + cat);
+      if (inp) inp.dataset.applied = ujiNorm(inp.value);
+    }
+    function ujiAddRow(cat) {
+      const tbody = document.getElementById('tbody_uji_' + cat);
+      if (!tbody) return;
+      const inp = document.getElementById('uji_produk_' + cat);
+      const ref = ujiRefForProduct(inp ? inp.value : '', cat);
+      const n = tbody.querySelectorAll('tr').length;
+      const tmp = document.createElement('tbody');
+      tmp.innerHTML = ujiRowHtml(n, {
+        batch: String(n + 1),
+        tekstur: ref.tekstur, rasa: ref.rasa, aroma: ref.aroma, warna: ref.warna
+      }, cat);
+      const tr = tmp.querySelector('tr');
+      tbody.appendChild(tr);
+      ujiNumberRows(cat);
+      ujiRowCalc(tr);
+      window.ujiDirty = true;
+      try { tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    }
+    function ujiDelRow(cat) {
+      const tbody = document.getElementById('tbody_uji_' + cat);
+      if (!tbody) return;
+      const trs = tbody.querySelectorAll('tr');
+      if (trs.length <= 1) { alert('Minimal 1 baris batch untuk setiap menu.'); return; }
+      const last = trs[trs.length - 1];
+      const hasData = Array.from(last.querySelectorAll('input, textarea, select')).some(el => String(el.value || '').trim() !== '');
+      if (hasData && !confirm('Hapus baris batch terakhir beserta isinya?')) return;
+      last.remove();
+      ujiNumberRows(cat);
+      window.ujiDirty = true;
+    }
+    function ujiCollectCatRows(cat) {
+      const out = [];
+      document.querySelectorAll('#tbody_uji_' + cat + ' tr').forEach(tr => {
+        const fi = tr.querySelector('.uji-foto-input');
+        out.push({
+          jam: tr.querySelector('.uji-jam').value,
+          batch: tr.querySelector('.uji-batch').value,
+          suhu: tr.querySelector('.uji-suhu').value,
+          tekstur: tr.querySelector('.uji-tekstur').value,
+          rasa: tr.querySelector('.uji-rasa').value,
+          aroma: tr.querySelector('.uji-aroma').value,
+          warna: tr.querySelector('.uji-warna').value,
+          keputusan: tr.querySelector('.uji-keputusan').value,
+          ket: tr.querySelector('.uji-ket').value,
+          foto: fi ? (fi.getAttribute('data-base64') || '') : ''
+        });
+      });
+      return out;
+    }
+    function ujiCollectMenus() {
+      const out = {};
+      document.querySelectorAll('#uji_menus_wrapper [data-uji-menu]').forEach(card => {
+        const key = card.getAttribute('data-uji-menu');
+        const inp = card.querySelector('.uji-produk');
+        const produk = inp ? inp.value.trim().replace(/\s+/g, ' ') : '';
+        const rows = ujiCollectCatRows(key);
+        const hasData = produk || rows.some(r => r.jam || r.batch || String(r.suhu).trim() !== '' || r.ket || r.keputusan);
+        if (hasData) out[key] = { produk, rows };
+      });
+      return out;
+    }
+
+    // ---------- dokumentasi foto per baris (di dalam tabel, pola modul Suhu/Pendinginan) ----------
+    function buildUjiPhotoHtml(id, b64) {
+      const img = b64
+        ? '<img src="' + b64 + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #10b981;cursor:pointer;" class="mx-auto shadow-sm" onclick="reviewPhoto(\'' + id + '\')" title="Klik gambar untuk review">'
+        : '';
+      const extra = b64
+        ? '<button type="button" onclick="reviewPhoto(\'' + id + '\')" class="text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>'
+          + '<button type="button" onclick="deleteUjiPhoto(\'' + id + '\')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>'
+        : '';
+      return '<div class="flex flex-col items-center gap-1">'
+        + '<div class="flex flex-wrap items-center justify-center gap-1">'
+        + '<button type="button" onclick="openPhotoSourcePicker(\'' + id + '\', \'camera\')" title="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>'
+        + '<button type="button" onclick="openPhotoSourcePicker(\'' + id + '\', \'gallery\')" title="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>'
+        + '</div>'
+        + '<input type="file" accept="image/*" id="' + id + '" class="hidden uji-foto-input" data-base64="' + ujiEsc(b64 || '') + '" onchange="handleUjiPhoto(this)">'
+        + img + extra
+        + '</div>';
+    }
+    function handleUjiPhoto(input) {
+      if (!input.files || !input.files.length) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          let w = img.width, h = img.height;
+          const MAX = 600;
+          if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+          else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(w); canvas.height = Math.round(h);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          if (typeof window.stampPhoto === 'function') window.stampPhoto(img, canvas, input);
+          const b64 = canvas.toDataURL('image/jpeg', 0.6);
+          const td = input.closest('td');
+          if (td) td.innerHTML = buildUjiPhotoHtml(input.id, b64);
+          window.ujiDirty = true;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+    function deleteUjiPhoto(id) {
+      if (!confirm('Apakah Anda yakin ingin menghapus bukti foto ini?')) return;
+      const input = document.getElementById(id);
+      if (!input) return;
+      const td = input.closest('td');
+      if (td) td.innerHTML = buildUjiPhotoHtml(id, '');
+      window.ujiDirty = true;
+    }
+
+    // Foto lama (3 slot harian) dipindahkan ke baris tabel agar tetap tampil setelah revisi.
+    function ujiDistributeLegacyPhotos(menus, fotos) {
+      const list = (fotos || []).filter(Boolean);
+      if (!list.length) return;
+      let n = 0;
+      ujiMenuKeysFor(menus).forEach(key => {
+        if (n >= list.length) return;
+        const m = menus[key];
+        if (!m || !m.rows || !m.rows.length) return;
+        if (!m.rows[0].foto) { m.rows[0].foto = list[n++]; }
+      });
+    }
+
+    // ---------- muat / simpan ----------
+    function ujiCatGuess(produk) {
+      const n = ujiNorm(produk);
+      if (!n) return '';
+      if (/^(NASI|BERAS|KENTANG|UBI|MIE|MI|BAKWAN|ROTI|JAGUNG)\b/.test(n)) return 'KARBO';
+      if (/SUSU/.test(n)) return 'SUSU';
+      if (/^(AYAM|IKAN|TELUR|UDANG|DAGING|SAPI|BAKSO|NUGET|NUGET|SEMPOL|DIMSUM)\b/.test(n)) return 'PH';
+      if (/^(TAHU|TEMPE|KACANG|PERKEDEL|BOLA|ONCOM)\b/.test(n)) return 'PN';
+      if (/(SAYUR|SOP|SOUP|TUMIS|LALAP|LALAPAN|CAPCAY|GADO|KANGKUNG|SAWI|BAYAM|LABU|BUNCIS|WORTEL|SALADA|SELADA|MENTIMUN|TIMUN|KOL|BROKOLI|TOGE)/.test(n)) return 'SAYUR';
+      if (/(JERUK|PISANG|APEL|MELON|SEMANGKA|PEPAYA|ANGGUR|BUAH|NANAS|MANGGA|SALAK)/.test(n)) return 'BUAH';
+      return '';
+    }
+    function ujiLegacyMeta(day) {
+      const keys = Object.keys(day || {}).filter(k => k !== 'meta' && k !== 'menus' && k !== 'fotos');
+      for (const k of keys) {
+        const rec = day[k];
+        if (rec && rec.meta) return rec.meta;
+      }
+      return null;
+    }
+    function ujiLegacyMenus(day, dateKey) {
+      const out = {};
+      const siklus = ujiSiklusProducts(dateKey);
+      const byProduk = {};
+      UJI_MENU_ALL.forEach(m => { if (siklus[m.key]) byProduk[ujiNorm(siklus[m.key])] = m.key; });
+      Object.keys(day || {}).forEach(k => {
+        if (k === 'meta' || k === 'menus' || k === 'fotos') return;
+        const rec = day[k];
+        if (!rec || !rec.rows) return;
+        const produk = String((rec.meta && rec.meta.produk) || '').trim();
+        const cat = byProduk[ujiNorm(produk)] || ujiCatGuess(produk);
+        if (!cat || out[cat]) return;
+        out[cat] = { produk, rows: ujiRowArray(rec.rows) };
+      });
+      return out;
+    }
+    function ujiBuildMenus(day, dateKey) {
+      const siklus = ujiSiklusProducts(dateKey);
+      let saved = {};
+      if (day && day.menus && typeof day.menus === 'object') {
+        Object.keys(day.menus).forEach(k => {
+          const m = day.menus[k] || {};
+          saved[k] = { produk: String(m.produk || '').trim(), rows: ujiRowArray(m.rows) };
+        });
+      } else {
+        saved = ujiLegacyMenus(day, dateKey);
+      }
+      const menus = {};
+      UJI_MENU_ALL.forEach(m => {
+        const key = m.key;
+        if (key === 'SUSU' && !String(siklus.SUSU || '').trim() && !saved.SUSU) return;
+        const rec = saved[key] || null;
+        const produk = rec ? String(rec.produk || '').trim() : String(siklus[key] || '').trim();
+        let rows = rec ? ujiRowArray(rec.rows) : [];
+        if (!rows.length) {
+          if (produk) {
+            const ref = ujiRefForProduct(produk, key);
+            const base = { tekstur: ref.tekstur, rasa: ref.rasa, aroma: ref.aroma, warna: ref.warna };
+            rows = [Object.assign({ batch: '1' }, base), Object.assign({ batch: '2' }, base)];
+          } else {
+            rows = [{}, {}];
+          }
+        }
+        menus[key] = { produk, rows };
+      });
+      return menus;
+    }
+    function ujiLoadRecord(fromRealtime) {
+      const dateKey = ujiDateKey();
+      if (!dateKey) return;
+      if (fromRealtime === true && window.ujiDirty) return;
+      if (fromRealtime !== true) window.ujiDirty = false;
+
+      if (window.ujiSubscribedDate !== dateKey) {
+        window.ujiSubscribedDate = dateKey;
+        if (window.subscribeItem) window.subscribeItem(UJI_PATH, dateKey);
+      }
+      window.ujiLoadedDate = dateKey;
+
+      const day = (window.dbCache[UJI_PATH] || {})[dateKey] || {};
+      const menus = ujiBuildMenus(day, dateKey);
+      const meta = (day.meta && typeof day.meta === 'object') ? day.meta : (ujiLegacyMeta(day) || {});
+
+      let fotos = Array.isArray(day.fotos) ? day.fotos : Object.values(day.fotos || {});
+      if (!fotos.length) {
+        const legacy = Object.keys(day).filter(k => k !== 'meta' && k !== 'menus' && k !== 'fotos').map(k => day[k]).find(r => r && r.fotos);
+        if (legacy) fotos = Array.isArray(legacy.fotos) ? legacy.fotos : Object.values(legacy.fotos || {});
+      }
+      ujiDistributeLegacyPhotos(menus, fotos);
+
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+      setVal('uji_relawan_nama', meta.relawan_nama);
+      setVal('uji_relawan_ttd', meta.relawan_ttd);
+      setVal('uji_relawan_tgl', meta.relawan_tgl || dateKey);
+      setVal('uji_pengawas_nama', meta.pengawas_nama);
+      setVal('uji_pengawas_ttd', meta.pengawas_ttd);
+      setVal('uji_pengawas_tgl', meta.pengawas_tgl || dateKey);
+
+      ujiRenderMenus(menus);
+      ujiRenderSiklusInfo(dateKey);
+    }
+
+    function ujiCollectMeta() {
+      const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+      return {
+        tanggal: ujiDateKey(),
+        relawan_nama: val('uji_relawan_nama'),
+        relawan_ttd: val('uji_relawan_ttd'),
+        relawan_tgl: val('uji_relawan_tgl'),
+        pengawas_nama: val('uji_pengawas_nama'),
+        pengawas_ttd: val('uji_pengawas_ttd'),
+        pengawas_tgl: val('uji_pengawas_tgl')
+      };
+    }
+
+    function saveUjiOrganoleptik() {
+      const dateKey = ujiDateKey();
+      if (!dateKey) { alert('Isi dulu Tanggal Uji.'); document.getElementById('uji_tanggal').focus(); return; }
+      const menus = ujiCollectMenus();
+      const filled = Object.keys(menus).filter(k => String(menus[k].produk || '').trim());
+      if (!filled.length) { alert('Isi dulu minimal satu Nama Produk / Masakan pada kartu menu.'); return; }
+      if (window.dbLoaded && !window.dbLoaded[UJI_PATH + '/' + dateKey]) {
+        alert('Data tanggal ini masih dimuat dari server. Mohon tunggu sebentar lalu simpan kembali.');
+        return;
+      }
+      const all = window.dbCache[UJI_PATH] || {};
+      const day = all[dateKey] ? Object.assign({}, all[dateKey]) : {};
+      const legacyKeys = Object.keys(day).filter(k => k !== 'meta' && k !== 'menus' && k !== 'fotos' && day[k] && day[k].rows);
+      const existed = (day.menus && Object.keys(day.menus).length) || legacyKeys.length;
+      if (existed) {
+        if (!confirm('⚠️ Data Uji Organoleptik tanggal ' + dateKey + ' sudah ada.\n\nYakin ingin memperbarui dan menimpa data lama?')) return;
+      }
+      day.meta = ujiCollectMeta();
+      day.menus = menus;
+      delete day.fotos;   // foto kini tersimpan per baris di dalam menus
+      all[dateKey] = day;
+      window.dbCache[UJI_PATH] = all;
+      window.ujiDirty = false;
+      if (typeof window.fbSet === 'function') window.fbSet(UJI_PATH + '/' + dateKey, day);
+      const produkList = filled.map(k => menus[k].produk).join(', ');
+      if (window.sppgNotify) sppgNotify('Data tersimpan', 'Uji organoleptik ' + dateKey + ': ' + produkList);
+      alert('✅ Data Uji Organoleptik dan Suhu Memasak tanggal ' + dateKey + ' berhasil disimpan di Firebase!\n\n' + filled.length + ' menu: ' + produkList);
+    }
+
+    // ---------- interaksi tanggal / produk ----------
+    function onUjiDateChange() {
+      const el = document.getElementById('uji_tanggal');
+      const next = el ? el.value : '';
+      if (window.ujiDirty && next !== window.ujiLoadedDate) {
+        if (!confirm('Ada perubahan Uji Organoleptik yang belum disimpan.\n\nYakin pindah tanggal? Perubahan akan hilang.')) {
+          if (el) el.value = window.ujiLoadedDate || '';
+          return;
+        }
+      }
+      ujiLoadRecord();
+    }
+    function ujiActivateCat(cat) {
+      if (!cat) return;
+      window.ujiActiveCat = cat;
+      UJI_MENU_ALL.forEach(m => {
+        if (m.key === cat) return;
+        const b = document.getElementById('uji_chips_' + m.key);
+        if (b) b.innerHTML = '';
+      });
+      ujiRenderChips(cat);
+      ujiUpdateCatRef(cat);
+    }
+    function onUjiCatInput(cat) {
+      window.ujiActiveCat = cat;
+      ujiRenderChips(cat);
+      ujiUpdateCatRef(cat);
+    }
+    function onUjiCatChange(cat) {
+      const inp = document.getElementById('uji_produk_' + cat);
+      if (!inp) return;
+      let n = inp.value.trim().replace(/\s+/g, ' ');
+      const ref = ujiFindRef(n);
+      if (ref) n = ref.nama;
+      inp.value = n;
+      if (n && ujiNorm(n) !== (inp.dataset.applied || '')) {
+        ujiApplyRefToCat(cat, ujiRefForProduct(n, cat));
+        ujiMarkApplied(cat);
+        window.ujiDirty = true;
+      }
+      ujiRenderChips(cat);
+      ujiUpdateCatRef(cat);
+    }
+    function ujiPickProduct(cat, name) {
+      const inp = document.getElementById('uji_produk_' + cat);
+      if (!inp) return;
+      const n = String(name || '').trim();
+      if (!n) return;
+      inp.value = n;
+      ujiApplyRefToCat(cat, ujiRefForProduct(n, cat));
+      ujiMarkApplied(cat);
+      ujiRenderChips(cat);
+      ujiUpdateCatRef(cat);
+      window.ujiDirty = true;
+      try { inp.focus({ preventScroll: true }); } catch (e) {}
+    }
+
+    // ---------- inisialisasi ----------
+    function initUjiOrganoleptik() {
+      if (!window.ujiInitialized) {
+        window.ujiInitialized = true;
+        const tgl = document.getElementById('uji_tanggal');
+        if (tgl && !tgl.value) tgl.value = getLocalDateKey();
+        ujiFillDatalist();
+        ujiRenderMenus({});
+        ujiRenderSiklusInfo(tgl ? tgl.value : '');
+        ['uji_relawan_nama', 'uji_relawan_ttd', 'uji_relawan_tgl', 'uji_pengawas_nama', 'uji_pengawas_ttd', 'uji_pengawas_tgl'].forEach(id => {
+          const el = document.getElementById(id);
+          if (!el || el.dataset.dirtyBound === '1') return;
+          el.dataset.dirtyBound = '1';
+          el.addEventListener('input', e => { if (e.isTrusted) window.ujiDirty = true; });
+          el.addEventListener('change', e => { if (e.isTrusted) window.ujiDirty = true; });
+        });
+        ujiLoadRecord();
+      } else {
+        ujiFillDatalist();
+        ujiLoadRecord(true);
+      }
+    }
+
+    // ---------- realtime & backup hooks ----------
+    (function () {
+      const baseRe = window.reRenderActiveTab;
+      window.reRenderActiveTab = function () {
+        if (baseRe) baseRe.apply(this, arguments);
+        if (window.currentActiveTab === 'uji-organoleptik') {
+          ujiFillDatalist();
+          ujiLoadRecord(true);
+        }
+      };
+      const baseFirst = window.onItemFirstLoad;
+      window.onItemFirstLoad = function (path, key) {
+        if (baseFirst) baseFirst.apply(this, arguments);
+        if (path === UJI_PATH && window.currentActiveTab === 'uji-organoleptik') ujiLoadRecord(true);
+      };
+    })();
+
+    // =====================================================================
+    // EXPORT EXCEL / WORD - UJI ORGANOLEPTIK DAN SUHU MEMASAK
+    // =====================================================================
+    function ujiReadMeta() {
+      const m = ujiCollectMeta();
+      m.tanggalText = rptLongDate(m.tanggal) || '';
+      return m;
+    }
+    function ujiReadMenus() {
+      const out = [];
+      document.querySelectorAll('#uji_menus_wrapper [data-uji-menu]').forEach(card => {
+        const key = card.getAttribute('data-uji-menu');
+        const inp = card.querySelector('.uji-produk');
+        const produk = inp ? inp.value.trim().replace(/\s+/g, ' ') : '';
+        const rows = [];
+        card.querySelectorAll('tbody tr').forEach(tr => {
+          const num = v => { const n = parseFloat(v); return isNaN(n) ? '' : n; };
+          rows.push({
+            jam: tr.querySelector('.uji-jam').value,
+            batch: tr.querySelector('.uji-batch').value,
+            suhu: num(tr.querySelector('.uji-suhu').value),
+            tekstur: tr.querySelector('.uji-tekstur').value,
+            rasa: tr.querySelector('.uji-rasa').value,
+            aroma: tr.querySelector('.uji-aroma').value,
+            warna: tr.querySelector('.uji-warna').value,
+            keputusan: tr.querySelector('.uji-keputusan').value,
+            ket: tr.querySelector('.uji-ket').value,
+            foto: (() => { const fi = tr.querySelector('.uji-foto-input'); return fi ? (fi.getAttribute('data-base64') || '') : ''; })()
+          });
+        });
+        const hasData = rows.some(r => r.jam || r.batch || String(r.suhu).trim() !== '' || r.ket || r.keputusan);
+        if (produk || hasData) out.push({ key, label: ujiCatLabel(key), produk, rows });
+      });
+      return out;
+    }
+
+    async function exportUjiOrganoleptikExcel() {
+      try {
+        const mode = await askExportPhotoMode();
+        if (!mode) return;
+        const withPhoto = mode === 'inline';
+        const menus = ujiReadMenus();
+        if (!menus.length) return alert('Belum ada menu yang diisi untuk diexport.');
+        const meta = ujiReadMeta();
+
+        const widths = withPhoto ? [5, 11, 12, 15, 26, 20, 26, 22, 15, 17, 20] : [5, 12, 13, 15, 28, 22, 28, 24, 16, 22];
+        const lastCol = widths.length;
+        const fotoCol = withPhoto ? 10 : 0;
+        const ketCol = withPhoto ? 11 : 10;
+        const H = { bold: true, h: 'center', size: 9 };
+        const headers = ['No', 'Waktu (Jam)', 'Batch/Panci Ke', 'Suhu Inti (°C) (Min 60°C)', 'Tekstur', 'Rasa', 'Aroma', 'Warna', 'Keputusan Layak/Ditolak'];
+        if (withPhoto) headers.push('Bukti Foto');
+        headers.push('Keterangan');
+
+        const wb = new ExcelJS.Workbook();
+        const normCache = new Map(), idCache = new Map();
+        const usedNames = {};
+
+        for (let mi = 0; mi < menus.length; mi++) {
+          const menu = menus[mi];
+          let sheetName = ((mi + 1) + ' ' + menu.label).replace(/[\\\/\?\*\[\]:]/g, ' ').slice(0, 31).trim() || ('MENU ' + (mi + 1));
+          if (usedNames[sheetName]) sheetName = (sheetName.slice(0, 28) + ' ' + (mi + 1));
+          usedNames[sheetName] = true;
+
+          const ws = wb.addWorksheet(sheetName);
+          widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+          ws.properties.tabColor = { argb: 'FF10B981' };
+
+          rptKop(wb, ws, {
+            r: 1, rowH: 22, logo: [1, 2], title: [3, 9], lab: withPhoto ? 10 : 9, val: withPhoto ? 11 : 10,
+            judul: 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', noDoc: UJI_DOC_CODE, rev: '00', colon: true
+          });
+
+          ws.getRow(5).height = 20; ws.getRow(6).height = 20;
+          rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Uji', { size: 10, h: 'left' });
+          rptMerge(ws, 5, 4, 5, 6); rptPut(ws, 5, 4, ': ' + (meta.tanggalText || ''), { size: 10, h: 'left' });
+          rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Siklus Menu 20 Hari', { size: 10, h: 'left' });
+          rptMerge(ws, 6, 4, 6, 7); rptPut(ws, 6, 4, ': ' + (ujiSiklusText(meta.tanggal) || '-'), { size: 10, h: 'left' });
+
+          ws.getRow(7).height = 20;
+          rptMerge(ws, 7, 1, 7, lastCol);
+          rptPut(ws, 7, 1, 'MENU ' + (mi + 1) + ' — ' + menu.label.toUpperCase() + (menu.produk ? ' (' + menu.produk + ')' : ''), { bold: true, h: 'left', size: 9.5 });
+          rptFill(ws, 7, 1, 7, lastCol, 'FFECFDF5');
+          rptBorder(ws, 7, 1, 7, lastCol, 'grid');
+
+          ws.getRow(8).height = 36;
+          headers.forEach((h, i) => rptPut(ws, 8, i + 1, h, H));
+          rptFill(ws, 8, 1, 8, lastCol, RPT_GREY);
+          rptBorder(ws, 8, 1, 8, lastCol, 'grid');
+
+          let r = 9;
+          const dataRows = menu.rows.length ? menu.rows : [{}];
+          for (let i = 0; i < dataRows.length; i++) {
+            const d = dataRows[i];
+            let lines = 1;
+            lines = Math.max(lines, rptLines(d.tekstur, widths[4], 8), rptLines(d.rasa, widths[5], 8), rptLines(d.aroma, widths[6], 8), rptLines(d.warna, widths[7], 8), rptLines(d.ket, widths[ketCol - 1], 8));
+            ws.getRow(r).height = Math.max(withPhoto ? 58 : 26, Math.min(96, lines * 12 + 8));
+            rptPut(ws, r, 1, i + 1, { h: 'center', size: 9 });
+            rptPut(ws, r, 2, d.jam, { h: 'center', size: 9 });
+            rptPut(ws, r, 3, d.batch, { h: 'center', size: 9 });
+            rptPut(ws, r, 4, d.suhu, { h: 'center', size: 9, numFmt: '0.0' });
+            rptPut(ws, r, 5, d.tekstur, { h: 'left', size: 8 });
+            rptPut(ws, r, 6, d.rasa, { h: 'left', size: 8 });
+            rptPut(ws, r, 7, d.aroma, { h: 'left', size: 8 });
+            rptPut(ws, r, 8, d.warna, { h: 'left', size: 8 });
+            rptPut(ws, r, 9, d.keputusan, { h: 'center', size: 9, bold: true });
+            if (withPhoto) {
+              const b64 = d.foto || '';
+              if (b64) {
+                const norm = await exportNormalizePhoto(b64, normCache);
+                if (norm) await rptPlacePhoto(wb, ws, norm, r, fotoCol, r, fotoCol, idCache);
+                else rptPut(ws, r, fotoCol, '-', { h: 'center', size: 9 });
+              } else {
+                rptPut(ws, r, fotoCol, '-', { h: 'center', size: 9 });
+              }
+            }
+            rptPut(ws, r, ketCol, d.ket, { h: 'left', size: 8 });
+            rptBorder(ws, r, 1, r, lastCol, 'grid');
+            if (d.keputusan === 'DITOLAK') rptFill(ws, r, 9, r, 9, 'FFFDE2E4');
+            else if (d.keputusan === 'LAYAK') rptFill(ws, r, 9, r, 9, 'FFE4F4EC');
+            if (d.suhu !== '' && Number(d.suhu) < 60) ws.getCell(r, 4).font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFB91C1C' } };
+            r++;
+          }
+
+          r++;
+          rptMerge(ws, r, 2, r, 5); rptPut(ws, r, 2, 'RELAWAN PENGOLAHAN', { bold: true, h: 'center', size: 10 });
+          rptMerge(ws, r, 6, r, lastCol); rptPut(ws, r, 6, 'PENGAWAS GIZI', { bold: true, h: 'center', size: 10 });
+          rptFill(ws, r, 2, r, lastCol, RPT_GREY);
+          rptBorder(ws, r, 2, r, lastCol, 'grid');
+
+          r++; ws.getRow(r).height = 20;
+          rptPut(ws, r, 2, 'Nama', { size: 10, bold: true });
+          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, meta.relawan_nama, { h: 'left', size: 10 });
+          rptPut(ws, r, 6, 'Nama', { size: 10, bold: true });
+          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, meta.pengawas_nama, { h: 'left', size: 10 });
+          rptBorder(ws, r, 2, r, lastCol, 'grid');
+
+          r++; ws.getRow(r).height = 55;
+          rptPut(ws, r, 2, 'Tanda Tangan', { size: 10, bold: true });
+          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, meta.relawan_ttd, { h: 'center', size: 10 });
+          rptPut(ws, r, 6, 'Tanda Tangan', { size: 10, bold: true });
+          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, meta.pengawas_ttd, { h: 'center', size: 10 });
+          rptBorder(ws, r, 2, r, lastCol, 'grid');
+
+          r++; ws.getRow(r).height = 20;
+          rptPut(ws, r, 2, 'Tanggal', { size: 10, bold: true });
+          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, rptLongDate(meta.relawan_tgl) || '', { h: 'left', size: 10 });
+          rptPut(ws, r, 6, 'Tanggal', { size: 10, bold: true });
+          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, rptLongDate(meta.pengawas_tgl) || '', { h: 'left', size: 10 });
+          rptBorder(ws, r, 2, r, lastCol, 'grid');
+
+          rptPage(ws, true, 'A1:' + ws.getColumn(lastCol).letter + r);
+          ws.pageSetup.fitToHeight = 1;
+        }
+
+        await rptDownload(wb, exportFileName('wrapper_uji_organoleptik', 'xlsx', mode));
+      } catch (e) {
+        console.error('Export Excel Uji Organoleptik gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    async function exportUjiOrganoleptikWord() {
+      try {
+        const mode = await askExportPhotoMode();
+        if (!mode) return;
+        const withPhoto = mode === 'inline';
+        const menus = ujiReadMenus();
+        const meta = ujiReadMeta();
+        if (!menus.length) return alert('Belum ada menu yang diisi untuk diexport.');
+
+        const docName = 'dokumen';
+        const files = [];
+        const normCache = new Map();
+        const kopHtml = exportWordKop(UJI_DOC_CODE, docName, files, 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', '00');
+        const infoRow = (a, b) => '<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">' + ujiEsc(a) + '</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">' + ujiEsc(b) + '</td></tr>';
+        const td = (v, style) => '<td style="' + (style || '') + '">' + (v == null || v === '' ? '' : ujiEsc(v)) + '</td>';
+
+        async function photoImg(b64) {
+          if (!b64) return '';
+          const norm = await exportNormalizePhoto(b64, normCache);
+          if (!norm) return '';
+          const name = 'foto_' + (files.length + 1) + '.jpg';
+          files.push({ name: name, dataUrl: norm.dataUrl });
+          const w = norm.landscape ? 3 : 2, h = norm.landscape ? 2 : 3;
+          return '<img src="' + docName + '_files/' + name + '" width="' + Math.round(w * 37.795) + '" height="' + Math.round(h * 37.795) + '" style="width:' + w + 'cm;height:' + h + 'cm;object-fit:cover;">';
+        }
+
+        const sigHtml = () => '<table style="width:100%;border-collapse:collapse;margin-top:14px;">'
+          + '<tr><th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:9pt;">RELAWAN PENGOLAHAN</th>'
+          + '<th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:9pt;">PENGAWAS GIZI</th></tr>'
+          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;width:14%;">Nama</td><td style="border:1px solid black;padding:5px;width:36%;">' + ujiEsc(meta.relawan_nama) + '</td>'
+          + '<td style="border:1px solid black;padding:5px;font-weight:bold;width:14%;">Nama</td><td style="border:1px solid black;padding:5px;width:36%;">' + ujiEsc(meta.pengawas_nama) + '</td></tr>'
+          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.relawan_ttd) + '</td>'
+          + '<td style="border:1px solid black;padding:5px;font-weight:bold;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.pengawas_ttd) + '</td></tr>'
+          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;">Tanggal</td><td style="border:1px solid black;padding:5px;">' + (rptLongDate(meta.relawan_tgl) || '') + '</td>'
+          + '<td style="border:1px solid black;padding:5px;font-weight:bold;">Tanggal</td><td style="border:1px solid black;padding:5px;">' + (rptLongDate(meta.pengawas_tgl) || '') + '</td></tr>'
+          + '</table>';
+
+        const pages = [];
+        for (let mi = 0; mi < menus.length; mi++) {
+          const menu = menus[mi];
+          let rowsHtml = '';
+          const dataRows = menu.rows.length ? menu.rows : [{}];
+          for (let i = 0; i < dataRows.length; i++) {
+            const d = dataRows[i];
+            const fotoHtml = withPhoto ? (await photoImg(d.foto)) : '';
+            rowsHtml += '<tr>'
+              + td(i + 1, 'text-align:center;')
+              + td(d.jam, 'text-align:center;')
+              + td(d.batch, 'text-align:center;')
+              + td(d.suhu === '' || d.suhu == null ? '' : Number(d.suhu).toFixed(1), 'text-align:center;font-weight:bold;' + (d.suhu !== '' && Number(d.suhu) < 60 ? 'color:#b91c1c;' : ''))
+              + td(d.tekstur) + td(d.rasa) + td(d.aroma) + td(d.warna)
+              + td(d.keputusan, 'text-align:center;font-weight:bold;' + (d.keputusan === 'DITOLAK' ? 'background:#fde2e4;' : d.keputusan === 'LAYAK' ? 'background:#e4f4ec;' : ''))
+              + (withPhoto ? td(fotoHtml || '-', 'text-align:center;') : '')
+              + td(d.ket)
+              + '</tr>';
+          }
+          pages.push('<div class="Section1">'
+            + kopHtml
+            + '<table style="width:100%;border:none;border-collapse:collapse;margin:0 0 6px 0;">'
+            + infoRow('Tanggal Uji', meta.tanggalText)
+            + infoRow('Siklus Menu 20 Hari', ujiSiklusText(meta.tanggal))
+            + infoRow('Menu ' + (mi + 1), menu.label.toUpperCase() + (menu.produk ? ' — ' + menu.produk : ''))
+            + '</table>'
+            + '<table style="width:100%;border-collapse:collapse;">'
+            + '<thead><tr>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">No</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Waktu (Jam)</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Batch/Panci Ke</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Suhu Inti (°C) (Min 60°C)</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Tekstur</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Rasa</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Aroma</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Warna</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Keputusan Layak/Ditolak</th>'
+            + (withPhoto ? '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Bukti Foto</th>' : '')
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Keterangan</th>'
+            + '</tr></thead><tbody>' + rowsHtml + '</tbody></table>'
+            + sigHtml()
+            + '</div>');
+        }
+
+        const html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Uji Organoleptik dan Suhu Memasak (${UJI_DOC_CODE})</title>
+        <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+        <style>
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.2cm 1.2cm 1.2cm 1.2cm; }
+          div.Section1 { page: Section1; }
+          body { font-family: 'Calibri', sans-serif; font-size: 10pt; line-height: 1.15; }
+          table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+          th, td { border: 1px solid black; padding: 4px; font-size: 8.5pt; text-align: left; vertical-align: middle; }
+          th { background-color: #e2e8f0; text-align: center; font-weight: bold; }
+        </style>
+        </head>
+        <body>
+          ${pages.join('<br clear="all" style="mso-special-character:line-break;page-break-before:always">')}
+        </body></html>`;
+        const blob = new Blob([exportBuildMhtml(html, files, docName)], { type: 'application/msword' });
+        exportDownloadBlob(blob, exportFileName('wrapper_uji_organoleptik', 'doc', mode));
+      } catch (e) {
+        console.error('Export Word Uji Organoleptik gagal', e);
+        alert('Export Word gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+  </script>
+
+<script>
+    // =====================================================================
     // DATABASE PENERIMA MANFAAT (sekolah & posyandu) -- bagian dari modul Pendataan Sasaran (01.01)
     // Firebase: 'sppg_penerima_manfaat' = { tanggal: 'YYYY-MM-DD', items: [ {id,jenis,nama,kl,kp,bl,bp,tl,tp,org,bumil,busui} ] }
     // kl/kp = siswa/balita PORSI KECIL (L/P) | bl/bp = siswa PORSI BESAR (L/P) | tl/tp = tendik | org = uji organoleptik
@@ -7053,12 +8077,26 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       const dup = list.findIndex(x => pmbKey(x.nama) === pmbKey(nama) && x.id !== it.id);
       if (dup !== -1) { alert('"' + nama + '" sudah ada di database. Ubah langsung di tabel.'); return; }
       const i = list.findIndex(x => x.id === it.id);
-      const wasEdit = !!pmbEditId;
+      const wasEdit = !!pmbEditId && i !== -1;
+      const old = wasEdit ? list[i] : null;
       if (i !== -1) list[i] = it; else list.push(it);
       pmbSave({ tanggal: d.tanggal, items: list });
+      // sinkronisasi wajib: nama dan jenjang pada Data Alergi mengikuti satuan ini
+      if (old && typeof sdGetAll === 'function' && typeof sdSave === 'function') {
+        const jenjangMap = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', POSYANDU: 'BALITA' };
+        const all = sdGetAll(); let ch = false;
+        all.forEach(s => {
+          if (pmbNorm(s.sekolah) !== pmbNorm(old.nama)) return;
+          if (s.sekolah !== it.nama) { s.sekolah = it.nama; ch = true; }
+          if (old.jenis !== it.jenis && jenjangMap[it.jenis]) { s.jenjang = jenjangMap[it.jenis]; ch = true; }
+        });
+        if (ch) sdSave(all);
+      }
       pmbReset();
       pmbRender();
-      if (typeof renderSasaran === 'function') { try { sdRenderLists(sdGetAll()); } catch (e) {} }
+      if (typeof renderSasaran === 'function') {
+        try { sdRenderLists(sdGetAll()); sdRenderStats(sdGetAll()); sdRenderTable(); } catch (e) {}
+      }
       if (wasEdit) alert('Data berhasil diperbarui!');
     }
     function pmbEdit(id) {
@@ -7077,12 +8115,16 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     async function pmbDelete(id) {
       const d = pmbData(), it = d.items.find(x => x.id === id);
       if (!it) return;
-      const nAl = (typeof sdGetAll === 'function') ? sdGetAll().filter(s => pmbNorm(s.sekolah) === pmbNorm(it.nama)).length : 0;
-      const okDel = await pmbConfirm({ danger: true, ok: '🗑️ Ya, Hapus', title: '⚠️ Konfirmasi Hapus Data', html: '<div class="font-black text-slate-800">' + pmbEsc(it.nama) + '</div><div class="text-xs text-slate-600">' + pmbEsc(pmbDetail(it)) + '</div>' + (nAl ? '<div class="text-xs text-rose-700 font-semibold">🛡️ ' + nAl + ' data alergi masih memakai nama ini sebagai asal (data alergi tidak ikut terhapus).</div>' : '') + '<div class="text-xs text-slate-500">Hapus dari database?</div>' });
+      const linked = (typeof sdGetAll === 'function') ? sdGetAll().filter(s => pmbNorm(s.sekolah) === pmbNorm(it.nama)) : [];
+      const okDel = await pmbConfirm({ danger: true, ok: '🗑️ Ya, Hapus', title: '⚠️ Konfirmasi Hapus Data', html: '<div class="font-black text-slate-800">' + pmbEsc(it.nama) + '</div><div class="text-xs text-slate-600">' + pmbEsc(pmbDetail(it)) + '</div>' + (linked.length ? '<div class="text-xs text-rose-700 font-semibold">🛡️ ' + linked.length + ' data alergi memakai satuan ini. Data alergi tersebut akan IKUT DIHAPUS agar tetap sinkron.</div>' : '') + '<div class="text-xs text-slate-500">Hapus dari database?</div>' });
       if (!okDel) return;
       pmbSave({ tanggal: d.tanggal, items: d.items.filter(x => x.id !== id) });
+      if (linked.length && typeof sdSave === 'function') sdSave(sdGetAll().filter(s => pmbNorm(s.sekolah) !== pmbNorm(it.nama)));
       if (pmbEditId === id) pmbReset();
       pmbRender();
+      if (typeof renderSasaran === 'function') {
+        try { sdRenderLists(sdGetAll()); sdRenderStats(sdGetAll()); sdRenderTable(); } catch (e) {}
+      }
     }
     function pmbSetTanggal(v) { const d = pmbData(); pmbSave({ tanggal: v, items: d.items }); }
 
@@ -7209,8 +8251,10 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     // ---------- integrasi dengan data alergi (modul 01.01) & Inspeksi Alergen (22.01) ----------
     (function () {
       // 1) render database setiap modul Sasaran dibuka / data realtime berubah
+      let lastSyncCreated = [];
       const origRender = window.renderSasaran;
       window.renderSasaran = function () {
+        try { lastSyncCreated = sdEnsureUnits(sdGetAll()); } catch (e) { console.warn('Sinkron satuan gagal', e); }
         if (origRender) origRender.apply(this, arguments);
         pmbOnJenisOnce(); pmbRender();
       };
@@ -7220,27 +8264,100 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       const origOpenLabel = window.sdOpenLabel;
       window.sdOpenLabel = function () { pmSwitchView('alergi'); return origOpenLabel.apply(this, arguments); };
 
-      // 2) daftar "Asal Sekolah" pada form alergi ikut memuat nama sekolah dari database
+      // ---------- SINKRONISASI WAJIB: Data Alergi <-> Data Sekolah & Posyandu ----------
+      // Setiap nama satuan pada Data Alergi harus ada di database Penerima Manfaat.
+      function sdInferJenis(s) {
+        const j = pmbNorm(typeof sdNormJenjang === 'function' ? sdNormJenjang(s.jenjang) : s.jenjang);
+        if (/BALITA|BUMIL|HAMIL|MENYUSUI|BUSUI|POSYANDU/.test(j) || /POSYANDU/.test(pmbNorm(s.sekolah))) return 'POSYANDU';
+        if (/PAUD|TK|KB|RA/.test(j)) return 'PAUD';
+        if (/SMP|MTS/.test(j)) return 'SMP';
+        return 'SD';
+      }
+      function sdEnsureUnits(list) {
+        const d = pmbData();
+        const have = {};
+        d.items.forEach(i => { have[pmbNorm(i.nama)] = 1; });
+        const items = d.items.slice(), created = [];
+        (list || []).forEach(s => {
+          const nama = sdNorm(s.sekolah);
+          if (!nama || have[pmbNorm(nama)]) return;
+          have[pmbNorm(nama)] = 1;
+          const jenis = sdInferJenis(s);
+          const it = { id: 'sd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), jenis: jenis, nama: nama };
+          PMB_FIELDS.forEach(f => { it[f] = 0; });
+          items.push(it);
+          created.push({ nama: nama, jenis: jenis });
+        });
+        if (created.length) pmbSave({ tanggal: d.tanggal, items: items });
+        return created;
+      }
+      window.sdEnsureUnits = sdEnsureUnits;
+
+      function sdFillSekolahSelect() {
+        const sel = document.getElementById('sd_f_sekolah');
+        if (!sel) return;
+        const cur = sel.value;
+        const units = pmbData().items.slice().sort((a, b) => (PMB_RANK[a.jenis] - PMB_RANK[b.jenis]) || a.nama.localeCompare(b.nama));
+        const registered = {};
+        units.forEach(u => { registered[pmbNorm(u.nama)] = 1; });
+        const orphans = [];
+        sdGetAll().forEach(s => {
+          const n = sdNorm(s.sekolah);
+          if (n && !registered[pmbNorm(n)] && orphans.indexOf(n) === -1) orphans.push(n);
+        });
+        let h = '<option value="">— Pilih sekolah / posyandu —</option>';
+        if (units.length) {
+          h += '<optgroup label="Database Penerima Manfaat (tersinkron)">' + units.map(u =>
+            '<option value="' + sdEsc(u.nama) + '">' + sdEsc(u.nama) + ' — ' + sdEsc(PMB_LABEL[u.jenis] || u.jenis) + '</option>').join('') + '</optgroup>';
+        }
+        if (orphans.length) {
+          h += '<optgroup label="⚠ Belum ada di database (otomatis disinkronkan)">' + orphans.map(n =>
+            '<option value="' + sdEsc(n) + '">' + sdEsc(n) + '</option>').join('') + '</optgroup>';
+        }
+        sel.innerHTML = h;
+        if (cur && Array.from(sel.options).some(o => o.value === cur)) sel.value = cur;
+        const hint = document.getElementById('sd_sekolah_sync');
+        if (hint) {
+          const nPos = units.filter(u => u.jenis === 'POSYANDU').length;
+          let msg = units.length
+            ? '🔗 Tersinkron: <b>' + units.length + '</b> satuan (' + (units.length - nPos) + ' sekolah, ' + nPos + ' posyandu). ' +
+              '<button type="button" class="underline font-bold text-indigo-700" onclick="pmSwitchView(\'data\')">Kelola Data Sekolah</button>'
+            : '⚠ Database Penerima Manfaat masih kosong. Tambahkan sekolah/posyandu di tab <b>Data Sekolah</b>.';
+          if (lastSyncCreated && lastSyncCreated.length) {
+            msg += '<div class="mt-1 text-[9px] text-emerald-700 font-bold">✅ ' + lastSyncCreated.length + ' satuan baru otomatis ditambahkan: ' + lastSyncCreated.map(x => sdEsc(x.nama)).join(', ') + '</div>';
+          }
+          hint.innerHTML = msg;
+        }
+      }
+      window.sdFillSekolahSelect = sdFillSekolahSelect;
+
+      // Pilih satuan -> jenjang mengikuti jenis satuan (Posyandu = Balita).
+      window.sdOnSekolahPick = function (v) {
+        const unit = pmbData().items.find(i => pmbNorm(i.nama) === pmbNorm(v));
+        const jj = document.getElementById('sd_f_jenjang');
+        if (!unit || !jj) return;
+        const map = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', POSYANDU: 'BALITA' };
+        if (!jj.value.trim() || unit.jenis === 'POSYANDU') jj.value = map[unit.jenis] || '';
+      };
+
+      // 2) setiap simpan/ubah data alergi -> pastikan satuannya ada di database
+      const origSdSave = window.sdSave;
+      window.sdSave = function (list) {
+        if (origSdSave) origSdSave.apply(this, arguments);
+        try {
+          lastSyncCreated = sdEnsureUnits(list);
+          if (lastSyncCreated.length) { pmbRender(); }
+          sdFillSekolahSelect();
+        } catch (e) { console.warn('Sinkronisasi satuan alergi gagal', e); }
+      };
+
+      // 3) daftar pilihan asal sekolah/posyandu selalu dibangun dari database Penerima Manfaat
       const origLists = window.sdRenderLists;
       window.sdRenderLists = function (list) {
         if (origLists) origLists.apply(this, arguments);
         try { if (document.getElementById('pmb_tables')) { pmbRenderTable(); pmbRenderStats(); pmbRenderRincian(); } } catch (e) {}
-        try {
-          const dl = document.getElementById('sd_dl_sekolah');
-          if (!dl) return;
-          const have = {};
-          Array.from(dl.options).forEach(o => { have[pmbNorm(o.value)] = true; });
-          pmbData().items.forEach(i => { if (!have[pmbNorm(i.nama)]) { have[pmbNorm(i.nama)] = true; dl.insertAdjacentHTML('beforeend', '<option value="' + pmbEsc(i.nama) + '">'); } });
-        } catch (e) {}
+        try { sdFillSekolahSelect(); } catch (e) {}
       };
-      // 3) memilih sekolah dari database mengisi jenjang otomatis (bila masih kosong)
-      document.addEventListener('change', function (e) {
-        if (!e.target || e.target.id !== 'sd_f_sekolah') return;
-        const jj = document.getElementById('sd_f_jenjang');
-        if (!jj || jj.value.trim()) return;
-        const m = pmbData().items.find(i => i.jenis !== 'POSYANDU' && pmbNorm(i.nama) === pmbNorm(e.target.value));
-        if (m) jj.value = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP' }[m.jenis];
-      });
 
       // 4) panel sinkron di Inspeksi Manajemen Alergen: ringkasan porsi + rasio anak alergi per sekolah
       const origSync = window.renderAlergenSasaranSync;
