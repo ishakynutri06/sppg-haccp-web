@@ -7195,9 +7195,7 @@ function renderSuhuTable() {
           canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
           if (typeof window.stampPhoto === 'function') window.stampPhoto(img, canvas, input);
           const b64 = canvas.toDataURL('image/jpeg', 0.6);
-          const td = input.closest('td');
-          if (td) td.innerHTML = buildUjiPhotoHtml(input.id, b64);
-          window.ujiDirty = true;
+          ujiOpenPhotoConfirm(input, b64);
         };
         img.src = e.target.result;
       };
@@ -7211,6 +7209,56 @@ function renderSuhuTable() {
       if (td) td.innerHTML = buildUjiPhotoHtml(id, '');
       window.ujiDirty = true;
     }
+
+    // ---------- foto Uji Organoleptik -> jendela konfirmasi (waktu + suhu) ----------
+    let pendingUjiPhoto = null;
+    function ujiOpenPhotoConfirm(input, b64) {
+      const tr = input.closest('tr');
+      const jamInp = tr ? tr.querySelector('.uji-jam') : null;
+      const suhuInp = tr ? tr.querySelector('.uji-suhu') : null;
+      pendingUjiPhoto = { input: input, b64: b64, tr: tr, jamInp: jamInp, suhuInp: suhuInp };
+      document.getElementById('imageConfirmPreview').src = b64;
+      const tLbl = document.getElementById('imageConfirmTimeInput').previousElementSibling;
+      if (tLbl) tLbl.textContent = 'Waktu Pengujian (Jam)';
+      setImageConfirmValueLabel('Suhu Inti (°C)');
+      const tInp = document.getElementById('imageConfirmTempInput');
+      const wInp = document.getElementById('imageConfirmTimeInput');
+      tInp.value = suhuInp ? suhuInp.value : '';
+      wInp.value = (jamInp && jamInp.value) || getRealtimeTimeString();
+      tInp.parentElement.classList.remove('hidden');
+      wInp.parentElement.classList.remove('hidden');
+      const modal = document.getElementById('imageConfirmModal');
+      modal.classList.remove('hidden');
+      setTimeout(() => { modal.classList.remove('opacity-0'); modal.children[0].classList.remove('scale-95'); }, 10);
+    }
+    function confirmUjiPhoto() {
+      const p = pendingUjiPhoto;
+      pendingUjiPhoto = null;
+      if (p) {
+        const t = document.getElementById('imageConfirmTimeInput').value;
+        const v = document.getElementById('imageConfirmTempInput').value;
+        if (p.jamInp && t !== '') p.jamInp.value = t;
+        if (p.suhuInp && v !== '') p.suhuInp.value = v;
+        if (p.tr && typeof ujiRowCalc === 'function') ujiRowCalc(p.tr);
+        const td = p.input.closest('td');
+        if (td) td.innerHTML = buildUjiPhotoHtml(p.input.id, p.b64);
+        window.ujiDirty = true;
+      }
+      pendSetModalLabels('');
+      closeImageConfirmModal();
+    }
+    function cancelUjiPhoto() {
+      if (pendingUjiPhoto && pendingUjiPhoto.input) pendingUjiPhoto.input.value = '';
+      pendingUjiPhoto = null;
+      pendSetModalLabels('');
+      closeImageConfirmModal();
+    }
+    (function () {
+      const origConfirm = window.confirmImageConfirmation;
+      const origCancel = window.cancelImageConfirmation;
+      window.confirmImageConfirmation = function () { if (pendingUjiPhoto) return confirmUjiPhoto(); return origConfirm.apply(this, arguments); };
+      window.cancelImageConfirmation = function () { if (pendingUjiPhoto) return cancelUjiPhoto(); return origCancel.apply(this, arguments); };
+    })();
 
     // Foto lama (3 slot harian) dipindahkan ke baris tabel agar tetap tampil setelah revisi.
     function ujiDistributeLegacyPhotos(menus, fotos) {
@@ -8984,20 +9032,96 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       window.__camShot = null;
 
-      // Dipanggil dari 3 handler foto setelah foto digambar ke canvas (ukuran kompres untuk disimpan di server).
+      // ---------- Nama foto (label) + frame ----------
+      function clean(t) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim(); }
+      // Menentukan nama/tujuan foto dari input yang dipakai (area suhu, menu, tahap, dll).
+      window.photoLabelFor = function (input) {
+        var id = (input && input.id) || '', title = '', sub = '', m, tr = input && input.closest ? input.closest('tr') : null;
+        try {
+          if ((m = id.match(/^suhu_foto_(\d+)(?:_(\w+?)_b(\d+))?$/))) {
+            var cfg = (typeof SUHU_ITEMS_CONFIG !== 'undefined' ? SUHU_ITEMS_CONFIG : []).filter(function (c) { return c.id === m[1]; })[0];
+            if (m[2]) {
+              var cat = document.getElementById('suhu_cat_' + id.replace('suhu_foto_', ''));
+              title = cat && cat.dataset.menu ? cat.dataset.menu : '';
+              var lab = tr && tr.querySelector('td div.text-\\[10px\\]');
+              sub = (cfg ? cfg.cat : 'Suhu') + (lab ? ' - ' + clean(lab.firstChild ? lab.firstChild.textContent : lab.textContent) : '') + (m[3] > 1 ? ' (Batch ' + m[3] + ')' : '');
+              if (!title) title = cfg ? cfg.area : 'Foto Suhu';
+            } else if (cfg) { title = cfg.area; sub = cfg.cat; }
+          } else if ((m = id.match(/^pemorsian_foto_s(\d)_/))) {
+            var c2 = tr && tr.children[1];
+            var span = c2 && c2.querySelector('span');
+            title = span ? clean(span.textContent) : '';
+            var kel = c2 ? clean(c2.childNodes[0] && c2.childNodes[0].textContent).replace(/:$/, '') : '';
+            sub = 'Pemorsian' + (kel ? ' - ' + kel : '') + ' - Sampel ' + m[1];
+          } else if ((m = id.match(/^pend_foto_([ms])_/))) {
+            var mn = tr && tr.querySelector('.pend-menu');
+            title = mn ? clean(mn.textContent) : 'Pendinginan';
+            sub = 'Pendinginan - ' + (m[1] === 'm' ? 'Mulai Resting' : 'Selesai Resting');
+          } else if ((m = id.match(/^uji_foto_(\w+?)_\d+$/))) {
+            title = (typeof ujiCatLabel === 'function') ? ujiCatLabel(m[1]) : m[1];
+            sub = 'Uji Organoleptik & Suhu Memasak';
+          }
+        } catch (e) { console.warn('photoLabelFor', e); }
+        return { title: title || 'Foto Dokumentasi', sub: sub };
+      };
+      function coverDraw(ctx, src, sw, sh, dw, dh) {
+        var sc = Math.max(dw / sw, dh / sh), w = sw * sc, h = sh * sc;
+        ctx.drawImage(src, (dw - w) / 2, (dh - h) / 2, w, h);
+      }
+      function fitFont(ctx, text, fs, maxW, weight) {
+        ctx.font = weight + ' ' + fs + 'px Arial, sans-serif';
+        while (ctx.measureText(text).width > maxW && fs > 8) { fs--; ctx.font = weight + ' ' + fs + 'px Arial, sans-serif'; }
+        return fs;
+      }
+      // Frame: bingkai + pita nama foto di atas + pita tanggal/jam di bawah.
+      function drawFrame(canvas, label, text) {
+        var w = canvas.width, h = canvas.height, ctx = canvas.getContext('2d');
+        var base = Math.min(w, h), bd = Math.max(3, Math.round(base * 0.012));
+        ctx.save();
+        ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+        // pita bawah (tanggal & jam)
+        var fs2 = fitFont(ctx, text, Math.max(10, Math.round(base * 0.04)), w - bd * 4, 'bold');
+        var barB = Math.round(fs2 * 1.9);
+        ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(0, h - barB, w, barB);
+        ctx.fillStyle = '#fff'; ctx.fillText(text, w / 2, h - barB / 2);
+        // pita atas (nama foto)
+        var fs1 = fitFont(ctx, label.title, Math.max(12, Math.round(base * 0.058)), w - bd * 4, 'bold');
+        var fsS = label.sub ? fitFont(ctx, label.sub, Math.max(9, Math.round(fs1 * 0.62)), w - bd * 4, 'normal') : 0;
+        var barT = Math.round(fs1 * 1.7 + (label.sub ? fsS * 1.3 : 0));
+        ctx.fillStyle = 'rgba(13,59,54,0.88)'; ctx.fillRect(0, 0, w, barT);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold ' + fs1 + 'px Arial, sans-serif';
+        ctx.fillText(label.title, w / 2, label.sub ? barT * 0.38 : barT / 2);
+        if (label.sub) { ctx.fillStyle = '#a7f3d0'; ctx.font = fsS + 'px Arial, sans-serif'; ctx.fillText(label.sub, w / 2, barT - fsS * 1.0); }
+        // bingkai luar
+        ctx.strokeStyle = '#0d9488'; ctx.lineWidth = bd * 2;
+        ctx.strokeRect(0, 0, w, h);
+        ctx.restore();
+      }
+
+      // Dipanggil dari semua handler foto setelah foto digambar ke canvas (ukuran kompres untuk disimpan di server).
       window.stampPhoto = function (img, canvas, input) {
         window.__camShot = null;
-        if (!input || input.dataset.src !== 'camera') return;      // galeri: tidak diberi stempel (bukan waktu pengambilan)
-        var now = new Date(), text = stampText(now);
-        drawStamp(canvas, text);
+        if (!input) return;
+        var cam = input.dataset.src === 'camera';                   // galeri: ditandai "Diunggah" (bukan waktu pengambilan)
+        var now = new Date(), text = (cam ? '' : 'Diunggah: ') + stampText(now), label = window.photoLabelFor(input);
+        // paksa rasio tepat 2:3 / 3:2 agar frame tidak terpotong saat ekspor
+        var cw = canvas.width, ch = canvas.height, ow, oh;
+        if (cw >= ch) { ow = cw; oh = Math.round(cw * 2 / 3); } else { oh = ch; ow = Math.round(ch * 2 / 3); }
+        var tmp = document.createElement('canvas'); tmp.width = cw; tmp.height = ch; tmp.getContext('2d').drawImage(canvas, 0, 0);
+        canvas.width = ow; canvas.height = oh;
+        coverDraw(canvas.getContext('2d'), tmp, cw, ch, ow, oh);
+        drawFrame(canvas, label, text);
+        if (!cam) return;
         try {
           // salinan resolusi penuh (maks 2000 px) untuk perangkat
           var sc = Math.min(1, 2000 / Math.max(img.width, img.height));
           var full = document.createElement('canvas');
-          full.width = Math.round(img.width * sc); full.height = Math.round(img.height * sc);
-          full.getContext('2d').drawImage(img, 0, 0, full.width, full.height);
-          drawStamp(full, text);
-          var name = 'SPPG_' + now.getFullYear() + p2(now.getMonth() + 1) + p2(now.getDate()) + '_' + p2(now.getHours()) + p2(now.getMinutes()) + p2(now.getSeconds()) + '.jpg';
+          var fw = Math.round(img.width * sc), fh = Math.round(img.height * sc);
+          if (fw >= fh) { full.width = fw; full.height = Math.round(fw * 2 / 3); } else { full.height = fh; full.width = Math.round(fh * 2 / 3); }
+          coverDraw(full.getContext('2d'), img, img.width, img.height, full.width, full.height);
+          drawFrame(full, label, text);
+          var name = 'SPPG_' + now.getFullYear() + p2(now.getMonth() + 1) + p2(now.getDate()) + '_' + p2(now.getHours()) + p2(now.getMinutes()) + p2(now.getSeconds()) + '_' + (clean(label.title).replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40) || 'foto') + '.jpg';
           full.toBlob(function (blob) {
             if (!blob) return;
             window.__camShot = { blob: blob, name: name };
