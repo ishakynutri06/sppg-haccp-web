@@ -7319,7 +7319,7 @@ function renderSuhuTable() {
           ws.properties.tabColor = { argb: 'FF10B981' };
 
           rptKop(wb, ws, {
-            r: 1, rowH: 22, logo: [1, 2], title: [3, 9], lab: withPhoto ? 10 : 9, val: withPhoto ? 11 : 10,
+            r: 1, rowH: 22, logo: [1, 2], title: [3, lastCol - 2], lab: lastCol - 1, val: lastCol,
             judul: 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', noDoc: UJI_DOC_CODE, rev: '00', colon: true
           });
 
