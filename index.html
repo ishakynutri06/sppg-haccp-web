@@ -414,8 +414,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <button id="nav-overview" onclick="switchTab('overview')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📊</span> <span>Overview Dashboard</span></button>
         <button id="nav-sasaran-didik" onclick="switchTab('sasaran-didik')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🧒</span> <span>Pendataan Sasaran Peserta Didik (FM-SGR-SPPG-01.01)</span></button>
         <button id="nav-frekuensi-bahan" onclick="switchTab('frekuensi-bahan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🥬</span> <span>Frekuensi Bahan (FM-SGR-SPPG-01.03)</span></button>
-        <button id="nav-master-bahan-20" onclick="switchTab('master-bahan-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📦</span> <span>Master Bahan 20 Hari</span></button>
-        <button id="nav-siklus-menu-20" onclick="switchTab('siklus-menu-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍱</span> <span>Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</span></button>
+        <button id="nav-master-bahan-20" onclick="switchTab('master-bahan-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📦</span> <span>Master Bahan 60 Hari</span></button>
+        <button id="nav-siklus-menu-20" onclick="switchTab('siklus-menu-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍱</span> <span>Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</span></button>
         <button id="nav-pemorsian" onclick="switchTab('pemorsian')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">⚖️</span> <span>Pemorsian & Berat (FM-SGR-SPPG-06.01)</span></button>
         <button id="nav-suhu-ruangan" onclick="switchTab('suhu-ruangan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🌡️</span> <span>Pemantauan Suhu (FM-SGR-SPPG-03.05)</span></button>
         <button id="nav-pendinginan" onclick="switchTab('pendinginan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">❄️</span> <span>Pemantauan di Cooling Area (FM-SGR-SPPG-05.03)</span></button>
@@ -461,7 +461,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           <div class="absolute -right-4 -bottom-4 text-7xl opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-500">📦</div>
           <div class="text-[11px] text-slate-400 font-extrabold uppercase tracking-widest">Total Bahan Baku</div>
           <div id="dashTotalBahan" class="text-3xl font-black text-slate-800 tracking-tight">0 Jenis</div>
-          <p class="text-[11px] text-indigo-600 font-bold flex items-center gap-1.5 bg-indigo-50 w-fit px-2 py-1 rounded-md"><span>✓</span> Master 20 Hari Tersinkron</p>
+          <p class="text-[11px] text-indigo-600 font-bold flex items-center gap-1.5 bg-indigo-50 w-fit px-2 py-1 rounded-md"><span>✓</span> Master 60 Hari Tersinkron</p>
         </div>
 
         <div class="bg-white p-6 rounded-3xl border-0 shadow-lg shadow-slate-200/50 ring-1 ring-slate-100 border-t-4 border-t-blue-500 space-y-3 relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
@@ -491,7 +491,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 gap-4">
             <div>
               <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2"><span class="text-xl">🍽️</span> Rincian Komponen Menu Tanggal Aktif Hari Ini</h3>
-              <p class="text-[11px] text-slate-500 font-medium mt-1">Disajikan berdasarkan sinkronisasi tanggal realtime & Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</p>
+              <p class="text-[11px] text-slate-500 font-medium mt-1">Disajikan berdasarkan sinkronisasi tanggal realtime & Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</p>
             </div>
             <button onclick="switchTab('siklus-menu-20')" class="text-[11px] font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors w-full sm:w-auto">Kelola Menu →</button>
           </div>
@@ -557,23 +557,25 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
              <div class="text-[10px] font-extrabold text-indigo-500 tracking-widest uppercase bg-indigo-50 w-fit px-2 py-0.5 rounded">Database Inti</div>
-             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">📦 Master Bahan 20 Hari</h2>
+             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">📦 Master Bahan 60 Hari</h2>
           </div>
           <div class="flex flex-wrap gap-2 w-full lg:w-auto">
             <button onclick="exportGenericExcel('Master Bahan', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
-            <button onclick="exportGenericWord('Master Bahan 20 Hari', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
+            <button onclick="exportGenericWord('Master Bahan 60 Hari', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
             <button onclick="saveMasterBahanManual()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Master</button>
           </div>
         </div>
         
         <div class="bg-gradient-to-br from-indigo-50 to-white p-4 md:p-5 rounded-2xl border border-indigo-200 shadow-inner space-y-3">
           <div class="flex flex-wrap items-center gap-2">
-            <h3 class="font-extrabold text-indigo-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Master Bahan 20 Hari</h3>
-            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-indigo-200 text-indigo-900">FORMAT: MASTER_BAHAN_20_HARI</span>
+            <h3 class="font-extrabold text-indigo-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Master Bahan 60 Hari</h3>
+            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-indigo-200 text-indigo-900">FORMAT: MASTER_BAHAN_60_HARI</span>
           </div>
-          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>MASTER_BAHAN_20_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>MASTER_BAHAN_60_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <p id="imp_master_cycle_note" class="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 font-semibold">Template memuat seluruh blok yang ada ditambah 1 blok tambahan opsional di akhir untuk menambah 5 hari baru.</p>
           <div class="flex flex-wrap gap-2">
-            <button onclick="impDownloadTemplate('master', false)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template Kosong (.xlsx)</button>
+            <button onclick="impDownloadTemplate('master', false)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template 60 Hari (.xlsx)</button>
+            <button onclick="impDownloadTemplate('master', false, true)" class="flex-1 md:flex-none bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">➕ Template Tambah 5 Hari</button>
             <button onclick="impDownloadTemplate('master', true)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Data Saat Ini (format import)</button>
             <label class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer text-center">📂 Pilih File Excel<input type="file" accept=".xlsx" class="hidden" onchange="impLoadFile('master', this)"></label>
           </div>
@@ -586,7 +588,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       </div>
     </section>
 
-    <!-- SIKLUS MENU 20 HARI (FM-SGR-SPPG-01.04) -->
+    <!-- SIKLUS MENU 60 HARI (FM-SGR-SPPG-01.04) -->
     <section id="sec-siklus-menu-20" class="tab-content hidden space-y-6">
       <div class="flex items-center justify-between">
         <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
@@ -597,23 +599,25 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
              <div class="text-[10px] font-extrabold text-blue-500 tracking-widest uppercase bg-blue-50 w-fit px-2 py-0.5 rounded">Operasional Menu</div>
-             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">🍱 Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</h2>
+             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">🍱 Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</h2>
           </div>
           <div class="flex flex-wrap gap-2 w-full lg:w-auto">
             <button onclick="exportGenericExcel('Siklus_Menu', 'siklus_menu_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
-            <button onclick="exportGenericWord('Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)', 'siklus_menu_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
+            <button onclick="exportGenericWord('Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)', 'siklus_menu_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
             <button onclick="saveSiklusMenuManual()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Menu</button>
           </div>
         </div>
 
         <div class="bg-gradient-to-br from-blue-50 to-white p-4 md:p-5 rounded-2xl border border-blue-200 shadow-inner space-y-3">
           <div class="flex flex-wrap items-center gap-2">
-            <h3 class="font-extrabold text-blue-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)</h3>
-            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-blue-200 text-blue-900">FORMAT: SIKLUS_MENU_20_HARI</span>
+            <h3 class="font-extrabold text-blue-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</h3>
+            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-blue-200 text-blue-900">FORMAT: SIKLUS_MENU_60_HARI</span>
           </div>
-          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>SIKLUS_MENU_20_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>SIKLUS_MENU_60_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <p id="imp_menu_cycle_note" class="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 font-semibold">Template memuat seluruh blok yang ada ditambah 1 blok tambahan opsional di akhir untuk menambah 5 hari baru.</p>
           <div class="flex flex-wrap gap-2">
-            <button onclick="impDownloadTemplate('menu', false)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template Kosong (.xlsx)</button>
+            <button onclick="impDownloadTemplate('menu', false)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template 60 Hari (.xlsx)</button>
+            <button onclick="impDownloadTemplate('menu', false, true)" class="flex-1 md:flex-none bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">➕ Template Tambah 5 Hari</button>
             <button onclick="impDownloadTemplate('menu', true)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Data Saat Ini (format import)</button>
             <label class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer text-center">📂 Pilih File Excel<input type="file" accept=".xlsx" class="hidden" onchange="impLoadFile('menu', this)"></label>
           </div>
@@ -1410,7 +1414,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             <input type="date" id="uji_tanggal" onchange="onUjiDateChange()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800">
           </div>
           <div class="md:col-span-2">
-            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Menu Otomatis dari Siklus Menu 20 Hari:</label>
+            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Menu Otomatis dari Siklus Menu 60 Hari:</label>
             <div id="uji_siklus_info" class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-[11px] font-semibold text-emerald-900 leading-snug">Pilih tanggal uji.</div>
             <p class="text-[10px] text-slate-400 mt-2">Produk, Warna, Tekstur, Rasa, dan Aroma terisi otomatis dari siklus menu. Anda cukup mengisi <b>Waktu</b>, <b>Suhu Inti</b>, dan <b>Keterangan</b>. Bukti foto diunggah langsung pada kolom <b>Bukti Foto</b> di setiap baris. Semua kolom tetap bisa diedit.</p>
             <datalist id="uji_produk_list"></datalist>
@@ -2139,7 +2143,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       wrapper_uji_organoleptik:    { nama: 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', foto: true, tgl: '#uji_tanggal' },
       wrapper_inspeksi_silang:     { nama: 'KONTAMINASI SILANG',      tgl: '#ks_tanggal' },
       'sec-inspeksi-alergen':      { nama: 'MANAJEMEN ALERGEN',       tgl: '#al_tanggal' },
-      siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU 20 HARI' },
+      siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU 60 HARI' },
       master_bahan_tables_wrapper: { nama: 'MASTER BAHAN 20 HARI' },
       frekuensi:                   { nama: 'FREKUENSI BAHAN' },
       sasaran:                     { nama: 'SASARAN PESERTA DIDIK' },
@@ -2340,7 +2344,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     const KOP_TGL_BAKU = '26 Oktober 2026'; // tanggal baku kop SEMUA laporan (Excel & Word)
     const WORD_KOP_TGL = KOP_TGL_BAKU;
     const WORD_KOP_JUDUL = {
-      '01.01': 'PENDATAAN SASARAN PESERTA DIDIK', '01.02': 'PENDATAAN SASARAN 3B', '01.03': 'JENIS DAN FREKUENSI BAHAN BAKU', '01.04': 'SIKLUS MENU 20 HARI',
+      '01.01': 'PENDATAAN SASARAN PESERTA DIDIK', '01.02': 'PENDATAAN SASARAN 3B', '01.03': 'JENIS DAN FREKUENSI BAHAN BAKU', '01.04': 'SIKLUS MENU 60 HARI',
       '06.01': 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', '03.05': 'PEMANTAUAN SUHU RUANGAN',
       '21.01': 'INSPEKSI KONTAMINASI SILANG', '22.01': 'CHECKLIST INSPEKSI HARIAN MANAJEMEN ALERGEN'
     };
@@ -2868,7 +2872,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       }
     }
 
-    // ---------- FM-SGR-SPPG-01.04  SIKLUS MENU 20 HARI ----------
+    // ---------- FM-SGR-SPPG-01.04  SIKLUS MENU 60 HARI ----------
     async function rptExportSiklus(wrapperId) {
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet('FM-SGR-SPPG-01.04');
@@ -2877,7 +2881,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       ws.getColumn(14).width = 8.66;
       ws.getRow(1).height = 3.75;
       rptKop(wb, ws, { r: 2, rowH: 27, logo: [2, 3], title: [4, 11], lab: 12, val: 13,
-        judul: 'SIKLUS MENU 20 HARI', noDoc: 'FM-SGR-SPPG-01.04', tgl: exportGetDocDateText(wrapperId), colon: false });
+        judul: 'SIKLUS MENU 60 HARI', noDoc: 'FM-SGR-SPPG-01.04', tgl: exportGetDocDateText(wrapperId), colon: false });
       rptDateLine(ws, 5, 2, 13);
 
       const weeks = getSuhuWeeks();
@@ -2890,23 +2894,26 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         return (v === undefined || v === null) ? '' : String(v).trim();
       };
       const groups = [['KARBO', 'Makanan Pokok'], ['PH', 'Lauk Hewani'], ['PN', 'Lauk Nabati'], ['SAYUR', 'Sayur'], ['BUAH', 'Buah']];
+      const totalDays = weeks.reduce((n, w) => n + ((w && w.dates) ? (Array.isArray(w.dates) ? w.dates.length : Object.values(w.dates).length) : 0), 0);
       let hasSusu = false;
-      for (let m = 0; m < 20; m++) if (readCell('SUSU', m) !== '') hasSusu = true;
+      for (let m = 0; m < totalDays; m++) if (readCell('SUSU', m) !== '') hasSusu = true;
       if (hasSusu) groups.push(['SUSU', 'Susu']);
 
       let row = 6;
-      for (let b = 0; b < 2; b++) {
+      const tableCount = Math.ceil(totalDays / 10);
+      for (let b = 0; b < tableCount; b++) {
+        const dayCount = Math.min(10, totalDays - b * 10);
         ws.getRow(row).height = 43;
         rptMerge(ws, row, 2, row, 3);
         rptPut(ws, row, 2, 'Kelompok Bahan Makanan', { size: 14 });
-        for (let i = 0; i < 10; i++) rptPut(ws, row, 4 + i, 'Menu ' + (b * 10 + i + 1), { size: 14, h: 'center' });
+        for (let i = 0; i < dayCount; i++) rptPut(ws, row, 4 + i, 'Menu ' + (b * 10 + i + 1), { size: 14, h: 'center' });
         rptFill(ws, row, 2, row, 13, RPT_GREY);
         rptBorder(ws, row, 2, row, 13, 'grid');
         row++;
         groups.forEach(g => {
           let maxLines = 1;
           const vals = [];
-          for (let i = 0; i < 10; i++) {
+          for (let i = 0; i < dayCount; i++) {
             const v = readCell(g[0], b * 10 + i).toUpperCase();
             vals.push(v);
             maxLines = Math.max(maxLines, rptLines(v, 20.2, 14));
@@ -3265,24 +3272,50 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     let suhuBatchCounters = { matang: 1, pemorsian: 1 };
     let suhuRuangColumns = 1;
 
-    const DEFAULT_SIKLUS_MENU_20_DAYS = [
+    // ===== SIKLUS MENU 60 HARI KERJA (12 blok x 5 hari) =====
+    // Periode: Senin, 26 Okt 2026 s.d. 60 hari kerja ke depan. Isi menu TIDAK diubah;
+    // pola menu 20 hari yang sudah ada diulang untuk blok-blok berikutnya.
+    const SIKLUS_TOTAL_DAYS = 60;
+    const SIKLUS_START_Y = 2026, SIKLUS_START_M = 9, SIKLUS_START_D = 26;
+    const SIKLUS_DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const SIKLUS_MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    function buildSiklusBlockDates() {
+      const out = [];
+      const d = new Date(SIKLUS_START_Y, SIKLUS_START_M, SIKLUS_START_D);
+      while (out.length < Math.ceil(SIKLUS_TOTAL_DAYS / 5)) {
+        const dates = [];
+        while (dates.length < 5) {
+          const dow = d.getDay();
+          if (dow >= 1 && dow <= 5) dates.push(`${SIKLUS_DAY_NAMES[dow]}, ${String(d.getDate()).padStart(2, '0')} ${SIKLUS_MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`);
+          d.setDate(d.getDate() + 1);
+        }
+        out.push(dates);
+      }
+      return out;
+    }
+
+    // Pola menu 20 hari (4 blok) yang lama - dipakai bergilir sebagai isi siklus 60 hari.
+    const SIKLUS_MENU_POLA_20_HARI = [
       {
-        dates: ["Senin, 12 Okt 2026", "Selasa, 13 Okt 2026", "Rabu, 14 Okt 2026", "Kamis, 15 Okt 2026", "Jumat, 16 Okt 2026"],
         items: { KARBO: ["NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI KUNING"], PH: ["AYAM SERUNDENG", "TELUR REBUS BALADO", "AYAM BAKAR", "UDANG ASAM MANIS", "AYAM KRISPI"], PN: ["TAHU BALADO", "TAHU KECAP", "TAHU MARINASI", "PERKEDEL JAGUNG", "TEMPE KECAP"], SAYUR: ["SAYUR KACANG PANJANG", "TUMIS KANGKUNG", "LALAPAN", "TUMIS KACANG", "TUMIS LABU SIAM"], SAYUR_2: ["", "", "", "", ""], BUAH: ["SEMANGKA", "ANGGUR", "PISANG", "PEPAYA", "SEMANGKA"], SUSU: ["", "", "", "", ""] }
       },
       {
-        dates: ["Senin, 19 Okt 2026", "Selasa, 20 Okt 2026", "Rabu, 21 Okt 2026", "Kamis, 22 Okt 2026", "Jumat, 23 Okt 2026"],
         items: { KARBO: ["NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI KUNING"], PH: ["AYAM RICA", "TELUR NASU CEMPA", "UDANG KRISPI", "SEMUR AYAM", "AYAM KRISPI"], PN: ["TEMPE MENTEGA", "TAHU MENDOAN", "TEMPE KECAP", "TAHU KRISPI", "TAHU BALADO"], SAYUR: ["SAWI PUTIH", "SAYUR BUNCIS", "SAYUR LABU", "SAYUR MIX", "SAWI PUTIH"], SAYUR_2: ["", "", "", "", ""], BUAH: ["PISANG", "APEL", "PEPAYA", "MELON", "SEMANGKA"], SUSU: ["", "", "", "", ""] }
       },
       {
-        dates: ["Senin, 26 Okt 2026", "Selasa, 27 Okt 2026", "Rabu, 28 Okt 2026", "Kamis, 29 Okt 2026", "Jumat, 30 Okt 2026"],
         items: { KARBO: ["NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI KUNING"], PH: ["AYAM LENGKUAS", "TELUR DADAR", "IKAN BAKAR", "AYAM WOKU", "AYAM KRISPI"], PN: ["TAHU BACEM", "TEMPE OREK", "TAHU GORENG", "TEMPE MENDOAN", "TAHU BALADO"], SAYUR: ["SAYUR ASEM", "BUNCIS WORTEL", "SOUP HATI", "CAPCAY", "SAYUR BAYAM"], SAYUR_2: ["", "", "", "", ""], BUAH: ["JERUK", "PISANG", "MELON", "PEPAYA", "SEMANGKA"], SUSU: ["", "", "", "", ""] }
       },
       {
-        dates: ["Senin, 02 Nov 2026", "Selasa, 03 Nov 2026", "Rabu, 04 Nov 2026", "Kamis, 05 Nov 2026", "Jumat, 06 Nov 2026"],
         items: { KARBO: ["NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI PUTIH", "NASI KUNING"], PH: ["AYAM GEPREK", "TELUR KECAP", "UDANG MENTEGA", "AYAM SERUNDENG", "AYAM KRISPI"], PN: ["TEMPE BALADO", "TAHU CRISPY", "TEMPE KECAP", "PERKEDEL TAHU", "TEMPE BACEM"], SAYUR: ["TOGE KACANG", "SAYUR LODEH", "LABU SIAM", "SOUP BOLA TAHU", "TUMIS WORTEL"], SAYUR_2: ["", "", "", "", ""], BUAH: ["PISANG", "SEMANGKA", "ANGGUR", "PEPAYA", "MELON"], SUSU: ["", "", "", "", ""] }
       }
     ];
+
+    const DEFAULT_SIKLUS_MENU_60_DAYS = buildSiklusBlockDates().map((dates, i) => ({
+      dates,
+      // rotasi mulai blok ke-3 (26 Okt) supaya tanggal yang sudah ada tetap memakai menu yang sama
+      items: JSON.parse(JSON.stringify(SIKLUS_MENU_POLA_20_HARI[(i + 2) % 4].items))
+    }));
 
     function createInitialCleanGiziSubmenus(isPemorsian = false) {
       return [
@@ -3386,7 +3419,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const lines = rawText.trim().split('\n').map(l => l.split('\t').map(cell => cell.trim()));
       const storageKey = isMasterBahan ? 'sppg_master_bahan_weeks' : 'sppg_siklus_menu_weeks';
       
-      let weeks = window.dbCache[storageKey] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      let weeks = window.dbCache[storageKey] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       
       if (!weeks[targetWeek]) {
         weeks[targetWeek] = { dates: [`Hari ${targetWeek*5+1}`, `Hari ${targetWeek*5+2}`, `Hari ${targetWeek*5+3}`, `Hari ${targetWeek*5+4}`, `Hari ${targetWeek*5+5}`], items: { KARBO:[], PH:[], PN:[], SAYUR:[], SAYUR_2:[], BUAH:[], SUSU:[] } };
@@ -3449,12 +3482,12 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     // =====================================================================
     const IMP_CFG = {
       master: {
-        code: 'MASTER_BAHAN_20_HARI', title: 'Master Bahan 20 Hari', sheet: 'IMPORT_MASTER_BAHAN', color: 'FFC7D2FE', head: 'FF3730A3',
+        code: 'MASTER_BAHAN_60_HARI', title: 'Master Bahan 60 Hari', sheet: 'IMPORT_MASTER_BAHAN', color: 'FFC7D2FE', head: 'FF3730A3',
         key: 'sppg_master_bahan_weeks', groups: KELOMPOK_LIST_MASTER,
         label: k => String(KELOMPOK_LABELS_MASTER[k]).toUpperCase(), other: 'menu'
       },
       menu: {
-        code: 'SIKLUS_MENU_20_HARI', title: 'Siklus Menu 20 Hari (FM-SGR-SPPG-01.04)', sheet: 'IMPORT_SIKLUS_MENU', color: 'FFBFDBFE', head: 'FF1E3A8A',
+        code: 'SIKLUS_MENU_60_HARI', title: 'Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)', sheet: 'IMPORT_SIKLUS_MENU', color: 'FFBFDBFE', head: 'FF1E3A8A',
         key: 'sppg_siklus_menu_weeks', groups: KELOMPOK_LIST_MENU,
         label: k => String(KELOMPOK_LABELS_MENU[k]).toUpperCase(), other: 'master'
       }
@@ -3492,13 +3525,70 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       if (m) return impDateToText(new Date(Date.UTC(+m[3], +m[2] - 1, +m[1])));
       return v;
     }
+    // ---- BANTUAN SIKLUS UNTUK IMPORT (blok tambahan 5 hari) ----
+    function impWeeks(t) {
+      const raw = window.dbCache[IMP_CFG[t].key];
+      if (!raw) return [];
+      const arr = Array.isArray(raw) ? raw : Object.values(raw);
+      return arr.filter(w => w && w.dates);
+    }
+    function impBlockDateLabels(w) {
+      const ds = Array.isArray(w.dates) ? w.dates : Object.values(w.dates);
+      return ds.map(String);
+    }
+    function impLastDateKey(weeks) {
+      if (!weeks.length) return null;
+      const ds = impBlockDateLabels(weeks[weeks.length - 1]);
+      return parseSiklusDateToKey(ds[ds.length - 1]);
+    }
+    function impNextWorkdayKey(key) {
+      const d = new Date(key + 'T00:00:00Z');
+      do { d.setUTCDate(d.getUTCDate() + 1); } while (d.getUTCDay() === 0 || d.getUTCDay() === 6);
+      return d.toISOString().slice(0, 10);
+    }
+    function impWorkdaysAfterKey(key, count) {
+      const out = [];
+      let k = key;
+      for (let i = 0; i < count; i++) { k = impNextWorkdayKey(k); out.push(k); }
+      return out;
+    }
+    function impIsWorkdayKey(key) {
+      const dow = new Date(key + 'T00:00:00Z').getUTCDay();
+      return dow >= 1 && dow <= 5;
+    }
+    // Blok siklus yang ada (atau default 12 blok bila database belum ada) + tanggal blok tambahan berikutnya.
+    function impCyclePlan(t) {
+      const weeks = impWeeks(t);
+      const base = weeks.length ? weeks : DEFAULT_SIKLUS_MENU_60_DAYS;
+      const lastKey = impLastDateKey(base);
+      const nextKeys = lastKey ? impWorkdaysAfterKey(lastKey, 5) : [];
+      return { weeks: base, blockCount: base.length, lastKey, nextKeys, nextDates: nextKeys.map(k => impDateToText(new Date(k + 'T00:00:00Z'))) };
+    }
+    // Catatan siklus di panel import selalu mengikuti jumlah blok yang tersimpan.
+    function refreshImportNotes() {
+      ['master', 'menu'].forEach(t => {
+        const el = document.getElementById('imp_' + t + '_cycle_note');
+        if (!el) return;
+        const plan = impCyclePlan(t);
+        const first = impBlockDateLabels(plan.weeks[0])[0] || '';
+        const last = impBlockDateLabels(plan.weeks[plan.blockCount - 1]).slice(-1)[0] || '';
+        const extraFrom = plan.nextDates[0] || '';
+        const extraTo = plan.nextDates[4] || '';
+        el.innerHTML = 'Template berisi <b>' + plan.blockCount + ' blok × 5 hari = ' + (plan.blockCount * 5) + ' hari</b> (' + first + ' s.d. ' + last + '), tanggal sudah terisi otomatis. '
+          + 'Blok <b>' + (plan.blockCount + 1) + ' = blok tambahan opsional</b>' + (extraFrom ? ' (' + extraFrom + ' s.d. ' + extraTo + ')' : '') + ': isi menunya untuk menambah <b>5 hari baru</b>; biarkan kosong bila tidak perlu.';
+      });
+    }
+
     function impParse(t, raw) {
       const cfg = IMP_CFG[t], oth = IMP_CFG[cfg.other];
-      const errors = [];
+      const errors = [], notes = [];
+      const plan = impCyclePlan(t);
+      const oldBlocks = plan.blockCount;
+      const maxBlock = oldBlocks + 1;   // blok terakhir = tambahan 5 hari baru (opsional)
       const rows = String(raw || '').replace(/\r/g, '').split('\n')
         .map((l, i) => ({ n: i + 1, c: l.split('\t').map(impUnquote) }))
         .filter(r => r.c.some(x => x !== ''));
-      if (!rows.length) return { errors: ['Tidak ada data. Tempelkan isi template terlebih dahulu.'], blocks: {} };
+      if (!rows.length) return { errors: ['Tidak ada data. Tempelkan isi template terlebih dahulu.'], blocks: {}, notes: [] };
 
       // 1. penanda format harus ada & sesuai modul
       const first = rows[0];
@@ -3535,7 +3625,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         if (head === '#BLOK') {
           closeBlock();
           const n = parseInt(r.c[1], 10);
-          if (!(n >= 1 && n <= 4)) { errors.push('Baris ' + r.n + ': nomor #BLOK harus 1 sampai 4.'); cur = { n: 'x' + r.n, items: {}, bad: true }; continue; }
+          if (!(n >= 1 && n <= maxBlock)) { errors.push('Baris ' + r.n + ': nomor #BLOK harus 1 sampai ' + maxBlock + ' (Blok ' + maxBlock + ' = blok tambahan untuk 5 hari baru).'); cur = { n: 'x' + r.n, items: {}, bad: true }; continue; }
           if (blocks[n]) errors.push('Baris ' + r.n + ': Blok ' + n + ' muncul dua kali.');
           cur = { n: n, items: {}, dates: null };
           continue;
@@ -3559,14 +3649,49 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         cur.items[k] = vals.map(v => { v = v.toUpperCase(); return (v === '0' || v === '-') ? '' : v; });
       }
       closeBlock();
-      if (!Object.keys(blocks).length) errors.push('Tidak ada blok data (#BLOK) yang ditemukan.');
-      return { errors: errors, blocks: blocks };
+
+      // 3. blok kosong tidak diterapkan, supaya template kosong tidak menghapus data lama.
+      Object.keys(blocks).map(Number).forEach(n => {
+        const b = blocks[n];
+        if (!b || !b.dates) return;
+        const filled = cfg.groups.some(k => b.items[k] && b.items[k].some(Boolean));
+        if (filled) return;
+        delete blocks[n];
+        notes.push(n > oldBlocks
+          ? 'Blok ' + n + ' (blok tambahan) kosong, jadi tidak ada 5 hari baru yang ditambahkan.'
+          : 'Blok ' + n + ' kosong, jadi data lama blok ini tidak diubah.');
+      });
+
+      // 4. blok tambahan (nomor di atas jumlah blok sekarang): harus 5 hari kerja berurutan setelah blok terakhir.
+      const lbl = key => impDateToText(new Date(key + 'T00:00:00Z'));
+      Object.keys(blocks).map(Number).filter(n => n > oldBlocks).forEach(n => {
+        const b = blocks[n];
+        if (!b || !b.dates) return;
+        const tag = 'Blok tambahan ' + n + ': ';
+        const keys = b.dates.map(parseSiklusDateToKey);
+        keys.forEach((kk, i) => {
+          if (kk && !impIsWorkdayKey(kk)) errors.push(tag + 'tanggal hari ke-' + (i + 1) + ' ("' + b.dates[i] + '") bukan hari kerja (Senin-Jumat).');
+        });
+        if (!keys.every(Boolean)) return;
+        if (plan.lastKey && keys[0] !== impNextWorkdayKey(plan.lastKey)) {
+          errors.push(tag + 'harus dimulai ' + lbl(impNextWorkdayKey(plan.lastKey)) + ', yaitu hari kerja setelah tanggal terakhir siklus (' + lbl(plan.lastKey) + ').');
+        }
+        for (let i = 1; i < 5; i++) {
+          if (keys[i] !== impNextWorkdayKey(keys[i - 1])) {
+            errors.push(tag + 'tanggal harus berurutan hari kerja (Senin-Jumat) tanpa jeda sejak ' + b.dates[0] + '.');
+            break;
+          }
+        }
+      });
+
+      if (!Object.keys(blocks).length) errors.push(notes.length ? 'Tidak ada blok berisi data. Semua blok kosong sehingga tidak ada yang diubah.' : 'Tidak ada blok data (#BLOK) yang ditemukan.');
+      return { errors: errors, blocks: blocks, notes: notes };
     }
 
     // ---- TERAPKAN (hanya menulis ke kunci milik modul ini) ----
     function impApply(t, blocks) {
       const cfg = IMP_CFG[t];
-      const weeks = JSON.parse(JSON.stringify(window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_20_DAYS));
+      const weeks = JSON.parse(JSON.stringify(window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_60_DAYS));
       Object.keys(blocks).forEach(n => {
         const b = blocks[n], idx = Number(n) - 1;
         const w = weeks[idx] || { dates: [], items: {} };
@@ -3587,6 +3712,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         initSuhuModule();
         initAlergenModule();
       }
+      refreshImportNotes();
       updateDashboardSummary();
     }
 
@@ -3601,13 +3727,17 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         alert('Import ditolak. Tidak ada data yang diubah. Lihat rincian kesalahan di bawah kotak import.');
         return;
       }
-      const oldWeeks = window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_20_DAYS;
+      const oldWeeks = window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_60_DAYS;
+      const oldBlocks = oldWeeks.length;
       const lines = Object.keys(res.blocks).map(Number).sort((a, b) => a - b).map(n => {
         const b = res.blocks[n];
         const filled = cfg.groups.reduce((s, k) => s + b.items[k].filter(Boolean).length, 0);
         const had = oldWeeks[n - 1] && oldWeeks[n - 1].items && cfg.groups.some(k => (oldWeeks[n - 1].items[k] || []).some(Boolean));
-        return 'Blok ' + n + ' (Hari ' + ((n - 1) * 5 + 1) + '-' + (n * 5) + '): ' + b.dates[0] + ' s.d. ' + b.dates[4] + ', ' + filled + ' sel terisi' + (had ? ' (MENGGANTI data lama)' : '');
+        const isNew = n > oldBlocks;
+        return 'Blok ' + n + ' (Hari ' + ((n - 1) * 5 + 1) + '-' + (n * 5) + '): ' + b.dates[0] + ' s.d. ' + b.dates[4] + ', ' + filled + ' sel terisi'
+          + (isNew ? ' (BLOK BARU: menambah 5 hari)' : (had ? ' (MENGGANTI data lama)' : ''));
       });
+      (res.notes || []).forEach(n2 => lines.push(n2));
       if (!confirm('Terapkan import ke modul ' + cfg.title + '?\n\n' + lines.join('\n') + '\n\nBlok lain yang tidak ada di data ini tidak diubah.')) {
         impShow(t, 'info', 'Dibatalkan. Tidak ada data yang diubah.', []);
         return;
@@ -3662,12 +3792,12 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     // ---- TEMPLATE EXCEL ----
-    async function impDownloadTemplate(t, withData) {
+    // onlyExtra=true -> file khusus 1 blok tambahan (5 hari baru) di akhir siklus.
+    async function impDownloadTemplate(t, withData, onlyExtra) {
       const cfg = IMP_CFG[t];
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet(cfg.sheet);
       ws.columns = [{ width: 22 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 }, { width: 30 }];
-      const weeks = withData ? (window.dbCache[cfg.key] || DEFAULT_SIKLUS_MENU_20_DAYS) : null;
       const thin = { style: 'thin', color: { argb: 'FF94A3B8' } };
       const addRow = (vals, style) => {
         const r = ws.addRow(vals);
@@ -3681,33 +3811,66 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         }
         return r;
       };
-      for (let b = 0; b < 4; b++) {
-        const w = weeks ? weeks[b] : null;
+      const plan = impCyclePlan(t);
+      const baseDates = buildSiklusBlockDates();
+      if (onlyExtra) {
         addRow(['#FORMAT', cfg.code], 'dir');
-        addRow(['#BLOK', String(b + 1)], 'dir');
-        const dts = [0, 1, 2, 3, 4].map(i => (w && w.dates && w.dates[i]) || '');
-        addRow(['TANGGAL'].concat(dts), 'tgl');
-        cfg.groups.forEach(k => {
-          const arr = [0, 1, 2, 3, 4].map(i => (w && w.items && w.items[k] && w.items[k][i]) || '');
-          addRow([cfg.label(k)].concat(arr), 'dat');
-        });
+        addRow(['#BLOK', String(plan.blockCount + 1)], 'dir');
+        addRow(['TANGGAL'].concat(plan.nextDates), 'tgl');
+        cfg.groups.forEach(k => addRow([cfg.label(k), '', '', '', '', ''], 'dat'));
         ws.addRow([]);
+      } else {
+        // Template memuat semua blok yang ada + 1 blok tambahan opsional (5 hari baru) di akhir.
+        for (let b = 0; b <= plan.blockCount; b++) {
+          const isExtra = b === plan.blockCount;
+          const w = (!isExtra && withData) ? plan.weeks[b] : null;
+          let dts;
+          if (isExtra) dts = plan.nextDates.slice();
+          else if (w) dts = [0, 1, 2, 3, 4].map(i => (w.dates && w.dates[i]) || (baseDates[b] && baseDates[b][i]) || '');
+          else dts = (baseDates[b] || []).slice(0, 5);
+          addRow(['#FORMAT', cfg.code], 'dir');
+          addRow(['#BLOK', String(b + 1)], 'dir');
+          addRow(['TANGGAL'].concat(dts), 'tgl');
+          cfg.groups.forEach(k => {
+            const arr = [0, 1, 2, 3, 4].map(i => (w && w.items && w.items[k] && w.items[k][i]) || '');
+            addRow([cfg.label(k)].concat(arr), 'dat');
+          });
+          ws.addRow([]);
+        }
       }
       const gd = wb.addWorksheet('PETUNJUK');
       gd.getColumn(1).width = 110;
-      [
+      const firstLbl = impBlockDateLabels(plan.weeks[0])[0] || '';
+      const lastLbl = impBlockDateLabels(plan.weeks[plan.blockCount - 1]).slice(-1)[0] || '';
+      const extraFrom = plan.nextDates[0] || '';
+      const extraTo = plan.nextDates[4] || '';
+      const notes = onlyExtra ? [
+        'PETUNJUK TAMBAH 5 HARI - ' + cfg.title,
+        '',
+        '1. File ini HANYA berisi 1 blok tambahan: #BLOK ' + (plan.blockCount + 1) + ' (' + extraFrom + ' s.d. ' + extraTo + ').',
+        '2. Isi kolom B sampai F tiap kelompok. Blok ini akan MENAMBAH 5 hari di akhir siklus (Hari ' + (plan.blockCount * 5 + 1) + ' s.d. Hari ' + (plan.blockCount * 5 + 5) + ').',
+        '3. Jangan mengubah baris #FORMAT, #BLOK, TANGGAL, dan nama kelompok di kolom A.',
+        '4. Tanggal harus 5 hari kerja berurutan (Senin-Jumat). Tanggal sudah terisi otomatis; jangan diubah.',
+        '5. Jika semua sel menu dibiarkan kosong, tidak ada hari yang ditambahkan.',
+        '6. Cara pakai: unggah file lewat tombol "Pilih File Excel", ATAU salin semua isi sheet IMPORT ke kotak import di dashboard.',
+        '7. Untuk menambah 5 hari berikutnya, unduh lagi tombol "Tambah 5 Hari" setelah import ini tersimpan.'
+      ] : [
         'PETUNJUK IMPORT - ' + cfg.title,
         '',
         '1. Template ini KHUSUS untuk modul ' + cfg.title + ' (format ' + cfg.code + ').',
         '2. Jangan mengubah baris #FORMAT, #BLOK, TANGGAL, dan nama kelompok di kolom A. Isi hanya kolom B sampai F (5 hari per blok).',
-        '3. Tanggal ditulis lengkap dengan tahun, contoh: Senin, 09 Nov 2026. Tanggal harus berurutan naik dalam satu blok.',
-        '4. Ada 4 blok (Hari 1-5, 6-10, 11-15, 16-20). Blok yang tidak ingin diubah boleh dihapus dari file / tidak ditempel.',
-        '5. Cara pakai: unggah file lewat tombol "Pilih File Excel", ATAU blok semua isi sheet IMPORT, salin, lalu tempel ke kotak import di dashboard.',
-        '6. Salah modul, format tidak lengkap, atau nama baris berbeda = DITOLAK otomatis dan tidak ada data yang diubah.'
-      ].forEach((tx, i) => { const r = gd.addRow([tx]); if (i === 0) r.font = { bold: true, size: 13 }; r.alignment = { wrapText: true }; });
+        '3. Tanggal sudah terisi otomatis: ' + firstLbl + ' s.d. ' + lastLbl + ' untuk ' + plan.blockCount + ' blok (Hari 1 s.d. Hari ' + (plan.blockCount * 5) + '). Tanggal ditulis lengkap dengan tahun, contoh: Senin, 09 Nov 2026, dan harus berurutan naik dalam satu blok.',
+        '4. Blok ' + (plan.blockCount + 1) + ' (tanggal ' + extraFrom + ' s.d. ' + extraTo + ') adalah BLOK TAMBAHAN opsional. Isi menunya untuk MENAMBAH 5 hari baru di akhir siklus. Jika blok ini dikosongkan, ia diabaikan dan jumlah hari tidak berubah.',
+        '5. #BLOK 1 s.d. ' + plan.blockCount + ' menggantikan blok yang sudah ada; hanya #BLOK ' + (plan.blockCount + 1) + ' yang menambah 5 hari. Jangan membuat nomor blok yang melompat.',
+        '6. Blok yang tidak ingin diubah boleh dihapus dari file / tidak ditempel. Blok kosong diabaikan sehingga data lama tidak terhapus.',
+        '7. Cara pakai: unggah file lewat tombol "Pilih File Excel", ATAU blok semua isi sheet IMPORT, salin, lalu tempel ke kotak import di dashboard.',
+        '8. Salah modul, format tidak lengkap, atau nama baris berbeda = DITOLAK otomatis dan tidak ada data yang diubah.'
+      ];
+      notes.forEach((tx, i) => { const r = gd.addRow([tx]); if (i === 0) r.font = { bold: true, size: 13 }; r.alignment = { wrapText: true }; });
       const buf = await wb.xlsx.writeBuffer();
       const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const nm = withData ? ('DATA_' + cfg.sheet + '_' + getLocalDateKey() + '.xlsx') : ('TEMPLATE_' + cfg.sheet + '.xlsx');
+      const nm = onlyExtra ? ('TAMBAH_5_HARI_' + cfg.sheet + '.xlsx')
+        : (withData ? ('DATA_' + cfg.sheet + '_' + getLocalDateKey() + '.xlsx') : ('TEMPLATE_' + cfg.sheet + '.xlsx'));
       exportDownloadBlob(blob, nm);
     }
 
@@ -3806,21 +3969,24 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function renderSiklusMenu20Table() {
       const wrapper = document.getElementById('siklus_menu_tables_wrapper');
       if (!wrapper) return;
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       
-      // Model tabel sama dengan laporan: Tabel 1 = Hari 1-10 (Menu 1-10), Tabel 2 = Hari 11-20 (Menu 11-20)
+      // Model tabel sama dengan laporan: setiap tabel memuat 10 hari (1 dekade siklus).
       const dayInfo = m => {
         const w = weeks[Math.floor(m / 5)] || { dates: [], items: {} };
         return { date: (w.dates && w.dates[m % 5]) || '', w: w, i: m % 5 };
       };
+      const totalDays = weeks.reduce((n, w) => n + ((w && w.dates) ? (Array.isArray(w.dates) ? w.dates.length : Object.values(w.dates).length) : 0), 0);
+      const tableCount = Math.ceil(totalDays / 10);
       let html = '';
-      [0, 1].forEach(tIdx => {
-        const days = Array.from({ length: 10 }, (_, i) => tIdx * 10 + i);
+      for (let tIdx = 0; tIdx < tableCount; tIdx++) {
+        const days = Array.from({ length: Math.min(10, totalDays - tIdx * 10) }, (_, i) => tIdx * 10 + i);
+        const lastDay = days[days.length - 1];
         html += `
           <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white space-y-2">
             <div class="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 font-bold text-xs flex justify-between items-center">
-              <span>Siklus Menu - Hari ke-${days[0] + 1} s.d. Hari ke-${days[9] + 1} (Menu ${days[0] + 1} - Menu ${days[9] + 1})</span>
-              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Tabel ${tIdx + 1} / 2</span>
+              <span>Siklus Menu - Hari ke-${days[0] + 1} s.d. Hari ke-${lastDay + 1} (Menu ${days[0] + 1} - Menu ${lastDay + 1})</span>
+              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Tabel ${tIdx + 1} / ${tableCount}</span>
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs border-collapse min-w-[1100px]">
               <thead class="bg-blue-50 text-blue-900"><tr><th class="p-3 border-b w-36">Kelompok</th>${days.map(m => `<th class="p-3 border-b border-l border-white/50 text-center">Menu ${m + 1}<br/><span class="text-[10px] font-bold">Hari ke-${m + 1}</span><br/><span class="text-[10px] text-blue-600/70 font-normal">${dayInfo(m).date}</span></th>`).join('')}</tr></thead>
@@ -3835,7 +4001,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                   </tr>`).join('')}
               </tbody></table></div>
           </div>`;
-      });
+      }
       wrapper.innerHTML = html;
       wrapper.querySelectorAll('textarea[id^="sm_cell_"]').forEach(autoGrowMenuCell);
     }
@@ -3847,14 +4013,17 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     function saveSiklusMenuManual() {
-      let weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      let weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       
       KELOMPOK_LIST_MENU.forEach(k => {
-        for (let m = 0; m < 20; m++) {
+        for (let m = 0; m < weeks.length * 5; m++) {
           const cell = document.getElementById(`sm_cell_${k}_${m}`);
           if (cell) {
             let weekIdx = Math.floor(m / 5);
             let dayIdx = m % 5;
+            if (!weeks[weekIdx]) continue;
+            if (!weeks[weekIdx].items) weeks[weekIdx].items = {};
+            if (!Array.isArray(weeks[weekIdx].items[k])) weeks[weekIdx].items[k] = ['', '', '', '', ''];
             weeks[weekIdx].items[k][dayIdx] = cell.value.trim().toUpperCase();
           }
         }
@@ -3870,7 +4039,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function renderMasterBahan20Table() {
       const wrapper = document.getElementById('master_bahan_tables_wrapper');
       if (!wrapper) return;
-      const weeks = window.dbCache['sppg_master_bahan_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      const weeks = window.dbCache['sppg_master_bahan_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       
       let html = '';
       weeks.forEach((w, wIdx) => {
@@ -3880,7 +4049,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white space-y-2">
             <div class="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-4 font-bold text-xs flex justify-between items-center">
               <span>Master Bahan - Hari ke-${startDayNum} s.d. Hari ke-${endDayNum}</span>
-              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Blok ${wIdx + 1} / 4</span>
+              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Blok ${wIdx + 1} / ${weeks.length}</span>
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs border-collapse min-w-[700px]">
               <thead class="bg-slate-100 text-slate-700"><tr><th class="p-3 border-b w-36">Kelompok</th>${w.dates.map((d, dIdx) => `<th class="p-3 border-b border-l border-white text-center">Hari ke-${wIdx * 5 + dIdx + 1}<br/><span class="text-[10px] text-slate-400 font-normal">${d}</span></th>`).join('')}</tr></thead>
@@ -3889,7 +4058,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                   <tr class="hover:bg-slate-50/50 transition-colors"><td class="p-3 border-b font-extrabold text-slate-600 bg-slate-50/50">${KELOMPOK_LABELS_MASTER[kKey]}</td>
                     ${[0, 1, 2, 3, 4].map(dIdx => {
                       let globalDayIdx = wIdx * 5 + dIdx;
-                      let val = (w.items[kKey] && w.items[kKey][dIdx]) ? w.items[kKey][dIdx] : '';
+                      let val = (w.items && w.items[kKey] && w.items[kKey][dIdx]) ? w.items[kKey][dIdx] : '';
                       return `<td class="p-2 border-b border-l border-slate-100"><input type="text" id="mb_cell_${kKey}_${globalDayIdx}" value="${val}" class="w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs uppercase bg-transparent focus:bg-white text-center font-medium"></td>`;
                     }).join('')}
                   </tr>`).join('')}
@@ -3900,14 +4069,17 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     function saveMasterBahanManual() {
-      let weeks = window.dbCache['sppg_master_bahan_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      let weeks = window.dbCache['sppg_master_bahan_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       
       KELOMPOK_LIST_MASTER.forEach(k => {
-        for (let m = 0; m < 20; m++) {
+        for (let m = 0; m < weeks.length * 5; m++) {
           const cell = document.getElementById(`mb_cell_${k}_${m}`);
           if (cell) {
             let weekIdx = Math.floor(m / 5);
             let dayIdx = m % 5;
+            if (!weeks[weekIdx]) continue;
+            if (!weeks[weekIdx].items) weeks[weekIdx].items = {};
+            if (!Array.isArray(weeks[weekIdx].items[k])) weeks[weekIdx].items[k] = ['', '', '', '', ''];
             weeks[weekIdx].items[k][dayIdx] = cell.value.trim().toUpperCase();
           }
         }
@@ -3985,7 +4157,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function initPemorsianOptions() {
       const sel = document.getElementById('selectSiklusPemorsian');
       if (!sel) return;
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       
       let html = '';
       let dayCounter = 0;
@@ -4127,7 +4299,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         totalBahanEl.innerText = `${totalBahanKeys.length} Jenis`;
       }
 
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       const menuMatrix = window.dbCache['sppg_siklus_menu_matrix'] || {};
       
       const activeMenuEl = document.getElementById('dashActiveMenu');
@@ -4198,10 +4370,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 // (blok ini berisi 3 fungsi bantu BARU + initSuhuModule versi baru)
 // =====================================================================
 
-// [BARU] Ambil data siklus menu (realtime dari Firebase cache, sama dengan modul Siklus Menu 20 Hari)
+// [BARU] Ambil data siklus menu (realtime dari Firebase cache, sama dengan modul Siklus Menu 60 Hari)
 function getSuhuWeeks() {
   let weeks = window.dbCache['sppg_siklus_menu_weeks'];
-  if (!weeks) return JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+  if (!weeks) return JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
   if (!Array.isArray(weeks)) weeks = Object.values(weeks);
   return weeks.filter(w => w);
 }
@@ -4278,7 +4450,7 @@ function parseSiklusDateToKey(str) {
   return `${m[3]}-${String(mon).padStart(2, '0')}-${String(parseInt(m[1], 10)).padStart(2, '0')}`;
 }
 
-// Daftar tanggal (YYYY-MM-DD) sejajar dengan index hari siklus 0..19
+// Daftar tanggal (YYYY-MM-DD) sejajar dengan index hari siklus 0..59
 function getSuhuDateKeyList(weeks) {
   const list = [];
   (weeks || []).forEach(w => {
@@ -4590,7 +4762,7 @@ function renderSuhuTable() {
       filteredConfigs.forEach(cfg => {
         let submenus = cfg.template;
         submenus.forEach((sub) => {
-          // [DIUBAH] nama menu diambil langsung dari data Siklus Menu 20 Hari (realtime)
+          // [DIUBAH] nama menu diambil langsung dari data Siklus Menu 60 Hari (realtime)
           let menuName = getSuhuMenuName(weeks, sub.key.toUpperCase(), activeDayIdx);
           let uniqueId = `${cfg.id}_${sub.key}_b${b}`;
           let defTime = realtimeNowTime;
@@ -4762,7 +4934,7 @@ function renderSuhuTable() {
     function initAlergenModule() {
       const siklusSelect = document.getElementById('al_siklus_active');
       if (siklusSelect) {
-        const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+        const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
         let options = '';
         let dayCounter = 0;
         weeks.forEach(w => {
@@ -4796,7 +4968,7 @@ function renderSuhuTable() {
       if (sup) sup.value = (data && data.al_supervisor !== undefined) ? data.al_supervisor : '';
       const sel = document.getElementById('al_siklus_active');
       if (sel) {
-        const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+        const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
         const idx = getSuhuCycleIndexForDate(weeks, dateKey);
         if (sel.querySelector(`option[value="${idx}"]`)) sel.value = idx;
       }
@@ -4806,7 +4978,7 @@ function renderSuhuTable() {
     function onAlergenSiklusChange() {
       const sel = document.getElementById('al_siklus_active');
       const tgl = document.getElementById('al_tanggal');
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS));
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
       const key = getSuhuDateKeyForIdx(weeks, parseInt(sel.value, 10));
       if (key && tgl && tgl.value !== key) {
         tgl.value = key;
@@ -4830,7 +5002,7 @@ function renderSuhuTable() {
       // Fallback dinamis jika matrix dari Firebase belum ter-load sempurna
       if (!menuMatrix || Object.keys(menuMatrix).length === 0) {
           menuMatrix = { KARBO: [], PH: [], PN: [], SAYUR: [], BUAH: [], SUSU: [] };
-          const wks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
+          const wks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_60_DAYS;
           wks.forEach(w => {
               ["KARBO", "PH", "PN", "SAYUR", "BUAH", "SUSU"].forEach(k => {
                   let colData = (w.items && w.items[k]) ? w.items[k] : ['', '', '', '', ''];
@@ -4843,7 +5015,7 @@ function renderSuhuTable() {
       if (menuContainer) {
         let menuHtml = `<div class="font-bold text-xs text-amber-900 mb-2">🍱 Menu Hari Ini (Siklus Ke-${activeDayIdx + 1}):</div><div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs">`;
         KELOMPOK_LIST_MENU.forEach(k => {
-          const wksAl = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
+          const wksAl = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_60_DAYS;
           const wkArr = wksAl[Math.floor(activeDayIdx / 5)]?.items?.[k];
           let item = Array.isArray(wkArr) ? (wkArr[activeDayIdx % 5] || '-') : ((menuMatrix[k] && menuMatrix[k][activeDayIdx]) ? menuMatrix[k][activeDayIdx] : '-');
           item = String(item);
@@ -4907,7 +5079,7 @@ function renderSuhuTable() {
       sppg_frequency_details: 'Frekuensi Bahan (detail)', sppg_allergens_found: 'Daftar Alergen', sppg_siklus_menu_matrix: 'Matriks Siklus Menu',
       sppg_sasaran_didik: 'Sasaran Peserta Didik', sppg_penerima_manfaat: 'Database Penerima Manfaat', sppg_pemorsian_data: 'Log Pemorsian', sppg_log_suhu: 'Log Suhu Ruangan',
       sppg_log_silang: 'Log Kontaminasi Silang', sppg_log_alergen: 'Log Inspeksi Alergen', sppg_pendinginan_data: 'Log Pendinginan',
-      sppg_uji_organoleptik: 'Log Uji Organoleptik & Suhu Masak', sppg_organoleptik_ref: 'Database Acuan Organoleptik (49 Produk)'
+      sppg_uji_organoleptik: 'Log Uji Organoleptik & Suhu Masak', sppg_organoleptik_ref: 'Database Acuan Organoleptik (50 Produk)'
     };
     const BK_LS = 'sppg_last_backup';
 
@@ -5441,9 +5613,9 @@ function renderSuhuTable() {
     }
 
     // ---------------------------------------------------------------- MENU -> REMINDER & SINKRON
-    // Isi menu satu hari siklus (idx 0..19) per kelompok; cara baca sama dengan modul Alergen (22.01)
+    // Isi menu satu hari siklus (idx 0..59) per kelompok; cara baca sama dengan modul Alergen (22.01)
     function sdMenuItemsForIdx(idx) {
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_60_DAYS;
       const matrix = window.dbCache['sppg_siklus_menu_matrix'] || {};
       return KELOMPOK_LIST_MENU.map(k => {
         const wkArr = weeks[Math.floor(idx / 5)]?.items?.[k];
@@ -5459,10 +5631,10 @@ function renderSuhuTable() {
       const box = document.getElementById('sd_reminder');
       if (!box) return;
       const dateKey = document.getElementById('sd_rem_date')?.value || getLocalDateKey();
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_20_DAYS;
+      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_60_DAYS;
       const idx = getSuhuDateKeyList(weeks).indexOf(dateKey);
       if (idx === -1) {
-        box.innerHTML = '<div class="text-amber-800/80 font-medium">Tanggal ini tidak ada dalam Siklus Menu 20 Hari. Anda tetap dapat mencetak label manual pada panel <b>Cetak Label</b> di bawah.</div>';
+        box.innerHTML = '<div class="text-amber-800/80 font-medium">Tanggal ini tidak ada dalam Siklus Menu 60 Hari. Anda tetap dapat mencetak label manual pada panel <b>Cetak Label</b> di bawah.</div>';
         return;
       }
       const items = sdMenuItemsForIdx(idx);
@@ -5846,24 +6018,68 @@ function renderSuhuTable() {
       }
     }
 
+    // Perluas rentang siklus menjadi 60 hari kerja mulai Senin, 26 Okt 2026.
+    // Blok/tanggal/menu yang sudah ada dipertahankan apa adanya, termasuk blok tambahan
+    // (Hari 61-65 dst.) yang ditambahkan lewat import; hanya blok yang belum ada yang ditambahkan.
+    function ensureSiklus60Days(storageKey) {
+      const cur = window.dbCache[storageKey];
+      if (!cur) return null;
+      const arr = (Array.isArray(cur) ? cur : Object.values(cur)).filter(w => w && w.dates);
+      const firstDate = w => { const ds = Array.isArray(w.dates) ? w.dates : Object.values(w.dates); return ds[0]; };
+      const keyOf = w => parseSiklusDateToKey(firstDate(w));
+      const have = new Set(arr.map(keyOf).filter(Boolean));
+      const add = [];
+      buildSiklusBlockDates().forEach(dates => {
+        const k = parseSiklusDateToKey(dates[0]);
+        if (!have.has(k)) {
+          have.add(k);
+          add.push({ dates: dates.slice(), items: { KARBO: [], PH: [], PN: [], SAYUR: [], SAYUR_2: [], BUAH: [], SUSU: [] } });
+        }
+      });
+      if (!add.length) return null;
+      const merged = arr.concat(add);
+      // Urutkan menurut tanggal mulai supaya blok tambahan tetap berada di akhir siklus.
+      merged.sort((a, b) => String(keyOf(a) || '').localeCompare(String(keyOf(b) || '')));
+      window.dbCache[storageKey] = merged;
+      window.fbSet(storageKey, JSON.parse(JSON.stringify(merged)));
+      return merged;
+    }
+
     // Fungsi Utama Inisialisasi UI setelah Firebase dimuat
     window.initializeAppUI = function() {
       if (!window.dbCache['sppg_master_bahan_weeks']) {
-        window.fbSet('sppg_master_bahan_weeks', DEFAULT_SIKLUS_MENU_20_DAYS);
-        syncMasterBahanData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS)));
+        window.fbSet('sppg_master_bahan_weeks', DEFAULT_SIKLUS_MENU_60_DAYS);
+        syncMasterBahanData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS)));
+      } else {
+        const mbWeeks = ensureSiklus60Days('sppg_master_bahan_weeks');
+        if (mbWeeks) syncMasterBahanData(mbWeeks);
       }
       if (!window.dbCache['sppg_siklus_menu_weeks']) {
-        window.fbSet('sppg_siklus_menu_weeks', DEFAULT_SIKLUS_MENU_20_DAYS);
-        syncSiklusMenuData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_20_DAYS)));
+        window.fbSet('sppg_siklus_menu_weeks', DEFAULT_SIKLUS_MENU_60_DAYS);
+        syncSiklusMenuData(JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS)));
+      } else {
+        const smWeeks = ensureSiklus60Days('sppg_siklus_menu_weeks');
+        if (smWeeks) syncSiklusMenuData(smWeeks);
       }
+      refreshImportNotes();
 
-      // Database acuan uji organoleptik (49 produk) - diunggah sekali ke Firebase bila belum ada
+      // Database acuan uji organoleptik (50 produk) - unggah bila kosong, lalu tambahkan produk bawaan yang belum ada
       const ujiRefNow = window.dbCache['sppg_organoleptik_ref'];
       if (!ujiRefNow || !Object.keys(ujiRefNow).length) {
         const seed = (window.UJI_REF_DEFAULT || []).slice();
         if (seed.length) {
           window.dbCache['sppg_organoleptik_ref'] = seed;
           window.fbSet('sppg_organoleptik_ref', seed);
+        }
+      } else {
+        const curRef = Array.isArray(ujiRefNow) ? ujiRefNow.slice() : Object.values(ujiRefNow);
+        const normRef = s => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').toUpperCase();
+        const haveRef = new Set(curRef.filter(r => r && r.nama).map(r => normRef(r.nama)));
+        const addRef = (window.UJI_REF_DEFAULT || []).filter(r => r && r.nama && !haveRef.has(normRef(r.nama)));
+        if (addRef.length) {
+          const mergedRef = curRef.concat(addRef);
+          window.dbCache['sppg_organoleptik_ref'] = mergedRef;
+          window.fbSet('sppg_organoleptik_ref', mergedRef);
         }
       }
       if (typeof window.initUjiOrganoleptik === 'function') window.initUjiOrganoleptik();
@@ -6586,13 +6802,13 @@ function renderSuhuTable() {
   <script>
     // =====================================================================
     // MODUL: UJI ORGANOLEPTIK DAN SUHU MEMASAK (FM-SGR-SPPG-05.01)
-    // Acuan produk : sppg_organoleptik_ref (49 produk dari UJI ORGANOLEPTIK.xlsx)
+    // Acuan produk : sppg_organoleptik_ref (50 produk dari UJI ORGANOLEPTIK.xlsx)
     // Log formulir : sppg_uji_organoleptik/{YYYY-MM-DD} = { meta, menus:{KARBO,PH,PN,SAYUR,BUAH,SUSU}, fotos }
     // =====================================================================
     const UJI_DOC_CODE = 'FM-SGR-SPPG-05.01';
     const UJI_PATH = 'sppg_uji_organoleptik';
     const UJI_REF_PATH = 'sppg_organoleptik_ref';
-    const UJI_REF_DEFAULT = [{"no":"1","nama":"NASI PUTIH","warna":"PUTIH HINGGA PUTIH KEKUNINGAN","tekstur":"PULEN, LEMBUT ATAU PERA TERGANTUNG JENIS BERAS","rasa":"TAWAR","aroma":"AROMA KHAS BERAS MATANG"},{"no":"2","nama":"NASI KUNING","warna":"KUNING","tekstur":"BUTIRAN NASI TERPISAH, TIDAK LEMBEK, SEDIKIT BERMINYAK","rasa":"GURIH","aroma":"HARUM KHAS AROMATIK"},{"no":"3","nama":"NASI UDUK","warna":"PUTIH","tekstur":"PULEN","rasa":"GURIH, ASIN, MANIS","aroma":"HARUM KHAS AROMATIK"},{"no":"4","nama":"TAHU GORENG","warna":"KUNING KEEMASAN","tekstur":"RENYAH","rasa":"GURIH","aroma":"KETUMBAR"},{"no":"5","nama":"TAHU KARI","warna":"KUNING KEMERAH MERAHAN","tekstur":"TAHU LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KARI"},{"no":"6","nama":"TAHU KECAP","warna":"COKELAT MENGKILAP","tekstur":"KENYAL SEDIKIT,LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"7","nama":"TAHU KRISPI","warna":"KUNING KEEMASAN MERATA PADA PERMUKAAN","tekstur":"RENYAH DAN KRISPI DI BAGIAN LUAR, LEMBUT DAN JUICY DI BAGIAN DALAM","rasa":"GURIH","aroma":"HARUM BAWANG PUTIH DAN KETUMBAR"},{"no":"8","nama":"TAHU GORENG MARINASI","warna":"KUNING KEEMASANMERATA PADA PERMUKAAN","tekstur":"RENYAH DAN KRISPI DI BAGIAN LUAR, LEMBUT DAN JUICY DI BAGIAN DALAM","rasa":"GURIH ALAMI DARI REMPAH","aroma":"HARUM TAHU"},{"no":"9","nama":"SEMUR TAHU","warna":"KUNING KE MERAH MERAHAN","tekstur":"TAHU LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"10","nama":"TEMPE KRISPI","warna":"KUNING KEEMASAN MERATA PADA PERMUKAAN","tekstur":"SUPER KRISPI","rasa":"GURIH DENGAN AROMA BAWANG PUTIH","aroma":"AROMA BAWANG PUTIH DAN KETUMBAR"},{"no":"11","nama":"TEMPE KECAP","warna":"COKELAT MENGKILAP","tekstur":"KENYAL SEDIKIT,LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"12","nama":"TEMPE MENDOANG","warna":"KUNING KEEMASAN","tekstur":"LEMBUT,LEMBEK, TIDAK KERING DAN KRISPI","rasa":"GURIH, ASIN","aroma":"KHAS TEMPE MENDOANG"},{"no":"13","nama":"TEMPE GORENG ORIGINAL","warna":"KUNING  KECOKLATAN","tekstur":"RENYAH DI LUAR,LEMBUT DAN EMPUK DI DALAM","rasa":"GURIH, KHAS TEMPE","aroma":"HARUM KHAS TEMPE GORENG"},{"no":"14","nama":"Tempe Goreng Ungkep","warna":"Kuning keemasan (golden yellow)","tekstur":"Sedikit remah di luar, lembut dan empuk di dalam","rasa":"Gurih, berbumbu hingga ke dalam","aroma":"Harum khas rempah ungkep (bawang, ketumbar, kunyit)"},{"no":"15","nama":"Saus Kacang Tanah","warna":"Coklat muda / Coklat kekuningan","tekstur":"Kental, halus (creamy)","rasa":"Gurih, manis, legit","aroma":"Harum khas kacang tanah sangrai"},{"no":"16","nama":"Ikan Goreng Tepung","warna":"Kuning keemasan (golden brown)","tekstur":"Renyah dan garing di luar, lembut dan empuk di dalam","rasa":"Gurih, asin, khas ikan","aroma":"Harum khas ikan goreng dan bumbu rempah"},{"no":"17","nama":"Ayam Goreng","warna":"Kuning keemasan (golden brown)","tekstur":"Daging empuk, lembut, dan tidak kering","rasa":"Gurih, asin, dan berbumbu hingga ke dalam","aroma":"Harum khas rempah (kunyit, bawang, dan salam)"},{"no":"18","nama":"Ayam Goreng Kecap","warna":"Coklat tua","tekstur":"Juicy","rasa":"Manis, asin, gurih","aroma":"Harum kecap manis"},{"no":"19","nama":"Ayam Gulai","warna":"Kuning kecoklatan dengan kuah kental berwarna oranye/kuning","tekstur":"Daging empuk, kuah kental dan creamy","rasa":"Gurih, sedikit pedas, kaya rempah","aroma":"Harum khas rempah gulai (serai, daun jeruk, kayu manis)"},{"no":"20","nama":"Ayam Goreng Kremes","warna":"Kuning keemasan/golden brown merata pada permukaan","tekstur":"Juicy dan tekstur luar nya crispy","rasa":"Gurih, asam, manis","aroma":"Khas ayam goreng"},{"no":"21","nama":"Ayam Kripspi","warna":"Kuning keemasan/golden brown merata pada permukaan","tekstur":"Renyah dan crispy di bagian luar, lembut dan juicy di bagian dalam","rasa":"Gurih, asin","aroma":"Khas ayam goreng berbumbu dan tepung goreng"},{"no":"22","nama":"Ayam Palekko","warna":"Kuning keemasan","tekstur":"Juicy","rasa":"Gurih, asam, manis","aroma":"Khas aromatik"},{"no":"23","nama":"Ayam Lada Hitam","warna":"Coklat tua kehitaman mengkilap","tekstur":"Daging empuk, saus kental dan licin","rasa":"Gurih, sedikit pedas, ada sensasi hangat dari lada","aroma":"Harum khas lada hitam dan bawang bombay"},{"no":"24","nama":"Ayam Popcorn","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, lembut di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ayam goreng tepung dan rempah"},{"no":"25","nama":"Ayam Serundeng","warna":"Ayam kuning keemasan, serundeng coklat keemasan","tekstur":"Daging ayam empuk dan juicy, serundeng kering dan renyah","rasa":"Gurih, manis, dan kaya rempah","aroma":"Harum khas kelapa sangrai dan rempah (serai, daun jeruk, lengkuas)"},{"no":"26","nama":"Nuget Ayam","warna":"Kuning keemasan (golden brown)","tekstur":"Renyah dan garing di luar, lembut dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ayam goreng dan tepung panir"},{"no":"27","nama":"Sempol Ayam","warna":"Kuning keemasan (golden brown)","tekstur":"Kenyal, lembut, dan tidak keras","rasa":"Gurih, asin, dengan aroma bawang dan ayam yang khas","aroma":"Harum khas gorengan telur dan bawang putih"},{"no":"28","nama":"Ayam Suir","warna":"Kuning kecoklatan merata pada serat ayam","tekstur":"Empuk, berserat halus, mudah dikunyah, tidak kering (sedikit berminyak/lembap)","rasa":"Gurih, manis, dan berbumbu hingga ke dalam serat","aroma":"Harum khas rempah (daun jeruk, serai, dan kunyit)"},{"no":"29","nama":"Telur Ayam Balado","warna":"Merah cerah mengkilap dari cabai merah, merata seluruh permukaan telur","tekstur":"Telur kenyal","rasa":"Manis, asin, gurih","aroma":"Harum cabai merah yang ditumis matang, bawang, dan tomat khas balado"},{"no":"30","nama":"Telur Ayam Kecap","warna":"Coklat tua kehitaman mengkilap","tekstur":"Telur empuk, kuah kental dan lengket","rasa":"Manis, gurih, dan sedikit asin","aroma":"Harum khas kecap manis dan rempah (daun salam, serai)"},{"no":"31","nama":"Telur Ceplok","warna":"Putih telur putih kekuningan, kuning telur kuning keemasan","tekstur":"Putih telur lembut dengan tepi sedikit garing, kuning telur padat dan matang","rasa":"Gurih alami, asin (berbumbu)","aroma":"Harum khas telur goreng"},{"no":"32","nama":"Telur Goreng Saus Tomat","warna":"Merah kecoklatan mengkilap (dari saus tomat)","tekstur":"Telur empuk, saus kental dan licin","rasa":"Gurih, manis, dan sedikit asam segar khas tomat","aroma":"Harum khas saus tomat dan tumisan bawang"},{"no":"33","nama":"Dimsum","warna":"Putih kekuningan dengan bintik oranye (dari wortel)","tekstur":"Lembut, kenyal, dan tidak keras","rasa":"Gurih, manis alami dari wortel, dan berbumbu","aroma":"Harum khas ayam, bawang putih, dan sedikit aroma minyak wijen"},{"no":"34","nama":"Ayam Goreng Mentega","warna":"Coklat keemasan dengan balutan saus coklat mengkilap","tekstur":"Daging empuk, saus kental dan licin, sedikit renyah di bagian luar","rasa":"Gurih, manis, dan rich (kaya) aroma mentega","aroma":"Harum khas mentega/margarin dan tumisan bawang bombay"},{"no":"35","nama":"Udang Asam Manis","warna":"Merah kecoklatan atau oranye mengkilap","tekstur":"Udang kenyal dan empuk (tidak alot), saus kental, sayuran sedikit renyah (crunchy)","rasa":"Dominan manis dan asam segar, gurih, pedas sangat ringan atau tidak pedas","aroma":"Harum khas saus tomat dan tumisan bawang"},{"no":"36","nama":"Udang Krispi","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, daging udang kenyal dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas udang goreng tepung dan bawang putih"},{"no":"37","nama":"Udang Rebus Biasa","warna":"Orange kemerahan atau merah muda cerah (tidak pucat/keabu-abuan)","tekstur":"Daging kenyal, padat, dan empuk (tidak lembek atau hancur)","rasa":"Gurih alami, manis, dan segar","aroma":"Harum segar khas udang rebus dan rempah (serai, daun salam)"},{"no":"38","nama":"Ikan Goreng","warna":"Kuning keemasan","tekstur":"Daging empuk, lembut, dan mudah lepas dari tulang","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ikan goreng dan bumbu rempah"},{"no":"39","nama":"Ikan Bandeng","warna":"Putih kekuningan atau coklat keemasan (tergantung metode masak)","tekstur":"Daging empuk, lembut, dan halus","rasa":"Gurih, manis alami, dan tidak amis","aroma":"Harum segar khas ikan, tidak berbau amis"},{"no":"40","nama":"Ikan Rebus","warna":"Putih kekuningan atau sesuai jenis ikan","tekstur":"Daging sangat empuk, lembut, dan mudah hancur","rasa":"Gurih alami, segar, dan tidak amis","aroma":"Harum segar khas rempah (serai, daun salam, jahe)"},{"no":"41","nama":"Ikan Goreng Krispi","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, daging ikan lembut dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ikan goreng tepung dan bawang putih"},{"no":"42","nama":"Tumis Wortel Sawi Putih","warna":"Oranye cerah (wortel) dan hijau tua mengkilap (sawi hijau)","tekstur":"Wortel sedikit renyah, sawi hijau layu namun tidak lembek","rasa":"Gurih, manis alami wortel, dan sedikit segar pahit khas sawi","aroma":"Harum khas tumisan bawang dan sayuran"},{"no":"43","nama":"Lalapan Selada Timun","warna":"Hijau segar (selada) dan hijau muda (timun)","tekstur":"Sangat renyah, segar, dan berair","rasa":"Segar, manis alami, dan sedikit sepat (timun)","aroma":"Harum segar khas sayuran mentah"},{"no":"44","nama":"Tumis Jagung Sawi Putih","warna":"Kuning cerah (jagung) dan putih kehijauan (sawi putih)","tekstur":"Jagung sedikit renyah dan juicy (berair), sawi putih lembut","rasa":"Manis alami dari jagung, gurih, dan segar","aroma":"Harum khas tumisan bawang dan jagung manis"},{"no":"45","nama":"Mix Vegetables","warna":"Warna-warni (orange, hijau, kuning, putih) yang cerah dan menarik","tekstur":"Bervariasi (wortel dan buncis sedikit renyah, kentang lembut)","rasa":"Gurih, manis alami dari sayuran, dan segar","aroma":"Harum khas sayuran segar dan tumisan bawang"},{"no":"46","nama":"Tumis Wortel Labu Siam","warna":"Oranye (wortel) dan putih kehijauan (labu siam) yang cerah","tekstur":"Lembut dan sedikit renyah, tidak lemek","rasa":"Gurih, manis alami, dan segar","aroma":"Harum khas tumisan bawang dan sayuran segar"},{"no":"47","nama":"Sayur Sop","warna":"Sayuran masih segar","tekstur":"Sayuran empuk namun tetap renyah saat dikunyah","rasa":"Gurih, sedikit manis, dan segar khas sayuran","aroma":"Aroma segar khas sayuran"},{"no":"48","nama":"Tumis Kembang Kol Buncis","warna":"Kuah bening kekuningan dengan warna sayuran yang tetap cerah","tekstur":"Sayuran empuk namun tetap segar dan tidak terlalu lunak","rasa":"Gurih, ringan, dan segar dengan cita rasa khas sayuran dan kaldu","aroma":"Harum dari kaldu dan bumbu yang berpadu dengan aroma segar sayuran"},{"no":"49","nama":"AYAM BAKAR","warna":"Cokelat tua mengkilap dengan rona keemasan merata hasil karamelisasi kecap manis, gula merah, dan margarin. Bebas dari bercak hitam gosong berlebih (karbonisasi)","tekstur":"Daging bagian dalam ayam empuk, matang sempurna, dan berserat utuh. Permukaan luar terkaramelisasi dan sedikit lengket, tidak alot maupun terlalu kering","rasa":"Gurih dan manis yang seimbang dari paduan kaldu Knorr, garam, kecap manis, dan gula merah","aroma":"Dominan wangi khas ayam panggang dan gurih margarin, diperkaya aroma volatil rempah yang kuat dari serai, lengkuas, kunyit basah, dan jahe. Tidak terdeteksi bau amis"}];
+    const UJI_REF_DEFAULT = [{"no":"1","nama":"NASI PUTIH","warna":"PUTIH HINGGA PUTIH KEKUNINGAN","tekstur":"PULEN, LEMBUT ATAU PERA TERGANTUNG JENIS BERAS","rasa":"TAWAR","aroma":"AROMA KHAS BERAS MATANG"},{"no":"2","nama":"NASI KUNING","warna":"KUNING","tekstur":"BUTIRAN NASI TERPISAH, TIDAK LEMBEK, SEDIKIT BERMINYAK","rasa":"GURIH","aroma":"HARUM KHAS AROMATIK"},{"no":"3","nama":"NASI UDUK","warna":"PUTIH","tekstur":"PULEN","rasa":"GURIH, ASIN, MANIS","aroma":"HARUM KHAS AROMATIK"},{"no":"4","nama":"TAHU GORENG","warna":"KUNING KEEMASAN","tekstur":"RENYAH","rasa":"GURIH","aroma":"KETUMBAR"},{"no":"5","nama":"TAHU KARI","warna":"KUNING KEMERAH MERAHAN","tekstur":"TAHU LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KARI"},{"no":"6","nama":"TAHU KECAP","warna":"COKELAT MENGKILAP","tekstur":"KENYAL SEDIKIT,LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"7","nama":"TAHU KRISPI","warna":"KUNING KEEMASAN MERATA PADA PERMUKAAN","tekstur":"RENYAH DAN KRISPI DI BAGIAN LUAR, LEMBUT DAN JUICY DI BAGIAN DALAM","rasa":"GURIH","aroma":"HARUM BAWANG PUTIH DAN KETUMBAR"},{"no":"8","nama":"TAHU GORENG MARINASI","warna":"KUNING KEEMASANMERATA PADA PERMUKAAN","tekstur":"RENYAH DAN KRISPI DI BAGIAN LUAR, LEMBUT DAN JUICY DI BAGIAN DALAM","rasa":"GURIH ALAMI DARI REMPAH","aroma":"HARUM TAHU"},{"no":"9","nama":"SEMUR TAHU","warna":"KUNING KE MERAH MERAHAN","tekstur":"TAHU LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"10","nama":"TEMPE KRISPI","warna":"KUNING KEEMASAN MERATA PADA PERMUKAAN","tekstur":"SUPER KRISPI","rasa":"GURIH DENGAN AROMA BAWANG PUTIH","aroma":"AROMA BAWANG PUTIH DAN KETUMBAR"},{"no":"11","nama":"TEMPE KECAP","warna":"COKELAT MENGKILAP","tekstur":"KENYAL SEDIKIT,LEMBUT DI DALAM","rasa":"GURIH MANIS","aroma":"HARUM KHAS KECAP"},{"no":"12","nama":"TEMPE MENDOANG","warna":"KUNING KEEMASAN","tekstur":"LEMBUT,LEMBEK, TIDAK KERING DAN KRISPI","rasa":"GURIH, ASIN","aroma":"KHAS TEMPE MENDOANG"},{"no":"13","nama":"TEMPE GORENG ORIGINAL","warna":"KUNING  KECOKLATAN","tekstur":"RENYAH DI LUAR,LEMBUT DAN EMPUK DI DALAM","rasa":"GURIH, KHAS TEMPE","aroma":"HARUM KHAS TEMPE GORENG"},{"no":"14","nama":"Tempe Goreng Ungkep","warna":"Kuning keemasan (golden yellow)","tekstur":"Sedikit remah di luar, lembut dan empuk di dalam","rasa":"Gurih, berbumbu hingga ke dalam","aroma":"Harum khas rempah ungkep (bawang, ketumbar, kunyit)"},{"no":"15","nama":"Saus Kacang Tanah","warna":"Coklat muda / Coklat kekuningan","tekstur":"Kental, halus (creamy)","rasa":"Gurih, manis, legit","aroma":"Harum khas kacang tanah sangrai"},{"no":"16","nama":"Ikan Goreng Tepung","warna":"Kuning keemasan (golden brown)","tekstur":"Renyah dan garing di luar, lembut dan empuk di dalam","rasa":"Gurih, asin, khas ikan","aroma":"Harum khas ikan goreng dan bumbu rempah"},{"no":"17","nama":"Ayam Goreng","warna":"Kuning keemasan (golden brown)","tekstur":"Daging empuk, lembut, dan tidak kering","rasa":"Gurih, asin, dan berbumbu hingga ke dalam","aroma":"Harum khas rempah (kunyit, bawang, dan salam)"},{"no":"18","nama":"Ayam Goreng Kecap","warna":"Coklat tua","tekstur":"Juicy","rasa":"Manis, asin, gurih","aroma":"Harum kecap manis"},{"no":"19","nama":"Ayam Gulai","warna":"Kuning kecoklatan dengan kuah kental berwarna oranye/kuning","tekstur":"Daging empuk, kuah kental dan creamy","rasa":"Gurih, sedikit pedas, kaya rempah","aroma":"Harum khas rempah gulai (serai, daun jeruk, kayu manis)"},{"no":"20","nama":"Ayam Goreng Kremes","warna":"Kuning keemasan/golden brown merata pada permukaan","tekstur":"Juicy dan tekstur luar nya crispy","rasa":"Gurih, asam, manis","aroma":"Khas ayam goreng"},{"no":"21","nama":"Ayam Kripspi","warna":"Kuning keemasan/golden brown merata pada permukaan","tekstur":"Renyah dan crispy di bagian luar, lembut dan juicy di bagian dalam","rasa":"Gurih, asin","aroma":"Khas ayam goreng berbumbu dan tepung goreng"},{"no":"22","nama":"Ayam Palekko","warna":"Kuning keemasan","tekstur":"Juicy","rasa":"Gurih, asam, manis","aroma":"Khas aromatik"},{"no":"23","nama":"Ayam Lada Hitam","warna":"Coklat tua kehitaman mengkilap","tekstur":"Daging empuk, saus kental dan licin","rasa":"Gurih, sedikit pedas, ada sensasi hangat dari lada","aroma":"Harum khas lada hitam dan bawang bombay"},{"no":"24","nama":"Ayam Popcorn","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, lembut di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ayam goreng tepung dan rempah"},{"no":"25","nama":"Ayam Serundeng","warna":"Ayam kuning keemasan, serundeng coklat keemasan","tekstur":"Daging ayam empuk dan juicy, serundeng kering dan renyah","rasa":"Gurih, manis, dan kaya rempah","aroma":"Harum khas kelapa sangrai dan rempah (serai, daun jeruk, lengkuas)"},{"no":"26","nama":"Nuget Ayam","warna":"Kuning keemasan (golden brown)","tekstur":"Renyah dan garing di luar, lembut dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ayam goreng dan tepung panir"},{"no":"27","nama":"Sempol Ayam","warna":"Kuning keemasan (golden brown)","tekstur":"Kenyal, lembut, dan tidak keras","rasa":"Gurih, asin, dengan aroma bawang dan ayam yang khas","aroma":"Harum khas gorengan telur dan bawang putih"},{"no":"28","nama":"Ayam Suir","warna":"Kuning kecoklatan merata pada serat ayam","tekstur":"Empuk, berserat halus, mudah dikunyah, tidak kering (sedikit berminyak/lembap)","rasa":"Gurih, manis, dan berbumbu hingga ke dalam serat","aroma":"Harum khas rempah (daun jeruk, serai, dan kunyit)"},{"no":"29","nama":"Telur Ayam Balado","warna":"Merah cerah mengkilap dari cabai merah, merata seluruh permukaan telur","tekstur":"Telur kenyal","rasa":"Manis, asin, gurih","aroma":"Harum cabai merah yang ditumis matang, bawang, dan tomat khas balado"},{"no":"30","nama":"Telur Ayam Kecap","warna":"Coklat tua kehitaman mengkilap","tekstur":"Telur empuk, kuah kental dan lengket","rasa":"Manis, gurih, dan sedikit asin","aroma":"Harum khas kecap manis dan rempah (daun salam, serai)"},{"no":"31","nama":"Telur Ceplok","warna":"Putih telur putih kekuningan, kuning telur kuning keemasan","tekstur":"Putih telur lembut dengan tepi sedikit garing, kuning telur padat dan matang","rasa":"Gurih alami, asin (berbumbu)","aroma":"Harum khas telur goreng"},{"no":"32","nama":"Telur Goreng Saus Tomat","warna":"Merah kecoklatan mengkilap (dari saus tomat)","tekstur":"Telur empuk, saus kental dan licin","rasa":"Gurih, manis, dan sedikit asam segar khas tomat","aroma":"Harum khas saus tomat dan tumisan bawang"},{"no":"33","nama":"Dimsum","warna":"Putih kekuningan dengan bintik oranye (dari wortel)","tekstur":"Lembut, kenyal, dan tidak keras","rasa":"Gurih, manis alami dari wortel, dan berbumbu","aroma":"Harum khas ayam, bawang putih, dan sedikit aroma minyak wijen"},{"no":"34","nama":"Ayam Goreng Mentega","warna":"Coklat keemasan dengan balutan saus coklat mengkilap","tekstur":"Daging empuk, saus kental dan licin, sedikit renyah di bagian luar","rasa":"Gurih, manis, dan rich (kaya) aroma mentega","aroma":"Harum khas mentega/margarin dan tumisan bawang bombay"},{"no":"35","nama":"Udang Asam Manis","warna":"Merah kecoklatan atau oranye mengkilap","tekstur":"Udang kenyal dan empuk (tidak alot), saus kental, sayuran sedikit renyah (crunchy)","rasa":"Dominan manis dan asam segar, gurih, pedas sangat ringan atau tidak pedas","aroma":"Harum khas saus tomat dan tumisan bawang"},{"no":"36","nama":"Udang Krispi","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, daging udang kenyal dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas udang goreng tepung dan bawang putih"},{"no":"37","nama":"Udang Rebus Biasa","warna":"Orange kemerahan atau merah muda cerah (tidak pucat/keabu-abuan)","tekstur":"Daging kenyal, padat, dan empuk (tidak lembek atau hancur)","rasa":"Gurih alami, manis, dan segar","aroma":"Harum segar khas udang rebus dan rempah (serai, daun salam)"},{"no":"38","nama":"Ikan Goreng","warna":"Kuning keemasan","tekstur":"Daging empuk, lembut, dan mudah lepas dari tulang","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ikan goreng dan bumbu rempah"},{"no":"39","nama":"Ikan Bandeng","warna":"Putih kekuningan atau coklat keemasan (tergantung metode masak)","tekstur":"Daging empuk, lembut, dan halus","rasa":"Gurih, manis alami, dan tidak amis","aroma":"Harum segar khas ikan, tidak berbau amis"},{"no":"40","nama":"Ikan Rebus","warna":"Putih kekuningan atau sesuai jenis ikan","tekstur":"Daging sangat empuk, lembut, dan mudah hancur","rasa":"Gurih alami, segar, dan tidak amis","aroma":"Harum segar khas rempah (serai, daun salam, jahe)"},{"no":"41","nama":"Ikan Goreng Krispi","warna":"Kuning keemasan (golden brown)","tekstur":"Sangat renyah dan garing di luar, daging ikan lembut dan empuk di dalam","rasa":"Gurih, asin, dan berbumbu","aroma":"Harum khas ikan goreng tepung dan bawang putih"},{"no":"42","nama":"Tumis Wortel Sawi Putih","warna":"Oranye cerah (wortel) dan hijau tua mengkilap (sawi hijau)","tekstur":"Wortel sedikit renyah, sawi hijau layu namun tidak lembek","rasa":"Gurih, manis alami wortel, dan sedikit segar pahit khas sawi","aroma":"Harum khas tumisan bawang dan sayuran"},{"no":"43","nama":"Lalapan Selada Timun","warna":"Hijau segar (selada) dan hijau muda (timun)","tekstur":"Sangat renyah, segar, dan berair","rasa":"Segar, manis alami, dan sedikit sepat (timun)","aroma":"Harum segar khas sayuran mentah"},{"no":"44","nama":"Tumis Jagung Sawi Putih","warna":"Kuning cerah (jagung) dan putih kehijauan (sawi putih)","tekstur":"Jagung sedikit renyah dan juicy (berair), sawi putih lembut","rasa":"Manis alami dari jagung, gurih, dan segar","aroma":"Harum khas tumisan bawang dan jagung manis"},{"no":"45","nama":"Mix Vegetables","warna":"Warna-warni (orange, hijau, kuning, putih) yang cerah dan menarik","tekstur":"Bervariasi (wortel dan buncis sedikit renyah, kentang lembut)","rasa":"Gurih, manis alami dari sayuran, dan segar","aroma":"Harum khas sayuran segar dan tumisan bawang"},{"no":"46","nama":"Tumis Wortel Labu Siam","warna":"Oranye (wortel) dan putih kehijauan (labu siam) yang cerah","tekstur":"Lembut dan sedikit renyah, tidak lemek","rasa":"Gurih, manis alami, dan segar","aroma":"Harum khas tumisan bawang dan sayuran segar"},{"no":"47","nama":"Sayur Sop","warna":"Sayuran masih segar","tekstur":"Sayuran empuk namun tetap renyah saat dikunyah","rasa":"Gurih, sedikit manis, dan segar khas sayuran","aroma":"Aroma segar khas sayuran"},{"no":"48","nama":"Tumis Kembang Kol Buncis","warna":"Kuah bening kekuningan dengan warna sayuran yang tetap cerah","tekstur":"Sayuran empuk namun tetap segar dan tidak terlalu lunak","rasa":"Gurih, ringan, dan segar dengan cita rasa khas sayuran dan kaldu","aroma":"Harum dari kaldu dan bumbu yang berpadu dengan aroma segar sayuran"},{"no":"49","nama":"AYAM BAKAR","warna":"Cokelat tua mengkilap dengan rona keemasan merata hasil karamelisasi kecap manis, gula merah, dan margarin. Bebas dari bercak hitam gosong berlebih (karbonisasi)","tekstur":"Daging bagian dalam ayam empuk, matang sempurna, dan berserat utuh. Permukaan luar terkaramelisasi dan sedikit lengket, tidak alot maupun terlalu kering","rasa":"Gurih dan manis yang seimbang dari paduan kaldu Knorr, garam, kecap manis, dan gula merah","aroma":"Dominan wangi khas ayam panggang dan gurih margarin, diperkaya aroma volatil rempah yang kuat dari serai, lengkuas, kunyit basah, dan jahe. Tidak terdeteksi bau amis"},{"no":"50","nama":"TAHU BALADO","warna":"Merah cerah mengkilap merata pada permukaan tahu","tekstur":"Tahu lembut di dalam dengan salut saus balado yang kental (pengaruh maizena).","rasa":"Gurih umami seimbang dengan pedas cabai dan sentuhan asam-manis saus tomat","aroma":"Harum khas tumisan bawang dan cabai matang, bebas bau langu"}];
 
     window.UJI_REF_DEFAULT = UJI_REF_DEFAULT;
     window.ujiDirty = false;
@@ -6709,7 +6925,7 @@ function renderSuhuTable() {
         const filled = UJI_MENU_BASE.filter(m => produk[m.key]).length;
         el.innerHTML = '<span class="font-black text-emerald-700">Siklus Menu Hari ke-' + (info.idx + 1) + '</span> · ' + ujiEsc(info.list[info.idx]) + ' · ' + filled + ' menu terisi otomatis';
       } else {
-        el.innerHTML = '<span class="font-black text-amber-700">Tanggal di luar 20 hari siklus menu.</span> Pilih produk manual pada tiap menu, atau pilih tanggal di rentang siklus.';
+        el.innerHTML = '<span class="font-black text-amber-700">Tanggal di luar rentang siklus menu.</span> Pilih produk manual pada tiap menu, atau pilih tanggal di rentang siklus.';
       }
     }
     function ujiRefForProduct(produk, catKey) {
@@ -6799,7 +7015,7 @@ function renderSuhuTable() {
           + '<div class="flex items-center gap-2">'
           + '<span class="w-7 h-7 rounded-full bg-emerald-600 text-white text-[11px] font-black flex items-center justify-center shrink-0">' + (n + 1) + '</span>'
           + '<div><div class="text-[11px] font-black text-slate-800 uppercase tracking-wider">' + ujiEsc(ujiCatLabel(key)) + '</div>'
-          + '<div class="text-[9px] text-slate-400">Menu otomatis dari Siklus Menu 20 Hari</div></div></div>'
+          + '<div class="text-[9px] text-slate-400">Menu otomatis dari Siklus Menu 60 Hari</div></div></div>'
           + '<div class="flex items-center gap-1.5 hidden-print">'
           + '<button type="button" onclick="ujiAddRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors">+ Tambah Batch</button>'
           + '<button type="button" onclick="ujiDelRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 transition-colors">− Hapus Batch</button>'
@@ -7326,7 +7542,7 @@ function renderSuhuTable() {
           ws.getRow(5).height = 20; ws.getRow(6).height = 20;
           rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Uji', { size: 10, h: 'left' });
           rptMerge(ws, 5, 4, 5, 6); rptPut(ws, 5, 4, ': ' + (meta.tanggalText || ''), { size: 10, h: 'left' });
-          rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Siklus Menu 20 Hari', { size: 10, h: 'left' });
+          rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Siklus Menu 60 Hari', { size: 10, h: 'left' });
           rptMerge(ws, 6, 4, 6, 7); rptPut(ws, 6, 4, ': ' + (ujiSiklusText(meta.tanggal) || '-'), { size: 10, h: 'left' });
 
           ws.getRow(7).height = 20;
@@ -7472,7 +7688,7 @@ function renderSuhuTable() {
             + kopHtml
             + '<table style="width:100%;border:none;border-collapse:collapse;margin:0 0 6px 0;">'
             + infoRow('Tanggal Uji', meta.tanggalText)
-            + infoRow('Siklus Menu 20 Hari', ujiSiklusText(meta.tanggal))
+            + infoRow('Siklus Menu 60 Hari', ujiSiklusText(meta.tanggal))
             + infoRow('Menu ' + (mi + 1), menu.label.toUpperCase() + (menu.produk ? ' — ' + menu.produk : ''))
             + '</table>'
             + '<table style="width:100%;border-collapse:collapse;">'
@@ -8944,7 +9160,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         else if (tab === 'pemorsian' || tab === 'pendinginan') {
           var sel = $(tab === 'pemorsian' ? 'selectSiklusPemorsian' : 'selectSiklusPendinginan');
           var keys = getSuhuDateKeyList(getSuhuWeeks()), i = keys.indexOf(today);
-          if (i === -1) { alert('Tanggal hari ini tidak ada dalam Siklus Menu 20 Hari.'); return; }
+          if (i === -1) { alert('Tanggal hari ini tidak ada dalam Siklus Menu 60 Hari.'); return; }
           sel.value = i;
           if (tab === 'pemorsian') onPemorsianDayChange(sel); else onPendDayChange(sel);
         }
