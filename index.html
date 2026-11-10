@@ -6177,7 +6177,32 @@ function renderSuhuTable() {
       function labelTables() {
         document.querySelectorAll('main table').forEach(function (t) {
           var hr = t.querySelector('thead tr'); if (!hr) return;
-          var heads = Array.prototype.map.call(hr.children, function (th) { return th.textContent.replace(/\s+/g, ' ').trim(); });
+          var heads = [];
+          var hrows = t.querySelectorAll('thead tr');
+          if (hrows.length > 1) {
+            // header bertingkat (rowspan/colspan): petakan tiap kolom nyata ke labelnya, gabungkan "Grup - Sub"
+            var grid = [];
+            Array.prototype.forEach.call(hrows, function (row, r) {
+              var c = 0;
+              Array.prototype.forEach.call(row.children, function (th) {
+                grid[r] = grid[r] || [];
+                while (grid[r][c] !== undefined) c++;
+                var txt = th.textContent.replace(/\s+/g, ' ').trim();
+                for (var dr = 0; dr < (th.rowSpan || 1); dr++) for (var dc = 0; dc < (th.colSpan || 1); dc++) {
+                  grid[r + dr] = grid[r + dr] || [];
+                  grid[r + dr][c + dc] = { t: txt, top: r === 0 };
+                }
+                c += (th.colSpan || 1);
+              });
+            });
+            var ncol = grid[0].length;
+            for (var ci = 0; ci < ncol; ci++) {
+              var a = grid[0][ci], b = grid[1] && grid[1][ci];
+              heads.push(b && a && b !== a && b.t !== a.t ? (a.t + ' - ' + b.t) : (a ? a.t : ''));
+            }
+          } else {
+            heads = Array.prototype.map.call(hr.children, function (th) { return th.textContent.replace(/\s+/g, ' ').trim(); });
+          }
           t.querySelectorAll('tbody tr').forEach(function (tr) {
             Array.prototype.forEach.call(tr.children, function (td, i) {
               if (td.colSpan > 1) return;
