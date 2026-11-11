@@ -2069,13 +2069,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
     // =====================================================================
     // EXPORT EXCEL & WORD (GENERIK)
-    // Foto selalu diekspor dengan ukuran seragam:
-    //   PORTRAIT  = 2 cm (lebar) x 3 cm (tinggi)
-    //   LANDSCAPE = 3 cm (lebar) x 2 cm (tinggi)
-    // Foto di-crop tengah ke rasio 2:3 / 3:2 (tidak gepeng) lalu disisipkan.
+    // Foto selalu diekspor dengan ukuran seragam (lebih besar, rasio 4:3 / 3:4):
+    //   PORTRAIT  = 3 cm (lebar) x 4 cm (tinggi)
+    //   LANDSCAPE = 4 cm (lebar) x 3 cm (tinggi)
+    // Foto di-crop tengah ke rasio 3:4 / 4:3 (tidak gepeng) lalu disisipkan.
     // =====================================================================
-    const EXPORT_PX_SHORT = 720000 / 9525 + 0.0001;   // 2 cm dalam piksel 96 dpi (= 720000 EMU)
-    const EXPORT_PX_LONG  = 1080000 / 9525 + 0.0001;  // 3 cm dalam piksel 96 dpi (= 1080000 EMU)
+    const EXPORT_PX_SHORT = 1080000 / 9525 + 0.0001;  // 3 cm dalam piksel 96 dpi (= 1080000 EMU)
+    const EXPORT_PX_LONG  = 1440000 / 9525 + 0.0001;  // 4 cm dalam piksel 96 dpi (= 1440000 EMU)
 
     function exportLoadImage(src) {
       return new Promise(resolve => {
@@ -2086,7 +2086,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       });
     }
 
-    // Foto -> JPEG berukuran tepat 2:3 (portrait) atau 3:2 (landscape)
+    // Foto -> JPEG berukuran tepat 3:4 (portrait) atau 4:3 (landscape)
     async function exportNormalizePhoto(b64, cache) {
       if (!b64 || !String(b64).startsWith('data:image')) return null;
       if (cache && cache.has(b64)) return cache.get(b64);
@@ -2095,7 +2095,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       if (img && img.naturalWidth && img.naturalHeight) {
         const sw = img.naturalWidth, sh = img.naturalHeight;
         const landscape = sw > sh;
-        const cw = landscape ? 600 : 400, ch = landscape ? 400 : 600;
+        const cw = landscape ? 800 : 600, ch = landscape ? 600 : 800;
         const canvas = document.createElement('canvas');
         canvas.width = cw; canvas.height = ch;
         const ctx = canvas.getContext('2d');
@@ -2265,13 +2265,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       if (exportModeResolver) { const r = exportModeResolver; exportModeResolver = null; r(v); }
     }
     const EXPORT_PHOTO_WRAPPERS = ['wrapper_pemorsian', 'wrapper_suhu', 'wrapper_pendinginan', 'wrapper_uji_organoleptik'];
-    // Foto di Word: tetap 2x3 cm / 3x2 cm, tetapi sel dibuat lebih besar dengan ruang di tepi
+    // Foto di Word: rasio 4:3 / 3:4 yang lebih besar, sel dibuat lebih besar dengan ruang di tepi
     // sehingga foto berada DI DALAM garis tabel (tidak menempel / melewati garis).
     function exportWordPhotoImgStyle(n) {
-      return 'width:' + (n.landscape ? 3 : 2) + 'cm;height:' + (n.landscape ? 2 : 3) + 'cm;display:block;margin:0 auto;';
+      return 'width:' + (n.landscape ? 4 : 3) + 'cm;height:' + (n.landscape ? 3 : 4) + 'cm;display:block;margin:0 auto;';
     }
     function exportWordPhotoCellStyle(n) {
-      return 'text-align:center;vertical-align:middle;width:3.6cm;height:' + ((n.landscape ? 2 : 3) + 0.4).toFixed(1) + 'cm;padding:0.2cm;';
+      return 'text-align:center;vertical-align:middle;width:' + (n.landscape ? 4.4 : 3.4) + 'cm;height:' + (n.landscape ? 3.4 : 4.4) + 'cm;padding:0.15cm;';
     }
 
     // Hapus kolom foto (header mengandung "FOTO") dari salinan tabel
@@ -2405,7 +2405,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         if (!norm) { m.parentNode.replaceChild(document.createTextNode('-'), m); continue; }
         const name = 'foto_' + (files.length + 1) + '.jpg';
         files.push({ name: name, dataUrl: norm.dataUrl });
-        const wCm = norm.landscape ? 3 : 2, hCm = norm.landscape ? 2 : 3;
+        const wCm = norm.landscape ? 4 : 3, hCm = norm.landscape ? 3 : 4;
         m.removeAttribute('data-export-b64');
         m.setAttribute('src', docName + '_files/' + name);
         m.setAttribute('width', Math.round(wCm * 37.795));
@@ -2431,16 +2431,20 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         await exportEmbedWordPhotos(clone, files, docName);
 
         const kopCode = (String(title).match(/FM-SGR-SPPG-[\d.]+/) || [])[0] || '';
+        const photoLayout = photoMode === 'inline';
+        const pageCss = photoLayout
+          ? 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1.5cm 1.5cm 1.5cm;'
+          : 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm;';
         const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>${title}</title>
         <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
-          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm; }
+          @page Section1 { ${pageCss} }
           div.Section1 { page: Section1; }
-          body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
+          body { font-family: 'Calibri', sans-serif; font-size: ${photoLayout ? 12 : 11}pt; line-height: 1.15; }
           table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-          th, td { border: 1px solid black; padding: 6px; font-size: 10pt; text-align: left; vertical-align: middle; }
+          th, td { border: 1px solid black; padding: ${photoLayout ? 4 : 6}px; font-size: ${photoLayout ? 12 : 10}pt; text-align: left; vertical-align: middle; }
           th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
           .header { text-align: center; font-weight: bold; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px; }
         </style>
@@ -2477,20 +2481,22 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         const dateText = exportGetDocDateText(wrapperId);
         const cache = new Map();
         const imageIdCache = new Map();
+        const photoExport = photoMode === 'inline';
         const suhuHdr = wrapperId === 'wrapper_suhu' ? suhuReportHeaderLines() : [];
         const isSuhu = suhuHdr.length > 0;
         // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
                 const HDR_ROWS = isSuhu ? 4 + suhuHdr.length : 4;
-        const PHOTO_COL_WIDTH = 18;         // ~131 px, cukup untuk foto 3 cm (113 px)
-        const PORTRAIT_ROW_PT = 104;        // foto 3 cm (85 pt) + ruang atas/bawah
-        const LANDSCAPE_ROW_PT = 74;        // foto 2 cm (57 pt) + ruang atas/bawah
+        const PHOTO_COL_WIDTH = photoExport ? 22 : 18;  // ~154 px, cukup untuk foto 4 cm (151 px)
+        const PORTRAIT_ROW_PT = photoExport ? 126 : 104; // foto 4 cm (113 pt) + ruang atas/bawah
+        const LANDSCAPE_ROW_PT = photoExport ? 96 : 74;  // foto 3 cm (85 pt) + ruang atas/bawah
 
         let tIdx = 0;
         for (const table of tables) {
           tIdx++;
           const ws = wb.addWorksheet(`Bagian ${tIdx}`);
           ws.views = [{ showGridLines: true }];
-          ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
+          ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true };
+          if (photoExport) ws.pageSetup.margins = { left: 0.5906, right: 0.5906, top: 0.7874, bottom: 0.5906, header: 0.3937, footer: 0.3937 };
 
                     if (isSuhu) {
             ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (3 baris)
@@ -2570,10 +2576,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           cells.forEach(x => {
             let w = 0;
             for (let j = 0; j < x.cs; j++) w += colWidth[x.c + j] || 10;
-            const per = Math.max(1, (w - 1) / (x.header ? 1.15 : 1));
+            const per = Math.max(1, (w - 1) / (x.header ? 1.15 : 1) * (photoExport ? 11 / 12 : 1));
             let lines = 1;
             if (!x.norm) lines = String(x.value).split('\n').reduce((s, l) => s + Math.max(1, Math.ceil(l.length / per)), 0);
-            const need = x.norm ? (x.norm.landscape ? LANDSCAPE_ROW_PT : PORTRAIT_ROW_PT) : Math.max(20, lines * 15 + 5) / x.rs;
+            const need = x.norm ? (x.norm.landscape ? LANDSCAPE_ROW_PT : PORTRAIT_ROW_PT) : Math.max(20, lines * (photoExport ? 17 : 15) + (photoExport ? 8 : 5)) / x.rs;
             rowPt[x.r] = Math.max(rowPt[x.r] || 20, need);
           });
           Object.keys(rowPt).forEach(k => { ws.getRow(HDR_ROWS + Number(k)).height = rowPt[k]; });
@@ -2585,7 +2591,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             if (x.cs > 1 || x.rs > 1) ws.mergeCells(top, x.c, top + x.rs - 1, x.c + x.cs - 1);
             for (let i = 0; i < x.rs; i++) for (let j = 0; j < x.cs; j++) {
               const cell = ws.getCell(top + i, x.c + j);
-              cell.font = { name: 'Calibri', bold: x.header };
+              cell.font = photoExport ? { name: 'Calibri', size: 12, bold: x.header } : { name: 'Calibri', bold: x.header };
               cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
               cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
               if (x.header) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
@@ -2623,8 +2629,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             ws.getRow(4).height = 20; rptMerge(ws, 4, 1, 4, lastC);
           } else {
             ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
-            ws.getCell('A2').font = { name: 'Calibri', bold: true, size: 11 };
-            ws.getCell('A3').font = { name: 'Calibri', bold: true, size: 11 };
+            ws.getCell('A2').font = { name: 'Calibri', bold: true, size: photoExport ? 12 : 11 };
+            ws.getCell('A3').font = { name: 'Calibri', bold: true, size: photoExport ? 12 : 11 };
           }
         }
 
@@ -2738,7 +2744,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       for (let r = r1; r <= r2; r++) ah += rptRowPx(ws, r);
       const pw = norm.landscape ? EXPORT_PX_LONG : EXPORT_PX_SHORT;
       const ph = norm.landscape ? EXPORT_PX_SHORT : EXPORT_PX_LONG;
-      const M = 10;                                            // ruang kosong minimal di tiap tepi (px)
+      const M = 4;                                             // ruang kosong minimal di tiap tepi (px)
       const k = Math.min(1, (aw - 2 * M) / pw, (ah - 2 * M) / ph);
       const w = pw * (k > 0 ? k : 1), hh = ph * (k > 0 ? k : 1);
       const key = norm.dataUrl + '|' + aw + 'x' + ah;
@@ -2811,6 +2817,17 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         orientation: landscape ? 'landscape' : 'portrait', paperSize: 9,
         fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true,
         margins: { left: 0.4, right: 0.4, top: 0.5, bottom: 0.5, header: 0.3, footer: 0.3 }
+      };
+      if (printArea) ws.pageSetup.printArea = printArea;
+    }
+
+    // Halaman laporan BERGAMBAR: A4 landscape, margin atas 2 cm; kiri/kanan/bawah 1,5 cm (proporsional),
+    // konten diskalakan memenuhi lebar halaman dan boleh mengalir ke halaman berikutnya agar foto tetap besar.
+    function rptPagePhoto(ws, printArea) {
+      ws.pageSetup = {
+        orientation: 'landscape', paperSize: 9,
+        fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true,
+        margins: { left: 0.5906, right: 0.5906, top: 0.7874, bottom: 0.5906, header: 0.3937, footer: 0.3937 }
       };
       if (printArea) ws.pageSetup.printArea = printArea;
     }
@@ -2955,7 +2972,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet('FM-SGR-SPPG-06.01');
       const widths = inl
-        ? [3.8, 6.5, 9.2, 9.3, 13, 12, 18, 12, 18, 12, 18, 14, 24, 8.66]
+        ? [3.8, 5.5, 8, 8, 9, 8, 23, 8, 23, 8, 23, 9, 16, 7]
         : [3.8, 6.5, 9.2, 9.3, 15.8, 15.8, 15.8, 15.8, 15.8, 12.7, 20.2, 8.66];
       widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
       const C = inl
@@ -2967,20 +2984,21 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         judul: 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', noDoc: 'FM-SGR-SPPG-06.01', tgl: tgl, colon: false });
 
       ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
-      rptMerge(ws, 5, 2, 5, 4); rptPut(ws, 5, 2, 'Hari/Tanggal ', { bold: true });
-      rptMerge(ws, 5, 5, 5, C.last); rptPut(ws, 5, 5, ': ' + (dateTxt || '….....................'), { bold: true });
-      rptMerge(ws, 6, 2, 6, 4); rptPut(ws, 6, 2, 'Siklus Menu Hari ini ', { bold: true });
-      rptMerge(ws, 6, 5, 6, C.last); rptPut(ws, 6, 5, ': ' + (siklusTxt || '….....................'), { bold: true });
+      rptMerge(ws, 5, 2, 5, 4); rptPut(ws, 5, 2, 'Hari/Tanggal ', { bold: true, size: inl ? 12 : 11 });
+      rptMerge(ws, 5, 5, 5, C.last); rptPut(ws, 5, 5, ': ' + (dateTxt || '….....................'), { bold: true, size: inl ? 12 : 11 });
+      rptMerge(ws, 6, 2, 6, 4); rptPut(ws, 6, 2, 'Siklus Menu Hari ini ', { bold: true, size: inl ? 12 : 11 });
+      rptMerge(ws, 6, 5, 6, C.last); rptPut(ws, 6, 5, ': ' + (siklusTxt || '….....................'), { bold: true, size: inl ? 12 : 11 });
 
       // header tabel
-      ws.getRow(7).height = 50.25;
-      rptPut(ws, 7, 2, 'No', { bold: true, h: 'center' });
-      rptMerge(ws, 7, 3, 7, 4); rptPut(ws, 7, 3, 'Komponen Menu', { bold: true, h: 'center' });
-      rptPut(ws, 7, 5, 'Standar \nGramasi (gr)', { bold: true, h: 'center' });
-      C.sCols.forEach((c, i) => rptPut(ws, 7, c, 'Sampel ' + (i + 1) + ' (gr)', { bold: true, h: 'center' }));
-      C.fCols.forEach((c, i) => rptPut(ws, 7, c, 'Foto Sampel ' + (i + 1), { bold: true, h: 'center' }));
-      rptPut(ws, 7, C.avg, 'Rata-Rata (gr)', { bold: true, h: 'center' });
-      rptMerge(ws, 7, C.ket[0], 7, C.ket[1]); rptPut(ws, 7, C.ket[0], 'Keterangan/Kesesuaian', { bold: true, h: 'center' });
+      ws.getRow(7).height = inl ? 64 : 50.25;
+      const hf = { bold: true, h: 'center', size: inl ? 12 : 11 };
+      rptPut(ws, 7, 2, 'No', hf);
+      rptMerge(ws, 7, 3, 7, 4); rptPut(ws, 7, 3, 'Komponen Menu', hf);
+      rptPut(ws, 7, 5, 'Standar \nGramasi (gr)', hf);
+      C.sCols.forEach((c, i) => rptPut(ws, 7, c, 'Sampel ' + (i + 1) + ' (gr)', hf));
+      C.fCols.forEach((c, i) => rptPut(ws, 7, c, 'Foto Sampel ' + (i + 1), hf));
+      rptPut(ws, 7, C.avg, 'Rata-Rata (gr)', hf);
+      rptMerge(ws, 7, C.ket[0], 7, C.ket[1]); rptPut(ws, 7, C.ket[0], 'Keterangan/Kesesuaian', hf);
       rptFill(ws, 7, 2, 7, C.last, RPT_GREY);
       rptBorder(ws, 7, 2, 7, C.last, 'grid');
 
@@ -3016,16 +3034,17 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         if (inl) for (const f of d.foto) norms.push(f ? await exportNormalizePhoto(f, cache) : null);
         const hasPhoto = norms.some(n => n);
         const anyPortrait = norms.some(n => n && !n.landscape);
-        const textH = Math.max(24.75, rptLines(d.label, 18.5, 11) * 15 + 6);
-        const rowPt = hasPhoto ? Math.max(textH, anyPortrait ? 104 : 74) : textH;
+        const textH = Math.max(24.75, rptLines(d.label, inl ? 16 : 18.5, inl ? 12 : 11) * 15 + 6);
+        const rowPt = hasPhoto ? Math.max(textH, anyPortrait ? 126 : 96) : textH;
         ws.getRow(row).height = rowPt;
 
-        rptPut(ws, row, 2, i + 1, { h: 'center' });
-        rptMerge(ws, row, 3, row, 4); rptPut(ws, row, 3, d.label, { h: 'center' });
-        rptPut(ws, row, 5, d.std, { h: 'center' });
-        d.s.forEach((v, k) => rptPut(ws, row, C.sCols[k], v, { h: 'center' }));
-        rptPut(ws, row, C.avg, d.avg, { h: 'center', numFmt: '0.00' });
-        rptMerge(ws, row, C.ket[0], row, C.ket[1]); rptPut(ws, row, C.ket[0], d.ket, { h: 'center' });
+        const df = { h: 'center', size: inl ? 12 : 11 };
+        rptPut(ws, row, 2, i + 1, df);
+        rptMerge(ws, row, 3, row, 4); rptPut(ws, row, 3, d.label, { h: 'center', size: inl ? 12 : 11 });
+        rptPut(ws, row, 5, d.std, df);
+        d.s.forEach((v, k) => rptPut(ws, row, C.sCols[k], v, df));
+        rptPut(ws, row, C.avg, d.avg, { h: 'center', size: inl ? 12 : 11, numFmt: '0.00' });
+        rptMerge(ws, row, C.ket[0], row, C.ket[1]); rptPut(ws, row, C.ket[0], d.ket, { h: 'center', size: inl ? 12 : 11 });
         rptBorder(ws, row, 2, row, C.last, 'grid');
 
         // foto di dalam sel, halaman yang sama dengan tabel (3 cm x 2 cm / 2 cm x 3 cm)
@@ -3043,8 +3062,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       ws.getRow(row).height = 69.75;
       rptMerge(ws, row, C.sig[0], row, C.sig[1]); rptPut(ws, row, C.sig[0], '(____________________________) ', { h: 'center', v: 'bottom' });
 
-      rptPage(ws, true, 'B1:' + C.lastL + row);
-      ws.pageSetup.fitToHeight = 1;
+      if (inl) rptPagePhoto(ws, 'B1:' + C.lastL + row);
+      else { rptPage(ws, true, 'B1:' + C.lastL + row); ws.pageSetup.fitToHeight = 1; }
       await rptDownload(wb, exportFileName('wrapper_pemorsian', 'xlsx', mode));
     }
 
@@ -6685,13 +6704,13 @@ function renderSuhuTable() {
         const ttdKepala = document.getElementById('pend_ttd_kepala_sppg')?.value || '';
 
         const cols = [
-          { k: 'no', w: 6 }, { k: 'tahap', w: 8 }, { k: 'jenis', w: 16 }, { k: 'menu', w: 26 }, { k: 'jml', w: 14 },
-          { k: 'jm', w: 11 }, { k: 'sm', w: 10 }
+          { k: 'no', w: inl ? 5 : 6 }, { k: 'tahap', w: inl ? 6 : 8 }, { k: 'jenis', w: inl ? 12 : 16 }, { k: 'menu', w: inl ? 17 : 26 }, { k: 'jml', w: inl ? 9 : 14 },
+          { k: 'jm', w: inl ? 8 : 11 }, { k: 'sm', w: inl ? 7 : 10 }
         ];
-        if (inl) cols.push({ k: 'fm', w: 18 });
-        cols.push({ k: 'js', w: 11 }, { k: 'ss', w: 10 });
-        if (inl) cols.push({ k: 'fs', w: 18 });
-        cols.push({ k: 'dur', w: 16 }, { k: 'sr', w: 14 }, { k: 'ket', w: 26 });
+        if (inl) cols.push({ k: 'fm', w: 23 });
+        cols.push({ k: 'js', w: inl ? 8 : 11 }, { k: 'ss', w: inl ? 7 : 10 });
+        if (inl) cols.push({ k: 'fs', w: 23 });
+        cols.push({ k: 'dur', w: inl ? 11 : 16 }, { k: 'sr', w: inl ? 8 : 14 }, { k: 'ket', w: inl ? 14 : 26 });
 
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet('COOLING AREA');
@@ -6705,14 +6724,14 @@ function renderSuhuTable() {
 
         // --- INFO TANGGAL & PETUGAS ---
         ws.getRow(5).height = 20; ws.getRow(6).height = 20;
-        rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Produksi', { size: 10, h: 'left' });
-        rptMerge(ws, 5, 4, 5, 5); rptPut(ws, 5, 4, ': ' + (rptLongDate(tglProd) || ''), { size: 10, h: 'left' });
-        rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Petugas', { size: 10, h: 'left' });
-        rptMerge(ws, 6, 4, 6, 5); rptPut(ws, 6, 4, ': ' + petugas, { size: 10, h: 'left' });
+        rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Produksi', { size: inl ? 12 : 10, h: 'left' });
+        rptMerge(ws, 5, 4, 5, 5); rptPut(ws, 5, 4, ': ' + (rptLongDate(tglProd) || ''), { size: inl ? 12 : 10, h: 'left' });
+        rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Petugas', { size: inl ? 12 : 10, h: 'left' });
+        rptMerge(ws, 6, 4, 6, 5); rptPut(ws, 6, 4, ': ' + petugas, { size: inl ? 12 : 10, h: 'left' });
 
         // --- HEADER TABEL (2 baris) ---
-        ws.getRow(8).height = 25; ws.getRow(9).height = 30;
-        const H = { bold: true, h: 'center', size: 10 };
+        ws.getRow(8).height = inl ? 32 : 25; ws.getRow(9).height = inl ? 56 : 30;
+        const H = { bold: true, h: 'center', size: inl ? 12 : 10 };
         [['no', 'No'], ['tahap', 'Tahap'], ['jenis', 'Jenis Menu'], ['menu', 'Nama Menu/Olahan'], ['jml', 'Jumlah Produksi'],
          ['dur', 'Total Durasi Resting (menit)'], ['sr', 'Suhu Ruang'], ['ket', 'Keterangan']].forEach(p => {
           rptMerge(ws, 8, cx[p[0]], 9, cx[p[0]]); rptPut(ws, 8, cx[p[0]], p[1], H);
@@ -6738,10 +6757,10 @@ function renderSuhuTable() {
           if (inl) { norms.push(d.fm ? await exportNormalizePhoto(d.fm, cache) : null); norms.push(d.fs ? await exportNormalizePhoto(d.fs, cache) : null); }
           const hasPhoto = norms.some(n => n);
           const anyPortrait = norms.some(n => n && !n.landscape);
-          const textH = Math.max(24.75, rptLines(d.menu, 26, 10) * 15 + 6);
-          ws.getRow(r).height = hasPhoto ? Math.max(textH, anyPortrait ? 104 : 74) : textH;
+          const textH = Math.max(24.75, rptLines(d.menu, inl ? 17 : 26, inl ? 12 : 10) * 15 + 6);
+          ws.getRow(r).height = hasPhoto ? Math.max(textH, anyPortrait ? 126 : 96) : textH;
 
-          const put = (k, v, o) => rptPut(ws, r, cx[k], v, Object.assign({ h: 'center', size: 10 }, o || {}));
+          const put = (k, v, o) => rptPut(ws, r, cx[k], v, Object.assign({ h: 'center', size: inl ? 12 : 10 }, o || {}));
           put('no', parseInt(d.no, 10)); put('tahap', d.tahap); put('jenis', d.jenis, { h: 'left' }); put('menu', d.menu, { h: 'left' });
           put('jml', d.jml); put('jm', d.jm); put('sm', d.sm, { numFmt: '0.0' });
           put('js', d.js); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' }); put('ket', d.ket, { h: 'left' });
@@ -6769,8 +6788,8 @@ function renderSuhuTable() {
         g.forEach((c, n) => { rptMerge(ws, sigRow, c[0], sigRow, c[1]); rptPut(ws, sigRow, c[0], vals[n], { h: 'center' }); });
         rptBorder(ws, sigRow, 4, sigRow, lastCol, 'grid');
 
-        rptPage(ws, true, 'A1:' + ws.getColumn(lastCol).letter + sigRow);
-        ws.pageSetup.fitToHeight = 1;
+        if (inl) rptPagePhoto(ws, 'A1:' + ws.getColumn(lastCol).letter + sigRow);
+        else { rptPage(ws, true, 'A1:' + ws.getColumn(lastCol).letter + sigRow); ws.pageSetup.fitToHeight = 1; }
         await rptDownload(wb, exportFileName('wrapper_pendinginan', 'xlsx', mode));
       } catch (e) {
         console.error('Export Excel Cooling Area gagal', e);
@@ -6801,16 +6820,20 @@ function renderSuhuTable() {
 
         const infoRow = (a, b) => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${a}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${pendEsc(b)}</td></tr>`;
 
+        const photoLayout = mode === 'inline';
+        const pageCss = photoLayout
+          ? 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1.5cm 1.5cm 1.5cm;'
+          : 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm;';
         const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>Pemantauan di Cooling Area (${PEND_DOC_CODE})</title>
         <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
-          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm; }
+          @page Section1 { ${pageCss} }
           div.Section1 { page: Section1; }
-          body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
+          body { font-family: 'Calibri', sans-serif; font-size: ${photoLayout ? 12 : 11}pt; line-height: 1.15; }
           table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-          th, td { border: 1px solid black; padding: 6px; font-size: 10pt; text-align: left; vertical-align: middle; }
+          th, td { border: 1px solid black; padding: ${photoLayout ? 4 : 6}px; font-size: ${photoLayout ? 12 : 10}pt; text-align: left; vertical-align: middle; }
           th { background-color: #e2e8f0; text-align: center; font-weight: bold; }
         </style>
         </head>
@@ -7603,12 +7626,13 @@ function renderSuhuTable() {
         if (!menus.length) return alert('Belum ada menu yang diisi untuk diexport.');
         const meta = ujiReadMeta();
 
-        const widths = withPhoto ? [5, 17, 11, 12, 15, 26, 20, 26, 22, 15, 20] : [5, 12, 13, 15, 28, 22, 28, 24, 16, 22];
+        const widths = withPhoto ? [5, 22, 8, 9, 10, 20, 14, 18, 16, 11, 14] : [5, 12, 13, 15, 28, 22, 28, 24, 16, 22];
         const lastCol = widths.length;
         const C = withPhoto
           ? { no: 1, foto: 2, jam: 3, batch: 4, suhu: 5, tekstur: 6, rasa: 7, aroma: 8, warna: 9, kep: 10, ket: 11 }
           : { no: 1, foto: 0, jam: 2, batch: 3, suhu: 4, tekstur: 5, rasa: 6, aroma: 7, warna: 8, kep: 9, ket: 10 };
-        const H = { bold: true, h: 'center', size: 9 };
+        const H = { bold: true, h: 'center', size: withPhoto ? 12 : 9 };
+        const FS = withPhoto ? 12 : 9;
         const headers = ['No'];
         if (withPhoto) headers.push('Bukti Foto');
         headers.push('Waktu (Jam)', 'Batch/Panci Ke', 'Suhu Inti (°C) (Min 60°C)', 'Tekstur', 'Rasa', 'Aroma', 'Warna', 'Keputusan Layak/Ditolak', 'Keterangan');
@@ -7633,18 +7657,18 @@ function renderSuhuTable() {
           });
 
           ws.getRow(5).height = 20; ws.getRow(6).height = 20;
-          rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Uji', { size: 10, h: 'left' });
-          rptMerge(ws, 5, 4, 5, 6); rptPut(ws, 5, 4, ': ' + (meta.tanggalText || ''), { size: 10, h: 'left' });
-          rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Siklus Menu 60 Hari', { size: 10, h: 'left' });
-          rptMerge(ws, 6, 4, 6, 7); rptPut(ws, 6, 4, ': ' + (ujiSiklusText(meta.tanggal) || '-'), { size: 10, h: 'left' });
+          rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Uji', { size: withPhoto ? 12 : 10, h: 'left' });
+          rptMerge(ws, 5, 4, 5, 6); rptPut(ws, 5, 4, ': ' + (meta.tanggalText || ''), { size: withPhoto ? 12 : 10, h: 'left' });
+          rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Siklus Menu 60 Hari', { size: withPhoto ? 12 : 10, h: 'left' });
+          rptMerge(ws, 6, 4, 6, 7); rptPut(ws, 6, 4, ': ' + (ujiSiklusText(meta.tanggal) || '-'), { size: withPhoto ? 12 : 10, h: 'left' });
 
-          ws.getRow(7).height = 20;
+          ws.getRow(7).height = withPhoto ? 24 : 20;
           rptMerge(ws, 7, 1, 7, lastCol);
-          rptPut(ws, 7, 1, 'MENU ' + (mi + 1) + ' — ' + menu.label.toUpperCase() + (menu.produk ? ' (' + menu.produk + ')' : ''), { bold: true, h: 'left', size: 9.5 });
+          rptPut(ws, 7, 1, 'MENU ' + (mi + 1) + ' — ' + menu.label.toUpperCase() + (menu.produk ? ' (' + menu.produk + ')' : ''), { bold: true, h: 'left', size: withPhoto ? 12 : 9.5 });
           rptFill(ws, 7, 1, 7, lastCol, 'FFECFDF5');
           rptBorder(ws, 7, 1, 7, lastCol, 'grid');
 
-          ws.getRow(8).height = 36;
+          ws.getRow(8).height = withPhoto ? 66 : 36;
           headers.forEach((h, i) => rptPut(ws, 8, i + 1, h, H));
           rptFill(ws, 8, 1, 8, lastCol, RPT_GREY);
           rptBorder(ws, 8, 1, 8, lastCol, 'grid');
@@ -7653,65 +7677,62 @@ function renderSuhuTable() {
           const dataRows = menu.rows.length ? menu.rows : [{}];
           for (let i = 0; i < dataRows.length; i++) {
             const d = dataRows[i];
+            let normFoto = null;
+            if (withPhoto && d.foto) normFoto = await exportNormalizePhoto(d.foto, normCache);
             let lines = 1;
-            lines = Math.max(lines, rptLines(d.tekstur, widths[C.tekstur - 1], 8), rptLines(d.rasa, widths[C.rasa - 1], 8), rptLines(d.aroma, widths[C.aroma - 1], 8), rptLines(d.warna, widths[C.warna - 1], 8), rptLines(d.ket, widths[C.ket - 1], 8));
-            ws.getRow(r).height = Math.max(withPhoto ? 58 : 26, Math.min(96, lines * 12 + 8));
-            rptPut(ws, r, C.no, i + 1, { h: 'center', size: 9 });
-            rptPut(ws, r, C.jam, d.jam, { h: 'center', size: 9 });
-            rptPut(ws, r, C.batch, d.batch, { h: 'center', size: 9 });
-            rptPut(ws, r, C.suhu, d.suhu, { h: 'center', size: 9, numFmt: '0.0' });
-            rptPut(ws, r, C.tekstur, d.tekstur, { h: 'left', size: 8 });
-            rptPut(ws, r, C.rasa, d.rasa, { h: 'left', size: 8 });
-            rptPut(ws, r, C.aroma, d.aroma, { h: 'left', size: 8 });
-            rptPut(ws, r, C.warna, d.warna, { h: 'left', size: 8 });
-            rptPut(ws, r, C.kep, d.keputusan, { h: 'center', size: 9, bold: true });
+            lines = Math.max(lines, rptLines(d.tekstur, widths[C.tekstur - 1], FS), rptLines(d.rasa, widths[C.rasa - 1], FS), rptLines(d.aroma, widths[C.aroma - 1], FS), rptLines(d.warna, widths[C.warna - 1], FS), rptLines(d.ket, widths[C.ket - 1], FS));
+            const photoRow = withPhoto ? (normFoto ? (normFoto.landscape ? 96 : 126) : 58) : 26;
+            ws.getRow(r).height = Math.max(photoRow, Math.min(withPhoto ? 160 : 96, lines * (withPhoto ? 17 : 12) + 8));
+            rptPut(ws, r, C.no, i + 1, { h: 'center', size: FS });
+            rptPut(ws, r, C.jam, d.jam, { h: 'center', size: FS });
+            rptPut(ws, r, C.batch, d.batch, { h: 'center', size: FS });
+            rptPut(ws, r, C.suhu, d.suhu, { h: 'center', size: FS, numFmt: '0.0' });
+            rptPut(ws, r, C.tekstur, d.tekstur, { h: 'left', size: FS });
+            rptPut(ws, r, C.rasa, d.rasa, { h: 'left', size: FS });
+            rptPut(ws, r, C.aroma, d.aroma, { h: 'left', size: FS });
+            rptPut(ws, r, C.warna, d.warna, { h: 'left', size: FS });
+            rptPut(ws, r, C.kep, d.keputusan, { h: 'center', size: FS, bold: true });
             if (withPhoto) {
-              const b64 = d.foto || '';
-              if (b64) {
-                const norm = await exportNormalizePhoto(b64, normCache);
-                if (norm) await rptPlacePhoto(wb, ws, norm, r, C.foto, r, C.foto, idCache);
-                else rptPut(ws, r, C.foto, '-', { h: 'center', size: 9 });
-              } else {
-                rptPut(ws, r, C.foto, '-', { h: 'center', size: 9 });
-              }
+              if (normFoto) await rptPlacePhoto(wb, ws, normFoto, r, C.foto, r, C.foto, idCache);
+              else rptPut(ws, r, C.foto, '-', { h: 'center', size: FS });
             }
-            rptPut(ws, r, C.ket, d.ket, { h: 'left', size: 8 });
+            rptPut(ws, r, C.ket, d.ket, { h: 'left', size: FS });
             rptBorder(ws, r, 1, r, lastCol, 'grid');
             if (d.keputusan === 'DITOLAK') rptFill(ws, r, C.kep, r, C.kep, 'FFFDE2E4');
             else if (d.keputusan === 'LAYAK') rptFill(ws, r, C.kep, r, C.kep, 'FFE4F4EC');
-            if (d.suhu !== '' && Number(d.suhu) < 60) ws.getCell(r, C.suhu).font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFB91C1C' } };
+            if (d.suhu !== '' && Number(d.suhu) < 60) ws.getCell(r, C.suhu).font = { name: 'Calibri', size: FS, bold: true, color: { argb: 'FFB91C1C' } };
             r++;
           }
 
           r++;
-          rptMerge(ws, r, 2, r, 5); rptPut(ws, r, 2, 'RELAWAN PENGOLAHAN', { bold: true, h: 'center', size: 10 });
-          rptMerge(ws, r, 6, r, lastCol); rptPut(ws, r, 6, 'PENGAWAS GIZI', { bold: true, h: 'center', size: 10 });
+          rptMerge(ws, r, 2, r, 5); rptPut(ws, r, 2, 'RELAWAN PENGOLAHAN', { bold: true, h: 'center', size: withPhoto ? 12 : 10 });
+          rptMerge(ws, r, 6, r, lastCol); rptPut(ws, r, 6, 'PENGAWAS GIZI', { bold: true, h: 'center', size: withPhoto ? 12 : 10 });
           rptFill(ws, r, 2, r, lastCol, RPT_GREY);
           rptBorder(ws, r, 2, r, lastCol, 'grid');
 
           r++; ws.getRow(r).height = 20;
-          rptPut(ws, r, 2, 'Nama', { size: 10, bold: true });
-          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, meta.relawan_nama, { h: 'left', size: 10 });
-          rptPut(ws, r, 6, 'Nama', { size: 10, bold: true });
-          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, meta.pengawas_nama, { h: 'left', size: 10 });
+          rptPut(ws, r, 2, 'Nama', { size: withPhoto ? 12 : 10, bold: true });
+          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, meta.relawan_nama, { h: 'left', size: withPhoto ? 12 : 10 });
+          rptPut(ws, r, 6, 'Nama', { size: withPhoto ? 12 : 10, bold: true });
+          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, meta.pengawas_nama, { h: 'left', size: withPhoto ? 12 : 10 });
           rptBorder(ws, r, 2, r, lastCol, 'grid');
 
           r++; ws.getRow(r).height = 55;
-          rptPut(ws, r, 2, 'Tanda Tangan', { size: 10, bold: true });
-          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, meta.relawan_ttd, { h: 'center', size: 10 });
-          rptPut(ws, r, 6, 'Tanda Tangan', { size: 10, bold: true });
-          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, meta.pengawas_ttd, { h: 'center', size: 10 });
+          rptPut(ws, r, 2, 'Tanda Tangan', { size: withPhoto ? 12 : 10, bold: true });
+          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, meta.relawan_ttd, { h: 'center', size: withPhoto ? 12 : 10 });
+          rptPut(ws, r, 6, 'Tanda Tangan', { size: withPhoto ? 12 : 10, bold: true });
+          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, meta.pengawas_ttd, { h: 'center', size: withPhoto ? 12 : 10 });
           rptBorder(ws, r, 2, r, lastCol, 'grid');
 
           r++; ws.getRow(r).height = 20;
-          rptPut(ws, r, 2, 'Tanggal', { size: 10, bold: true });
-          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, rptLongDate(meta.relawan_tgl) || '', { h: 'left', size: 10 });
-          rptPut(ws, r, 6, 'Tanggal', { size: 10, bold: true });
-          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, rptLongDate(meta.pengawas_tgl) || '', { h: 'left', size: 10 });
+          rptPut(ws, r, 2, 'Tanggal', { size: withPhoto ? 12 : 10, bold: true });
+          rptMerge(ws, r, 3, r, 5); rptPut(ws, r, 3, rptLongDate(meta.relawan_tgl) || '', { h: 'left', size: withPhoto ? 12 : 10 });
+          rptPut(ws, r, 6, 'Tanggal', { size: withPhoto ? 12 : 10, bold: true });
+          rptMerge(ws, r, 7, r, lastCol); rptPut(ws, r, 7, rptLongDate(meta.pengawas_tgl) || '', { h: 'left', size: withPhoto ? 12 : 10 });
           rptBorder(ws, r, 2, r, lastCol, 'grid');
 
-          rptPage(ws, true, 'A1:' + ws.getColumn(lastCol).letter + r);
-          ws.pageSetup.fitToHeight = 1;
+          if (withPhoto) { rptPagePhoto(ws, 'A1:' + ws.getColumn(lastCol).letter + r); ws.pageSetup.fitToHeight = 1; }
+          else { rptPage(ws, true, 'A1:' + ws.getColumn(lastCol).letter + r); ws.pageSetup.fitToHeight = 1; }
         }
 
         await rptDownload(wb, exportFileName('wrapper_uji_organoleptik', 'xlsx', mode));
@@ -7743,13 +7764,13 @@ function renderSuhuTable() {
           if (!norm) return '';
           const name = 'foto_' + (files.length + 1) + '.jpg';
           files.push({ name: name, dataUrl: norm.dataUrl });
-          const w = norm.landscape ? 3 : 2, h = norm.landscape ? 2 : 3;
+          const w = norm.landscape ? 4 : 3, h = norm.landscape ? 3 : 4;
           return '<img src="' + docName + '_files/' + name + '" width="' + Math.round(w * 37.795) + '" height="' + Math.round(h * 37.795) + '" style="width:' + w + 'cm;height:' + h + 'cm;object-fit:cover;">';
         }
 
         const sigHtml = () => '<table style="width:100%;border-collapse:collapse;margin-top:14px;">'
-          + '<tr><th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:9pt;">RELAWAN PENGOLAHAN</th>'
-          + '<th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:9pt;">PENGAWAS GIZI</th></tr>'
+          + '<tr><th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:' + (withPhoto ? 12 : 9) + 'pt;">RELAWAN PENGOLAHAN</th>'
+          + '<th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:' + (withPhoto ? 12 : 9) + 'pt;">PENGAWAS GIZI</th></tr>'
           + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;width:14%;">Nama</td><td style="border:1px solid black;padding:5px;width:36%;">' + ujiEsc(meta.relawan_nama) + '</td>'
           + '<td style="border:1px solid black;padding:5px;font-weight:bold;width:14%;">Nama</td><td style="border:1px solid black;padding:5px;width:36%;">' + ujiEsc(meta.pengawas_nama) + '</td></tr>'
           + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.relawan_ttd) + '</td>'
@@ -7807,11 +7828,11 @@ function renderSuhuTable() {
         <head><meta charset='utf-8'><title>Uji Organoleptik dan Suhu Memasak (${UJI_DOC_CODE})</title>
         <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
-          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.2cm 1.2cm 1.2cm 1.2cm; }
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: ${withPhoto ? '2cm 1.5cm 1.5cm 1.5cm' : '1.2cm 1.2cm 1.2cm 1.2cm'}; }
           div.Section1 { page: Section1; }
-          body { font-family: 'Calibri', sans-serif; font-size: 10pt; line-height: 1.15; }
+          body { font-family: 'Calibri', sans-serif; font-size: ${withPhoto ? 12 : 10}pt; line-height: 1.15; }
           table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-          th, td { border: 1px solid black; padding: 4px; font-size: 8.5pt; text-align: left; vertical-align: middle; }
+          th, td { border: 1px solid black; padding: 4px; font-size: ${withPhoto ? 12 : 8.5}pt; text-align: left; vertical-align: middle; }
           th { background-color: #e2e8f0; text-align: center; font-weight: bold; }
         </style>
         </head>
@@ -8872,7 +8893,12 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       var A = a1(pm[0]), B = a1(pm[1] || pm[0]);
       c1 = A.c; r1 = A.r; c2 = B.c; r2 = B.r;
     }
-    var PW = (land ? 285 : 198) / 25.4 * 96 * 0.97, PH = (land ? 198 : 285) / 25.4 * 96 * 0.97;
+    // Batas cetak mengikuti margin halaman: laporan bergambar = atas 2 cm, kiri/kanan/bawah 1,5 cm.
+    var pm = ps.margins || {};
+    var photoPage = Math.abs((pm.top || 0) - 0.7874) < 0.02 && Math.abs((pm.left || 0) - 0.5906) < 0.02;
+    var mw = photoPage ? { t: 20, r: 15, b: 15, l: 15 } : { t: 6, r: 6, b: 6, l: 6 };
+    var PWmm = (land ? 297 : 210) - mw.l - mw.r, PHmm = (land ? 210 : 297) - mw.t - mw.b;
+    var PW = PWmm / 25.4 * 96 * 0.97, PH = PHmm / 25.4 * 96 * 0.97;
 
     var cw = function (c) { return Math.floor((ws.getColumn(c).width || 8.43) * 7); };
     var rh = function (r) { return Math.round((ws.getRow(r).height || 15) * 96 / 72); };
@@ -8973,7 +8999,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         html += '<img src="' + src + '" style="position:absolute;left:' + x.toFixed(2) + 'px;top:' + y.toFixed(2) + 'px;width:' + w.toFixed(2) + 'px;height:' + h.toFixed(2) + 'px">';
       });
 
-      out.push('<div class="wrap ' + (land ? 'land' : 'port') + '"><div class="box" style="zoom:' + zoom.toFixed(4) + ';width:' + W0 + 'px;height:' + chunkH + 'px">' + html + '</div></div>');
+      out.push('<div class="wrap ' + (land ? 'land' : 'port') + (photoPage ? ' p2' : '') + '" data-mt="' + mw.t + '" data-mr="' + mw.r + '" data-mb="' + mw.b + '" data-ml="' + mw.l + '"><div class="box" style="zoom:' + zoom.toFixed(4) + ';width:' + W0 + 'px;height:' + chunkH + 'px">' + html + '</div></div>');
     });
     return out;
   }
@@ -8984,9 +9010,10 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     if (!pages.length) { alert('Tidak ada data untuk dicetak.'); return; }
     if (window.__pdfHook) { var hk = window.__pdfHook; window.__pdfHook = null; hk(pages, title); return; }
     var css = '@page land{size:A4 landscape;margin:6mm}@page port{size:A4 portrait;margin:6mm}' +
+      '@page landp{size:A4 landscape;margin:20mm 15mm 15mm}@page portp{size:A4 portrait;margin:20mm 15mm 15mm}' +
       'html,body{margin:0;padding:0;background:#fff}' +
       '.wrap{text-align:center;page-break-after:always;break-after:page}.wrap:last-child{page-break-after:auto;break-after:auto}' +
-      '.wrap.land{page:land}.wrap.port{page:port}' +
+      '.wrap.land{page:land}.wrap.port{page:port}.wrap.land.p2{page:landp}.wrap.port.p2{page:portp}' +
       '.box{display:inline-block;position:relative;text-align:left;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
       '.box img{max-width:none}';
     var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + esc(title || 'Cetak') + '</title><style>' + css + '</style></head><body>' + pages.join('') + '</body></html>';
@@ -9840,7 +9867,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     host.style.cssText = 'position:fixed;left:-20000px;top:0;background:#fff;z-index:-1';
     host.innerHTML = pages.join('');
     document.body.appendChild(host);
-    var PX = 25.4 / 96, M = 6, pdf = null;
+    var PX = 25.4 / 96, pdf = null;
     try {
       var wraps = host.querySelectorAll('.wrap');
       for (var i = 0; i < wraps.length; i++) {
@@ -9855,11 +9882,14 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         wrap.style.cssText = 'display:inline-block;background:#fff';
         var canvas = await window.html2canvas(cell, { scale: 2, backgroundColor: '#fff', useCORS: true, logging: false });
         var pw = land ? 297 : 210, ph = land ? 210 : 297;
+        var mt = parseFloat(wrap.getAttribute('data-mt')) || 6, mr = parseFloat(wrap.getAttribute('data-mr')) || 6;
+        var mb = parseFloat(wrap.getAttribute('data-mb')) || 6, ml = parseFloat(wrap.getAttribute('data-ml')) || 6;
         if (!pdf) pdf = new window.jspdf.jsPDF({ orientation: land ? 'l' : 'p', unit: 'mm', format: 'a4', compress: true });
         else pdf.addPage('a4', land ? 'l' : 'p');
-        var w = bw * z * PX, h = bh * z * PX, k = Math.min(1, (pw - 2 * M) / w, (ph - 2 * M) / h);
+        var aw = pw - ml - mr, ah = ph - mt - mb;
+        var w = bw * z * PX, h = bh * z * PX, k = Math.min(1, aw / w, ah / h);
         w *= k; h *= k;
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', (pw - w) / 2, M, w, h);
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', ml + Math.max(0, (aw - w) / 2), mt, w, h);
         await new Promise(function (r) { setTimeout(r, 0); });
       }
     } finally { host.remove(); }
