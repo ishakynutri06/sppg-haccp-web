@@ -1568,6 +1568,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <h3 class="font-bold text-slate-800 text-sm">👁️ Review Foto</h3>
         <button type="button" onclick="closePhotoReview()" class="text-slate-500 hover:text-slate-800 font-bold text-lg px-2">✕</button>
       </div>
+      <p id="photoReviewLabel" class="hidden text-[11px] font-bold text-slate-600 text-center leading-snug"></p>
       <img id="photoReviewImg" src="" alt="Review foto" class="w-full max-h-[75vh] object-contain rounded-xl border border-slate-200 bg-slate-50">
       <button type="button" onclick="closePhotoReview()" class="w-full bg-slate-800 hover:bg-black text-white font-bold py-2.5 rounded-xl text-sm">Tutup</button>
     </div>
@@ -2010,6 +2011,12 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         b64 = typeof pd === 'string' ? pd : pd.base64;
       }
       if (!b64) { alert('Belum ada foto yang diunggah.'); return; }
+      const lab = (el && typeof window.photoLabelFor === 'function') ? window.photoLabelFor(el) : null;
+      const cap = document.getElementById('photoReviewLabel');
+      if (cap) {
+        if (lab) { cap.textContent = lab.title + (lab.sub ? ' — ' + lab.sub : ''); cap.classList.remove('hidden'); }
+        else { cap.textContent = ''; cap.classList.add('hidden'); }
+      }
       document.getElementById('photoReviewImg').src = b64;
       const m = document.getElementById('photoReviewModal');
       m.classList.remove('hidden');
@@ -2020,6 +2027,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       m.classList.add('hidden');
       m.classList.remove('flex');
       document.getElementById('photoReviewImg').src = '';
+      const cap = document.getElementById('photoReviewLabel');
+      if (cap) { cap.textContent = ''; cap.classList.add('hidden'); }
     }
     function suhuHasPhotos() {
       const map = window.suhuPhotosMap || {};
@@ -6371,10 +6380,10 @@ function renderSuhuTable() {
           <td class="p-2 text-center border-r border-slate-200"><input type="number" min="0" inputmode="numeric" class="${cls} pend-jml" value="${pendEsc(d.jml || '')}" placeholder="porsi"></td>
           <td class="p-2 text-center border-r border-slate-200"><input type="time" class="${cls} pend-jm" value="${pendEsc(d.jm || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
           <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sm" value="${pendEsc(d.sm || '')}" placeholder="°C"></td>
-          <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_m_${idx}_${i}`, 'm', d.fm || '')}</td>
+          <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_m_${idx}_${i}`, 'm', d.fm || '', r.tahap)}</td>
           <td class="p-2 text-center border-r border-slate-200"><input type="time" class="${cls} pend-js" value="${pendEsc(d.js || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
           <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-ss" value="${pendEsc(d.ss || '')}" placeholder="°C"></td>
-          <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_s_${idx}_${i}`, 's', d.fs || '')}</td>
+          <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_s_${idx}_${i}`, 's', d.fs || '', r.tahap)}</td>
           <td class="p-3 text-center font-black text-slate-800 bg-slate-100 border-r border-slate-200 pend-dur">-</td>
           <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sr" value="${pendEsc(d.sr || '')}" placeholder="°C"></td>
           <td class="p-2"><input type="text" class="w-full border-2 border-slate-200 rounded-xl p-2 font-bold text-slate-700 pend-ket" data-menu="${pendEsc(menu)}" value="${pendEsc(ketVal)}" placeholder="Keterangan..."></td>
@@ -6487,18 +6496,21 @@ function renderSuhuTable() {
       window.dbCache[PEND_PATH] = all;
       window.fbSet(PEND_PATH + '/' + storeKey, payload);
       window.pendDirty = false;
+      try { document.dispatchEvent(new Event('sppg:data-changed')); } catch (e) {}
       alert('Data Pemantauan di Cooling Area berhasil disimpan di Server Real-Time!');
     }
 
     let pendingPendPhoto = null;
 
     // ---------- sel foto ----------
-    function buildPendPhotoHtml(id, kind, b64) {
+    function buildPendPhotoHtml(id, kind, b64, tahap) {
       const img = b64 ? `<img src="${b64}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:2px solid #10b981;cursor:pointer;" class="mx-auto shadow-sm" onclick="reviewPhoto('${id}')" title="Klik gambar untuk review">` : '';
       const extra = b64 ? `
         <button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button>
         <button type="button" onclick="deletePendPhoto('${id}')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>` : '';
+      const stage = tahap ? `<div class="text-[9px] font-black px-2 py-0.5 rounded-full ${kind === 'm' ? 'bg-sky-100 text-sky-800' : 'bg-amber-100 text-amber-800'}" title="Tahap pendinginan">${pendEsc(tahap)} · ${kind === 'm' ? 'Mulai' : 'Selesai'}</div>` : '';
       return `<div class="flex flex-col items-center gap-1">
+        ${stage}
         <div class="flex flex-wrap items-center justify-center gap-1">
           <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
           <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
@@ -6513,14 +6525,17 @@ function renderSuhuTable() {
       const input = document.getElementById(id);
       if (!input) return;
       const cell = input.closest('td');
-      cell.innerHTML = buildPendPhotoHtml(id, input.dataset.kind, '');
+      const tr = input.closest('tr');
+      cell.innerHTML = buildPendPhotoHtml(id, input.dataset.kind, '', tr ? tr.dataset.tahap : '');
       window.pendDirty = true;
+      try { document.dispatchEvent(new Event('sppg:data-changed')); } catch (e) {}
     }
 
     // ---------- foto -> pop-up konfirmasi (waktu + suhu aktual) ----------
-    function pendSetModalLabels(kind) {
+    function pendSetModalLabels(kind, tahap) {
+      const tag = tahap ? ' · ' + tahap : '';
       const tLbl = document.getElementById('imageConfirmTimeInput').previousElementSibling;
-      if (tLbl) tLbl.textContent = kind === 'm' ? 'Pukul Mulai Resting' : kind === 's' ? 'Pukul Selesai Resting' : 'Waktu Aktual';
+      if (tLbl) tLbl.textContent = kind === 'm' ? 'Pukul Mulai Resting' + tag : kind === 's' ? 'Pukul Selesai Resting' + tag : 'Waktu Aktual';
       setImageConfirmValueLabel('Suhu Aktual (°C)');
     }
 
@@ -6546,7 +6561,7 @@ function renderSuhuTable() {
           pendingPendPhoto = { input: input, b64: b64, timeInp: timeInp, tempInp: tempInp, kind: kind };
 
           document.getElementById('imageConfirmPreview').src = b64;
-          pendSetModalLabels(kind);
+          pendSetModalLabels(kind, tr.dataset.tahap);
           const tInp = document.getElementById('imageConfirmTempInput');
           const wInp = document.getElementById('imageConfirmTimeInput');
           tInp.value = tempInp.value || '';
@@ -6573,9 +6588,10 @@ function renderSuhuTable() {
         const v = document.getElementById('imageConfirmTempInput').value;
         if (t !== '') p.timeInp.value = t;
         if (v !== '') p.tempInp.value = v;
-        cell.innerHTML = buildPendPhotoHtml(id, kind, p.b64);
+        cell.innerHTML = buildPendPhotoHtml(id, kind, p.b64, tr ? tr.dataset.tahap : '');
         pendCalcRow(tr);
         window.pendDirty = true;
+        try { document.dispatchEvent(new Event('sppg:data-changed')); } catch (e) {}
       }
       pendingPendPhoto = null;
       pendSetModalLabels('');
@@ -7001,6 +7017,7 @@ function renderSuhuTable() {
       const fotoId = 'uji_foto_' + cat + '_' + i;
       return '<tr data-idx="' + i + '" class="hover:bg-emerald-50/40">'
         + '<td data-label="No" class="uji-no p-2 text-center font-black text-slate-500 bg-slate-50 border border-slate-200">' + (i + 1) + '</td>'
+        + '<td data-label="Bukti Foto" class="uji-foto-cell p-1.5 border border-slate-200 text-center align-middle"><div class="uji-foto-slot">' + buildUjiPhotoHtml(fotoId, d.foto || '') + '</div></td>'
         + '<td data-label="Waktu (Jam)" class="p-1.5 border border-slate-200"><input type="time" class="' + UJI_INP + ' uji-jam" value="' + ujiEsc(d.jam || '') + '"></td>'
         + '<td data-label="Batch/Panci Ke" class="p-1.5 border border-slate-200"><input type="number" min="1" inputmode="numeric" class="' + UJI_INP + ' uji-batch text-center" value="' + ujiEsc(d.batch || '') + '" placeholder="Ke-"></td>'
         + '<td data-label="Suhu Inti (°C)" class="p-1.5 border border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="' + UJI_INP + ' uji-suhu text-center" value="' + ujiEsc(d.suhu || '') + '" placeholder="°C" oninput="ujiRowCalc(this.closest(\'tr\'))"></td>'
@@ -7009,7 +7026,6 @@ function renderSuhuTable() {
         + '<td data-label="Aroma" class="p-1.5 border border-slate-200"><textarea rows="2" class="' + UJI_INP + ' uji-aroma resize-y min-h-[54px]" placeholder="Aroma...">' + ujiEsc(d.aroma || '') + '</textarea></td>'
         + '<td data-label="Warna" class="p-1.5 border border-slate-200"><textarea rows="2" class="' + UJI_INP + ' uji-warna resize-y min-h-[54px]" placeholder="Warna...">' + ujiEsc(d.warna || '') + '</textarea></td>'
         + '<td data-label="Keputusan" class="p-1.5 border border-slate-200"><select class="' + UJI_INP + ' uji-keputusan text-center font-black"' + manual + ' onchange="this.dataset.manual=\'1\';ujiRowCalc(this.closest(\'tr\'))"><option value="">-</option><option value="LAYAK"' + (kep === 'LAYAK' ? ' selected' : '') + '>LAYAK</option><option value="DITOLAK"' + (kep === 'DITOLAK' ? ' selected' : '') + '>DITOLAK</option></select></td>'
-        + '<td data-label="Bukti Foto" class="uji-foto-cell p-1.5 border border-slate-200 text-center align-middle"><div class="uji-foto-slot">' + buildUjiPhotoHtml(fotoId, d.foto || '') + '</div></td>'
         + '<td data-label="Keterangan" class="p-1.5 border border-slate-200"><input type="text" class="' + UJI_INP + ' uji-ket" value="' + ujiEsc(d.ket || '') + '" placeholder="Keterangan..."></td>'
         + '</tr>';
     }
@@ -7064,6 +7080,7 @@ function renderSuhuTable() {
           + '<table class="w-full text-xs text-left border-collapse" style="min-width:1480px">'
           + '<thead class="bg-slate-300 text-slate-800 uppercase font-bold tracking-wider text-[10px]"><tr>'
           + '<th class="p-2 text-center border border-slate-400 w-12">No</th>'
+          + '<th class="p-2 text-center border border-slate-400 w-32">Bukti Foto</th>'
           + '<th class="p-2 text-center border border-slate-400 w-24">Waktu (Jam)</th>'
           + '<th class="p-2 text-center border border-slate-400 w-28">Batch/Panci Ke</th>'
           + '<th class="p-2 text-center border border-slate-400 w-32">Suhu Inti (°C) (Min 60°C)</th>'
@@ -7072,7 +7089,6 @@ function renderSuhuTable() {
           + '<th class="p-2 text-center border border-slate-400 min-w-[190px]">Aroma</th>'
           + '<th class="p-2 text-center border border-slate-400 min-w-[170px]">Warna</th>'
           + '<th class="p-2 text-center border border-slate-400 w-32">Keputusan Layak/Ditolak</th>'
-          + '<th class="p-2 text-center border border-slate-400 w-32">Bukti Foto</th>'
           + '<th class="p-2 text-center border border-slate-400 min-w-[150px]">Keterangan</th>'
           + '</tr></thead><tbody id="tbody_uji_' + key + '" class="divide-y divide-slate-200"></tbody>'
           + '</table></div></div>';
@@ -7233,6 +7249,7 @@ function renderSuhuTable() {
       const td = input.closest('td');
       if (td) td.innerHTML = buildUjiPhotoHtml(id, '');
       window.ujiDirty = true;
+      try { document.dispatchEvent(new Event('sppg:data-changed')); } catch (e) {}
     }
 
     // ---------- foto Uji Organoleptik -> jendela konfirmasi (waktu + suhu) ----------
@@ -7268,6 +7285,7 @@ function renderSuhuTable() {
         const td = p.input.closest('td');
         if (td) td.innerHTML = buildUjiPhotoHtml(p.input.id, p.b64);
         window.ujiDirty = true;
+        try { document.dispatchEvent(new Event('sppg:data-changed')); } catch (e) {}
       }
       pendSetModalLabels('');
       closeImageConfirmModal();
@@ -7437,6 +7455,7 @@ function renderSuhuTable() {
       window.dbCache[UJI_PATH] = all;
       window.ujiDirty = false;
       if (typeof window.fbSet === 'function') window.fbSet(UJI_PATH + '/' + dateKey, day);
+      try { document.dispatchEvent(new Event('sppg:data-changed')); } catch (e) {}
       const produkList = filled.map(k => menus[k].produk).join(', ');
       if (window.sppgNotify) sppgNotify('Data tersimpan', 'Uji organoleptik ' + dateKey + ': ' + produkList);
       alert('✅ Data Uji Organoleptik dan Suhu Memasak tanggal ' + dateKey + ' berhasil disimpan di Firebase!\n\n' + filled.length + ' menu: ' + produkList);
@@ -7584,14 +7603,15 @@ function renderSuhuTable() {
         if (!menus.length) return alert('Belum ada menu yang diisi untuk diexport.');
         const meta = ujiReadMeta();
 
-        const widths = withPhoto ? [5, 11, 12, 15, 26, 20, 26, 22, 15, 17, 20] : [5, 12, 13, 15, 28, 22, 28, 24, 16, 22];
+        const widths = withPhoto ? [5, 17, 11, 12, 15, 26, 20, 26, 22, 15, 20] : [5, 12, 13, 15, 28, 22, 28, 24, 16, 22];
         const lastCol = widths.length;
-        const fotoCol = withPhoto ? 10 : 0;
-        const ketCol = withPhoto ? 11 : 10;
+        const C = withPhoto
+          ? { no: 1, foto: 2, jam: 3, batch: 4, suhu: 5, tekstur: 6, rasa: 7, aroma: 8, warna: 9, kep: 10, ket: 11 }
+          : { no: 1, foto: 0, jam: 2, batch: 3, suhu: 4, tekstur: 5, rasa: 6, aroma: 7, warna: 8, kep: 9, ket: 10 };
         const H = { bold: true, h: 'center', size: 9 };
-        const headers = ['No', 'Waktu (Jam)', 'Batch/Panci Ke', 'Suhu Inti (°C) (Min 60°C)', 'Tekstur', 'Rasa', 'Aroma', 'Warna', 'Keputusan Layak/Ditolak'];
+        const headers = ['No'];
         if (withPhoto) headers.push('Bukti Foto');
-        headers.push('Keterangan');
+        headers.push('Waktu (Jam)', 'Batch/Panci Ke', 'Suhu Inti (°C) (Min 60°C)', 'Tekstur', 'Rasa', 'Aroma', 'Warna', 'Keputusan Layak/Ditolak', 'Keterangan');
 
         const wb = new ExcelJS.Workbook();
         const normCache = new Map(), idCache = new Map();
@@ -7634,32 +7654,32 @@ function renderSuhuTable() {
           for (let i = 0; i < dataRows.length; i++) {
             const d = dataRows[i];
             let lines = 1;
-            lines = Math.max(lines, rptLines(d.tekstur, widths[4], 8), rptLines(d.rasa, widths[5], 8), rptLines(d.aroma, widths[6], 8), rptLines(d.warna, widths[7], 8), rptLines(d.ket, widths[ketCol - 1], 8));
+            lines = Math.max(lines, rptLines(d.tekstur, widths[C.tekstur - 1], 8), rptLines(d.rasa, widths[C.rasa - 1], 8), rptLines(d.aroma, widths[C.aroma - 1], 8), rptLines(d.warna, widths[C.warna - 1], 8), rptLines(d.ket, widths[C.ket - 1], 8));
             ws.getRow(r).height = Math.max(withPhoto ? 58 : 26, Math.min(96, lines * 12 + 8));
-            rptPut(ws, r, 1, i + 1, { h: 'center', size: 9 });
-            rptPut(ws, r, 2, d.jam, { h: 'center', size: 9 });
-            rptPut(ws, r, 3, d.batch, { h: 'center', size: 9 });
-            rptPut(ws, r, 4, d.suhu, { h: 'center', size: 9, numFmt: '0.0' });
-            rptPut(ws, r, 5, d.tekstur, { h: 'left', size: 8 });
-            rptPut(ws, r, 6, d.rasa, { h: 'left', size: 8 });
-            rptPut(ws, r, 7, d.aroma, { h: 'left', size: 8 });
-            rptPut(ws, r, 8, d.warna, { h: 'left', size: 8 });
-            rptPut(ws, r, 9, d.keputusan, { h: 'center', size: 9, bold: true });
+            rptPut(ws, r, C.no, i + 1, { h: 'center', size: 9 });
+            rptPut(ws, r, C.jam, d.jam, { h: 'center', size: 9 });
+            rptPut(ws, r, C.batch, d.batch, { h: 'center', size: 9 });
+            rptPut(ws, r, C.suhu, d.suhu, { h: 'center', size: 9, numFmt: '0.0' });
+            rptPut(ws, r, C.tekstur, d.tekstur, { h: 'left', size: 8 });
+            rptPut(ws, r, C.rasa, d.rasa, { h: 'left', size: 8 });
+            rptPut(ws, r, C.aroma, d.aroma, { h: 'left', size: 8 });
+            rptPut(ws, r, C.warna, d.warna, { h: 'left', size: 8 });
+            rptPut(ws, r, C.kep, d.keputusan, { h: 'center', size: 9, bold: true });
             if (withPhoto) {
               const b64 = d.foto || '';
               if (b64) {
                 const norm = await exportNormalizePhoto(b64, normCache);
-                if (norm) await rptPlacePhoto(wb, ws, norm, r, fotoCol, r, fotoCol, idCache);
-                else rptPut(ws, r, fotoCol, '-', { h: 'center', size: 9 });
+                if (norm) await rptPlacePhoto(wb, ws, norm, r, C.foto, r, C.foto, idCache);
+                else rptPut(ws, r, C.foto, '-', { h: 'center', size: 9 });
               } else {
-                rptPut(ws, r, fotoCol, '-', { h: 'center', size: 9 });
+                rptPut(ws, r, C.foto, '-', { h: 'center', size: 9 });
               }
             }
-            rptPut(ws, r, ketCol, d.ket, { h: 'left', size: 8 });
+            rptPut(ws, r, C.ket, d.ket, { h: 'left', size: 8 });
             rptBorder(ws, r, 1, r, lastCol, 'grid');
-            if (d.keputusan === 'DITOLAK') rptFill(ws, r, 9, r, 9, 'FFFDE2E4');
-            else if (d.keputusan === 'LAYAK') rptFill(ws, r, 9, r, 9, 'FFE4F4EC');
-            if (d.suhu !== '' && Number(d.suhu) < 60) ws.getCell(r, 4).font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFB91C1C' } };
+            if (d.keputusan === 'DITOLAK') rptFill(ws, r, C.kep, r, C.kep, 'FFFDE2E4');
+            else if (d.keputusan === 'LAYAK') rptFill(ws, r, C.kep, r, C.kep, 'FFE4F4EC');
+            if (d.suhu !== '' && Number(d.suhu) < 60) ws.getCell(r, C.suhu).font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFB91C1C' } };
             r++;
           }
 
@@ -7748,12 +7768,12 @@ function renderSuhuTable() {
             const fotoHtml = withPhoto ? (await photoImg(d.foto)) : '';
             rowsHtml += '<tr>'
               + td(i + 1, 'text-align:center;')
+              + (withPhoto ? td(fotoHtml || '-', 'text-align:center;') : '')
               + td(d.jam, 'text-align:center;')
               + td(d.batch, 'text-align:center;')
               + td(d.suhu === '' || d.suhu == null ? '' : Number(d.suhu).toFixed(1), 'text-align:center;font-weight:bold;' + (d.suhu !== '' && Number(d.suhu) < 60 ? 'color:#b91c1c;' : ''))
               + td(d.tekstur) + td(d.rasa) + td(d.aroma) + td(d.warna)
               + td(d.keputusan, 'text-align:center;font-weight:bold;' + (d.keputusan === 'DITOLAK' ? 'background:#fde2e4;' : d.keputusan === 'LAYAK' ? 'background:#e4f4ec;' : ''))
-              + (withPhoto ? td(fotoHtml || '-', 'text-align:center;') : '')
               + td(d.ket)
               + '</tr>';
           }
@@ -7767,6 +7787,7 @@ function renderSuhuTable() {
             + '<table style="width:100%;border-collapse:collapse;">'
             + '<thead><tr>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">No</th>'
+            + (withPhoto ? '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Bukti Foto</th>' : '')
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Waktu (Jam)</th>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Batch/Panci Ke</th>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Suhu Inti (°C) (Min 60°C)</th>'
@@ -7775,7 +7796,6 @@ function renderSuhuTable() {
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Aroma</th>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Warna</th>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Keputusan Layak/Ditolak</th>'
-            + (withPhoto ? '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Bukti Foto</th>' : '')
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Keterangan</th>'
             + '</tr></thead><tbody>' + rowsHtml + '</tbody></table>'
             + sigHtml()
@@ -9080,8 +9100,11 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
             sub = 'Pemorsian' + (kel ? ' - ' + kel : '') + ' - Sampel ' + m[1];
           } else if ((m = id.match(/^pend_foto_([ms])_/))) {
             var mn = tr && tr.querySelector('.pend-menu');
-            title = mn ? clean(mn.textContent) : 'Pendinginan';
-            sub = 'Pendinginan - ' + (m[1] === 'm' ? 'Mulai Resting' : 'Selesai Resting');
+            var tahap = (tr && tr.dataset && tr.dataset.tahap) ? tr.dataset.tahap : '';
+            var namaMenu = mn ? clean(mn.textContent) : '';
+            var tahapResting = (m[1] === 'm' ? 'Mulai' : 'Selesai') + ' Resting';
+            title = (tahap ? tahap + ' · ' : '') + (namaMenu || 'Pendinginan');
+            sub = 'Cooling Area - ' + tahapResting + (tahap ? ' (' + tahap + ')' : '');
           } else if ((m = id.match(/^uji_foto_(\w+?)_\d+$/))) {
             title = (typeof ujiCatLabel === 'function') ? ujiCatLabel(m[1]) : m[1];
             sub = 'Uji Organoleptik & Suhu Memasak';
@@ -9415,7 +9438,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       var cfg = { on: true, every: 60, from: '06:00', to: '18:00' };
       try { var sv = JSON.parse(localStorage.getItem(LS) || 'null'); if (sv) Object.assign(cfg, sv); } catch (e) {}
       function saveCfg() { try { localStorage.setItem(LS, JSON.stringify(cfg)); } catch (e) {} }
-      var snoozeUntil = 0, lastStatus = null;
+      var snoozeUntil = 0;
       var lastRemind = 0; try { lastRemind = parseInt(localStorage.getItem(LSL) || '0', 10) || 0; } catch (e) {}
       var baseTitle = document.title;
 
@@ -9423,6 +9446,8 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       var arr = function (v) { return Array.isArray(v) ? v : (v ? Object.values(v) : []); };
 
       // ---------- hitung slot foto hari ini ----------
+      // Memakai data tersimpan + isi layar yang belum disimpan, dan baris/batch yang benar-benar
+      // dirender modul. Data ditunggu termuat penuh agar angka lencana tidak melonjak sementara.
       function getStatus() {
         var today = getLocalDateKey();
         var overlay = $('loadingOverlay');
@@ -9430,18 +9455,24 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         var weeks = getSuhuWeeks(), keys = getSuhuDateKeyList(weeks), idx = keys.indexOf(today);
         if (window.subscribeItem) {
           subscribeItem('sppg_log_suhu', today);
-          if (idx !== -1) { subscribeItem('sppg_pemorsian_data', today); subscribeItem('sppg_pendinginan_data', today); }
+          if (idx !== -1) {
+            subscribeItem('sppg_pemorsian_data', today);
+            subscribeItem('sppg_pendinginan_data', today);
+            subscribeItem('sppg_uji_organoleptik', today);
+          }
         }
         var L = window.dbLoaded || {};
         if (!L['sppg_log_suhu/' + today]) return null;
-        if (idx !== -1 && !(L['sppg_pemorsian_data/' + today] && L['sppg_pendinginan_data/' + today])) return null;
+        if (idx !== -1 && !(L['sppg_pemorsian_data/' + today] && L['sppg_pendinginan_data/' + today] && L['sppg_uji_organoleptik/' + today])) return null;
         var menuOf = function (key) { return idx === -1 ? 'x' : getSuhuMenuName(weeks, key, idx); };
         var mods = [];
 
         // Pemantauan Suhu
         var entry = (window.dbCache['sppg_log_suhu'] || {})[today] || {};
-        var photos = (window.suhuRenderedDate === today) ? (window.suhuPhotosMap || {}) : (entry.photos || {});
-        var counters = entry.suhuBatchCounters || {};
+        var photos = Object.assign({}, entry.photos || {});
+        if (window.suhuRenderedDate === today) Object.assign(photos, window.suhuPhotosMap || {});
+        var counters = Object.assign({}, entry.suhuBatchCounters || {});
+        if (window.suhuRenderedDate === today && typeof suhuBatchCounters !== 'undefined') Object.assign(counters, suhuBatchCounters || {});
         var groupName = { ruang: 'Ruangan', penyimpanan: 'Penyimpanan', matang: 'Makanan Matang', pemorsian: 'Pemorsian' };
         var sub = {}, sTotal = 0, sMiss = 0;
         var count = function (g, id) { sub[g] = sub[g] || { t: 0, m: 0 }; sub[g].t++; sTotal++; if (!has(photos[id])) { sub[g].m++; sMiss++; } };
@@ -9453,8 +9484,9 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
             count(c.groupKey, 'suhu_foto_' + c.id + '_' + t.key + '_b' + b);
           });
         });
-        mods.push({ name: 'Pemantauan Suhu', tab: 'suhu-ruangan', total: sTotal, missing: sMiss,
-          detail: Object.keys(sub).filter(function (g) { return sub[g].m; }).map(function (g) { return groupName[g] + ' ' + sub[g].m; }).join(', ') });
+        var sDetail = ['ruang', 'penyimpanan', 'matang', 'pemorsian'].filter(function (g) { return sub[g] && sub[g].t; })
+          .map(function (g) { return groupName[g] + ' ' + (sub[g].t - sub[g].m) + '/' + sub[g].t; }).join(' · ');
+        mods.push({ name: 'Pemantauan Suhu', tab: 'suhu-ruangan', total: sTotal, missing: sMiss, detail: sDetail });
 
         if (idx !== -1) {
           // Pemorsian
@@ -9465,16 +9497,37 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
           });
           mods.push({ name: 'Pemorsian', tab: 'pemorsian', total: pT, missing: pM, detail: '' });
 
-          // Pendinginan Makanan
+          // Pendinginan Makanan — batch mengikuti aturan tampilan modul (batch kosong di akhir disembunyikan)
           var rawP = (window.dbCache['sppg_pendinginan_data'] || {})[today], da = arr(rawP && !Array.isArray(rawP) && rawP.rows ? rawP.rows : rawP);
-          var pBatches = (rawP && !Array.isArray(rawP) && rawP.meta && parseInt(rawP.meta.batches, 10)) || (da.length ? Math.ceil(da.length / PEND_JENIS.length) : PEND_DEFAULT_BATCH);
+          var pBatches = parseInt(rawP && !Array.isArray(rawP) && rawP.meta && rawP.meta.batches, 10);
+          if (isNaN(pBatches) || pBatches < PEND_MIN_BATCH) {
+            pBatches = da.length ? Math.ceil(da.length / PEND_JENIS.length) : PEND_DEFAULT_BATCH;
+            while (pBatches > PEND_DEFAULT_BATCH) {
+              var block = da.slice((pBatches - 1) * PEND_JENIS.length, pBatches * PEND_JENIS.length);
+              if (block.some(pendRowHasData)) break;
+              pBatches--;
+            }
+          }
+          pBatches = Math.max(PEND_MIN_BATCH, Math.min(PEND_MAX_BATCH, pBatches));
           var pRows = pendStaticRows(pBatches), rows = pRows.length, dT = 0, dM = 0;
           for (var r = 0; r < rows; r++) {
             var j = pRows[r];
             if (menuOf(j.key) === '-') continue;
             ['fm', 'fs'].forEach(function (f) { dT++; if (!has(da[r] && da[r][f])) dM++; });
           }
-          mods.push({ name: 'Pendinginan Makanan', tab: 'pendinginan', total: dT, missing: dM, detail: '' });
+          mods.push({ name: 'Pendinginan Makanan', tab: 'pendinginan', total: dT, missing: dM, detail: pBatches + ' batch (T01' + (pBatches > 1 ? '–' + pendTahap(pBatches) : '') + ')' });
+
+          // Uji Organoleptik & Suhu Memasak — foto per baris/batch di setiap kartu menu
+          var uDay = (window.dbCache['sppg_uji_organoleptik'] || {})[today] || {};
+          var uMenus = (typeof ujiBuildMenus === 'function') ? ujiBuildMenus(uDay, today) : {};
+          var uT = 0, uM = 0, uCards = 0;
+          Object.keys(uMenus).forEach(function (key) {
+            var uRows = (typeof ujiRowArray === 'function') ? ujiRowArray(uMenus[key].rows) : [];
+            if (!uRows.length) uRows = [{}, {}];
+            uCards++;
+            uRows.forEach(function (d) { uT++; if (!has(d && d.foto)) uM++; });
+          });
+          mods.push({ name: 'Uji Organoleptik & Suhu Memasak', tab: 'uji-organoleptik', total: uT, missing: uM, detail: uCards ? uCards + ' menu' : '' });
         }
         var total = mods.reduce(function (a, m) { return a + m.missing; }, 0);
         return { today: today, mods: mods, total: total };
@@ -9508,6 +9561,10 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         var n = stt ? stt.total : 0;
         badge.style.display = n > 0 ? '' : 'none';
         $('pinPhotoN').textContent = n;
+        if (stt) {
+          var parts = stt.mods.filter(function (m) { return m.missing; }).map(function (m) { return m.name + ' ' + m.missing; }).join(', ');
+          badge.title = parts ? ('Belum diunggah hari ini — ' + parts + ' (klik untuk rincian)') : 'Semua foto hari ini sudah diunggah';
+        }
         document.title = n > 0 ? '(📷' + n + ') ' + baseTitle : baseTitle;
       }
 
@@ -9517,18 +9574,19 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       document.body.appendChild(card);
       function dateLabel() { var d = new Date(); return HARI[d.getDay()] + ', ' + p2(d.getDate()) + ' ' + BLN[d.getMonth()] + ' ' + d.getFullYear(); }
       function openCard() {
-        var stt = getStatus() || lastStatus;
+        var stt = getStatus();
         var h = '<div class="hd"><span>📷 Pengingat Foto · ' + dateLabel() + '</span><button class="cl" data-a="close">✕</button></div><div class="bd">';
-        if (!stt) h += '<div>Memuat data hari ini dari server…</div>';
+        if (!stt) h += '<div>Memuat data hari ini dari server… Angka akan muncul setelah semua data selesai dibaca.</div>';
         else {
           if (stt.total === 0) h += '<div class="row ok"><span>🎉</span><div class="t">Semua foto hari ini sudah diunggah.</div></div>';
           stt.mods.forEach(function (m) {
             if (!m.total) return;
             var ok = m.missing === 0;
             h += '<div class="row ' + (ok ? 'ok' : '') + '"><span>' + (ok ? '✅' : '⚠️') + '</span><div class="t"><b>' + m.name + '</b><small>' +
-              (ok ? 'Lengkap (' + m.total + ' foto)' : m.missing + ' dari ' + m.total + ' foto belum diunggah' + (m.detail ? ' — ' + m.detail : '')) + '</small></div>' +
+              (ok ? 'Lengkap (' + m.total + ' foto wajib)' : m.missing + ' dari ' + m.total + ' foto wajib belum diunggah' + (m.detail ? ' — ' + m.detail : '')) + '</small></div>' +
               (ok ? '' : '<button class="go" data-a="go" data-tab="' + m.tab + '">Buka</button>') + '</div>';
           });
+          h += '<div style="font-size:10px;color:#64748b;font-weight:600">Hanya baris/komponen yang memiliki menu hari ini yang dihitung. Baris "TIDAK TERSEDIA MENU" tidak wajib foto, sehingga jumlah di sini bisa lebih kecil dari kotak foto kosong di layar.</div>';
           if (stt.total > 0) h += '<div style="display:flex;gap:6px"><button class="sn" data-a="snooze">⏰ Ingatkan 30 menit lagi</button><button class="cl" data-a="close">Tutup</button></div>';
         }
         h += '<div class="set"><label><input type="checkbox" id="remOn"' + (cfg.on ? ' checked' : '') + '> Pengingat aktif</label>' +
@@ -9590,7 +9648,6 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       function run() {
         var stt = getStatus();
         if (!stt) return;
-        lastStatus = stt;
         updateBadge(stt);
         if (card.style.display !== 'none' && !card.contains(document.activeElement)) openCard();   // rincian ikut diperbarui
         if (stt.total === 0 || !cfg.on) return;
@@ -9602,6 +9659,8 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       setTimeout(run, 3000); setTimeout(run, 8000);
       // memeriksa ulang segera setelah foto diunggah / data tersimpan
       document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(run, 500); });
+      document.addEventListener('sppg:data-changed', function () { setTimeout(run, 600); });
+      window.sppgReminderRefresh = run;
       var oSw = window.switchTab;
       window.switchTab = function () { var r = oSw.apply(this, arguments); setTimeout(run, 1500); return r; };
     })();
