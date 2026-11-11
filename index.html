@@ -723,11 +723,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
             <div class="space-y-4">
               <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Pilih Kategori Objek Pemantauan:</span>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-bold">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs font-bold">
                 <button type="button" id="btnCat_ruang" onclick="switchSuhuCategoryView('ruang')" class="p-3.5 rounded-xl border transition-all duration-300 text-center shadow-md bg-gradient-to-r from-slate-900 to-slate-800 text-white transform scale-100">🏢 1. Suhu Ruangan</button>
                 <button type="button" id="btnCat_penyimpanan" onclick="switchSuhuCategoryView('penyimpanan')" class="p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md">❄️ 2. Suhu Penyimpanan</button>
-                <button type="button" id="btnCat_matang" onclick="switchSuhuCategoryView('matang')" class="p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md">🍳 3. Suhu Makanan Matang</button>
-                <button type="button" id="btnCat_pemorsian" onclick="switchSuhuCategoryView('pemorsian')" class="p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md">⚖️ 4. Suhu Pemorsian</button>
+                <button type="button" id="btnCat_pemorsian" onclick="switchSuhuCategoryView('pemorsian')" class="p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md">⚖️ 3. Suhu Pemorsian</button>
               </div>
             </div>
 
@@ -1239,7 +1238,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal / Bulan:</label>
               <input type="date" id="al_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800" required>
             </div>
-            <div>
+            <div class="hidden-print">
               <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime):</label>
               <select id="al_siklus_active" onchange="onAlergenSiklusChange()" class="w-full border-2 border-amber-200 rounded-xl p-2.5 text-sm font-bold bg-amber-50 text-amber-900 cursor-pointer">
               </select>
@@ -1250,7 +1249,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             </div>
           </div>
 
-          <div id="al_menu_integration" class="bg-gradient-to-br from-amber-50 to-white p-5 rounded-2xl border border-amber-200 shadow-inner space-y-3"></div>
+          <div id="al_menu_integration" class="hidden-print bg-gradient-to-br from-amber-50 to-white p-5 rounded-2xl border border-amber-200 shadow-inner space-y-3"></div>
 
           <div id="al_sasaran_sync" class="hidden-print bg-gradient-to-br from-rose-50 to-white p-5 rounded-2xl border border-rose-200 shadow-inner"></div>
 
@@ -2174,7 +2173,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function exportFileName(key, ext, photoMode) {
       const m = EXPORT_MENU[key] || { nama: String(key).toUpperCase() };
       let nama = m.nama;
-      if (key === 'wrapper_suhu') nama = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', matang: 'SUHU MAKANAN MATANG', pemorsian: 'SUHU PEMORSIAN' })[activeSuhuCategory] || nama;
+      if (key === 'wrapper_suhu') nama = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', pemorsian: 'SUHU PEMORSIAN' })[activeSuhuCategory] || nama;
       let name = nama + '_' + exportDocDateKey(key);
       if (m.foto) name += '_' + (photoMode === 'none' ? 'TANPA' : 'DENGAN') + ' GAMBAR';
       return name + '.' + ext;
@@ -2964,7 +2963,6 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const sel = document.getElementById('selectSiklusPemorsian');
       const optText = (sel && sel.selectedOptions && sel.selectedOptions[0]) ? sel.selectedOptions[0].text : '';
       const mt = optText.match(/^(.*?)\s*\((.*)\)\s*$/);
-      const siklusTxt = mt ? mt[1] : optText;
       const dateTxt = mt ? mt[2] : '';
       const dKey = parseSiklusDateToKey(dateTxt);
       const tgl = dKey ? rptLongDate(dKey) : rptToday();
@@ -2983,11 +2981,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       rptKop(wb, ws, { r: 2, rowH: 19.5, logo: [2, 4], title: C.title, lab: C.lab, val: C.val,
         judul: 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', noDoc: 'FM-SGR-SPPG-06.01', tgl: tgl, colon: false });
 
-      ws.getRow(5).height = 25.5; ws.getRow(6).height = 24.75;
+      ws.getRow(5).height = 25.5; ws.getRow(6).height = 6;
       rptMerge(ws, 5, 2, 5, 4); rptPut(ws, 5, 2, 'Hari/Tanggal ', { bold: true, size: inl ? 12 : 11 });
       rptMerge(ws, 5, 5, 5, C.last); rptPut(ws, 5, 5, ': ' + (dateTxt || '….....................'), { bold: true, size: inl ? 12 : 11 });
-      rptMerge(ws, 6, 2, 6, 4); rptPut(ws, 6, 2, 'Siklus Menu Hari ini ', { bold: true, size: inl ? 12 : 11 });
-      rptMerge(ws, 6, 5, 6, C.last); rptPut(ws, 6, 5, ': ' + (siklusTxt || '….....................'), { bold: true, size: inl ? 12 : 11 });
 
       // header tabel
       ws.getRow(7).height = inl ? 64 : 50.25;
@@ -3297,7 +3293,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     };
 
     let activeSuhuCategory = 'ruang';
-    let suhuBatchCounters = { matang: 1, pemorsian: 1 };
+    let suhuBatchCounters = { pemorsian: 1 };
     let suhuRuangColumns = 1;
 
     // ===== SIKLUS MENU 60 HARI KERJA (12 blok x 5 hari) =====
@@ -3371,7 +3367,6 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       { id: "11", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Sharp", min: -30, max: -18, std: "≤ -18°C", defPagi: -20.0, defMalam: -20.5 },
       { id: "12", groupKey: "penyimpanan", cat: "Suhu Penyimpanan", area: "Freezer Midea", min: -30, max: -18, std: "≤ -18°C", defPagi: -19.5, defMalam: -20.0 },
       
-      { id: "13", groupKey: "matang", cat: "Suhu Makanan Matang", area: "Pengolahan Makanan Matang", template: createInitialCleanGiziSubmenus(false) },
       { id: "14", groupKey: "pemorsian", cat: "Suhu Pemorsian", area: "Holding Box / Meja Pemorsian", template: createInitialCleanGiziSubmenus(true) }
     ];
 
@@ -3969,7 +3964,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function switchSuhuCategoryView(catKey) {
       autoSaveCurrentSuhuToCache();
       activeSuhuCategory = catKey;
-      ['ruang', 'penyimpanan', 'matang', 'pemorsian'].forEach(c => {
+      ['ruang', 'penyimpanan', 'pemorsian'].forEach(c => {
         const btn = document.getElementById(`btnCat_${c}`);
         if (btn) btn.className = (c === catKey) 
             ? "p-3.5 rounded-xl border transition-all duration-300 text-center shadow-md bg-gradient-to-r from-slate-900 to-slate-800 text-white transform scale-105" 
@@ -4557,7 +4552,7 @@ function handleSuhuDateChange() {
 
     const data = (window.dbCache['sppg_log_suhu'] || {})[newKey];
     suhuRuangColumns = (data && data.suhuRuangColumns) || 1;
-    suhuBatchCounters = (data && data.suhuBatchCounters) || { matang: 1, pemorsian: 1 };
+    suhuBatchCounters = (data && data.suhuBatchCounters) || { pemorsian: 1 };
 
     applySuhuDateFields(newKey, data);
     renderSuhuTable(); // memuat foto + isian milik tanggal baru saja
@@ -4597,7 +4592,7 @@ function initSuhuModule() {
 // =================================================================================================
 
     function addSuhuBatch() {
-      if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
+      if (activeSuhuCategory === 'pemorsian') {
         markSuhuDirty();
         autoSaveCurrentSuhuToCache();
         suhuBatchCounters[activeSuhuCategory]++;
@@ -4645,7 +4640,7 @@ function initSuhuModule() {
         : `<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>`;
     }
 
-    // Menu Makanan Matang / Pemorsian (1 kolom suhu)
+    // Menu Pemorsian (1 kolom suhu)
     function evalSuhuStatusSingle(id, min, max) {
       const statusElem = document.getElementById(`suhu_status_${id}`);
       if (!statusElem) return;
@@ -4769,7 +4764,7 @@ function renderSuhuTable() {
       </tr>
     `;
 
-  } else if (activeSuhuCategory === 'matang' || activeSuhuCategory === 'pemorsian') {
+  } else if (activeSuhuCategory === 'pemorsian') {
         htmlHead = `
       <tr>
         <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
@@ -6972,13 +6967,6 @@ function renderSuhuTable() {
       if (s2) out.SAYUR = out.SAYUR ? (out.SAYUR + ' + ' + s2) : s2;
       return out;
     }
-    function ujiSiklusText(dateKey) {
-      const info = ujiSiklusInfo(dateKey);
-      if (!info.inCycle) return '-';
-      const ds = info.list[info.idx];
-      const lbl = (typeof rptLongDate === 'function' && rptLongDate(ds)) || ds;
-      return 'Hari ke-' + (info.idx + 1) + ' (' + lbl + ')';
-    }
     function ujiRenderSiklusInfo(dateKey) {
       const el = document.getElementById('uji_siklus_info');
       if (!el) return;
@@ -7656,11 +7644,9 @@ function renderSuhuTable() {
             judul: 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', noDoc: UJI_DOC_CODE, rev: '00', colon: true
           });
 
-          ws.getRow(5).height = 20; ws.getRow(6).height = 20;
+          ws.getRow(5).height = 20; ws.getRow(6).height = 6;
           rptMerge(ws, 5, 1, 5, 3); rptPut(ws, 5, 1, 'Tanggal Uji', { size: withPhoto ? 12 : 10, h: 'left' });
           rptMerge(ws, 5, 4, 5, 6); rptPut(ws, 5, 4, ': ' + (meta.tanggalText || ''), { size: withPhoto ? 12 : 10, h: 'left' });
-          rptMerge(ws, 6, 1, 6, 3); rptPut(ws, 6, 1, 'Siklus Menu 60 Hari', { size: withPhoto ? 12 : 10, h: 'left' });
-          rptMerge(ws, 6, 4, 6, 7); rptPut(ws, 6, 4, ': ' + (ujiSiklusText(meta.tanggal) || '-'), { size: withPhoto ? 12 : 10, h: 'left' });
 
           ws.getRow(7).height = withPhoto ? 24 : 20;
           rptMerge(ws, 7, 1, 7, lastCol);
@@ -7802,7 +7788,6 @@ function renderSuhuTable() {
             + kopHtml
             + '<table style="width:100%;border:none;border-collapse:collapse;margin:0 0 6px 0;">'
             + infoRow('Tanggal Uji', meta.tanggalText)
-            + infoRow('Siklus Menu 60 Hari', ujiSiklusText(meta.tanggal))
             + infoRow('Menu ' + (mi + 1), menu.label.toUpperCase() + (menu.produk ? ' — ' + menu.produk : ''))
             + '</table>'
             + '<table style="width:100%;border-collapse:collapse;">'
@@ -9500,7 +9485,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         if (window.suhuRenderedDate === today) Object.assign(photos, window.suhuPhotosMap || {});
         var counters = Object.assign({}, entry.suhuBatchCounters || {});
         if (window.suhuRenderedDate === today && typeof suhuBatchCounters !== 'undefined') Object.assign(counters, suhuBatchCounters || {});
-        var groupName = { ruang: 'Ruangan', penyimpanan: 'Penyimpanan', matang: 'Makanan Matang', pemorsian: 'Pemorsian' };
+        var groupName = { ruang: 'Ruangan', penyimpanan: 'Penyimpanan', pemorsian: 'Pemorsian' };
         var sub = {}, sTotal = 0, sMiss = 0;
         var count = function (g, id) { sub[g] = sub[g] || { t: 0, m: 0 }; sub[g].t++; sTotal++; if (!has(photos[id])) { sub[g].m++; sMiss++; } };
         SUHU_ITEMS_CONFIG.forEach(function (c) {
@@ -9511,7 +9496,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
             count(c.groupKey, 'suhu_foto_' + c.id + '_' + t.key + '_b' + b);
           });
         });
-        var sDetail = ['ruang', 'penyimpanan', 'matang', 'pemorsian'].filter(function (g) { return sub[g] && sub[g].t; })
+        var sDetail = ['ruang', 'penyimpanan', 'pemorsian'].filter(function (g) { return sub[g] && sub[g].t; })
           .map(function (g) { return groupName[g] + ' ' + (sub[g].t - sub[g].m) + '/' + sub[g].t; }).join(' · ');
         mods.push({ name: 'Pemantauan Suhu', tab: 'suhu-ruangan', total: sTotal, missing: sMiss, detail: sDetail });
 
