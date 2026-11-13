@@ -1347,10 +1347,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                 <th rowspan="2" class="p-3 border border-slate-500 w-48">Keterangan</th>
               </tr>
               <tr>
-                <th class="p-3 text-center border border-slate-500 w-24">Pukul</th>
+                <th class="p-3 text-center border border-slate-500 w-24 whitespace-nowrap">Pukul</th>
                 <th class="p-3 text-center border border-slate-500 w-24">Suhu</th>
                 <th class="pend-foto p-3 text-center border border-slate-500 w-36">Foto</th>
-                <th class="p-3 text-center border border-slate-500 w-24">Pukul</th>
+                <th class="p-3 text-center border border-slate-500 w-24 whitespace-nowrap">Pukul</th>
                 <th class="p-3 text-center border border-slate-500 w-24">Suhu</th>
                 <th class="pend-foto p-3 text-center border border-slate-500 w-36">Foto</th>
               </tr>
@@ -1421,6 +1421,16 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             <p class="text-[10px] text-slate-400 mt-2">Produk, Warna, Tekstur, Rasa, dan Aroma terisi otomatis dari siklus menu. Anda cukup mengisi <b>Waktu</b>, <b>Suhu Inti</b>, dan <b>Keterangan</b>. Bukti foto diunggah langsung pada kolom <b>Bukti Foto</b> di setiap baris. Semua kolom tetap bisa diedit.</p>
             <datalist id="uji_produk_list"></datalist>
           </div>
+        </div>
+
+        <div class="hidden-print flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+          <div class="text-[11px] font-semibold text-emerald-900 leading-snug">
+            <span class="font-black">Produk di luar Siklus Menu?</span>
+            Tambahkan kartu produk manual, lalu pilih nama dari daftar acuan organoleptik atau ketik produk baru. Produk baru yang parameternya diisi manual akan otomatis masuk database acuan saat data disimpan.
+          </div>
+          <button type="button" onclick="ujiAddManualProduct()" class="shrink-0 w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-1.5">
+            <span>➕</span> Tambah Produk Manual
+          </button>
         </div>
 
         <div class="md:hidden text-[10px] text-slate-400 italic flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
@@ -2328,6 +2338,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         }
       });
       if (noPhotos) exportRemovePhotoColumns(clone);
+      // Pastikan Word/print preview benar-benar tidak memecah baris pada kolom tanggal/waktu.
+      clone.querySelectorAll('.whitespace-nowrap').forEach(el => { el.style.whiteSpace = 'nowrap'; });
       return { clone: clone };
     }
 
@@ -2403,6 +2415,15 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       return lines;
     }
 
+    // Baris ke-3 kop laporan Pemantauan Suhu mengikuti sub-menu yang aktif
+    function suhuKopJudul() {
+      return ({
+        ruang: 'PEMANTAUAN SUHU RUANGAN',
+        penyimpanan: 'PEMANTAUAN SUHU PENYIMPANAN',
+        pemorsian: 'PEMANTAUAN SUHU PEMORSIAN'
+      })[activeSuhuCategory] || 'PEMANTAUAN SUHU RUANGAN';
+    }
+
     // Ganti penanda foto pada salinan tabel dengan <img> ukuran seragam 2x3 cm / 3x2 cm (dipakai semua export Word)
     async function exportEmbedWordPhotos(clone, files, docName) {
       const cache = new Map();
@@ -2453,12 +2474,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           table { width: 100%; border-collapse: collapse; margin-top: 10px; }
           th, td { border: 1px solid black; padding: ${photoLayout ? 4 : 6}px; font-size: ${photoLayout ? 12 : 10}pt; text-align: left; vertical-align: middle; }
           th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+          th.whitespace-nowrap, td.whitespace-nowrap { white-space: nowrap; }
           .header { text-align: center; font-weight: bold; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px; }
         </style>
         </head>
         <body>
           <div class="Section1">
-          ${kopCode ? exportWordKop(kopCode, docName, files)
+          ${kopCode ? exportWordKop(kopCode, docName, files, wrapperId === 'wrapper_suhu' ? suhuKopJudul() : undefined)
             : isMasterBahan ? exportWordKop('FM-SGR-DST', docName, files, 'MASTER BAHAN', '00', '')
             : `<div class="header">
             <h2 style="margin:0;">NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</h2>
@@ -2558,7 +2580,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                   value = td.innerText.trim();
                 }
               }
-              cells.push({ r: r, c: c, rs: rs, cs: cs, value: value, header: td.tagName === 'TH', b64: photoB64 || null, norm: null });
+              cells.push({ r: r, c: c, rs: rs, cs: cs, value: value, header: td.tagName === 'TH', b64: photoB64 || null, norm: null, nowrap: td.classList.contains('whitespace-nowrap') });
               for (let i = 0; i < rs; i++) for (let j = 0; j < cs; j++) if (i || j) occupied.add((r + i) + ',' + (c + j));
               c += cs;
             });
@@ -2572,6 +2594,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           // 3) Lebar kolom & tinggi baris
           const maxCol = cells.reduce((m, x) => Math.max(m, x.c + x.cs - 1), 1);
           const photoCols = new Set(cells.filter(x => x.norm).map(x => x.c));
+          const nowrapCols = new Set(cells.filter(x => x.nowrap).map(x => x.c));
           const colWidth = {};
           for (let c = 1; c <= maxCol; c++) {
             if (photoCols.has(c)) { colWidth[c] = PHOTO_COL_WIDTH; }
@@ -2580,7 +2603,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               cells.forEach(x => {
                 if (x.c === c && x.cs === 1) String(x.value).split('\n').forEach(s => { len = Math.max(len, s.length); });
               });
-              colWidth[c] = Math.min(Math.max(len + 2, 10), 40);
+              // Kolom tanggal/waktu diberi ruang lebih agar teks tidak terpotong saat dicetak.
+              colWidth[c] = Math.min(Math.max(len + (nowrapCols.has(c) ? 6 : 2), 10), 40);
             }
             ws.getColumn(c).width = colWidth[c];
           }
@@ -2605,7 +2629,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             for (let j = 0; j < x.cs; j++) w += colWidth[x.c + j] || 10;
             const per = Math.max(1, (w - 1) / (x.header ? 1.15 : 1) * (photoExport ? 11 / 12 : 1));
             let lines = 1;
-            if (!x.norm) lines = String(x.value).split('\n').reduce((s, l) => s + Math.max(1, Math.ceil(l.length / per)), 0);
+            if (!x.norm) lines = x.nowrap ? 1 : String(x.value).split('\n').reduce((s, l) => s + Math.max(1, Math.ceil(l.length / per)), 0);
             const need = x.norm ? (x.norm.landscape ? LANDSCAPE_ROW_PT : PORTRAIT_ROW_PT) : Math.max(20, lines * (photoExport ? 17 : 15) + (photoExport ? 8 : 5)) / x.rs;
             rowPt[x.r] = Math.max(rowPt[x.r] || 20, need);
           });
@@ -2627,7 +2651,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               const cell = ws.getCell(top + i, x.c + j);
               cell.font = photoExport ? { name: 'Calibri', size: 12, bold: x.header } : { name: 'Calibri', bold: x.header };
               cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-              cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+              cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: !x.nowrap };
               if (x.header) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
             }
           });
@@ -2659,7 +2683,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               ws.getCell(5 + i, 1).alignment = { horizontal: 'left', vertical: 'middle', wrapText: false };
             }
             rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 2], title: [3, lastC - 2], lab: lastC - 1, val: lastC,
-              judul: 'PEMANTAUAN SUHU RUANGAN', noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
+              judul: suhuKopJudul(), noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
             ws.getRow(4).height = 20; rptMerge(ws, 4, 1, 4, lastC);
           } else if (!isMasterBahan) {
             ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
@@ -5093,14 +5117,14 @@ function renderSuhuTable() {
   if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
             let dynamicHeaders = '';
     for (let c = 1; c <= suhuRuangColumns; c++) {
-      dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
+      dynamicHeaders += `<th class="p-3 border-b border-slate-600 w-24 text-center whitespace-nowrap">WAKTU</th>
                          <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU</th>`;
     }
 
     htmlHead = `
   <tr>
     <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-    <th class="p-3 border-b border-slate-600 w-32 text-center">TANGGAL</th>
+    <th class="p-3 border-b border-slate-600 w-32 text-center whitespace-nowrap">TANGGAL</th>
     <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
     <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
     ${dynamicHeaders}
@@ -5116,7 +5140,7 @@ function renderSuhuTable() {
         let defVal = c === 1 ? cfg.defPagi : cfg.defMalam;
 
         dynamicCells += `
-          <td class="p-2 text-center"><input type="time" id="suhu_waktu_${c}_${cfg.id}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
+          <td class="p-2 text-center whitespace-nowrap"><input type="time" id="suhu_waktu_${c}_${cfg.id}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
           <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${c}_${cfg.id}" value="${defVal}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})"></td>
         `;
       }
@@ -5126,7 +5150,7 @@ function renderSuhuTable() {
             htmlBody += `
         <tr class="hover:bg-slate-50 border-b border-slate-100">
           <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
-          <td class="p-2 text-center"><input type="date" id="suhu_tgl_${cfg.id}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
+          <td class="p-2 text-center whitespace-nowrap"><input type="date" id="suhu_tgl_${cfg.id}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
           <td class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap">${cfg.area}</td>
           <td class="p-2 text-center">${fotoHtml}</td>
           ${dynamicCells}
@@ -5151,10 +5175,10 @@ function renderSuhuTable() {
         htmlHead = `
       <tr>
         <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
-        <th class="p-3 border-b border-slate-600 w-32 text-center">TANGGAL</th>
+        <th class="p-3 border-b border-slate-600 w-32 text-center whitespace-nowrap">TANGGAL</th>
         <th class="p-3 border-b border-slate-600 w-[1%]">KOMPONEN & MENU HARI INI</th>
         <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
-        <th class="p-3 border-b border-slate-600 w-24 text-center">WAKTU</th>
+        <th class="p-3 border-b border-slate-600 w-24 text-center whitespace-nowrap">WAKTU</th>
         <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU AKTUAL</th>
         <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
         <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
@@ -5177,13 +5201,13 @@ function renderSuhuTable() {
                     htmlBody += `
           <tr class="hover:bg-slate-50 border-b border-slate-100 ${b > 1 ? 'bg-indigo-50/30' : ''}">
             <td class="p-3 text-center font-bold text-slate-400">${rowCounter++}</td>
-            <td class="p-2 text-center"><input type="date" id="suhu_tgl_${uniqueId}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
+            <td class="p-2 text-center whitespace-nowrap"><input type="date" id="suhu_tgl_${uniqueId}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
             <td class="p-3 font-black text-blue-800 uppercase tracking-wide bg-slate-50/50 w-[1%] whitespace-nowrap">
               <div class="text-[10px] font-extrabold text-slate-500 mb-1">${sub.labelName} ${b > 1 ? `<span class="ml-1 inline-block text-[8px] text-white bg-indigo-500 font-bold px-1.5 py-0.5 rounded shadow-sm">BATCH ${b}</span>` : ''}</div>
               ${menuName}
             </td>
             <td class="p-2 text-center">${fotoHtml}</td>
-            <td class="p-2 text-center"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
+            <td class="p-2 text-center whitespace-nowrap"><input type="time" id="suhu_waktu_${uniqueId}" value="${defTime}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
             <td class="p-2 text-center"><input type="number" step="0.1" id="suhu_val_${uniqueId}" value="${sub.def}" class="w-full min-w-[100px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})"></td>
             <td class="p-2 text-center"><input type="text" id="suhu_std_${uniqueId}" value="${sub.std}" oninput="evalSuhuStatusSingle('${uniqueId}', ${sub.min}, ${sub.max})" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
             <td class="p-3 text-center font-bold text-sm" id="suhu_status_${uniqueId}"><span class="text-emerald-600">Sesuai</span></td>
@@ -6773,10 +6797,10 @@ function renderSuhuTable() {
           <td class="p-3 font-semibold text-slate-600 border-r border-slate-200">${r.jenis}</td>
           <td class="p-3 font-bold uppercase text-blue-700 border-r border-slate-200 pend-menu">${pendEsc(menu)}</td>
           <td class="p-2 text-center border-r border-slate-200"><input type="number" min="0" inputmode="numeric" class="${cls} pend-jml" value="${pendEsc(d.jml || '')}" placeholder="porsi"></td>
-          <td class="p-2 text-center border-r border-slate-200"><input type="time" class="${cls} pend-jm" value="${pendEsc(d.jm || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
+          <td class="p-2 text-center border-r border-slate-200 whitespace-nowrap"><input type="time" class="${cls} pend-jm" value="${pendEsc(d.jm || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
           <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-sm" value="${pendEsc(d.sm || '')}" placeholder="°C"></td>
           <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_m_${idx}_${i}`, 'm', d.fm || '', r.tahap)}</td>
-          <td class="p-2 text-center border-r border-slate-200"><input type="time" class="${cls} pend-js" value="${pendEsc(d.js || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
+          <td class="p-2 text-center border-r border-slate-200 whitespace-nowrap"><input type="time" class="${cls} pend-js" value="${pendEsc(d.js || '')}" oninput="pendCalcRow(this.closest('tr'))"></td>
           <td class="p-2 text-center border-r border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="${cls} pend-ss" value="${pendEsc(d.ss || '')}" placeholder="°C"></td>
           <td class="pend-foto p-2 text-center border-r border-slate-200">${buildPendPhotoHtml(`pend_foto_s_${idx}_${i}`, 's', d.fs || '', r.tahap)}</td>
           <td class="p-3 text-center font-black text-slate-800 bg-slate-100 border-r border-slate-200 pend-dur">-</td>
@@ -7115,7 +7139,7 @@ function renderSuhuTable() {
         const grp = (title, k1, k2, kf) => {
           const last = kf ? cx[kf] : cx[k2];
           rptMerge(ws, 8, cx[k1], 8, last); rptPut(ws, 8, cx[k1], title, H);
-          rptPut(ws, 9, cx[k1], 'Pukul', H); rptPut(ws, 9, cx[k2], 'Suhu', H);
+          rptPut(ws, 9, cx[k1], 'Pukul', Object.assign({}, H, { wrap: false })); rptPut(ws, 9, cx[k2], 'Suhu', H);
           if (kf) rptPut(ws, 9, cx[kf], 'Foto', H);
         };
         grp('Mulai Resting', 'jm', 'sm', inl ? 'fm' : null);
@@ -7138,8 +7162,8 @@ function renderSuhuTable() {
 
           const put = (k, v, o) => rptPut(ws, r, cx[k], v, Object.assign({ h: 'center', size: inl ? 12 : 10 }, o || {}));
           put('no', parseInt(d.no, 10)); put('tahap', d.tahap); put('jenis', d.jenis, { h: 'left' }); put('menu', d.menu, { h: 'left' });
-          put('jml', d.jml); put('jm', d.jm); put('sm', d.sm, { numFmt: '0.0' });
-          put('js', d.js); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' }); put('ket', d.ket, { h: 'left' });
+          put('jml', d.jml); put('jm', d.jm, { wrap: false }); put('sm', d.sm, { numFmt: '0.0' });
+          put('js', d.js, { wrap: false }); put('ss', d.ss, { numFmt: '0.0' }); put('dur', d.dur); put('sr', d.sr, { numFmt: '0.0' }); put('ket', d.ket, { h: 'left' });
           rptBorder(ws, r, 1, r, lastCol, 'grid');
 
           for (const p of [['fm', norms[0]], ['fs', norms[1]]]) {
@@ -7210,6 +7234,7 @@ function renderSuhuTable() {
           table { width: 100%; border-collapse: collapse; margin-top: 10px; }
           th, td { border: 1px solid black; padding: ${photoLayout ? 4 : 6}px; font-size: ${photoLayout ? 12 : 10}pt; text-align: left; vertical-align: middle; }
           th { background-color: #e2e8f0; text-align: center; font-weight: bold; }
+          th.whitespace-nowrap, td.whitespace-nowrap { white-space: nowrap; }
         </style>
         </head>
         <body>
@@ -7313,11 +7338,17 @@ function renderSuhuTable() {
       const el = document.getElementById('uji_tanggal');
       return el && /^\d{4}-\d{2}-\d{2}$/.test(el.value) ? el.value : '';
     }
+    function ujiIsManualKey(key) {
+      return /^MANUAL_\d+$/.test(String(key || ''));
+    }
     function ujiCatLabel(key) {
+      if (ujiIsManualKey(key)) return 'PRODUK MANUAL';
       const m = UJI_MENU_ALL.find(x => x.key === key);
       return m ? m.label : key;
     }
     function ujiCatFallback(key) {
+      // Produk manual tidak punya acuan kategori: parameter diisi sendiri oleh pengguna.
+      if (ujiIsManualKey(key)) return { warna: '', tekstur: '', rasa: '', aroma: '' };
       return UJI_CAT_FALLBACK[key] || UJI_CAT_FALLBACK.KARBO;
     }
     function ujiRowArray(rows) {
@@ -7368,7 +7399,11 @@ function renderSuhuTable() {
     }
     function ujiMenuKeysFor(products) {
       const keys = UJI_MENU_BASE.map(m => m.key);
-      if (products && String(products.SUSU || '').trim()) keys.push('SUSU');
+      if (products && (Object.prototype.hasOwnProperty.call(products, 'SUSU') || String(products.SUSU || '').trim())) keys.push('SUSU');
+      // Kartu produk manual (di luar Siklus Menu) tetap ditampilkan sesuai urutan penambahannya
+      Object.keys(products || {}).filter(ujiIsManualKey)
+        .sort((a, b) => Number(a.split('_')[1]) - Number(b.split('_')[1]))
+        .forEach(k => { if (keys.indexOf(k) === -1) keys.push(k); });
       return keys;
     }
 
@@ -7394,7 +7429,12 @@ function renderSuhuTable() {
       put('warna', ref.warna); put('tekstur', ref.tekstur);
       put('rasa', ref.rasa); put('aroma', ref.aroma);
       const st = document.getElementById('uji_ref_status_' + cat);
-      if (st) st.textContent = !produk ? 'Acuan kategori' : (ref._generic ? 'Acuan kategori (produk belum ada di DB acuan)' : 'Acuan: ' + ref.nama + ' · ' + ujiRefList().length + ' produk');
+      if (st) {
+        if (!produk) st.textContent = ujiIsManualKey(cat) ? 'Produk manual · isi parameter secara manual' : 'Acuan kategori';
+        else if (!ref._generic) st.textContent = 'Acuan: ' + ref.nama + ' · ' + ujiRefList().length + ' produk';
+        else if (ujiIsManualKey(cat)) st.textContent = 'Produk baru · parameter akan disimpan sebagai acuan saat data disimpan';
+        else st.textContent = 'Acuan kategori (produk belum ada di DB acuan)';
+      }
       ujiRenderChips(cat);
       return ref;
     }
@@ -7409,7 +7449,7 @@ function renderSuhuTable() {
       return '<tr data-idx="' + i + '" class="hover:bg-emerald-50/40">'
         + '<td data-label="No" class="uji-no p-2 text-center font-black text-slate-500 bg-slate-50 border border-slate-200">' + (i + 1) + '</td>'
         + '<td data-label="Bukti Foto" class="uji-foto-cell p-1.5 border border-slate-200 text-center align-middle"><div class="uji-foto-slot">' + buildUjiPhotoHtml(fotoId, d.foto || '') + '</div></td>'
-        + '<td data-label="Waktu (Jam)" class="p-1.5 border border-slate-200"><input type="time" class="' + UJI_INP + ' uji-jam" value="' + ujiEsc(d.jam || '') + '"></td>'
+        + '<td data-label="Waktu (Jam)" class="p-1.5 border border-slate-200 whitespace-nowrap"><input type="time" class="' + UJI_INP + ' uji-jam" value="' + ujiEsc(d.jam || '') + '"></td>'
         + '<td data-label="Batch/Panci Ke" class="p-1.5 border border-slate-200"><input type="number" min="1" inputmode="numeric" class="' + UJI_INP + ' uji-batch text-center" value="' + ujiEsc(d.batch || '') + '" placeholder="Ke-"></td>'
         + '<td data-label="Suhu Inti (°C)" class="p-1.5 border border-slate-200"><input type="number" step="0.1" inputmode="decimal" class="' + UJI_INP + ' uji-suhu text-center" value="' + ujiEsc(d.suhu || '') + '" placeholder="°C" oninput="ujiRowCalc(this.closest(\'tr\'))"></td>'
         + '<td data-label="Tekstur" class="p-1.5 border border-slate-200"><textarea rows="2" class="' + UJI_INP + ' uji-tekstur resize-y min-h-[54px]" placeholder="Tekstur...">' + ujiEsc(d.tekstur || '') + '</textarea></td>'
@@ -7447,10 +7487,11 @@ function renderSuhuTable() {
           + '<div class="flex items-center gap-2">'
           + '<span class="w-7 h-7 rounded-full bg-emerald-600 text-white text-[11px] font-black flex items-center justify-center shrink-0">' + (n + 1) + '</span>'
           + '<div><div class="text-[11px] font-black text-slate-800 uppercase tracking-wider">' + ujiEsc(ujiCatLabel(key)) + '</div>'
-          + '<div class="text-[9px] text-slate-400">Menu otomatis dari Siklus Menu</div></div></div>'
-          + '<div class="flex items-center gap-1.5 hidden-print">'
+          + '<div class="text-[9px] text-slate-400">' + (ujiIsManualKey(key) ? 'Produk manual · di luar Siklus Menu' : 'Menu otomatis dari Siklus Menu') + '</div></div></div>'
+          + '<div class="flex flex-wrap items-center gap-1.5 hidden-print">'
           + '<button type="button" onclick="ujiAddRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors">+ Tambah Batch</button>'
           + '<button type="button" onclick="ujiDelRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 transition-colors">− Hapus Batch</button>'
+          + (ujiIsManualKey(key) ? '<button type="button" onclick="ujiDelManualProduct(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors">🗑️ Hapus Produk</button>' : '')
           + '</div></div>'
           + '<div class="px-4 py-3 grid grid-cols-1 lg:grid-cols-2 gap-3">'
           + '<div>'
@@ -7472,7 +7513,7 @@ function renderSuhuTable() {
           + '<thead class="bg-slate-300 text-slate-800 uppercase font-bold tracking-wider text-[10px]"><tr>'
           + '<th class="p-2 text-center border border-slate-400 w-12">No</th>'
           + '<th class="p-2 text-center border border-slate-400 w-32">Bukti Foto</th>'
-          + '<th class="p-2 text-center border border-slate-400 w-24">Waktu (Jam)</th>'
+          + '<th class="p-2 text-center border border-slate-400 w-24 whitespace-nowrap">Waktu (Jam)</th>'
           + '<th class="p-2 text-center border border-slate-400 w-28">Batch/Panci Ke</th>'
           + '<th class="p-2 text-center border border-slate-400 w-32">Suhu Inti (°C) (Min 60°C)</th>'
           + '<th class="p-2 text-center border border-slate-400 min-w-[190px]">Tekstur</th>'
@@ -7560,6 +7601,51 @@ function renderSuhuTable() {
       if (hasData && !confirm('Hapus baris batch terakhir beserta isinya?')) return;
       last.remove();
       ujiNumberRows(cat);
+      window.ujiDirty = true;
+    }
+
+    // ---------- produk manual (di luar Siklus Menu) ----------
+    // Ambil state SEMUA kartu (termasuk yang masih kosong) agar tidak hilang saat render ulang.
+    function ujiCollectAllMenus() {
+      const out = {};
+      document.querySelectorAll('#uji_menus_wrapper [data-uji-menu]').forEach(card => {
+        const key = card.getAttribute('data-uji-menu');
+        const inp = card.querySelector('.uji-produk');
+        out[key] = {
+          produk: inp ? inp.value.trim().replace(/\s+/g, ' ') : '',
+          rows: ujiCollectCatRows(key)
+        };
+      });
+      return out;
+    }
+    function ujiAddManualProduct() {
+      const wrap = document.getElementById('uji_menus_wrapper');
+      if (!wrap) return;
+      const menus = ujiCollectAllMenus();
+      let n = 1;
+      while (Object.prototype.hasOwnProperty.call(menus, 'MANUAL_' + n)) n++;
+      const key = 'MANUAL_' + n;
+      menus[key] = { produk: '', rows: [{ batch: '1' }] };
+      ujiRenderMenus(menus);
+      window.ujiDirty = true;
+      const inp = document.getElementById('uji_produk_' + key);
+      if (inp) {
+        try {
+          inp.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          inp.focus({ preventScroll: true });
+        } catch (e) {}
+      }
+    }
+    function ujiDelManualProduct(key) {
+      if (!ujiIsManualKey(key)) return;
+      const card = document.querySelector('#uji_menus_wrapper [data-uji-menu="' + key + '"]');
+      if (!card) return;
+      const hasData = Array.from(card.querySelectorAll('input, textarea, select'))
+        .some(el => !el.classList.contains('uji-foto-input') && String(el.value || '').trim() !== '');
+      if (hasData && !confirm('Hapus kartu produk manual ini beserta seluruh barisnya?')) return;
+      const menus = ujiCollectAllMenus();
+      delete menus[key];
+      ujiRenderMenus(menus);
       window.ujiDirty = true;
     }
     function ujiCollectCatRows(cat) {
@@ -7772,6 +7858,10 @@ function renderSuhuTable() {
         }
         menus[key] = { produk, rows };
       });
+      // Kartu produk manual yang tersimpan ikut dimuat kembali (di luar menu baku)
+      Object.keys(saved).filter(ujiIsManualKey)
+        .sort((a, b) => Number(a.split('_')[1]) - Number(b.split('_')[1]))
+        .forEach(k => { if (!menus[k]) menus[k] = saved[k]; });
       return menus;
     }
     function ujiLoadRecord(fromRealtime) {
@@ -7822,6 +7912,48 @@ function renderSuhuTable() {
       };
     }
 
+    // ---------- simpan produk baru ke database acuan organoleptik ----------
+    function ujiRefExact(name) {
+      const n = ujiNorm(name);
+      if (!n) return null;
+      return ujiRefList().find(r => ujiNorm(r.nama) === n) || null;
+    }
+    // Baris yang parameternya diisi manual (bukan hasil salinan acuan kategori)
+    function ujiManualParamRow(rows, catKey) {
+      const fb = ujiCatFallback(catKey);
+      const fields = ['tekstur', 'rasa', 'aroma', 'warna'];
+      const cands = ujiRowArray(rows).filter(r => fields.every(f => String(r[f] || '').trim()));
+      for (const r of cands) {
+        if (fields.some(f => ujiNorm(r[f]) !== ujiNorm(fb[f]))) return r;
+      }
+      return null;
+    }
+    function ujiLearnRefs(menus) {
+      const list = ujiRefList().slice();
+      let maxNo = 0;
+      list.forEach(r => { const v = parseInt(r && r.no, 10); if (!isNaN(v) && v > maxNo) maxNo = v; });
+      const added = [];
+      Object.keys(menus || {}).forEach(k => {
+        const produk = String((menus[k] || {}).produk || '').trim().replace(/\s+/g, ' ');
+        if (!produk || ujiRefExact(produk)) return;
+        if (added.some(a => ujiNorm(a.nama) === ujiNorm(produk))) return;
+        const row = ujiManualParamRow((menus[k] || {}).rows, k);
+        if (!row) return;
+        maxNo += 1;
+        added.push({
+          no: String(maxNo), nama: produk,
+          warna: String(row.warna).trim(), tekstur: String(row.tekstur).trim(),
+          rasa: String(row.rasa).trim(), aroma: String(row.aroma).trim()
+        });
+      });
+      if (!added.length) return [];
+      const merged = list.concat(added);
+      window.dbCache[UJI_REF_PATH] = merged;
+      if (typeof window.fbSet === 'function') window.fbSet(UJI_REF_PATH, merged);
+      ujiFillDatalist();
+      return added;
+    }
+
     function saveUjiOrganoleptik() {
       const dateKey = ujiDateKey();
       if (!dateKey) { alert('Isi dulu Tanggal Uji.'); document.getElementById('uji_tanggal').focus(); return; }
@@ -7846,10 +7978,14 @@ function renderSuhuTable() {
       window.dbCache[UJI_PATH] = all;
       window.ujiDirty = false;
       if (typeof window.fbSet === 'function') window.fbSet(UJI_PATH + '/' + dateKey, day);
+      const newRefs = ujiLearnRefs(menus);   // produk baru + parameter manual -> database acuan
       try { document.dispatchEvent(new Event('sppg:data-changed')); } catch (e) {}
       const produkList = filled.map(k => menus[k].produk).join(', ');
       if (window.sppgNotify) sppgNotify('Data tersimpan', 'Uji organoleptik ' + dateKey + ': ' + produkList);
-      alert('✅ Data Uji Organoleptik dan Suhu Memasak tanggal ' + dateKey + ' berhasil disimpan di Firebase!\n\n' + filled.length + ' menu: ' + produkList);
+      const refMsg = newRefs.length
+        ? '\n\n📚 ' + newRefs.length + ' produk baru ditambahkan ke database acuan organoleptik:\n' + newRefs.map(r => '• ' + r.nama).join('\n')
+        : '';
+      alert('✅ Data Uji Organoleptik dan Suhu Memasak tanggal ' + dateKey + ' berhasil disimpan di Firebase!\n\n' + filled.length + ' menu: ' + produkList + refMsg);
     }
 
     // ---------- interaksi tanggal / produk ----------
@@ -7867,9 +8003,10 @@ function renderSuhuTable() {
     function ujiActivateCat(cat) {
       if (!cat) return;
       window.ujiActiveCat = cat;
-      UJI_MENU_ALL.forEach(m => {
-        if (m.key === cat) return;
-        const b = document.getElementById('uji_chips_' + m.key);
+      document.querySelectorAll('#uji_menus_wrapper [data-uji-menu]').forEach(card => {
+        const k = card.getAttribute('data-uji-menu');
+        if (k === cat) return;
+        const b = document.getElementById('uji_chips_' + k);
         if (b) b.innerHTML = '';
       });
       ujiRenderChips(cat);
@@ -7888,7 +8025,9 @@ function renderSuhuTable() {
       if (ref) n = ref.nama;
       inp.value = n;
       if (n && ujiNorm(n) !== (inp.dataset.applied || '')) {
-        ujiApplyRefToCat(cat, ujiRefForProduct(n, cat));
+        const rowRef = ujiRefForProduct(n, cat);
+        // Produk manual tanpa acuan: jangan timpa parameter yang sudah diketik pengguna.
+        if (!(rowRef._generic && ujiIsManualKey(cat))) ujiApplyRefToCat(cat, rowRef);
         ujiMarkApplied(cat);
         window.ujiDirty = true;
       }
@@ -8035,7 +8174,7 @@ function renderSuhuTable() {
           rptBorder(ws, 7, 1, 7, lastCol, 'grid');
 
           ws.getRow(8).height = withPhoto ? 66 : 36;
-          headers.forEach((h, i) => rptPut(ws, 8, i + 1, h, H));
+          headers.forEach((h, i) => rptPut(ws, 8, i + 1, h, (i + 1) === C.jam ? Object.assign({}, H, { wrap: false }) : H));
           rptFill(ws, 8, 1, 8, lastCol, RPT_GREY);
           rptBorder(ws, 8, 1, 8, lastCol, 'grid');
 
@@ -8050,7 +8189,7 @@ function renderSuhuTable() {
             const photoRow = withPhoto ? (normFoto ? (normFoto.landscape ? 96 : 126) : 58) : 26;
             ws.getRow(r).height = Math.max(photoRow, Math.min(withPhoto ? 160 : 96, lines * (withPhoto ? 17 : 12) + 8));
             rptPut(ws, r, C.no, i + 1, { h: 'center', size: FS });
-            rptPut(ws, r, C.jam, d.jam, { h: 'center', size: FS });
+            rptPut(ws, r, C.jam, d.jam, { h: 'center', size: FS, wrap: false });
             rptPut(ws, r, C.batch, d.batch, { h: 'center', size: FS });
             rptPut(ws, r, C.suhu, d.suhu, { h: 'center', size: FS, numFmt: '0.0' });
             rptPut(ws, r, C.tekstur, d.tekstur, { h: 'left', size: FS });
@@ -8156,7 +8295,7 @@ function renderSuhuTable() {
             rowsHtml += '<tr>'
               + td(i + 1, 'text-align:center;')
               + (withPhoto ? td(fotoHtml || '-', 'text-align:center;') : '')
-              + td(d.jam, 'text-align:center;')
+              + td(d.jam, 'text-align:center;white-space:nowrap;')
               + td(d.batch, 'text-align:center;')
               + td(d.suhu === '' || d.suhu == null ? '' : Number(d.suhu).toFixed(1), 'text-align:center;font-weight:bold;' + (d.suhu !== '' && Number(d.suhu) < 60 ? 'color:#b91c1c;' : ''))
               + td(d.tekstur) + td(d.rasa) + td(d.aroma) + td(d.warna)
@@ -8174,7 +8313,7 @@ function renderSuhuTable() {
             + '<thead><tr>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">No</th>'
             + (withPhoto ? '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Bukti Foto</th>' : '')
-            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Waktu (Jam)</th>'
+            + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;white-space:nowrap;">Waktu (Jam)</th>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Batch/Panci Ke</th>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Suhu Inti (°C) (Min 60°C)</th>'
             + '<th style="border:1px solid black;padding:4px;background:#e2e8f0;text-align:center;">Tekstur</th>'
@@ -9324,6 +9463,10 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
           var f = master.font || {}, al = master.alignment || {};
           var hAl = al.horizontal === 'center' ? 'center' : (al.horizontal === 'right' ? 'right' : 'left');
           var vAl = al.vertical === 'top' ? 'top' : (al.vertical === 'bottom' ? 'bottom' : 'middle');
+          // Nilai tanggal/jam tidak boleh dipecah baris saat dicetak, walau workbook lama masih wrapText:true
+          var txt = esc(cellText(master)).replace(/\n/g, '<br>');
+          var dateTimeCell = /^\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}$/.test(txt) || /^\d{1,2}[:.]\d{2}(?::\d{2})?$/.test(txt);
+          var wrap = al.wrapText !== false && !dateTimeCell;
           var hh = 0; for (var q = r; q < r + rs; q++) hh += rh(q);
           var st = 'padding:0;overflow:hidden;vertical-align:' + vAl + ';text-align:' + hAl + ';' +
             'border-top:' + (top ? '1px solid #000' : '0') + ';border-left:' + (left ? '1px solid #000' : '0') + ';' +
@@ -9331,10 +9474,8 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
             (fill ? 'background:' + fill + ';' : '') +
             'font-family:\'' + (f.name || 'Calibri') + '\',Calibri,Arial,sans-serif;font-size:' + (f.size || 11) + 'pt;' +
             (f.bold ? 'font-weight:bold;' : '') + (f.italic ? 'font-style:italic;' : '') + 'color:#000;';
-          var wrap = al.wrapText !== false;
-          var txt = esc(cellText(master)).replace(/\n/g, '<br>');
           html += '<td' + (rs > 1 ? ' rowspan="' + rs + '"' : '') + (cs > 1 ? ' colspan="' + cs + '"' : '') + ' style="' + st + '">' +
-            '<div style="box-sizing:border-box;padding:1px 3px;max-height:' + Math.max(1, hh - 1) + 'px;overflow:hidden;line-height:1.15;white-space:' + (wrap ? 'pre-wrap' : 'nowrap') + ';word-break:break-word">' + txt + '</div></td>';
+            '<div style="box-sizing:border-box;padding:1px 3px;max-height:' + Math.max(1, hh - 1) + 'px;overflow:hidden;line-height:1.15;white-space:' + (wrap ? 'pre-wrap' : 'nowrap') + ';word-break:' + (wrap ? 'break-word' : 'normal') + '">' + txt + '</div></td>';
         }
         html += '</tr>';
       }
