@@ -414,8 +414,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <button id="nav-overview" onclick="switchTab('overview')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📊</span> <span>Overview Dashboard</span></button>
         <button id="nav-sasaran-didik" onclick="switchTab('sasaran-didik')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🧒</span> <span>Pendataan Sasaran Peserta Didik (FM-SGR-SPPG-01.01)</span></button>
         <button id="nav-frekuensi-bahan" onclick="switchTab('frekuensi-bahan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🥬</span> <span>Frekuensi Bahan (FM-SGR-SPPG-01.03)</span></button>
-        <button id="nav-master-bahan-20" onclick="switchTab('master-bahan-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📦</span> <span>Master Bahan 60 Hari</span></button>
-        <button id="nav-siklus-menu-20" onclick="switchTab('siklus-menu-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍱</span> <span>Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</span></button>
+        <button id="nav-master-bahan-20" onclick="switchTab('master-bahan-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📦</span> <span>Master Bahan</span></button>
+        <button id="nav-siklus-menu-20" onclick="switchTab('siklus-menu-20')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍱</span> <span>Siklus Menu (FM-SGR-SPPG-01.04)</span></button>
         <button id="nav-pemorsian" onclick="switchTab('pemorsian')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">⚖️</span> <span>Pemorsian & Berat (FM-SGR-SPPG-06.01)</span></button>
         <button id="nav-suhu-ruangan" onclick="switchTab('suhu-ruangan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🌡️</span> <span>Pemantauan Suhu (FM-SGR-SPPG-03.05)</span></button>
         <button id="nav-pendinginan" onclick="switchTab('pendinginan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">❄️</span> <span>Pemantauan di Cooling Area (FM-SGR-SPPG-05.03)</span></button>
@@ -461,7 +461,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           <div class="absolute -right-4 -bottom-4 text-7xl opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-500">📦</div>
           <div class="text-[11px] text-slate-400 font-extrabold uppercase tracking-widest">Total Bahan Baku</div>
           <div id="dashTotalBahan" class="text-3xl font-black text-slate-800 tracking-tight">0 Jenis</div>
-          <p class="text-[11px] text-indigo-600 font-bold flex items-center gap-1.5 bg-indigo-50 w-fit px-2 py-1 rounded-md"><span>✓</span> Master 60 Hari Tersinkron</p>
+          <p class="text-[11px] text-indigo-600 font-bold flex items-center gap-1.5 bg-indigo-50 w-fit px-2 py-1 rounded-md"><span>✓</span> Master Bahan Tersinkron</p>
         </div>
 
         <div class="bg-white p-6 rounded-3xl border-0 shadow-lg shadow-slate-200/50 ring-1 ring-slate-100 border-t-4 border-t-blue-500 space-y-3 relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
@@ -491,7 +491,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 gap-4">
             <div>
               <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2"><span class="text-xl">🍽️</span> Rincian Komponen Menu Tanggal Aktif Hari Ini</h3>
-              <p class="text-[11px] text-slate-500 font-medium mt-1">Disajikan berdasarkan sinkronisasi tanggal realtime & Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</p>
+              <p class="text-[11px] text-slate-500 font-medium mt-1">Disajikan berdasarkan sinkronisasi tanggal realtime & Siklus Menu (FM-SGR-SPPG-01.04)</p>
             </div>
             <button onclick="switchTab('siklus-menu-20')" class="text-[11px] font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors w-full sm:w-auto">Kelola Menu →</button>
           </div>
@@ -529,6 +529,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         </div>
         
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+        <div class="siklus-period-host"></div>
         <div id="wrapper_frekuensi" class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm w-full">
           <table class="w-full text-xs text-left min-w-[600px]">
             <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold tracking-wider">
@@ -546,7 +547,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       </div>
     </section>
 
-    <!-- MASTER BAHAN 20 HARI -->
+    <!-- MASTER BAHAN -->
     <section id="sec-master-bahan-20" class="tab-content hidden space-y-6">
       <div class="flex items-center justify-between">
         <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
@@ -557,24 +558,24 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
              <div class="text-[10px] font-extrabold text-indigo-500 tracking-widest uppercase bg-indigo-50 w-fit px-2 py-0.5 rounded">Database Inti</div>
-             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">📦 Master Bahan 60 Hari</h2>
+             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">📦 Master Bahan</h2>
           </div>
           <div class="flex flex-wrap gap-2 w-full lg:w-auto">
             <button onclick="exportGenericExcel('Master Bahan', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
-            <button onclick="exportGenericWord('Master Bahan 60 Hari', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
+            <button onclick="exportGenericWord('Master Bahan', 'master_bahan_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
             <button onclick="saveMasterBahanManual()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Master</button>
           </div>
         </div>
         
         <div class="bg-gradient-to-br from-indigo-50 to-white p-4 md:p-5 rounded-2xl border border-indigo-200 shadow-inner space-y-3">
           <div class="flex flex-wrap items-center gap-2">
-            <h3 class="font-extrabold text-indigo-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Master Bahan 60 Hari</h3>
-            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-indigo-200 text-indigo-900">FORMAT: MASTER_BAHAN_60_HARI</span>
+            <h3 class="font-extrabold text-indigo-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Master Bahan</h3>
+            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-indigo-200 text-indigo-900">FORMAT: MASTER_BAHAN</span>
           </div>
-          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>MASTER_BAHAN_60_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>MASTER_BAHAN</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
           <p id="imp_master_cycle_note" class="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 font-semibold">Template memuat seluruh blok yang ada ditambah 1 blok tambahan opsional di akhir untuk menambah 5 hari baru.</p>
           <div class="flex flex-wrap gap-2">
-            <button onclick="impDownloadTemplate('master', false)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template 60 Hari (.xlsx)</button>
+            <button onclick="impDownloadTemplate('master', false)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template Lengkap (.xlsx)</button>
             <button onclick="impDownloadTemplate('master', false, true)" class="flex-1 md:flex-none bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">➕ Template Tambah 5 Hari</button>
             <button onclick="impDownloadTemplate('master', true)" class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Data Saat Ini (format import)</button>
             <label class="flex-1 md:flex-none bg-white border-2 border-indigo-200 text-indigo-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer text-center">📂 Pilih File Excel<input type="file" accept=".xlsx" class="hidden" onchange="impLoadFile('master', this)"></label>
@@ -584,11 +585,12 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           <div id="imp_master_result" class="hidden text-xs rounded-xl px-4 py-3 border leading-relaxed"></div>
         </div>
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+        <div class="siklus-period-host"></div>
         <div id="master_bahan_tables_wrapper" class="space-y-8 w-full"></div>
       </div>
     </section>
 
-    <!-- SIKLUS MENU 60 HARI (FM-SGR-SPPG-01.04) -->
+    <!-- SIKLUS MENU (FM-SGR-SPPG-01.04) -->
     <section id="sec-siklus-menu-20" class="tab-content hidden space-y-6">
       <div class="flex items-center justify-between">
         <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
@@ -599,24 +601,24 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
           <div>
              <div class="text-[10px] font-extrabold text-blue-500 tracking-widest uppercase bg-blue-50 w-fit px-2 py-0.5 rounded">Operasional Menu</div>
-             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">🍱 Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</h2>
+             <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">🍱 Siklus Menu (FM-SGR-SPPG-01.04)</h2>
           </div>
           <div class="flex flex-wrap gap-2 w-full lg:w-auto">
             <button onclick="exportGenericExcel('Siklus_Menu', 'siklus_menu_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
-            <button onclick="exportGenericWord('Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)', 'siklus_menu_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
+            <button onclick="exportGenericWord('Siklus Menu (FM-SGR-SPPG-01.04)', 'siklus_menu_tables_wrapper')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
             <button onclick="saveSiklusMenuManual()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Menu</button>
           </div>
         </div>
 
         <div class="bg-gradient-to-br from-blue-50 to-white p-4 md:p-5 rounded-2xl border border-blue-200 shadow-inner space-y-3">
           <div class="flex flex-wrap items-center gap-2">
-            <h3 class="font-extrabold text-blue-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)</h3>
-            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-blue-200 text-blue-900">FORMAT: SIKLUS_MENU_60_HARI</span>
+            <h3 class="font-extrabold text-blue-900 text-xs flex items-center gap-2"><span class="text-base">📥</span> Import Siklus Menu (FM-SGR-SPPG-01.04)</h3>
+            <span class="text-[10px] font-black tracking-wider px-2 py-0.5 rounded bg-white border border-blue-200 text-blue-900">FORMAT: SIKLUS_MENU</span>
           </div>
-          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>SIKLUS_MENU_60_HARI</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
+          <p class="text-[11px] text-slate-600 leading-relaxed">Data hanya diterima jika berformat <b>SIKLUS_MENU</b>. Data berformat modul lain (atau tanpa penanda format) <b>otomatis ditolak</b> dan tidak mengubah apa pun. Gunakan template agar format pasti benar.</p>
           <p id="imp_menu_cycle_note" class="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 font-semibold">Template memuat seluruh blok yang ada ditambah 1 blok tambahan opsional di akhir untuk menambah 5 hari baru.</p>
           <div class="flex flex-wrap gap-2">
-            <button onclick="impDownloadTemplate('menu', false)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template 60 Hari (.xlsx)</button>
+            <button onclick="impDownloadTemplate('menu', false)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Template Lengkap (.xlsx)</button>
             <button onclick="impDownloadTemplate('menu', false, true)" class="flex-1 md:flex-none bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">➕ Template Tambah 5 Hari</button>
             <button onclick="impDownloadTemplate('menu', true)" class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all">⬇️ Data Saat Ini (format import)</button>
             <label class="flex-1 md:flex-none bg-white border-2 border-blue-200 text-blue-900 font-bold px-4 py-2 rounded-xl text-xs shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer text-center">📂 Pilih File Excel<input type="file" accept=".xlsx" class="hidden" onchange="impLoadFile('menu', this)"></label>
@@ -626,6 +628,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           <div id="imp_menu_result" class="hidden text-xs rounded-xl px-4 py-3 border leading-relaxed"></div>
         </div>
         <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+        <div class="siklus-period-host"></div>
         <div id="siklus_menu_tables_wrapper" class="space-y-8 w-full"></div>
       </div>
     </section>
@@ -1413,7 +1416,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             <input type="date" id="uji_tanggal" onchange="onUjiDateChange()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-slate-50 text-slate-800">
           </div>
           <div class="md:col-span-2">
-            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Menu Otomatis dari Siklus Menu 60 Hari:</label>
+            <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Menu Otomatis dari Siklus Menu:</label>
             <div id="uji_siklus_info" class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-[11px] font-semibold text-emerald-900 leading-snug">Pilih tanggal uji.</div>
             <p class="text-[10px] text-slate-400 mt-2">Produk, Warna, Tekstur, Rasa, dan Aroma terisi otomatis dari siklus menu. Anda cukup mengisi <b>Waktu</b>, <b>Suhu Inti</b>, dan <b>Keterangan</b>. Bukti foto diunggah langsung pada kolom <b>Bukti Foto</b> di setiap baris. Semua kolom tetap bisa diedit.</p>
             <datalist id="uji_produk_list"></datalist>
@@ -1598,7 +1601,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     const keys = [
       'sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map',
       'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat',
-      'sppg_organoleptik_ref'
+      'sppg_organoleptik_ref', 'sppg_siklus_period'
     ];
 
     let loadedCount = 0;
@@ -2151,8 +2154,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       wrapper_uji_organoleptik:    { nama: 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', foto: true, tgl: '#uji_tanggal' },
       wrapper_inspeksi_silang:     { nama: 'KONTAMINASI SILANG',      tgl: '#ks_tanggal' },
       'sec-inspeksi-alergen':      { nama: 'MANAJEMEN ALERGEN',       tgl: '#al_tanggal' },
-      siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU 60 HARI' },
-      master_bahan_tables_wrapper: { nama: 'MASTER BAHAN 20 HARI' },
+      siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU' },
+      master_bahan_tables_wrapper: { nama: 'MASTER BAHAN' },
       frekuensi:                   { nama: 'FREKUENSI BAHAN' },
       sasaran:                     { nama: 'SASARAN PESERTA DIDIK' },
       sasaran3b:                   { nama: 'SASARAN 3B' }
@@ -2350,28 +2353,33 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
     // Kop baku laporan Word: logo | SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal (tetap)
     const KOP_TGL_BAKU = '26 Oktober 2026'; // tanggal baku kop SEMUA laporan (Excel & Word)
+    const RPT_KOP_ROW_H = 27;               // tinggi baku TIAP baris kop (pt) - seragam untuk semua modul
     const WORD_KOP_TGL = KOP_TGL_BAKU;
     const WORD_KOP_JUDUL = {
-      '01.01': 'PENDATAAN SASARAN PESERTA DIDIK', '01.02': 'PENDATAAN SASARAN 3B', '01.03': 'JENIS DAN FREKUENSI BAHAN BAKU', '01.04': 'SIKLUS MENU 60 HARI',
+      '01.01': 'PENDATAAN SASARAN PESERTA DIDIK', '01.02': 'PENDATAAN SASARAN 3B', '01.03': 'JENIS DAN FREKUENSI BAHAN BAKU', '01.04': 'SIKLUS MENU',
       '06.01': 'CHECKLIST PEMORSIAN DAN BERAT PORSI MBG', '03.05': 'PEMANTAUAN SUHU RUANGAN',
       '21.01': 'INSPEKSI KONTAMINASI SILANG', '22.01': 'CHECKLIST INSPEKSI HARIAN MANAJEMEN ALERGEN'
     };
-    function exportWordKop(code, docName, files, judulOverride, revOverride) {
+    function exportWordKop(code, docName, files, judulOverride, revOverride, docValue) {
       const num = code.replace('FM-SGR-SPPG-', '');
       const judul = judulOverride || WORD_KOP_JUDUL[num] || '';
+      // docValue '' = kolom di samping "No. dokumen" sengaja dikosongkan (diisi manual oleh pengguna)
+      const shownDoc = docValue === undefined ? code : docValue;
       let logoHtml = '';
       const logo = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
       if (logo) {
         files.push({ name: 'logo.png', type: 'image/png', dataUrl: logo });
         logoHtml = '<img src="' + docName + '_files/logo.png" width="136" height="62" style="width:3.6cm;height:1.63cm;">';
       }
-      const b = 'border:1px solid black;padding:4px;';
+      const b = 'border:1px solid black;padding:3px 4px;vertical-align:middle;';
+      const trh = 'height:0.95cm;'; // tinggi tiap baris kop = 27 pt (sama dengan Excel)
+      const f = 'text-align:center;font-weight:bold;font-size:12pt;';
       return '<table style="width:100%;border-collapse:collapse;margin:0 0 12px 0;">' +
-        '<tr><td rowspan="3" style="' + b + 'width:18%;text-align:center;vertical-align:middle;">' + logoHtml + '</td>' +
-        '<td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</td>' +
-        '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">: ' + code + '</td></tr>' +
-        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (revOverride || (num === '01.01' ? '01' : '00')) + '</td></tr>' +
-        '<tr><td style="' + b + 'text-align:center;font-weight:bold;font-size:14pt;">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + WORD_KOP_TGL + '</td></tr>' +
+        '<tr style="' + trh + '"><td rowspan="3" style="' + b + 'width:18%;text-align:center;">' + logoHtml + '</td>' +
+        '<td style="' + b + f + '">SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</td>' +
+        '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">' + (shownDoc ? ': ' + shownDoc : '') + '</td></tr>' +
+        '<tr style="' + trh + '"><td style="' + b + f + '">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (revOverride || (num === '01.01' ? '01' : '00')) + '</td></tr>' +
+        '<tr style="' + trh + '"><td style="' + b + f + '">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + WORD_KOP_TGL + '</td></tr>' +
         '</table>' +
 '';
     }
@@ -2430,10 +2438,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         await exportEmbedWordPhotos(clone, files, docName);
 
         const kopCode = (String(title).match(/FM-SGR-SPPG-[\d.]+/) || [])[0] || '';
+        const isMasterBahan = wrapperId === 'master_bahan_tables_wrapper';
         const photoLayout = photoMode === 'inline';
-        const pageCss = photoLayout
-          ? 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1.5cm 1.5cm 1.5cm;'
-          : 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm;';
+        // Margin kertas seragam semua laporan: atas 2 cm, kiri/kanan/bawah 1 cm
+        const pageCss = 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm;';
         const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>${title}</title>
@@ -2450,7 +2458,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         </head>
         <body>
           <div class="Section1">
-          ${kopCode ? exportWordKop(kopCode, docName, files) : `<div class="header">
+          ${kopCode ? exportWordKop(kopCode, docName, files)
+            : isMasterBahan ? exportWordKop('FM-SGR-DST', docName, files, 'MASTER BAHAN', '00', '')
+            : `<div class="header">
             <h2 style="margin:0;">NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</h2>
             <h3 style="margin:5px 0;">TANGGAL: ${dateText}</h3>
             <h3 style="margin:5px 0;">${title}</h3>
@@ -2483,8 +2493,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         const photoExport = photoMode === 'inline';
         const suhuHdr = wrapperId === 'wrapper_suhu' ? suhuReportHeaderLines() : [];
         const isSuhu = suhuHdr.length > 0;
+        const isMasterBahan = wrapperId === 'master_bahan_tables_wrapper';
         // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
                 const HDR_ROWS = isSuhu ? 4 + suhuHdr.length : 4;
+        const xlCol = n => { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
         const PHOTO_COL_WIDTH = photoExport ? 22 : 18;  // ~154 px, cukup untuk foto 4 cm (151 px)
         const PORTRAIT_ROW_PT = photoExport ? 126 : 104; // foto 4 cm (113 pt) + ruang atas/bawah
         const LANDSCAPE_ROW_PT = photoExport ? 96 : 74;  // foto 3 cm (85 pt) + ruang atas/bawah
@@ -2494,8 +2506,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           tIdx++;
           const ws = wb.addWorksheet(`Bagian ${tIdx}`);
           ws.views = [{ showGridLines: true }];
-          ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true };
-          if (photoExport) ws.pageSetup.margins = { left: 0.5906, right: 0.5906, top: 0.7874, bottom: 0.5906, header: 0.3937, footer: 0.3937 };
+          ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true,
+            margins: { left: 0.3937, right: 0.3937, top: 0.7874, bottom: 0.3937, header: 0.315, footer: 0.315 } };
+          let masterLastC = 0;
 
                     if (isSuhu) {
             ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (3 baris)
@@ -2504,6 +2517,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               row.getCell(1).font = { name: 'Calibri', size: 11, bold: true };
             });
             ws.addRow([]);
+          } else if (isMasterBahan) {
+            ws.addRow([]); ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (3 baris) + jarak
           } else {
             ws.addRow(['NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI']);
             ws.addRow(['TANGGAL: ' + dateText]);
@@ -2569,6 +2584,19 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             }
             ws.getColumn(c).width = colWidth[c];
           }
+          if (isMasterBahan) {
+            // Kolom kop: minimal 4 kolom; kolom pertama dilebarkan agar logo tampil proporsional di kop.
+            masterLastC = Math.max(maxCol, 4);
+            if (colWidth[1] < 18) { colWidth[1] = 18; ws.getColumn(1).width = 18; }
+            for (let c = maxCol + 1; c <= masterLastC; c++) { colWidth[c] = 12; ws.getColumn(c).width = 12; }
+            // Area judul kop diberi lebar minimum agar nama SPPG tidak terlipat berlebihan.
+            const t1 = 2, t2 = masterLastC - 2;
+            let tw = 0; for (let c = t1; c <= t2; c++) tw += colWidth[c] || 10;
+            if (tw < 44) {
+              const add = (44 - tw) / (t2 - t1 + 1);
+              for (let c = t1; c <= t2; c++) { colWidth[c] = (colWidth[c] || 10) + add; ws.getColumn(c).width = colWidth[c]; }
+            }
+          }
           // Tinggi SEMUA baris dibuat eksplisit (perkiraan baris teks yang terlipat), agar posisi foto
           // tidak bergeser ketika Excel/LibreOffice menghitung ulang tinggi baris otomatis.
           const rowPt = {};
@@ -2582,6 +2610,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             rowPt[x.r] = Math.max(rowPt[x.r] || 20, need);
           });
           Object.keys(rowPt).forEach(k => { ws.getRow(HDR_ROWS + Number(k)).height = rowPt[k]; });
+
+          if (isMasterBahan) {
+            // Kop baku yang sama dengan modul lain; kolom di samping "No. dokumen" dikosongkan (diisi manual).
+            rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 1], title: [2, masterLastC - 2], lab: masterLastC - 1, val: masterLastC,
+              judul: 'MASTER BAHAN', noDoc: '', tgl: KOP_TGL_BAKU, colon: false });
+            rptDateLine(ws, 4, 1, masterLastC);
+          }
 
           // 4) Tulis sel, gabung sel, gaya
           cells.forEach(x => {
@@ -2626,10 +2661,15 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 2], title: [3, lastC - 2], lab: lastC - 1, val: lastC,
               judul: 'PEMANTAUAN SUHU RUANGAN', noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
             ws.getRow(4).height = 20; rptMerge(ws, 4, 1, 4, lastC);
-          } else {
+          } else if (!isMasterBahan) {
             ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
             ws.getCell('A2').font = { name: 'Calibri', bold: true, size: photoExport ? 12 : 11 };
             ws.getCell('A3').font = { name: 'Calibri', bold: true, size: photoExport ? 12 : 11 };
+          }
+          if (isMasterBahan) {
+            // Margin & skala kertas disamakan dengan modul laporan baku lainnya
+            const maxRow = cells.reduce((m, x) => Math.max(m, x.r + x.rs - 1), 1);
+            rptPage(ws, true, 'A1:' + xlCol(masterLastC) + (HDR_ROWS + maxRow));
           }
         }
 
@@ -2670,11 +2710,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
     // Baris "Tanggal Cetak" (tanggal real hari ini) tepat di bawah kop, di atas tabel
     function rptDateLine(ws, row, c1, c2) {
+      // "Tanggal Cetak" dihilangkan atas permintaan; baris tetap ada sebagai jarak kecil antar kop dan tabel
       ws.getRow(row).height = 20;
-      function rptDateLine(ws, row, c1, c2) {
-  // "Tanggal Cetak" dihilangkan atas permintaan; baris tetap ada sebagai jarak kecil antar kop dan tabel
-  ws.getRow(row).height = 8;
-}
     }
     function rptTitleCase(s) {
       return String(s || '').toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase());
@@ -2781,31 +2818,35 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     // Kop surat baku: logo | nama SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal
+    // Tinggi 3 baris SELALU sama di semua modul; huruf dikecilkan otomatis agar teks tetap utuh.
     function rptKop(wb, ws, o) {
       const r = o.r;
-      for (let i = 0; i < 3; i++) ws.getRow(r + i).height = o.rowH;
+      const H = RPT_KOP_ROW_H;
+      for (let i = 0; i < 3; i++) ws.getRow(r + i).height = H;
       rptMerge(ws, r, o.logo[0], r + 2, o.logo[1]);
       rptBorder(ws, r, o.logo[0], r + 2, o.logo[1], 'box');
-      // lebar area judul (satuan karakter Excel) -> ukuran huruf / jumlah baris disesuaikan agar teks kop tampil utuh
-      let tw = 0; for (let c = o.title[0]; c <= o.title[1]; c++) tw += ws.getColumn(c).width || 8.43;
-      tw = Math.max(1, tw - 2);
-      const fit = txt => {
-        const len = String(txt).length, per = s => tw / (1.3 * s / 11);
-        for (let s = 16; s >= 13; s--) if (len <= per(s) * 0.92) return { size: s, lines: 1 };
-        for (let s = 16; s >= 12; s--) { const n = Math.ceil(len / (per(s) * 0.85)); if (n <= 2) return { size: s, lines: n }; }
-        return { size: 12, lines: Math.ceil(len / (per(12) * 0.85)) };
+      const widthOf = (c1, c2) => { let w = 0; for (let c = c1; c <= c2; c++) w += ws.getColumn(c).width || 8.43; return w; };
+      // Ukuran huruf terbesar (langkah 0,5 pt) yang membuat teks muat dalam lebar kolom.
+      const fitSize = (txt, units, bold, maxPt, minPt) => {
+        const len = Math.max(1, String(txt == null ? '' : txt).length);
+        const avail = Math.max(18, units * 7 - 6);
+        for (let s = maxPt; s >= minPt - 1e-9; s -= 0.5) {
+          if (len * (bold ? 0.62 : 0.58) * s * 96 / 72 <= avail) return s;
+        }
+        return minPt;
       };
+      const tw = widthOf(o.title[0], o.title[1]);
       [RPT_SPPG_NAME, 'FORMULIR', o.judul].forEach((t, i) => {
         rptMerge(ws, r + i, o.title[0], r + i, o.title[1]);
-        const f = fit(t);
-        rptPut(ws, r + i, o.title[0], t, { size: f.size, bold: true, h: 'center' });
-        ws.getRow(r + i).height = Math.max(o.rowH, f.lines * f.size * 1.4 + 4);
+        rptPut(ws, r + i, o.title[0], t, { size: fitSize(t, tw, true, 16, 9), bold: true, h: 'center' });
       });
       rptBorder(ws, r, o.title[0], r + 2, o.title[1], 'box');
       const pre = o.colon ? ': ' : '';
+      const labW = widthOf(o.lab, o.lab), valW = widthOf(o.val, o.val);
       [['No. dokumen', o.noDoc], ['No. revisi', o.rev || '00'], ['Tanggal', KOP_TGL_BAKU]] /* tanggal kop tetap */.forEach((p, i) => {
-        rptPut(ws, r + i, o.lab, p[0], {});
-        rptPut(ws, r + i, o.val, pre + p[1], {});
+        const lab = String(p[0]), val = String(pre + p[1]);
+        rptPut(ws, r + i, o.lab, lab, { size: fitSize(lab, labW, false, 11, 9) });
+        rptPut(ws, r + i, o.val, val, { size: fitSize(val, valW, false, 11, 9) });
         rptBorder(ws, r + i, o.lab, r + i, o.val, 'grid');
       });
       rptLogo(wb, ws, r, o.logo[0], r + 2, o.logo[1]);
@@ -2815,18 +2856,18 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       ws.pageSetup = {
         orientation: landscape ? 'landscape' : 'portrait', paperSize: 9,
         fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true,
-        margins: { left: 0.4, right: 0.4, top: 0.5, bottom: 0.5, header: 0.3, footer: 0.3 }
+        margins: { left: 0.3937, right: 0.3937, top: 0.7874, bottom: 0.3937, header: 0.315, footer: 0.315 }
       };
       if (printArea) ws.pageSetup.printArea = printArea;
     }
 
-    // Halaman laporan BERGAMBAR: A4 landscape, margin atas 2 cm; kiri/kanan/bawah 1,5 cm (proporsional),
+    // Halaman laporan BERGAMBAR: A4 landscape, margin atas 2 cm; kiri/kanan/bawah 1 cm (seragam dengan modul lain),
     // konten diskalakan memenuhi lebar halaman dan boleh mengalir ke halaman berikutnya agar foto tetap besar.
     function rptPagePhoto(ws, printArea) {
       ws.pageSetup = {
         orientation: 'landscape', paperSize: 9,
         fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true,
-        margins: { left: 0.5906, right: 0.5906, top: 0.7874, bottom: 0.5906, header: 0.3937, footer: 0.3937 }
+        margins: { left: 0.3937, right: 0.3937, top: 0.7874, bottom: 0.3937, header: 0.315, footer: 0.315 }
       };
       if (printArea) ws.pageSetup.printArea = printArea;
     }
@@ -2841,8 +2882,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     // ---------- FM-SGR-SPPG-01.03  FORMULIR JENIS DAN FREKUENSI BAHAN BAKU ----------
     async function exportFrekuensiExcel() {
       try {
-        const freqMap = window.dbCache['sppg_frequency_map'] || {};
-        const freqDetails = window.dbCache['sppg_frequency_details'] || {};
+        const { freqMap, freqDetails } = computeFrekuensiPeriode();
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet('FM-SGR-SPPG-01.03');
         [4.33, 6.33, 16, 4, 22.83, 27.5, 22.16, 15.16, 21.16, 8.66].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
@@ -2897,7 +2937,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       }
     }
 
-    // ---------- FM-SGR-SPPG-01.04  SIKLUS MENU 60 HARI ----------
+    // ---------- FM-SGR-SPPG-01.04  SIKLUS MENU ----------
     async function rptExportSiklus(wrapperId) {
       const wb = new ExcelJS.Workbook();
       const ws = wb.addWorksheet('FM-SGR-SPPG-01.04');
@@ -2906,10 +2946,11 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       ws.getColumn(14).width = 8.66;
       ws.getRow(1).height = 3.75;
       rptKop(wb, ws, { r: 2, rowH: 27, logo: [2, 3], title: [4, 11], lab: 12, val: 13,
-        judul: 'SIKLUS MENU 60 HARI', noDoc: 'FM-SGR-SPPG-01.04', tgl: exportGetDocDateText(wrapperId), colon: false });
+        judul: 'SIKLUS MENU', noDoc: 'FM-SGR-SPPG-01.04', tgl: exportGetDocDateText(wrapperId), colon: false });
       rptDateLine(ws, 5, 2, 13);
 
       const weeks = getSuhuWeeks();
+      const periodDays = siklusPeriodDayList('sppg_siklus_menu_weeks');
       const readCell = (k, m) => {
         const el = document.getElementById(`sm_cell_${k}_${m}`);
         if (el) return String(el.value || '').trim();
@@ -2919,13 +2960,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         return (v === undefined || v === null) ? '' : String(v).trim();
       };
       const groups = [['KARBO', 'Makanan Pokok'], ['PH', 'Lauk Hewani'], ['PN', 'Lauk Nabati'], ['SAYUR', 'Sayur'], ['BUAH', 'Buah']];
-      const totalDays = weeks.reduce((n, w) => n + ((w && w.dates) ? (Array.isArray(w.dates) ? w.dates.length : Object.values(w.dates).length) : 0), 0);
+      const totalDays = periodDays.length;
       let hasSusu = false;
-      for (let m = 0; m < totalDays; m++) if (readCell('SUSU', m) !== '') hasSusu = true;
+      periodDays.forEach(d => { if (readCell('SUSU', d.globalIdx) !== '') hasSusu = true; });
       if (hasSusu) groups.push(['SUSU', 'Susu']);
 
       let row = 6;
-      const tableCount = Math.ceil(totalDays / 10);
+      const tableCount = Math.max(1, Math.ceil(totalDays / 10));
       for (let b = 0; b < tableCount; b++) {
         const dayCount = Math.min(10, totalDays - b * 10);
         ws.getRow(row).height = 43;
@@ -2939,7 +2980,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           let maxLines = 1;
           const vals = [];
           for (let i = 0; i < dayCount; i++) {
-            const v = readCell(g[0], b * 10 + i).toUpperCase();
+            const v = readCell(g[0], periodDays[b * 10 + i].globalIdx).toUpperCase();
             vals.push(v);
             maxLines = Math.max(maxLines, rptLines(v, 20.2, 14));
           }
@@ -3220,8 +3261,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     function exportFrekuensiWord() {
-      const freqMap = window.dbCache['sppg_frequency_map'] || {};
-      const freqDetails = window.dbCache['sppg_frequency_details'] || {};
+      const { freqMap, freqDetails } = computeFrekuensiPeriode();
       const kopFiles = [];
       const kopHtml = exportWordKop('FM-SGR-SPPG-01.03', 'dokumen', kopFiles);
 
@@ -3296,7 +3336,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     let suhuBatchCounters = { pemorsian: 1 };
     let suhuRuangColumns = 1;
 
-    // ===== SIKLUS MENU 60 HARI KERJA (12 blok x 5 hari) =====
+    // ===== SIKLUS MENU KERJA (12 blok x 5 hari) =====
     // Periode: Senin, 26 Okt 2026 s.d. 60 hari kerja ke depan. Isi menu TIDAK diubah;
     // pola menu 20 hari yang sudah ada diulang untuk blok-blok berikutnya.
     const SIKLUS_TOTAL_DAYS = 60;
@@ -3505,12 +3545,12 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     // =====================================================================
     const IMP_CFG = {
       master: {
-        code: 'MASTER_BAHAN_60_HARI', title: 'Master Bahan 60 Hari', sheet: 'IMPORT_MASTER_BAHAN', color: 'FFC7D2FE', head: 'FF3730A3',
+        code: 'MASTER_BAHAN', legacy: 'MASTER_BAHAN_60_HARI', title: 'Master Bahan', sheet: 'IMPORT_MASTER_BAHAN', color: 'FFC7D2FE', head: 'FF3730A3',
         key: 'sppg_master_bahan_weeks', groups: KELOMPOK_LIST_MASTER,
         label: k => String(KELOMPOK_LABELS_MASTER[k]).toUpperCase(), other: 'menu'
       },
       menu: {
-        code: 'SIKLUS_MENU_60_HARI', title: 'Siklus Menu 60 Hari (FM-SGR-SPPG-01.04)', sheet: 'IMPORT_SIKLUS_MENU', color: 'FFBFDBFE', head: 'FF1E3A8A',
+        code: 'SIKLUS_MENU', legacy: 'SIKLUS_MENU_60_HARI', title: 'Siklus Menu (FM-SGR-SPPG-01.04)', sheet: 'IMPORT_SIKLUS_MENU', color: 'FFBFDBFE', head: 'FF1E3A8A',
         key: 'sppg_siklus_menu_weeks', groups: KELOMPOK_LIST_MENU,
         label: k => String(KELOMPOK_LABELS_MENU[k]).toUpperCase(), other: 'master'
       }
@@ -3621,8 +3661,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         return { errors: ['Data tidak memiliki penanda format "#FORMAT" di baris pertama' + hint + '. Data lama / tanpa template tidak diterima. Unduh template ' + cfg.title + ' lalu isi.'], blocks: {} };
       }
       const code = impNorm(first.c[1]);
-      if (code === oth.code) return { errors: ['SALAH MODUL: data ini berformat ' + oth.code + ' (' + oth.title + '), sedangkan Anda berada di modul ' + cfg.title + '. Ditolak.'], blocks: {} };
-      if (code !== cfg.code) return { errors: ['Format "' + (first.c[1] || '(kosong)') + '" tidak dikenali. Modul ini hanya menerima format ' + cfg.code + '.'], blocks: {} };
+      if (code === oth.code || code === oth.legacy) return { errors: ['SALAH MODUL: data ini berformat ' + oth.code + ' (' + oth.title + '), sedangkan Anda berada di modul ' + cfg.title + '. Ditolak.'], blocks: {} };
+      if (code !== cfg.code && code !== cfg.legacy) return { errors: ['Format "' + (first.c[1] || '(kosong)') + '" tidak dikenali. Modul ini hanya menerima format ' + cfg.code + '.'], blocks: {} };
 
       // 2. baca blok demi blok
       const labelToKey = {}; cfg.groups.forEach(k => { labelToKey[cfg.label(k)] = k; });
@@ -3642,7 +3682,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       for (let ri = 1; ri < rows.length; ri++) {
         const r = rows[ri], head = impNorm(r.c[0]);
         if (head === '#FORMAT') {
-          if (impNorm(r.c[1]) !== cfg.code) errors.push('Baris ' + r.n + ': penanda #FORMAT berbeda di tengah data (' + (r.c[1] || 'kosong') + '). Satu tempelan hanya boleh satu jenis format.');
+          if (impNorm(r.c[1]) !== cfg.code && impNorm(r.c[1]) !== cfg.legacy) errors.push('Baris ' + r.n + ': penanda #FORMAT berbeda di tengah data (' + (r.c[1] || 'kosong') + '). Satu tempelan hanya boleh satu jenis format.');
           continue;
         }
         if (head === '#BLOK') {
@@ -3989,37 +4029,369 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       }
     }
 
+    // =====================================================================
+    // PERIODE SIKLUS FLEKSIBEL — rentang tanggal bebas (tanpa batas 10/20 hari)
+    // Satu pengaturan bersama (sppg_siklus_period) dipakai Frekuensi Bahan (01.03),
+    // Master Bahan, dan Siklus Menu (01.04) sehingga ketiganya selalu sinkron.
+    // Format simpan: { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }.
+    // Data lama { start: indeksBlok } tetap terbaca dan dikonversi ke rentang 20 hari.
+    // =====================================================================
+    const SIKLUS_PERIOD_MONTH_LONG = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const SIKLUS_PERIOD_DAY_LONG = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+    function siklusAllWeeks(key) {
+      const raw = window.dbCache[key] || DEFAULT_SIKLUS_MENU_60_DAYS;
+      return (Array.isArray(raw) ? raw : Object.values(raw)).filter(w => w && w.dates);
+    }
+    function siklusDatesOf(w) { return Array.isArray(w.dates) ? w.dates : Object.values(w.dates); }
+    function siklusPeriodMenuWeeks() {
+      const menu = siklusAllWeeks('sppg_siklus_menu_weeks');
+      return menu.length ? menu : siklusAllWeeks('sppg_master_bahan_weeks');
+    }
+    function siklusPeriodKeyDate(key) {
+      if (!key) return null;
+      const d = new Date(key + 'T00:00:00');
+      return isNaN(d.getTime()) ? null : d;
+    }
+    function siklusPeriodKeyShort(key) {
+      const d = siklusPeriodKeyDate(key);
+      if (!d) return key || '';
+      return String(d.getDate()).padStart(2, '0') + ' ' + SIKLUS_MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    function siklusPeriodKeyLong(key) {
+      const d = siklusPeriodKeyDate(key);
+      if (!d) return key || '';
+      return SIKLUS_PERIOD_DAY_LONG[d.getDay()] + ', ' + d.getDate() + ' ' + SIKLUS_PERIOD_MONTH_LONG[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    // Semua hari pada data siklus, lengkap dengan indeks global yang dipakai id sel.
+    function siklusPeriodEntries(key) {
+      const out = [];
+      const source = key ? siklusAllWeeks(key) : siklusPeriodMenuWeeks();
+      source.forEach((w, wIdx) => {
+        siklusDatesOf(w).forEach((ds, dIdx) => {
+          out.push({ w, wIdx, dIdx, globalIdx: wIdx * 5 + dIdx, text: String(ds || ''), key: parseSiklusDateToKey(ds) });
+        });
+      });
+      return out;
+    }
+    function siklusPeriodBounds() {
+      const valid = siklusPeriodEntries('sppg_siklus_menu_weeks').filter(e => e.key);
+      if (!valid.length) return { minKey: '', maxKey: '' };
+      return { minKey: valid[0].key, maxKey: valid[valid.length - 1].key };
+    }
+    // Rentang aktif. Mendukung format baru { start, end } maupun data lama { start: indeksBlok }.
+    function getSiklusPeriodRange() {
+      const valid = siklusPeriodEntries('sppg_siklus_menu_weeks').filter(e => e.key);
+      if (!valid.length) return { startKey: '', endKey: '', startIdx: 0, endIdx: -1, workdays: 0, minKey: '', maxKey: '' };
+      const minKey = valid[0].key, maxKey = valid[valid.length - 1].key;
+      const saved = window.dbCache['sppg_siklus_period'] || {};
+      let startKey = '', endKey = '';
+      if (typeof saved.start === 'string' && saved.start.indexOf('-') !== -1) {
+        startKey = saved.start;
+        if (typeof saved.end === 'string' && saved.end.indexOf('-') !== -1) endKey = saved.end;
+      } else if (saved.start !== undefined && saved.start !== null && saved.start !== '') {
+        const blk = Math.max(0, parseInt(saved.start, 10) || 0);
+        const byStart = valid.find(e => e.globalIdx >= blk * 5);
+        startKey = byStart ? byStart.key : maxKey;
+        let byEnd = '';
+        valid.forEach(e => { if (e.globalIdx <= blk * 5 + 19) byEnd = e.key; });
+        endKey = byEnd || maxKey;
+      }
+      if (!startKey) {
+        const todayIdx = (typeof getTodayCycleIndex === 'function') ? getTodayCycleIndex(siklusPeriodMenuWeeks()) : -1;
+        const base = todayIdx >= 0 ? Math.floor(todayIdx / 5) * 5 : 0;
+        const byStart = valid.find(e => e.globalIdx >= base);
+        startKey = byStart ? byStart.key : minKey;
+        let byEnd = '';
+        valid.forEach(e => { if (e.globalIdx <= base + 19) byEnd = e.key; });
+        endKey = byEnd || maxKey;
+      }
+      if (!endKey) endKey = maxKey;
+      if (startKey < minKey) startKey = minKey;
+      if (startKey > maxKey) startKey = maxKey;
+      if (endKey < startKey) endKey = startKey;
+      if (endKey > maxKey) endKey = maxKey;
+      const inRange = valid.filter(e => e.key >= startKey && e.key <= endKey);
+      return {
+        startKey: startKey, endKey: endKey,
+        startIdx: inRange[0].globalIdx, endIdx: inRange[inRange.length - 1].globalIdx,
+        workdays: inRange.length, minKey: minKey, maxKey: maxKey
+      };
+    }
+    function siklusPeriodRangeText() {
+      const r = getSiklusPeriodRange();
+      if (!r.startKey) return '';
+      return siklusPeriodKeyShort(r.startKey) + ' – ' + siklusPeriodKeyShort(r.endKey);
+    }
+    // Daftar hari pada rentang aktif untuk satu sumber data (Master Bahan / Siklus Menu).
+    function siklusPeriodDayList(key) {
+      const r = getSiklusPeriodRange();
+      if (!r.startKey) return [];
+      return siklusPeriodEntries(key)
+        .filter(e => e.key && e.key >= r.startKey && e.key <= r.endKey)
+        .map((e, i) => Object.assign({}, e, { pos: i }));
+    }
+    function siklusPeriodCalendarDays(a, b) {
+      const da = siklusPeriodKeyDate(a), db = siklusPeriodKeyDate(b);
+      if (!da || !db) return 0;
+      return Math.round((db.getTime() - da.getTime()) / 86400000) + 1;
+    }
+    function siklusPeriodRangeInfo(startKey, endKey) {
+      const entries = siklusPeriodEntries('sppg_siklus_menu_weeks').filter(e => e.key && e.key >= startKey && e.key <= endKey);
+      return {
+        startKey: startKey, endKey: endKey,
+        workdays: entries.length,
+        blocks: new Set(entries.map(e => e.wIdx)).size,
+        tables: Math.ceil(entries.length / 10),
+        calendarDays: siklusPeriodCalendarDays(startKey, endKey)
+      };
+    }
+    function setSiklusPeriod(startKey, endKey) {
+      const b = siklusPeriodBounds();
+      if (!b.minKey) return false;
+      if (!startKey || startKey < b.minKey) startKey = b.minKey;
+      if (startKey > b.maxKey) startKey = b.maxKey;
+      if (!endKey || endKey > b.maxKey) endKey = b.maxKey;
+      if (endKey < startKey) endKey = startKey;
+      window.dbCache['sppg_siklus_period'] = { start: startKey, end: endKey };
+      try { window.fbSet('sppg_siklus_period', { start: startKey, end: endKey }); } catch (e) {}
+      renderSiklusPeriodBars();
+      renderFrekuensiBahanTable();
+      renderMasterBahan20Table();
+      renderSiklusMenu20Table();
+      if (typeof updateDashboardSummary === 'function') updateDashboardSummary();
+      return true;
+    }
+    // Tambah sejumlah hari kerja (bebas, tidak lagi terkunci 20 hari) di akhir kedua database siklus.
+    function addSiklusDaysFlexible() {
+      const base = siklusAllWeeks('sppg_siklus_menu_weeks');
+      if (!base.length) return;
+      const raw = prompt('Tambah berapa hari kerja baru di akhir Master Bahan & Siklus Menu? (1–365)\nPeriode fleksibel dapat diatur setelah data ditambah.', '5');
+      if (raw === null) return;
+      const count = parseInt(raw, 10);
+      if (!count || count < 1 || count > 365) { alert('Jumlah hari kerja harus antara 1 sampai 365.'); return; }
+      const lastDs = siklusDatesOf(base[base.length - 1]);
+      const lastKey = parseSiklusDateToKey(lastDs[lastDs.length - 1]);
+      if (!lastKey) { alert('Tanggal terakhir siklus tidak valid.'); return; }
+      const nextKeys = impWorkdaysAfterKey(lastKey, count);
+      const labels = nextKeys.map(k => impDateToText(new Date(k + 'T00:00:00Z')));
+      const a = labels[0].replace(/^[A-Za-z]+,\s*/, '');
+      const z = labels[labels.length - 1].replace(/^[A-Za-z]+,\s*/, '');
+      if (!confirm('Tambah ' + count + ' hari kerja baru (' + a + ' – ' + z + ') pada Master Bahan dan Siklus Menu sekaligus?\nIsi awal menyalin pola menu yang ada dan dapat diubah.')) return;
+      ['sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks'].forEach(key => {
+        const arr = JSON.parse(JSON.stringify(siklusAllWeeks(key)));
+        let li = 0;
+        if (arr.length) {
+          const lastDates = siklusDatesOf(arr[arr.length - 1]);
+          while (lastDates.length < 5 && li < labels.length) lastDates.push(labels[li++]);
+          arr[arr.length - 1].dates = lastDates;
+        }
+        while (li < labels.length) {
+          arr.push({ dates: labels.slice(li, li + 5), items: JSON.parse(JSON.stringify(SIKLUS_MENU_POLA_20_HARI[(arr.length + 2) % 4].items)) });
+          li += 5;
+        }
+        window.dbCache[key] = arr;
+        window.fbSet(key, arr);
+        if (key === 'sppg_master_bahan_weeks') syncMasterBahanData(arr); else syncSiklusMenuData(arr);
+      });
+      renderSiklusPeriodBars();
+      renderFrekuensiBahanTable();
+      renderMasterBahan20Table();
+      renderSiklusMenu20Table();
+      if (typeof refreshImportNotes === 'function') refreshImportNotes();
+      if (typeof initSuhuModule === 'function') initSuhuModule();
+      if (typeof initAlergenModule === 'function') initAlergenModule();
+      if (typeof updateDashboardSummary === 'function') updateDashboardSummary();
+      siklusPeriodToast(count + ' hari kerja baru ditambahkan. Atur rentang periode bila perlu.');
+    }
+    function renderSiklusPeriodBars() {
+      const hosts = document.querySelectorAll('.siklus-period-host');
+      if (!hosts.length) return;
+      const r = getSiklusPeriodRange();
+      if (!r.startKey) { hosts.forEach(h => { h.innerHTML = ''; }); return; }
+      const b = siklusPeriodBounds();
+      const info = siklusPeriodRangeInfo(r.startKey, r.endKey);
+      const preview = 'Hari ke-1 = ' + siklusPeriodKeyShort(r.startKey)
+        + ' • Hari kerja/menu: ' + info.workdays + ' hari'
+        + ' • ' + info.blocks + ' blok data'
+        + ' • ' + info.tables + ' tabel Siklus Menu';
+      const html = '<div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-2xl p-3 md:p-4 space-y-3">'
+        + '<div class="flex flex-wrap items-center justify-between gap-2">'
+        + '<div class="flex items-center gap-2 text-xs font-extrabold text-indigo-900"><span class="text-base">🗓️</span> Periode Siklus Fleksibel</div>'
+        + '<span class="text-[10px] font-bold text-indigo-800 bg-white border border-indigo-200 rounded-full px-2.5 py-1">Aktif: ' + siklusPeriodRangeText() + ' • ' + r.workdays + ' hari kerja</span>'
+        + '</div>'
+        + '<div class="grid grid-cols-1 md:grid-cols-2 gap-2">'
+        + '<label class="block text-[10px] font-extrabold text-indigo-900 uppercase tracking-wide">Tanggal Mulai'
+        + '<input type="date" class="siklus-period-start mt-1 w-full bg-white border-2 border-indigo-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700" min="' + b.minKey + '" max="' + b.maxKey + '" value="' + r.startKey + '" onchange="updateSiklusPeriodPreview(this)">'
+        + '</label>'
+        + '<label class="block text-[10px] font-extrabold text-indigo-900 uppercase tracking-wide">Tanggal Selesai'
+        + '<input type="date" class="siklus-period-end mt-1 w-full bg-white border-2 border-indigo-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700" min="' + b.minKey + '" max="' + b.maxKey + '" value="' + r.endKey + '" onchange="updateSiklusPeriodPreview(this)">'
+        + '</label>'
+        + '</div>'
+        + '<div class="flex flex-wrap items-center gap-2">'
+        + '<button type="button" onclick="applySiklusPeriodFromInputs(this)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow">✅ Terapkan Periode</button>'
+        + '<button type="button" onclick="addSiklusDaysFlexible()" class="bg-white border-2 border-indigo-200 text-indigo-900 font-bold text-xs px-3 py-2.5 rounded-xl">➕ Tambah Hari Kerja</button>'
+        + '<span class="text-[10px] text-indigo-700/80 font-semibold">Berlaku untuk Frekuensi Bahan, Master Bahan &amp; Siklus Menu (tersinkron).</span>'
+        + '</div>'
+        + '<div class="siklus-period-preview text-[10px] font-semibold text-indigo-900 bg-white/80 border border-indigo-200 rounded-lg px-3 py-2">' + preview + '</div>'
+        + '</div>';
+      hosts.forEach(h => { h.innerHTML = html; });
+    }
+    function updateSiklusPeriodPreview(inp) {
+      const host = inp && inp.closest ? inp.closest('.siklus-period-host') : null;
+      if (!host) return;
+      const sEl = host.querySelector('.siklus-period-start');
+      const eEl = host.querySelector('.siklus-period-end');
+      const box = host.querySelector('.siklus-period-preview');
+      if (!box) return;
+      const s = sEl ? sEl.value : '', e = eEl ? eEl.value : '';
+      if (!s || !e) { box.textContent = 'Lengkapi tanggal mulai dan tanggal selesai.'; return; }
+      if (s > e) { box.textContent = '⚠️ Tanggal selesai harus sama dengan atau setelah tanggal mulai.'; return; }
+      const info = siklusPeriodRangeInfo(s, e);
+      if (!info.workdays) {
+        const b = siklusPeriodBounds();
+        box.textContent = '⚠️ Tidak ada hari kerja/menu pada rentang tersebut. Data tersedia ' + siklusPeriodKeyShort(b.minKey) + ' – ' + siklusPeriodKeyShort(b.maxKey) + '.';
+        return;
+      }
+      box.textContent = 'Hari ke-1 = ' + siklusPeriodKeyShort(s) + ' • Hari kerja/menu: ' + info.workdays + ' hari • ' + info.blocks + ' blok data • ' + info.tables + ' tabel Siklus Menu';
+    }
+    function applySiklusPeriodFromInputs(btn) {
+      const host = btn && btn.closest ? btn.closest('.siklus-period-host') : document.querySelector('.siklus-period-host');
+      const sEl = host ? host.querySelector('.siklus-period-start') : null;
+      const eEl = host ? host.querySelector('.siklus-period-end') : null;
+      const startKey = sEl ? sEl.value : '';
+      const endKey = eEl ? eEl.value : '';
+      const b = siklusPeriodBounds();
+      if (!b.minKey) { alert('Data siklus belum tersedia.'); return; }
+      if (!startKey || !endKey) { alert('Tentukan tanggal mulai dan tanggal selesai periode terlebih dahulu.'); return; }
+      if (startKey > endKey) { alert('Tanggal selesai harus sama dengan atau setelah tanggal mulai.'); return; }
+      if (startKey < b.minKey || endKey > b.maxKey) {
+        alert('Rentang tanggal harus berada di dalam data siklus yang tersedia:\n' + siklusPeriodKeyLong(b.minKey) + ' s.d. ' + siklusPeriodKeyLong(b.maxKey) + '.\nGunakan tombol "➕ Tambah Hari Kerja" untuk memperpanjang data.');
+        return;
+      }
+      const info = siklusPeriodRangeInfo(startKey, endKey);
+      if (!info.workdays) { alert('Tidak ada hari kerja/menu pada rentang tanggal tersebut. Pilih rentang lain.'); return; }
+      openSiklusPeriodConfirm(startKey, endKey, info);
+    }
+    function ensureSiklusPeriodModal() {
+      let modal = document.getElementById('siklusPeriodModal');
+      if (modal) return modal;
+      modal = document.createElement('div');
+      modal.id = 'siklusPeriodModal';
+      modal.className = 'hidden';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:220;';
+      modal.innerHTML = '<div style="position:absolute;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(2px);" onclick="closeSiklusPeriodModal()"></div>'
+        + '<div style="position:relative;min-height:100%;display:flex;align-items:center;justify-content:center;padding:16px;">'
+        + '<div style="width:100%;max-width:520px;max-height:90vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 24px 64px rgba(15,23,42,.35);border:1px solid #e2e8f0;">'
+        + '<div class="flex items-start gap-3 border-b border-slate-100 p-5">'
+        + '<div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-xl shrink-0">🗓️</div>'
+        + '<div><h3 class="text-base font-black text-slate-800 leading-tight">Konfirmasi Perubahan Periode</h3>'
+        + '<p class="text-[11px] text-slate-500 font-medium mt-0.5">Periksa detail rentang baru sebelum disimpan.</p></div>'
+        + '</div>'
+        + '<div id="siklusPeriodModalBody" class="p-5 space-y-3"></div>'
+        + '<div class="flex flex-wrap justify-end gap-2 border-t border-slate-100 p-4 bg-slate-50" style="position:sticky;bottom:0;">'
+        + '<button type="button" onclick="closeSiklusPeriodModal()" class="px-4 py-2.5 rounded-xl bg-white border-2 border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-100">Batal</button>'
+        + '<button type="button" onclick="confirmSiklusPeriodChange()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-lg">✅ Ya, Simpan Periode</button>'
+        + '</div></div></div>';
+      document.body.appendChild(modal);
+      return modal;
+    }
+    function openSiklusPeriodConfirm(startKey, endKey, info) {
+      info = info || siklusPeriodRangeInfo(startKey, endKey);
+      const modal = ensureSiklusPeriodModal();
+      const cur = getSiklusPeriodRange();
+      const row = (label, value) => '<div class="flex items-start justify-between gap-3 py-1.5 border-b border-dashed border-slate-100 last:border-0"><span class="text-[11px] font-bold text-slate-500">' + label + '</span><span class="text-[11px] font-extrabold text-slate-800 text-right">' + value + '</span></div>';
+      document.getElementById('siklusPeriodModalBody').innerHTML =
+        '<div class="rounded-2xl border-2 border-indigo-200 bg-indigo-50/60 p-3 space-y-1">'
+        + row('Tanggal Mulai', siklusPeriodKeyLong(startKey))
+        + row('Tanggal Selesai', siklusPeriodKeyLong(endKey))
+        + row('Durasi', info.calendarDays + ' hari kalender')
+        + row('Hari Kerja / Menu', info.workdays + ' hari (Hari ke-1 s.d. Hari ke-' + info.workdays + ')')
+        + row('Blok Data Terpakai', info.blocks + ' blok')
+        + row('Tabel Siklus Menu', info.tables + ' tabel (10 hari per tabel)')
+        + '</div>'
+        + '<div class="text-[11px] text-slate-600 leading-relaxed">Periode aktif saat ini: <b>' + siklusPeriodRangeText() + '</b> (' + cur.workdays + ' hari kerja).</div>'
+        + '<div class="rounded-xl bg-amber-50 border border-amber-200 p-3 text-[11px] text-amber-900 font-semibold leading-relaxed">Perubahan ini berlaku untuk <b>Frekuensi Bahan (01.03)</b>, <b>Master Bahan</b>, dan <b>Siklus Menu (01.04)</b>. Penomoran “Hari ke-1” dimulai dari tanggal mulai baru. Data yang sudah tersimpan tidak dihapus.</div>';
+      window.__pendingSiklusPeriod = { startKey: startKey, endKey: endKey };
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSiklusPeriodModal() {
+      const modal = document.getElementById('siklusPeriodModal');
+      if (modal) modal.classList.add('hidden');
+      window.__pendingSiklusPeriod = null;
+      document.body.style.overflow = '';
+    }
+    function confirmSiklusPeriodChange() {
+      const pending = window.__pendingSiklusPeriod;
+      if (!pending) { closeSiklusPeriodModal(); return; }
+      const startKey = pending.startKey, endKey = pending.endKey;
+      closeSiklusPeriodModal();
+      if (!setSiklusPeriod(startKey, endKey)) return;
+      siklusPeriodToast('Periode siklus disimpan: ' + siklusPeriodKeyShort(startKey) + ' – ' + siklusPeriodKeyShort(endKey) + ' (' + siklusPeriodRangeInfo(startKey, endKey).workdays + ' hari kerja).');
+    }
+    function siklusPeriodToast(msg) {
+      let el = document.getElementById('siklusPeriodToast');
+      if (el) el.remove();
+      el = document.createElement('div');
+      el.id = 'siklusPeriodToast';
+      el.textContent = msg;
+      el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:240;max-width:92vw;background:#1e1b4b;color:#fff;font:700 12px Arial,sans-serif;padding:11px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(15,23,42,.35);';
+      document.body.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .4s'; }, 3200);
+      setTimeout(() => { el.remove(); }, 3700);
+    }
+    // Frekuensi bahan dihitung dari Master Bahan pada rentang periode terpilih
+    // (terhubung langsung dengan modul Master Bahan, termasuk blok yang terpotong periode).
+    function computeFrekuensiPeriode() {
+      const freqMap = {}, freqDetails = {};
+      siklusPeriodDayList('sppg_master_bahan_weeks').forEach(d => {
+        KELOMPOK_LIST_MASTER.forEach(k => {
+          const raw = (d.w.items && d.w.items[k]) ? d.w.items[k] : [];
+          const item = Array.isArray(raw) ? raw[d.dIdx] : raw[String(d.dIdx)];
+          if (item && String(item).trim() !== '' && String(item).trim() !== '0') {
+            const v = String(item).trim().toUpperCase();
+            freqMap[v] = (freqMap[v] || 0) + 1;
+            if (!freqDetails[v]) freqDetails[v] = KELOMPOK_LABELS_FREKUENSI[k] || 'BAHAN BAKU';
+          }
+        });
+      });
+      return { freqMap, freqDetails };
+    }
+
     function renderSiklusMenu20Table() {
       const wrapper = document.getElementById('siklus_menu_tables_wrapper');
       if (!wrapper) return;
-      const weeks = window.dbCache['sppg_siklus_menu_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
-      
-      // Model tabel sama dengan laporan: setiap tabel memuat 10 hari (1 dekade siklus).
-      const dayInfo = m => {
-        const w = weeks[Math.floor(m / 5)] || { dates: [], items: {} };
-        return { date: (w.dates && w.dates[m % 5]) || '', w: w, i: m % 5 };
-      };
-      const totalDays = weeks.reduce((n, w) => n + ((w && w.dates) ? (Array.isArray(w.dates) ? w.dates.length : Object.values(w.dates).length) : 0), 0);
+      renderSiklusPeriodBars();
+      // Daftar hari mengikuti rentang tanggal periode (bisa 1 hari, 7 hari, 45 hari, dst.).
+      const days = siklusPeriodDayList('sppg_siklus_menu_weeks');
+      if (!days.length) {
+        wrapper.innerHTML = '<div class="p-8 text-center text-xs text-slate-400 font-semibold bg-white rounded-2xl border border-dashed border-slate-200">Tidak ada hari menu pada periode terpilih.</div>';
+        return;
+      }
+      // Setiap tabel memuat 10 hari. Id sel tetap memakai indeks global agar penyimpanan & modul lain tidak berubah.
+      const totalDays = days.length;
       const tableCount = Math.ceil(totalDays / 10);
       let html = '';
       for (let tIdx = 0; tIdx < tableCount; tIdx++) {
-        const days = Array.from({ length: Math.min(10, totalDays - tIdx * 10) }, (_, i) => tIdx * 10 + i);
-        const lastDay = days[days.length - 1];
+        const chunk = days.slice(tIdx * 10, tIdx * 10 + 10);
+        const firstPos = chunk[0].pos + 1;
+        const lastPos = chunk[chunk.length - 1].pos + 1;
         html += `
           <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white space-y-2">
             <div class="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 font-bold text-xs flex justify-between items-center">
-              <span>Siklus Menu - Hari ke-${days[0] + 1} s.d. Hari ke-${lastDay + 1} (Menu ${days[0] + 1} - Menu ${lastDay + 1})</span>
+              <span>Siklus Menu - Hari ke-${firstPos} s.d. Hari ke-${lastPos} (Menu ${firstPos} - Menu ${lastPos})</span>
               <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Tabel ${tIdx + 1} / ${tableCount}</span>
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs border-collapse min-w-[1100px]">
-              <thead class="bg-blue-50 text-blue-900"><tr><th class="p-3 border-b w-36">Kelompok</th>${days.map(m => `<th class="p-3 border-b border-l border-white/50 text-center">Menu ${m + 1}<br/><span class="text-[10px] font-bold">Hari ke-${m + 1}</span><br/><span class="text-[10px] text-blue-600/70 font-normal">${dayInfo(m).date}</span></th>`).join('')}</tr></thead>
+              <thead class="bg-blue-50 text-blue-900"><tr><th class="p-3 border-b w-36">Kelompok</th>${chunk.map(d => `<th class="p-3 border-b border-l border-white/50 text-center">Menu ${d.pos + 1}<br/><span class="text-[10px] font-bold">Hari ke-${d.pos + 1}</span><br/><span class="text-[10px] text-blue-600/70 font-normal">${d.text}</span></th>`).join('')}</tr></thead>
               <tbody>
                 ${KELOMPOK_LIST_MENU.map(kKey => `
                   <tr class="hover:bg-blue-50/30 transition-colors"><td class="p-3 border-b font-extrabold text-slate-600 bg-slate-50/50">${KELOMPOK_LABELS_MENU[kKey]}</td>
-                    ${days.map(m => {
-                      const d = dayInfo(m);
-                      const val = (d.w.items && d.w.items[kKey] && d.w.items[kKey][d.i]) ? d.w.items[kKey][d.i] : '';
-                      return `<td class="p-2 border-b border-l border-slate-100"><textarea id="sm_cell_${kKey}_${m}" rows="1" spellcheck="false" onkeydown="if(event.key==='Enter')event.preventDefault()" oninput="autoGrowMenuCell(this)" style="resize:none;overflow:hidden;min-height:38px;word-break:break-word;" class="block w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs font-bold uppercase bg-transparent text-center focus:bg-white leading-snug">${String(val).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea></td>`;
+                    ${chunk.map(d => {
+                      const raw = (d.w.items && d.w.items[kKey]) ? d.w.items[kKey] : [];
+                      const val = (Array.isArray(raw) ? raw[d.dIdx] : raw[String(d.dIdx)]) || '';
+                      return `<td class="p-2 border-b border-l border-slate-100"><textarea id="sm_cell_${kKey}_${d.globalIdx}" rows="1" spellcheck="false" onkeydown="if(event.key==='Enter')event.preventDefault()" oninput="autoGrowMenuCell(this)" style="resize:none;overflow:hidden;min-height:38px;word-break:break-word;" class="block w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs font-bold uppercase bg-transparent text-center focus:bg-white leading-snug">${String(val).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea></td>`;
                     }).join('')}
                   </tr>`).join('')}
               </tbody></table></div>
@@ -4062,27 +4434,38 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function renderMasterBahan20Table() {
       const wrapper = document.getElementById('master_bahan_tables_wrapper');
       if (!wrapper) return;
-      const weeks = window.dbCache['sppg_master_bahan_weeks'] || JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
-      
+      renderSiklusPeriodBars();
+      // Daftar hari mengikuti rentang tanggal periode; blok yang terpotong tetap ditampilkan sesuai harinya.
+      const days = siklusPeriodDayList('sppg_master_bahan_weeks');
+      if (!days.length) {
+        wrapper.innerHTML = '<div class="p-8 text-center text-xs text-slate-400 font-semibold bg-white rounded-2xl border border-dashed border-slate-200">Tidak ada hari bahan pada periode terpilih.</div>';
+        return;
+      }
+      const groups = [];
+      days.forEach(d => {
+        let g = groups.length && groups[groups.length - 1].wIdx === d.wIdx ? groups[groups.length - 1] : null;
+        if (!g) { g = { wIdx: d.wIdx, w: d.w, days: [] }; groups.push(g); }
+        g.days.push(d);
+      });
       let html = '';
-      weeks.forEach((w, wIdx) => {
-        let startDayNum = wIdx * 5 + 1;
-        let endDayNum = wIdx * 5 + 5;
+      groups.forEach(g => {
+        const firstPos = g.days[0].pos + 1;
+        const lastPos = g.days[g.days.length - 1].pos + 1;
         html += `
           <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white space-y-2">
             <div class="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-4 font-bold text-xs flex justify-between items-center">
-              <span>Master Bahan - Hari ke-${startDayNum} s.d. Hari ke-${endDayNum}</span>
-              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Blok ${wIdx + 1} / ${weeks.length}</span>
+              <span>Master Bahan - Hari ke-${firstPos} s.d. Hari ke-${lastPos}</span>
+              <span class="bg-white/20 px-2 py-1 rounded text-[10px]">Blok ${g.wIdx + 1} • ${g.days.length} hari</span>
             </div>
             <div class="overflow-x-auto"><table class="w-full text-xs border-collapse min-w-[700px]">
-              <thead class="bg-slate-100 text-slate-700"><tr><th class="p-3 border-b w-36">Kelompok</th>${w.dates.map((d, dIdx) => `<th class="p-3 border-b border-l border-white text-center">Hari ke-${wIdx * 5 + dIdx + 1}<br/><span class="text-[10px] text-slate-400 font-normal">${d}</span></th>`).join('')}</tr></thead>
+              <thead class="bg-slate-100 text-slate-700"><tr><th class="p-3 border-b w-36">Kelompok</th>${g.days.map(d => `<th class="p-3 border-b border-l border-white text-center">Hari ke-${d.pos + 1}<br/><span class="text-[10px] text-slate-400 font-normal">${d.text}</span></th>`).join('')}</tr></thead>
               <tbody>
                 ${KELOMPOK_LIST_MASTER.map(kKey => `
                   <tr class="hover:bg-slate-50/50 transition-colors"><td class="p-3 border-b font-extrabold text-slate-600 bg-slate-50/50">${KELOMPOK_LABELS_MASTER[kKey]}</td>
-                    ${[0, 1, 2, 3, 4].map(dIdx => {
-                      let globalDayIdx = wIdx * 5 + dIdx;
-                      let val = (w.items && w.items[kKey] && w.items[kKey][dIdx]) ? w.items[kKey][dIdx] : '';
-                      return `<td class="p-2 border-b border-l border-slate-100"><input type="text" id="mb_cell_${kKey}_${globalDayIdx}" value="${val}" class="w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs uppercase bg-transparent focus:bg-white text-center font-medium"></td>`;
+                    ${g.days.map(d => {
+                      const raw = (d.w.items && d.w.items[kKey]) ? d.w.items[kKey] : [];
+                      const val = (Array.isArray(raw) ? raw[d.dIdx] : raw[String(d.dIdx)]) || '';
+                      return `<td class="p-2 border-b border-l border-slate-100"><input type="text" id="mb_cell_${kKey}_${d.globalIdx}" value="${val}" class="w-full border-2 border-transparent hover:border-slate-200 rounded p-2 text-xs uppercase bg-transparent focus:bg-white text-center font-medium"></td>`;
                     }).join('')}
                   </tr>`).join('')}
               </tbody></table></div>
@@ -4116,8 +4499,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function renderFrekuensiBahanTable() {
       const tbody = document.getElementById('tbody_frekuensi_bahan');
       if (!tbody) return;
-      const freqMap = window.dbCache['sppg_frequency_map'] || {};
-      const freqDetails = window.dbCache['sppg_frequency_details'] || {};
+      renderSiklusPeriodBars();
+      const { freqMap, freqDetails } = computeFrekuensiPeriode();
       let html = '';
       let idx = 1;
       for (const [bahan, count] of Object.entries(freqMap)) {
@@ -4393,7 +4776,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 // (blok ini berisi 3 fungsi bantu BARU + initSuhuModule versi baru)
 // =====================================================================
 
-// [BARU] Ambil data siklus menu (realtime dari Firebase cache, sama dengan modul Siklus Menu 60 Hari)
+// [BARU] Ambil data siklus menu (realtime dari Firebase cache, sama dengan modul Siklus Menu)
 function getSuhuWeeks() {
   let weeks = window.dbCache['sppg_siklus_menu_weeks'];
   if (!weeks) return JSON.parse(JSON.stringify(DEFAULT_SIKLUS_MENU_60_DAYS));
@@ -4785,7 +5168,7 @@ function renderSuhuTable() {
       filteredConfigs.forEach(cfg => {
         let submenus = cfg.template;
         submenus.forEach((sub) => {
-          // [DIUBAH] nama menu diambil langsung dari data Siklus Menu 60 Hari (realtime)
+          // [DIUBAH] nama menu diambil langsung dari data Siklus Menu (realtime)
           let menuName = getSuhuMenuName(weeks, sub.key.toUpperCase(), activeDayIdx);
           let uniqueId = `${cfg.id}_${sub.key}_b${b}`;
           let defTime = realtimeNowTime;
@@ -5095,7 +5478,7 @@ function renderSuhuTable() {
     // =====================================================================
     // BACKUP / RESTORE DATABASE
     // =====================================================================
-    const BK_LIGHT = ['sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map', 'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat', 'sppg_organoleptik_ref'];
+    const BK_LIGHT = ['sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map', 'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat', 'sppg_organoleptik_ref', 'sppg_siklus_period'];
     const BK_HEAVY = ['sppg_pemorsian_data', 'sppg_log_suhu', 'sppg_log_silang', 'sppg_log_alergen', 'sppg_pendinginan_data', 'sppg_uji_organoleptik'];
     const BK_LABEL = {
       sppg_master_bahan_weeks: 'Master Bahan', sppg_siklus_menu_weeks: 'Siklus Menu', sppg_frequency_map: 'Frekuensi Bahan (ringkas)',
@@ -5657,7 +6040,7 @@ function renderSuhuTable() {
       const weeks = window.dbCache['sppg_siklus_menu_weeks'] || DEFAULT_SIKLUS_MENU_60_DAYS;
       const idx = getSuhuDateKeyList(weeks).indexOf(dateKey);
       if (idx === -1) {
-        box.innerHTML = '<div class="text-amber-800/80 font-medium">Tanggal ini tidak ada dalam Siklus Menu 60 Hari. Anda tetap dapat mencetak label manual pada panel <b>Cetak Label</b> di bawah.</div>';
+        box.innerHTML = '<div class="text-amber-800/80 font-medium">Tanggal ini tidak ada dalam Siklus Menu. Anda tetap dapat mencetak label manual pada panel <b>Cetak Label</b> di bawah.</div>';
         return;
       }
       const items = sdMenuItemsForIdx(idx);
@@ -5871,7 +6254,6 @@ function renderSuhuTable() {
 
         rptKop(wb, ws, { r: 1, rowH: 20.25, logo: [2, 4], title: [5, 8], lab: 9, val: 10,
           judul: 'PENDATAAN SASARAN PESERTA DIDIK', noDoc: 'FM-SGR-SPPG-01.01', rev: '01', colon: false });
-        ws.getRow(1).height = 21.75;
         rptDateLine(ws, 4, 2, 10);
 
         ws.getRow(5).height = 24.75;
@@ -5929,7 +6311,7 @@ function renderSuhuTable() {
         <head><meta charset='utf-8'><title>Formulir Pendataan Sasaran Peserta Didik (FM-SGR-SPPG-01.01)</title>
         <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
-          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm; }
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm; }
           div.Section1 { page: Section1; }
           body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
           table.main-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -5964,7 +6346,6 @@ function renderSuhuTable() {
 
         rptKop(wb, ws, { r: 1, rowH: 20.25, logo: [2, 4], title: [5, 8], lab: 9, val: 10,
           judul: 'PENDATAAN SASARAN 3B', noDoc: 'FM-SGR-SPPG-01.02', rev: '00', colon: false });
-        ws.getRow(1).height = 21.75;
         rptDateLine(ws, 4, 2, 10);
 
         ws.getRow(5).height = 24.75;
@@ -6018,7 +6399,7 @@ function renderSuhuTable() {
         <head><meta charset='utf-8'><title>Formulir Pendataan Sasaran 3B (FM-SGR-SPPG-01.02)</title>
         <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
-          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm; }
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm; }
           div.Section1 { page: Section1; }
           body { font-family: 'Calibri', sans-serif; font-size: 11pt; line-height: 1.15; }
           table.main-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -6816,9 +7197,8 @@ function renderSuhuTable() {
         const infoRow = (a, b) => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${a}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${pendEsc(b)}</td></tr>`;
 
         const photoLayout = mode === 'inline';
-        const pageCss = photoLayout
-          ? 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1.5cm 1.5cm 1.5cm;'
-          : 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 1.5cm 1.5cm 1.5cm 1.5cm;';
+        // Margin kertas seragam semua laporan: atas 2 cm, kiri/kanan/bawah 1 cm
+        const pageCss = 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm;';
         const html = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>Pemantauan di Cooling Area (${PEND_DOC_CODE})</title>
@@ -7067,7 +7447,7 @@ function renderSuhuTable() {
           + '<div class="flex items-center gap-2">'
           + '<span class="w-7 h-7 rounded-full bg-emerald-600 text-white text-[11px] font-black flex items-center justify-center shrink-0">' + (n + 1) + '</span>'
           + '<div><div class="text-[11px] font-black text-slate-800 uppercase tracking-wider">' + ujiEsc(ujiCatLabel(key)) + '</div>'
-          + '<div class="text-[9px] text-slate-400">Menu otomatis dari Siklus Menu 60 Hari</div></div></div>'
+          + '<div class="text-[9px] text-slate-400">Menu otomatis dari Siklus Menu</div></div></div>'
           + '<div class="flex items-center gap-1.5 hidden-print">'
           + '<button type="button" onclick="ujiAddRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors">+ Tambah Batch</button>'
           + '<button type="button" onclick="ujiDelRow(\'' + key + '\')" class="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 transition-colors">− Hapus Batch</button>'
@@ -7813,7 +8193,7 @@ function renderSuhuTable() {
         <head><meta charset='utf-8'><title>Uji Organoleptik dan Suhu Memasak (${UJI_DOC_CODE})</title>
         <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
         <style>
-          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: ${withPhoto ? '2cm 1.5cm 1.5cm 1.5cm' : '1.2cm 1.2cm 1.2cm 1.2cm'}; }
+          @page Section1 { size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm; }
           div.Section1 { page: Section1; }
           body { font-family: 'Calibri', sans-serif; font-size: ${withPhoto ? 12 : 10}pt; line-height: 1.15; }
           table { width: 100%; border-collapse: collapse; margin-top: 6px; }
@@ -8878,10 +9258,8 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       var A = a1(pm[0]), B = a1(pm[1] || pm[0]);
       c1 = A.c; r1 = A.r; c2 = B.c; r2 = B.r;
     }
-    // Batas cetak mengikuti margin halaman: laporan bergambar = atas 2 cm, kiri/kanan/bawah 1,5 cm.
-    var pm = ps.margins || {};
-    var photoPage = Math.abs((pm.top || 0) - 0.7874) < 0.02 && Math.abs((pm.left || 0) - 0.5906) < 0.02;
-    var mw = photoPage ? { t: 20, r: 15, b: 15, l: 15 } : { t: 6, r: 6, b: 6, l: 6 };
+    // Batas cetak seragam semua laporan: atas 2 cm, kiri/kanan/bawah 1 cm.
+    var mw = { t: 20, r: 10, b: 10, l: 10 };
     var PWmm = (land ? 297 : 210) - mw.l - mw.r, PHmm = (land ? 210 : 297) - mw.t - mw.b;
     var PW = PWmm / 25.4 * 96 * 0.97, PH = PHmm / 25.4 * 96 * 0.97;
 
@@ -8984,7 +9362,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         html += '<img src="' + src + '" style="position:absolute;left:' + x.toFixed(2) + 'px;top:' + y.toFixed(2) + 'px;width:' + w.toFixed(2) + 'px;height:' + h.toFixed(2) + 'px">';
       });
 
-      out.push('<div class="wrap ' + (land ? 'land' : 'port') + (photoPage ? ' p2' : '') + '" data-mt="' + mw.t + '" data-mr="' + mw.r + '" data-mb="' + mw.b + '" data-ml="' + mw.l + '"><div class="box" style="zoom:' + zoom.toFixed(4) + ';width:' + W0 + 'px;height:' + chunkH + 'px">' + html + '</div></div>');
+      out.push('<div class="wrap ' + (land ? 'land' : 'port') + '" data-mt="' + mw.t + '" data-mr="' + mw.r + '" data-mb="' + mw.b + '" data-ml="' + mw.l + '"><div class="box" style="zoom:' + zoom.toFixed(4) + ';width:' + W0 + 'px;height:' + chunkH + 'px">' + html + '</div></div>');
     });
     return out;
   }
@@ -8994,11 +9372,10 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     wb.eachSheet(function (ws) { pages = pages.concat(sheetPages(wb, ws)); });
     if (!pages.length) { alert('Tidak ada data untuk dicetak.'); return; }
     if (window.__pdfHook) { var hk = window.__pdfHook; window.__pdfHook = null; hk(pages, title); return; }
-    var css = '@page land{size:A4 landscape;margin:6mm}@page port{size:A4 portrait;margin:6mm}' +
-      '@page landp{size:A4 landscape;margin:20mm 15mm 15mm}@page portp{size:A4 portrait;margin:20mm 15mm 15mm}' +
+    var css = '@page land{size:A4 landscape;margin:20mm 10mm 10mm}@page port{size:A4 portrait;margin:20mm 10mm 10mm}' +
       'html,body{margin:0;padding:0;background:#fff}' +
       '.wrap{text-align:center;page-break-after:always;break-after:page}.wrap:last-child{page-break-after:auto;break-after:auto}' +
-      '.wrap.land{page:land}.wrap.port{page:port}.wrap.land.p2{page:landp}.wrap.port.p2{page:portp}' +
+      '.wrap.land{page:land}.wrap.port{page:port}' +
       '.box{display:inline-block;position:relative;text-align:left;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
       '.box img{max-width:none}';
     var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + esc(title || 'Cetak') + '</title><style>' + css + '</style></head><body>' + pages.join('') + '</body></html>';
@@ -9344,7 +9721,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         else if (tab === 'pemorsian' || tab === 'pendinginan') {
           var sel = $(tab === 'pemorsian' ? 'selectSiklusPemorsian' : 'selectSiklusPendinginan');
           var keys = getSuhuDateKeyList(getSuhuWeeks()), i = keys.indexOf(today);
-          if (i === -1) { alert('Tanggal hari ini tidak ada dalam Siklus Menu 60 Hari.'); return; }
+          if (i === -1) { alert('Tanggal hari ini tidak ada dalam Siklus Menu.'); return; }
           sel.value = i;
           if (tab === 'pemorsian') onPemorsianDayChange(sel); else onPendDayChange(sel);
         }
@@ -9867,8 +10244,8 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         wrap.style.cssText = 'display:inline-block;background:#fff';
         var canvas = await window.html2canvas(cell, { scale: 2, backgroundColor: '#fff', useCORS: true, logging: false });
         var pw = land ? 297 : 210, ph = land ? 210 : 297;
-        var mt = parseFloat(wrap.getAttribute('data-mt')) || 6, mr = parseFloat(wrap.getAttribute('data-mr')) || 6;
-        var mb = parseFloat(wrap.getAttribute('data-mb')) || 6, ml = parseFloat(wrap.getAttribute('data-ml')) || 6;
+        var mt = parseFloat(wrap.getAttribute('data-mt')) || 20, mr = parseFloat(wrap.getAttribute('data-mr')) || 10;
+        var mb = parseFloat(wrap.getAttribute('data-mb')) || 10, ml = parseFloat(wrap.getAttribute('data-ml')) || 10;
         if (!pdf) pdf = new window.jspdf.jsPDF({ orientation: land ? 'l' : 'p', unit: 'mm', format: 'a4', compress: true });
         else pdf.addPage('a4', land ? 'l' : 'p');
         var aw = pw - ml - mr, ah = ph - mt - mb;
