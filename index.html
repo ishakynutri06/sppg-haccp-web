@@ -309,6 +309,7 @@ html body #loadingOverlay .text-slate-400{color:#9fc4b4 !important}
 
 /* ---- modal ---- */
 html body #customAlert > div,html body #exportModeModal > div,
+html body #suhuExportScopeModal > div,
 html body #imageConfirmModal > div,html body #photoReviewModal > div{
   border:1px solid var(--line);box-shadow:var(--shadow-lg) !important;
 }
@@ -697,30 +698,62 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">PEMANTAUAN SUHU (FM-SGR-SPPG-03.05)</h2>
             </div>
             <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs shadow-inner w-full lg:w-auto overflow-x-auto">
-              <button type="button" id="btnTabSuhuInput" onclick="toggleSuhuSubView('input')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200 whitespace-nowrap">📝 Input Hari Ini</button>
-              <button type="button" id="btnTabSuhuHistory" onclick="toggleSuhuSubView('history')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 whitespace-nowrap">📜 Histori Log</button>
+              <button type="button" id="btnTabSuhuInput" onclick="toggleSuhuSubView('input')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200 whitespace-nowrap">📝 Input dan Pantau</button>
+              <button type="button" id="btnTabSuhuHistory" onclick="toggleSuhuSubView('history')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 whitespace-nowrap">📅 Monitor Riwayat Periode</button>
             </div>
           </div>
         </div>
 
         <div id="suhuSubViewInput" class="space-y-8">
-          <div class="export-toolbar flex flex-wrap gap-2 w-full"><button type="button" onclick="exportGenericExcel('SUHU RUANGAN','wrapper_suhu')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button><button type="button" onclick="exportGenericWord('Pemantauan Suhu (FM-SGR-SPPG-03.05)','wrapper_suhu')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button></div>
+          <div class="export-toolbar flex flex-wrap gap-2 w-full"><button type="button" onclick="openSuhuExportMenu('excel')" class="flex-1 lg:flex-none whitespace-nowrap bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-3 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button><button type="button" onclick="openSuhuExportMenu('word')" class="flex-1 lg:flex-none whitespace-nowrap bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-3 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button><button type="button" onclick="openSuhuExportMenu('print')" class="flex-1 lg:flex-none whitespace-nowrap bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-3 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-xs shadow-lg shadow-amber-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>🖨️</span> Cetak</button></div>
 
           <form id="formSuhuDoc" onsubmit="event.preventDefault(); saveGenericForm('formSuhuDoc', 'sppg_log_suhu', 'Data Pemantauan Suhu Area & Makanan berhasil disimpan!');" class="space-y-8">
             <!-- HEADER FORM (DIPERBAIKI: tidak ada lagi tag ganda / penutup berlebih) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
               <div>
-                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Pemantauan</label>
-                <input type="date" id="suhu_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800 cursor-pointer" required>
+                <label for="suhu_mode_harian" class="flex items-center gap-2 font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px] cursor-pointer select-none">
+                  <input type="checkbox" id="suhu_mode_harian" onchange="setSuhuMode('harian')" class="w-4 h-4 accent-indigo-600 cursor-pointer shrink-0">
+                  <span>Tanggal Pemantauan</span>
+                </label>
+                <input type="date" id="suhu_tanggal" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800 cursor-pointer transition-opacity disabled:opacity-60 disabled:cursor-not-allowed" required>
               </div>
               <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Siklus Menu (Referensi Realtime)</label>
-                <select id="suhu_siklus_active" onchange="onSuhuSiklusChange();" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer">
+                <select id="suhu_siklus_active" onchange="onSuhuSiklusChange();" class="w-full border-2 border-blue-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-blue-50 text-blue-900 cursor-pointer transition-opacity disabled:opacity-60 disabled:cursor-not-allowed">
                 </select>
               </div>
               <div>
                 <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Petugas QC / Supervisor</label>
                 <input type="text" id="suhu_supervisor" placeholder="Nama Lengkap..." class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-base font-bold bg-slate-50 text-slate-800" required>
+              </div>
+              <!-- TANGGAL PEMANTAUAN PERIODIK: rentang tanggal awal & akhir sesuai kebutuhan user -->
+              <div class="md:col-span-3 pt-4 mt-1 border-t border-slate-100">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <label for="suhu_mode_periodik" class="flex items-center gap-2 font-extrabold text-slate-700 uppercase tracking-wider text-[10px] cursor-pointer select-none">
+                    <input type="checkbox" id="suhu_mode_periodik" onchange="setSuhuMode('periodik')" class="w-4 h-4 accent-emerald-600 cursor-pointer shrink-0">
+                    <span>Tanggal Pemantauan Periodik</span>
+                  </label>
+                  <span class="text-[10px] text-slate-400 font-semibold">Pilih salah satu mode — tentukan tanggal awal dan akhir sendiri</span>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 sm:items-end">
+                  <div class="flex-1 min-w-0">
+                    <label for="suhu_period_start" class="block font-extrabold text-slate-600 mb-1.5 uppercase tracking-wider text-[9px]">Tanggal Awal</label>
+                    <input type="date" id="suhu_period_start" onchange="suhuValidatePeriod(true)" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer transition-opacity disabled:opacity-60 disabled:cursor-not-allowed">
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <label for="suhu_period_end" class="block font-extrabold text-slate-600 mb-1.5 uppercase tracking-wider text-[9px]">Tanggal Akhir</label>
+                    <input type="date" id="suhu_period_end" onchange="suhuValidatePeriod(true)" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer transition-opacity disabled:opacity-60 disabled:cursor-not-allowed">
+                  </div>
+                  <div class="sm:flex-none">
+                    <label class="hidden sm:block mb-1.5 text-[9px]">&nbsp;</label>
+                    <button type="button" onclick="applySuhuPeriod()" title="Terapkan tanggal pemantauan periodik" class="w-full sm:w-auto min-h-[48px] px-6 py-3 rounded-xl font-black text-sm text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0">✓ OK</button>
+                  </div>
+                </div>
+                <p id="suhuPeriodHint" class="text-[10px] text-slate-400 mt-2">Rentang ini tampil pada cetak/export. Kosongkan bila pemantauan hanya 1 hari.</p>
+                <div id="suhuPeriodStatus" class="hidden mt-2 flex-wrap items-center gap-2">
+                  <span id="suhuPeriodStatusText" class="text-[10px] font-bold text-emerald-700"></span>
+                  <button type="button" onclick="clearSuhuPeriod()" title="Kembali ke mode 1 hari" class="text-[10px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-2 py-1 rounded-lg transition-colors">↺ Hapus Periode</button>
+                </div>
               </div>
             </div>
 
@@ -731,6 +764,24 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                 <button type="button" id="btnCat_penyimpanan" onclick="switchSuhuCategoryView('penyimpanan')" class="p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md">❄️ 2. Suhu Penyimpanan</button>
                 <button type="button" id="btnCat_pemorsian" onclick="switchSuhuCategoryView('pemorsian')" class="p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md">⚖️ 3. Suhu Pemorsian</button>
               </div>
+            </div>
+
+            <!-- NAVIGASI ITEM AKTIF (1 HALAMAN = 1 RUANGAN / 1 ALAT PENYIMPANAN) -->
+            <div id="suhuItemNav" class="space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Pilih Item Pemantauan (1 Lembar = 1 Item):</span>
+                <span id="suhuItemNavInfo" class="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">0/6 terisi</span>
+              </div>
+              <div id="suhuItemPills" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- NAVIGASI TANGGAL (muncul pada mode Tanggal Pemantauan Periodik) -->
+            <div id="suhuDateNavBox" class="hidden space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Tanggal dalam Periode</span>
+                <span id="suhuDateNavInfo" class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-full"></span>
+              </div>
+              <div id="suhuDateNav" class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1"></div>
             </div>
 
             <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
@@ -757,6 +808,57 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               <button type="button" onclick="saveGenericForm('formSuhuDoc', 'sppg_log_suhu', 'Data Pemantauan Suhu Area & Makanan berhasil disimpan!');" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg shadow-slate-800/40 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>💾</span> Simpan Log Data</button>
             </div>
           </form>
+        </div>
+
+        <!-- SUB-VIEW 2: MONITOR RIWAYAT PERIODE (MULTI-HARI / HARI-HARI BELAKANG) -->
+        <div id="suhuSubViewHistory" class="space-y-6 hidden">
+          <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Monitor Riwayat Periode (Multi-Hari)</span>
+              <span id="suhuRangeInfo" class="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">—</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Mulai</label>
+                <input type="date" id="suhuRangeStart" onchange="renderSuhuHistory()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
+              </div>
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Akhir</label>
+                <input type="date" id="suhuRangeEnd" onchange="renderSuhuHistory()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
+              </div>
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Kategori</label>
+                <select id="suhuHistKategori" onchange="onSuhuHistKategoriChange()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
+                  <option value="all">Semua Kategori</option>
+                  <option value="ruang">1. Suhu Ruangan</option>
+                  <option value="penyimpanan">2. Suhu Penyimpanan</option>
+                  <option value="pemorsian">3. Suhu Pemorsian</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Objek Pemantauan</label>
+                <select id="suhuHistItem" onchange="renderSuhuHistory()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
+                  <option value="all">Semua Objek</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="setSuhuRangeQuick(7)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">7 Hari Terakhir</button>
+              <button type="button" onclick="setSuhuRangeQuick(14)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">14 Hari Terakhir</button>
+              <button type="button" onclick="setSuhuRangeQuick('month')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">Bulan Ini</button>
+              <button type="button" onclick="clearSuhuHistFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">↺ Reset</button>
+              <button type="button" id="btnSuhuHistLoadAll" onclick="loadSuhuRangeMissing(true)" class="bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-4 py-2.5 rounded-xl text-[11px] shadow-md transition-all">⬇ Muat Data Periode</button>
+            </div>
+            <div class="flex flex-wrap gap-2 pt-3 border-t border-slate-100">
+              <button type="button" onclick="openSuhuPeriodExport('print')" class="flex-1 lg:flex-none bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>🖨️</span> Cetak Laporan Periode</button>
+              <button type="button" onclick="openSuhuPeriodExport('word')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word Periode</button>
+              <button type="button" onclick="openSuhuPeriodExport('excel')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel Periode</button>
+            </div>
+            <p class="text-[10px] text-slate-400 italic leading-relaxed">Rekap kronologis per tanggal &amp; per objek pemantauan, dibaca langsung dari <span class="font-semibold">sppg_log_suhu/{tanggal}</span> tanpa mengubah data. Setiap kombinasi 1 tanggal + 1 objek dicetak pada halaman/lembar kerja terpisah dengan kop FM-SGR-SPPG-03.05 lengkap.</p>
+          </div>
+          <div id="suhuHistoryContent" class="space-y-5">
+            <div class="p-6 text-center text-xs text-slate-400 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">Memuat histori…</div>
+          </div>
         </div>
       </div>
     </section>
@@ -1546,8 +1648,35 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     </div>
   </div>
 
-  <!-- IMAGE CONFIRMATION MODAL (POP-UP BERSAMAAN FOTO, WAKTU & SUHU) -->
-  <div id="imageConfirmModal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-slate-900/80 backdrop-blur-sm opacity-0 transition-opacity duration-300 p-4">
+  <!-- MODAL PILIHAN CAKUPAN EXPORT MODUL PEMANTAUAN SUHU (1 HALAMAN = 1 ITEM) -->
+  <div id="suhuExportScopeModal" class="fixed inset-0 z-[130] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+      <div class="text-center space-y-1">
+        <div class="text-3xl">📑</div>
+        <h3 class="text-lg font-bold text-slate-800">Cakupan Export Laporan Suhu</h3>
+        <p class="text-[11px] text-slate-500" id="suhuExportScopeInfo">Pilih cakupan data yang akan diekspor:</p>
+      </div>
+      <button type="button" onclick="resolveSuhuExportScope('item')" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all">📄 Cetak/Export Objek Aktif (1 Halaman)<br><span class="text-[11px] font-medium opacity-90">Hanya 1 ruangan / alat yang sedang dibuka</span></button>
+      <button type="button" onclick="resolveSuhuExportScope('all')" class="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-black text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-slate-800/30 transition-all">📚 Cetak/Export Semua Objek Kategori Ini (Terpisah Per Halaman)<br><span class="text-[11px] font-medium opacity-90">Terpisah per halaman (Word) / per sheet (Excel)</span></button>
+      <button type="button" onclick="resolveSuhuExportScope(null)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm transition-all">Batal</button>
+    </div>
+  </div>
+
+  <!-- MODAL PILIHAN CAKUPAN CETAK / EXPORT PERIODE (RENTANG TANGGAL) -->
+  <div id="suhuPeriodScopeModal" class="fixed inset-0 z-[130] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+      <div class="text-center space-y-1">
+        <div class="text-3xl">🗓️</div>
+        <h3 class="text-lg font-bold text-slate-800">Cakupan Laporan Periode</h3>
+        <p class="text-[11px] text-slate-500" id="suhuPeriodScopeInfo">Pilih cakupan objek yang akan dicetak/diekspor:</p>
+      </div>
+      <button type="button" onclick="resolveSuhuPeriodExport('item')" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all">📄 1 Objek Pemantauan Tertentu<br><span class="text-[11px] font-medium opacity-90">Sesuai filter objek pada tab ini, seluruh tanggal</span></button>
+      <button type="button" onclick="resolveSuhuPeriodExport('all')" class="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-black text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-slate-800/30 transition-all">📚 Semua Objek dalam Kategori<br><span class="text-[11px] font-medium opacity-90">Tiap tanggal + tiap objek = 1 halaman / 1 sheet</span></button>
+      <button type="button" onclick="resolveSuhuPeriodExport(null)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm transition-all">Batal</button>
+    </div>
+  </div>
+
+  <!-- IMAGE CONFIRMATION MODAL (POP-UP BERSAMAAN FOTO, WAKTU & SUHU) -->  <div id="imageConfirmModal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-slate-900/80 backdrop-blur-sm opacity-0 transition-opacity duration-300 p-4">
     <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md transform scale-95 transition-transform duration-300 overflow-hidden flex flex-col">
         <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-4 text-white text-center font-bold text-lg flex items-center justify-center gap-2">
             <span>📸</span> Konfirmasi Bukti Foto
@@ -1668,11 +1797,20 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     window.dbCache = {};
     setTimeout(() => { const h = document.getElementById('loadingHint'); const o = document.getElementById('loadingOverlay'); if (h && o && !o.classList.contains('hidden')) h.textContent = 'Koneksi lambat, mohon tunggu... (periksa jaringan internet)'; }, 8000);
     window.suhuPhotosMap = {}; 
+    window.suhuActivePeriod = null; // {start, end} rentang periodik yang sedang aktif di layar
     window.currentSuhuDate = null;
     window.suhuDirty = {};          // tanggal -> true jika ada input MANUAL yang belum disimpan
     window.suhuRenderedDate = null; // tanggal milik isi tabel yang sedang tampil di layar
     window.suhuSwitching = false;   // true saat sedang berpindah tanggal
-    function markSuhuDirty() { if (window.suhuRenderedDate) window.suhuDirty[window.suhuRenderedDate] = true; }
+    // Mode multi-tanggal (periodik, kategori Ruangan/Penyimpanan): seluruh tanggal tampil sekaligus
+    window.suhuMultiRendered = false;
+    window.suhuMultiDates = [];
+    window.suhuMultiStart = null;
+    window.suhuPeriodFilterMode = 'all';
+    function markSuhuDirty(dateKey) {
+      if (dateKey) { window.suhuDirty[dateKey] = true; return; }
+      if (window.suhuRenderedDate) window.suhuDirty[window.suhuRenderedDate] = true;
+    }
     window.currentActiveTab = 'overview';
 
     // FUNGSI MENDAPATKAN JAM REALTIME DALAM FORMAT HH:mm
@@ -1819,11 +1957,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
     function confirmImageConfirmation() {
         if (pendingPemorsianPhoto) { confirmPemorsianPhoto(); return; }
+        let photoId = null;
         if (pendingPhoto) {
+            photoId = pendingPhoto.id;
             window.suhuPhotosMap[pendingPhoto.id] = { base64: pendingPhoto.base64, expW: pendingPhoto.expW, expH: pendingPhoto.expH };
             pendingPhoto = null;
         }
-        markSuhuDirty();
+        markSuhuDirty(photoId ? suhuMultiDateFromId(photoId) : undefined);
         const tempVal = document.getElementById('imageConfirmTempInput').value;
         const timeVal = document.getElementById('imageConfirmTimeInput').value;
         
@@ -1860,10 +2000,11 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
     function deleteSuhuPhoto(fotoId) {
         if (confirm("Apakah Anda yakin ingin menghapus bukti foto ini?")) {
+            const photoDate = suhuMultiDateFromId(fotoId);
             if (window.suhuPhotosMap && window.suhuPhotosMap[fotoId]) {
                 delete window.suhuPhotosMap[fotoId];
             }
-            markSuhuDirty();
+            markSuhuDirty(photoDate || undefined);
             autoSaveCurrentSuhuToCache();
             renderSuhuTable();
         }
@@ -2183,10 +2324,12 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       return getLocalDateKey();
     }
     // key = kunci EXPORT_MENU; photoMode: 'inline' | 'none' (hanya dipakai bila menu berfoto)
-    function exportFileName(key, ext, photoMode) {
+    // itemName (opsional, khusus modul Suhu): nama item/ruangan yang diekspor satuan.
+    function exportFileName(key, ext, photoMode, itemName) {
       const m = EXPORT_MENU[key] || { nama: String(key).toUpperCase() };
       let nama = m.nama;
       if (key === 'wrapper_suhu') nama = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', pemorsian: 'SUHU PEMORSIAN' })[activeSuhuCategory] || nama;
+      if (itemName) nama += '_' + String(itemName).toUpperCase().replace(/[\\/:*?"<>|]/g, '-').trim();
       let name = nama + '_' + exportDocDateKey(key);
       if (m.foto) name += '_' + (photoMode === 'none' ? 'TANPA' : 'DENGAN') + ' GAMBAR';
       return name + '.' + ext;
@@ -2406,22 +2549,42 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       }
       return key || getLocalDateKey();
     }
-        function suhuReportHeaderLines() {
-      const names = g => SUHU_ITEMS_CONFIG.filter(c => c.groupKey === g).map(c => c.area).join(', ');
-      const lines = [['NAMA SPPG/ID SPPG', 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI-SEGERI']];
-      if (activeSuhuCategory === 'ruang') lines.push(['JENIS RUANGAN', names('ruang')]);
-      if (activeSuhuCategory === 'penyimpanan') lines.push(['JENIS PENYIMPANAN', names('penyimpanan')]);
+        function suhuReportHeaderLines(itemIds, catKey) {
+      // 6 baris keterangan baku laporan Pemantauan Suhu (FM-SGR-SPPG-03.05).
+      // itemIds: array id item yang dicetak pada halaman/lembar ini (opsional).
+      // catKey  : kategori yang dicetak ('ruang' | 'penyimpanan' | 'pemorsian'); default = kategori aktif di layar.
+      // Jika itemIds tidak diberikan, dipakai item yang sedang aktif pada layar.
+      const cat = catKey || activeSuhuCategory;
+      let ids = itemIds;
+      if (!ids) {
+        if (cat === 'ruang' || cat === 'penyimpanan') ids = activeSuhuItemId ? [activeSuhuItemId] : [];
+        else ids = null;
+      }
+      const namesOf = (groupKey) => {
+        const list = (ids && ids.length) ? ids : getSuhuCategoryItems(groupKey).map(c => c.id);
+        return list
+          .map(id => SUHU_ITEMS_CONFIG.find(c => c.id === id))
+          .filter(c => c && c.groupKey === groupKey)
+          .map(c => suhuItemShortName(c))
+          .filter(Boolean)
+          .join(', ');
+      };
+
+      const lines = [['NAMA SPPG', 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI-SEGERI']];
+      if (cat === 'ruang') lines.push(['JENIS RUANGAN', namesOf('ruang')]);
+      else if (cat === 'penyimpanan') lines.push(['JENIS PENYIMPANAN', namesOf('penyimpanan')]);
+      else if (cat === 'pemorsian') lines.push(['JENIS RUANGAN', 'Pemorsian (Holding Box / Meja Pemorsian)']);
       lines.push(['PENANGGUNG JAWAB', 'ISHAK YUNUS'], ['JENIS PASOKAN', ''], ['PETUGAS PENERIMA', ''], ['ID SPPG', '']);
       return lines;
     }
 
     // Baris ke-3 kop laporan Pemantauan Suhu mengikuti sub-menu yang aktif
-    function suhuKopJudul() {
+    function suhuKopJudul(catKey) {
       return ({
         ruang: 'PEMANTAUAN SUHU RUANGAN',
         penyimpanan: 'PEMANTAUAN SUHU PENYIMPANAN',
         pemorsian: 'PEMANTAUAN SUHU PEMORSIAN'
-      })[activeSuhuCategory] || 'PEMANTAUAN SUHU RUANGAN';
+      })[catKey || activeSuhuCategory] || 'PEMANTAUAN SUHU RUANGAN';
     }
 
     // Ganti penanda foto pada salinan tabel dengan <img> ukuran seragam 2x3 cm / 3x2 cm (dipakai semua export Word)
@@ -2443,11 +2606,434 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       }
     }
 
+    // =====================================================================
+    // EXPORT MODUL PEMANTAUAN SUHU — 1 HALAMAN / 1 SHEET = 1 ITEM
+    // =====================================================================
+    function suhuHeaderBlockHtml(lines) {
+      return `<table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">${lines.map(l =>
+        `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${l[0]}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${l[1]}</td></tr>`
+      ).join('')}</table>`;
+    }
+
+    let suhuExportKind = null;
+    function openSuhuExportMenu(kind) {
+      suhuExportKind = kind;
+      const m = document.getElementById('suhuExportScopeModal');
+      const info = document.getElementById('suhuExportScopeInfo');
+      if (info) {
+        const catLabel = ({ ruang: '1. Suhu Ruangan', penyimpanan: '2. Suhu Penyimpanan', pemorsian: '3. Suhu Pemorsian' })[activeSuhuCategory] || '';
+        const cfg = getActiveSuhuItemCfg();
+        const act = kind === 'print' ? 'Cetak' : 'Export';
+        let rangeInfo = '';
+        if (suhuIsPeriodicMode()) {
+          const ds = suhuDateKeysBetween((document.getElementById('suhu_period_start') || {}).value, (document.getElementById('suhu_period_end') || {}).value);
+          rangeInfo = ds.length
+            ? ' — periode ' + ds[0] + ' s.d. ' + ds[ds.length - 1] + ' (' + ds.length + ' hari)'
+            : ' — rentang tanggal belum valid';
+        } else {
+          rangeInfo = ' — tanggal ' + suhuDocDateKey();
+        }
+        info.textContent = act + ' ' + catLabel + (cfg ? ' — objek aktif: ' + suhuItemShortName(cfg) : '') + rangeInfo;
+      }
+      if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+
+    async function resolveSuhuExportScope(scope) {
+      const m = document.getElementById('suhuExportScopeModal');
+      if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+      if (!scope) return;
+      const kind = suhuExportKind; suhuExportKind = null;
+      const items = suhuExportItems(scope);
+      if (!items.length) return alert('Item tidak ditemukan');
+      const title = 'Pemantauan Suhu (FM-SGR-SPPG-03.05)';
+
+      // ==== MODE PERIODIK: seluruh tanggal dalam rentang ====
+      if (suhuIsPeriodicMode()) {
+        const dates = suhuDateKeysBetween(
+          (document.getElementById('suhu_period_start') || {}).value,
+          (document.getElementById('suhu_period_end') || {}).value
+        );
+        if (!dates.length) return alert('Tanggal Awal dan Tanggal Akhir belum valid. Isi rentang lalu tekan ✓ OK terlebih dahulu.');
+        const totalPages = dates.length * items.length;
+        if (totalPages > 120 && !confirm('Laporan periode ini akan menghasilkan ' + totalPages + ' halaman/lembar kerja. Lanjutkan?')) return;
+        const photoMode = await askExportPhotoMode();
+        if (!photoMode) return;
+        const opt = {
+          dates: dates,
+          withNote: true,
+          fileName: suhuRangeExportFileName(kind === 'word' ? 'doc' : 'xlsx', items, photoMode)
+        };
+        if (kind === 'word') return await suhuExportWordItems(title, items, photoMode, opt);
+        if (kind === 'print') {
+          if (typeof window.printExport === 'function') return await window.printExport(function () { return suhuExportExcelItems(items, photoMode, opt); });
+          return await suhuExportExcelItems(items, photoMode, opt);
+        }
+        return await suhuExportExcelItems(items, photoMode, opt);
+      }
+
+      // ==== MODE 1 HARI (HARI H) ====
+      const photoMode = await askExportPhotoMode();
+      if (!photoMode) return;
+      if (kind === 'word') return await suhuExportWordItems(title, items, photoMode);
+      // Cetak (Print) memakai jalur Excel yang sama, lalu dirender ke halaman cetak (1 item = 1 halaman)
+      if (kind === 'print') {
+        if (typeof window.printExport === 'function') return await window.printExport(function () { return suhuExportExcelItems(items, photoMode); });
+        return await suhuExportExcelItems(items, photoMode);
+      }
+      return await suhuExportExcelItems(items, photoMode);
+    }
+
+    // Daftar item yang akan diekspor: hanya item aktif, atau seluruh item kategori aktif.
+    function suhuExportItems(scope) {
+      if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
+        const items = getSuhuCategoryItems(activeSuhuCategory);
+        if (scope === 'item') { const cfg = getActiveSuhuItemCfg(); return cfg ? [cfg] : []; }
+        return items.slice();
+      }
+      return SUHU_ITEMS_CONFIG.filter(c => c.groupKey === 'pemorsian');
+    }
+
+    // =====================================================================
+    // CAPTURE HALAMAN (TANGGAL x OBJEK) UNTUK EXPORT / CETAK
+    // Tabel dirender sementara untuk setiap tanggal + objek, disalin, lalu
+    // seluruh state layar (tanggal, item, foto, kolom) dikembalikan seperti semula.
+    // =====================================================================
+    function suhuYmd(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    // Rentang tanggal pemantauan periodik tersimpan per tanggal (dipakai pada cetak/export)
+    function suhuPeriodLabel(dateKey) {
+      const entry = ((window.dbCache['sppg_log_suhu'] || {})[dateKey]) || null;
+      let a = entry && entry['suhu_period_start'];
+      let b = entry && entry['suhu_period_end'];
+      // Tanggal di dalam rentang aktif yang belum menyimpan metadata sendiri
+      const act = window.suhuActivePeriod;
+      if ((!suhuPeriodValid(a, b)) && act && suhuPeriodValid(act.start, act.end)
+        && dateKey >= act.start && dateKey <= act.end) {
+        a = act.start;
+        b = act.end;
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(a || '') || !/^\d{4}-\d{2}-\d{2}$/.test(b || '')) return '';
+      if (a > b) return '';                       // rentang tidak valid
+      if (a === b) return suhuLongDateKey(a);     // tanggal awal = tanggal akhir
+      return suhuLongDateKey(a) + ' s.d. ' + suhuLongDateKey(b);
+    }
+
+    function suhuLongDateKey(key) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(key || '')) return '';
+      const p = key.split('-');
+      return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    // Salinan tabel hidup untuk Excel: nilai input disalin (cloneNode tidak membawa properti .value)
+    function suhuCloneCurrentTableForExcel() {
+      const src = document.getElementById('wrapper_suhu');
+      if (!src) return null;
+      const table = src.querySelector('table');
+      if (!table) return null;
+      const cloneTable = table.cloneNode(true);
+      const srcInputs = Array.from(table.querySelectorAll('input, select, textarea'));
+      const dstInputs = Array.from(cloneTable.querySelectorAll('input, select, textarea'));
+      srcInputs.forEach((inp, i) => {
+        const d = dstInputs[i];
+        if (!d) return;
+        if (inp.type === 'file') {
+          const b64 = inp.getAttribute('data-base64') || '';
+          if (b64) d.setAttribute('data-base64', b64);
+          return;
+        }
+        d.value = inp.value;
+      });
+      return cloneTable;
+    }
+
+    async function suhuCapturePages(dates, items, catKey, photoMode, withNote) {
+      autoSaveCurrentSuhuToCache();
+      // Mode multi-tanggal: pastikan seluruh isian yang terlihat di tabel ikut diekspor,
+      // termasuk nilai yang diketik namun belum sempat ditandai dirty.
+      if (window.suhuMultiRendered && Array.isArray(window.suhuMultiDates)) {
+        window.suhuMultiDates.forEach(d => {
+          const entry = suhuMultiReadDateFromDom(d);
+          entry.photos = suhuMultiPhotosForDate(d);
+        });
+      }
+      const dateInp = document.getElementById('suhu_tanggal');
+      const prev = {
+        date: dateInp ? dateInp.value : null,
+        cat: activeSuhuCategory,
+        item: activeSuhuItemId,
+        cols: suhuRuangColumns,
+        batch: JSON.parse(JSON.stringify(suhuBatchCounters || {})),
+        photos: { ...(window.suhuPhotosMap || {}) },
+        snapshot: { ...(window.suhuPhotosSnapshot || {}) },
+        photosDate: window.suhuPhotosDate
+      };
+      const out = [];
+      window.__suhuCapturing = true;
+      window.suhuSwitching = true;
+      try {
+        for (const d of dates) {
+          if (!window.dbLoaded['sppg_log_suhu/' + d] && typeof window.fbGet === 'function') {
+            try {
+              const v = await window.fbGet('sppg_log_suhu/' + d);
+              if (!window.dbCache['sppg_log_suhu']) window.dbCache['sppg_log_suhu'] = {};
+              window.dbCache['sppg_log_suhu'][d] = v || null;
+              window.dbLoaded['sppg_log_suhu/' + d] = true;
+            } catch (e) { console.warn('Gagal memuat data suhu ' + d, e); }
+          }
+          const entry = (window.dbCache['sppg_log_suhu'] || {})[d] || null;
+          suhuRuangColumns = (entry && parseInt(entry.suhuRuangColumns, 10)) || 1;
+          suhuBatchCounters = (entry && entry.suhuBatchCounters) || { pemorsian: 1 };
+          if (dateInp) dateInp.value = d;
+          for (const cfg of items) {
+            activeSuhuCategory = cfg.groupKey || catKey;
+            activeSuhuItemId = cfg.id;
+            renderSuhuTable();
+            const built = getCleanTableHtml('wrapper_suhu', photoMode === 'none');
+            const tableEl = suhuCloneCurrentTableForExcel();
+            if (built && built.clone && tableEl) {
+              out.push({
+                date: d,
+                cfg: cfg,
+                cat: activeSuhuCategory,
+                clone: built.clone,
+                tableEl: tableEl,
+                note: withNote ? ('TANGGAL PEMANTAUAN : ' + suhuLongDateKey(d)) : '',
+                period: suhuPeriodLabel(d)
+              });
+            }
+          }
+        }
+      } finally {
+        window.__suhuCapturing = false;
+        suhuRuangColumns = prev.cols;
+        suhuBatchCounters = prev.batch;
+        activeSuhuCategory = prev.cat;
+        activeSuhuItemId = prev.item;
+        if (dateInp && prev.date) dateInp.value = prev.date;
+        window.suhuPhotosMap = prev.photos;
+        window.suhuPhotosSnapshot = prev.snapshot;
+        window.suhuPhotosDate = prev.photosDate;
+        window.suhuSwitching = false;
+        renderSuhuTable();
+      }
+      return out;
+    }
+
+    function suhuExportItemLabel(items) {
+      if (activeSuhuCategory === 'pemorsian') return ''; // nama file Pemorsian tetap seperti sebelumnya
+      return (items.length === 1) ? suhuItemShortName(items[0]) : 'SEMUA ITEM';
+    }
+
+    // Susun 1 halaman Word per entri pages (kop + blok keterangan + tabel)
+    async function suhuExportWordPages(title, pages, photoMode, fileName) {
+      const docName = 'dokumen';
+      const files = [];
+      const kopCode = 'FM-SGR-SPPG-03.05';
+      const photoLayout = photoMode === 'inline';
+      const pageCss = 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm;';
+
+      let body = '';
+      for (let i = 0; i < pages.length; i++) {
+        const pg = pages[i];
+        if (photoMode !== 'none') await exportEmbedWordPhotos(pg.clone, files, docName);
+        // Kop lengkap di setiap halaman; file logo hanya didaftarkan sekali.
+        const kopHtml = exportWordKop(kopCode, docName, i === 0 ? files : [], suhuKopJudul(pg.cat));
+        const hdrHtml = suhuHeaderBlockHtml(suhuReportHeaderLines([pg.cfg.id], pg.cat));
+        const noteLines = [];
+        if (pg.note) noteLines.push(pg.note);
+        if (pg.period) noteLines.push('TANGGAL PEMANTAUAN PERIODIK : ' + pg.period);
+        const noteHtml = noteLines.length
+          ? `<div style="font-weight:bold;font-size:10.5pt;margin:0 0 6px 0;">${noteLines.map(suhuHistEsc).join('<br>')}</div>`
+          : '';
+        const breakHtml = (i > 0) ? `<br clear="all" style="mso-special-character:line-break;page-break-before:always">` : '';
+        body += `${breakHtml}<div class="Section1">${kopHtml}${hdrHtml}${noteHtml}${pg.clone.innerHTML}</div>`;
+      }
+
+      const html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>${title}</title>
+        <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+        <style>
+          @page Section1 { ${pageCss} }
+          div.Section1 { page: Section1; }
+          body { font-family: 'Calibri', sans-serif; font-size: ${photoLayout ? 12 : 11}pt; line-height: 1.15; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid black; padding: ${photoLayout ? 4 : 6}px; font-size: ${photoLayout ? 12 : 10}pt; text-align: left; vertical-align: middle; }
+          th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+          th.whitespace-nowrap, td.whitespace-nowrap { white-space: nowrap; }
+          .header { text-align: center; font-weight: bold; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 15px; }
+        </style>
+        </head>
+        <body>
+          ${body}
+        </body></html>
+      `;
+      const mhtml = exportBuildMhtml(html, files, docName);
+      const blob = new Blob([mhtml], { type: 'application/msword' });
+      exportDownloadBlob(blob, fileName);
+    }
+
+    // Susun 1 worksheet per entri pages (kop + 6 baris keterangan + tabel)
+    async function suhuExportExcelPages(pages, photoMode, fileName) {
+      const multiDate = new Set(pages.map(p => p.date)).size > 1;
+      const sections = pages.map(pg => ({
+        tableEl: pg.tableEl,
+        headerLines: suhuReportHeaderLines([pg.cfg.id], pg.cat),
+        kopJudul: suhuKopJudul(pg.cat),
+        sheetName: (multiDate ? (pg.date.slice(8, 10) + '-' + pg.date.slice(5, 7) + ' ') : '') + suhuSheetShortName(pg.cfg),
+        dateText: suhuLongDateKey(pg.date),
+        extraLines: (() => {
+          const lines = [];
+          if (pg.note) lines.push(pg.note);
+          if (pg.period) lines.push('TANGGAL PEMANTAUAN PERIODIK : ' + pg.period);
+          return lines;
+        })()
+      }));
+      await exportGenericExcelLegacy('Pemantauan Suhu (FM-SGR-SPPG-03.05)', 'wrapper_suhu', photoMode, { sections: sections, fileName: fileName });
+    }
+
+    // opt: { dates:[YYYY-MM-DD], withNote:bool, fileName:string } — dipakai mode periodik.
+    // Tanpa opt, perilaku lama (1 tanggal) tidak berubah.
+    async function suhuExportWordItems(title, items, photoMode, opt) {
+      try {
+        const dates = (opt && opt.dates && opt.dates.length) ? opt.dates : [suhuDocDateKey()];
+        const withNote = !!(opt && opt.withNote);
+        const pages = await suhuCapturePages(dates, items, activeSuhuCategory, photoMode, withNote);
+        if (!pages.length) return alert('Data tidak ditemukan');
+        const fname = (opt && opt.fileName) ? opt.fileName
+          : exportFileName('wrapper_suhu', 'doc', photoMode, suhuExportItemLabel(items));
+        await suhuExportWordPages(title, pages, photoMode, fname);
+      } catch (e) {
+        console.error('Export Word (Suhu per item) gagal', e);
+        alert('Export Word gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    async function suhuExportExcelItems(items, photoMode, opt) {
+      try {
+        const dates = (opt && opt.dates && opt.dates.length) ? opt.dates : [suhuDocDateKey()];
+        const withNote = !!(opt && opt.withNote);
+        const pages = await suhuCapturePages(dates, items, activeSuhuCategory, photoMode, withNote);
+        if (!pages.length) return alert('Data tidak ditemukan');
+        const fname = (opt && opt.fileName) ? opt.fileName
+          : exportFileName('wrapper_suhu', 'xlsx', photoMode, suhuExportItemLabel(items));
+        await suhuExportExcelPages(pages, photoMode, fname);
+      } catch (e) {
+        console.error('Export Excel (Suhu per item) gagal', e);
+        alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    // Nama file export mode periodik: SUHU RUANGAN_<objek>_2026-11-01_sd_2026-11-15_DENGAN GAMBAR.xlsx
+    function suhuRangeExportFileName(ext, items, photoMode) {
+      const base = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', pemorsian: 'SUHU PEMORSIAN' })[activeSuhuCategory] || 'SUHU RUANGAN';
+      const label = suhuExportItemLabel(items);
+      let name = base + (label ? '_' + String(label).toUpperCase().replace(/[\\/:*?"<>|]/g, '-').trim() : '');
+      const s = (document.getElementById('suhu_period_start') || {}).value || '';
+      const e = (document.getElementById('suhu_period_end') || {}).value || '';
+      name += '_' + s + '_sd_' + e;
+      name += '_' + (photoMode === 'none' ? 'TANPA' : 'DENGAN') + ' GAMBAR';
+      return name + '.' + ext;
+    }
+
+    // =====================================================================
+    // EXPORT / CETAK PERIODE (RENTANG TANGGAL)
+    // 1 tanggal + 1 objek = 1 halaman (Word/Print) / 1 worksheet (Excel)
+    // =====================================================================
+    let suhuPeriodKind = null;
+
+    function suhuPeriodDates() {
+      const s = (document.getElementById('suhuRangeStart') || {}).value || '';
+      const e = (document.getElementById('suhuRangeEnd') || {}).value || '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(s) || !/^\d{4}-\d{2}-\d{2}$/.test(e) || s > e) return [];
+      const out = [];
+      const d = new Date(s + 'T00:00:00');
+      const end = new Date(e + 'T00:00:00');
+      let guard = 0;
+      while (d <= end && guard < 400) { out.push(suhuYmd(d)); d.setDate(d.getDate() + 1); guard++; }
+      return out;
+    }
+
+    function suhuPeriodItems(scope) {
+      const catSel = (document.getElementById('suhuHistKategori') || {}).value || 'all';
+      const itemSel = (document.getElementById('suhuHistItem') || {}).value || 'all';
+      const pool = (catSel === 'all') ? SUHU_ITEMS_CONFIG.slice() : SUHU_ITEMS_CONFIG.filter(c => c.groupKey === catSel);
+      if (scope === 'item') {
+        const chosen = pool.find(c => c.id === itemSel) || pool.find(c => c.id === activeSuhuItemId) || pool[0];
+        return chosen ? [chosen] : [];
+      }
+      if (catSel === 'all') return SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
+      return pool.slice();
+    }
+
+    function suhuPeriodFileName(ext, items) {
+      const cat = items[0].groupKey;
+      const base = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', pemorsian: 'SUHU PEMORSIAN' })[cat] || 'SUHU RUANGAN';
+      const showLabel = !(cat === 'pemorsian' && items.length === 1);
+      const label = showLabel
+        ? (items.length === 1 ? String(suhuItemShortName(items[0])) : 'SEMUA ITEM').toUpperCase().replace(/[\\/:*?"<>|]/g, '-').trim()
+        : '';
+      const s = (document.getElementById('suhuRangeStart') || {}).value || '';
+      const e = (document.getElementById('suhuRangeEnd') || {}).value || '';
+      return base + (label ? '_' + label : '') + '_' + s + '_sd_' + e + '.' + ext;
+    }
+
+    function openSuhuPeriodExport(kind) {
+      initSuhuRangeDefaults();
+      const dates = suhuPeriodDates();
+      if (!dates.length) return alert('Rentang tanggal belum valid. Isi Tanggal Mulai dan Tanggal Akhir (mulai ≤ akhir).');
+      suhuPeriodKind = kind;
+      const info = document.getElementById('suhuPeriodScopeInfo');
+      const pool = suhuPeriodItems('all');
+      const cat = pool[0] ? pool[0].groupKey : activeSuhuCategory;
+      const catLabel = ({ ruang: '1. Suhu Ruangan', penyimpanan: '2. Suhu Penyimpanan', pemorsian: '3. Suhu Pemorsian' })[cat] || '';
+      const selItem = (document.getElementById('suhuHistItem') || {}).value || 'all';
+      const chosen = SUHU_ITEMS_CONFIG.find(c => c.id === selItem);
+      const activeCfg = (typeof getActiveSuhuItemCfg === 'function') ? getActiveSuhuItemCfg() : null;
+      const objekInfo = chosen ? suhuItemShortName(chosen)
+        : ('semua objek' + (activeCfg ? ' (pilihan 1 objek = ' + suhuItemShortName(activeCfg) + ')' : ''));
+      if (info) {
+        info.textContent = dates[0] + ' s.d. ' + dates[dates.length - 1] + ' (' + dates.length + ' hari) — ' + catLabel
+          + ' — objek: ' + objekInfo;
+      }
+      const m = document.getElementById('suhuPeriodScopeModal');
+      if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+
+    async function resolveSuhuPeriodExport(scope) {
+      const m = document.getElementById('suhuPeriodScopeModal');
+      if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+      const kind = suhuPeriodKind; suhuPeriodKind = null;
+      if (!scope) return;
+      const dates = suhuPeriodDates();
+      if (!dates.length) return alert('Rentang tanggal belum valid.');
+      const items = suhuPeriodItems(scope);
+      if (!items.length) return alert('Objek pemantauan tidak ditemukan pada filter ini.');
+      const cat = items[0].groupKey;
+      const totalPages = dates.length * items.length;
+      if (totalPages > 120 && !confirm('Laporan periode ini akan menghasilkan ' + totalPages + ' halaman/lembar kerja. Lanjutkan?')) return;
+      const photoMode = await askExportPhotoMode();
+      if (!photoMode) return;
+      const title = 'Pemantauan Suhu (FM-SGR-SPPG-03.05)';
+      const pages = await suhuCapturePages(dates, items, cat, photoMode, true);
+      if (!pages.length) return alert('Data tidak ditemukan');
+      if (kind === 'word') return await suhuExportWordPages(title, pages, photoMode, suhuPeriodFileName('doc', items));
+      if (kind === 'print' && typeof window.printExport === 'function') {
+        return await window.printExport(function () { return suhuExportExcelPages(pages, photoMode, suhuPeriodFileName('xlsx', items)); });
+      }
+      return await suhuExportExcelPages(pages, photoMode, suhuPeriodFileName('xlsx', items));
+    }
+
     async function exportGenericWord(title, wrapperId, photoMode) {
       try {
         if (photoMode === undefined && EXPORT_PHOTO_WRAPPERS.indexOf(wrapperId) !== -1) {
           photoMode = await askExportPhotoMode();
           if (!photoMode) return;
+        }
+        // Khusus modul Pemantauan Suhu: 1 halaman = 1 item
+        if (wrapperId === 'wrapper_suhu') {
+          return await suhuExportWordItems(title, suhuExportItems('item'), photoMode);
         }
         const built = getCleanTableHtml(wrapperId, photoMode === 'none');
         if (!built.clone) return alert('Data tidak ditemukan');
@@ -2501,32 +3087,48 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       }
     }
 
-    async function exportGenericExcelLegacy(title, wrapperId, photoMode) {
+    // opts.sections: [{ tableEl, headerLines, kopJudul, sheetName, dateText }] — khusus export
+    // per-item modul Pemantauan Suhu (1 sheet = 1 item). Tanpa opts, perilaku lama tidak berubah.
+    async function exportGenericExcelLegacy(title, wrapperId, photoMode, opts) {
       try {
-        const wrapper = document.getElementById(wrapperId);
-        if (!wrapper) return alert('Data tidak ditemukan');
-        const tables = wrapper.querySelectorAll('table');
-        if (tables.length === 0) return alert('Tabel tidak ditemukan');
+        let sections;
+        if (opts && Array.isArray(opts.sections) && opts.sections.length) {
+          sections = opts.sections;
+        } else {
+          const wrapper = document.getElementById(wrapperId);
+          if (!wrapper) return alert('Data tidak ditemukan');
+          const tables = wrapper.querySelectorAll('table');
+          if (tables.length === 0) return alert('Tabel tidak ditemukan');
+          sections = Array.from(tables).map(t => ({ tableEl: t }));
+        }
 
         const wb = new ExcelJS.Workbook();
-        const dateText = exportGetDocDateText(wrapperId);
         const cache = new Map();
         const imageIdCache = new Map();
         const photoExport = photoMode === 'inline';
-        const suhuHdr = wrapperId === 'wrapper_suhu' ? suhuReportHeaderLines() : [];
-        const isSuhu = suhuHdr.length > 0;
         const isMasterBahan = wrapperId === 'master_bahan_tables_wrapper';
-        // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
-                const HDR_ROWS = isSuhu ? 4 + suhuHdr.length : 4;
         const xlCol = n => { let s = ''; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
         const PHOTO_COL_WIDTH = photoExport ? 22 : 18;  // ~154 px, cukup untuk foto 4 cm (151 px)
         const PORTRAIT_ROW_PT = photoExport ? 126 : 104; // foto 4 cm (113 pt) + ruang atas/bawah
         const LANDSCAPE_ROW_PT = photoExport ? 96 : 74;  // foto 3 cm (85 pt) + ruang atas/bawah
 
         let tIdx = 0;
-        for (const table of tables) {
+        const usedSheetNames = new Set();
+        for (const sec of sections) {
           tIdx++;
-          const ws = wb.addWorksheet(`Bagian ${tIdx}`);
+          const table = sec.tableEl;
+          const dateText = sec.dateText || exportGetDocDateText(wrapperId);
+          const suhuHdr = sec.headerLines || (wrapperId === 'wrapper_suhu' ? suhuReportHeaderLines() : []);
+          const isSuhu = suhuHdr.length > 0;
+          // Baris keterangan tambahan (mis. TANGGAL PEMANTAUAN pada export rentang tanggal)
+          const extraLines = Array.isArray(sec.extraLines) ? sec.extraLines.filter(Boolean) : [];
+          // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
+          const HDR_ROWS = isSuhu ? 4 + suhuHdr.length + extraLines.length : 4;
+          const kopJudul = sec.kopJudul || suhuKopJudul();
+          let sheetName = String(sec.sheetName || ('Bagian ' + tIdx)).replace(/[\\\/\?\*\[\]:]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 31) || ('Bagian ' + tIdx);
+          if (usedSheetNames.has(sheetName.toLowerCase())) sheetName = (sheetName.slice(0, 27) + ' ' + tIdx);
+          usedSheetNames.add(sheetName.toLowerCase());
+          const ws = wb.addWorksheet(sheetName);
           ws.views = [{ showGridLines: true }];
           ws.pageSetup = { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0, horizontalCentered: true,
             margins: { left: 0.3937, right: 0.3937, top: 0.7874, bottom: 0.3937, header: 0.315, footer: 0.315 } };
@@ -2536,6 +3138,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (3 baris)
             suhuHdr.forEach(l => {
               const row = ws.addRow([l[0] + (l[0].length < 18 ? ' '.repeat(18 - l[0].length) : '') + ': ' + l[1]]);
+              row.getCell(1).font = { name: 'Calibri', size: 11, bold: true };
+            });
+            extraLines.forEach(txt => {
+              const row = ws.addRow([txt]);
               row.getCell(1).font = { name: 'Calibri', size: 11, bold: true };
             });
             ws.addRow([]);
@@ -2678,13 +3284,15 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             const lastC = Math.max(maxCol, 6);
             ws.getColumn(lastC).width = Math.max(ws.getColumn(lastC).width || 0, 20);
             ws.getColumn(lastC - 1).width = Math.max(ws.getColumn(lastC - 1).width || 0, 14);
-            for (let i = 0; i < suhuHdr.length; i++) {   // baris keterangan digabung selebar tabel agar teks panjang tampil utuh
-              ws.mergeCells(5 + i, 1, 5 + i, lastC);
-              ws.getCell(5 + i, 1).alignment = { horizontal: 'left', vertical: 'middle', wrapText: false };
+            // Baris 4 sudah digabung oleh rptKop di bawah; gabung baris keterangan berikutnya selebar tabel.
+            for (let i = 1; i < suhuHdr.length + extraLines.length; i++) {
+              ws.mergeCells(4 + i, 1, 4 + i, lastC);
+              ws.getCell(4 + i, 1).alignment = { horizontal: 'left', vertical: 'middle', wrapText: false };
             }
             rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 2], title: [3, lastC - 2], lab: lastC - 1, val: lastC,
-              judul: suhuKopJudul(), noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
+              judul: kopJudul, noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
             ws.getRow(4).height = 20; rptMerge(ws, 4, 1, 4, lastC);
+            ws.getCell(4, 1).alignment = { horizontal: 'left', vertical: 'middle', wrapText: false };
           } else if (!isMasterBahan) {
             ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
             ws.getCell('A2').font = { name: 'Calibri', bold: true, size: photoExport ? 12 : 11 };
@@ -2700,7 +3308,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         if (window.__printMode) { window.printWorkbook(wb, title); return; }
         const buffer = await wb.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        exportDownloadBlob(blob, exportFileName(wrapperId, 'xlsx', photoMode));
+        exportDownloadBlob(blob, (opts && opts.fileName) ? opts.fileName : exportFileName(wrapperId, 'xlsx', photoMode));
       } catch (e) {
         console.error('Export Excel gagal', e);
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
@@ -3277,6 +3885,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         if (wrapperId === 'wrapper_pemorsian') return await rptExportPemorsian(wrapperId, photoMode);
         if (wrapperId === 'wrapper_inspeksi_silang') return await rptExportSilang();
         if (wrapperId === 'sec-inspeksi-alergen') return await rptExportAlergen();
+        // Khusus modul Pemantauan Suhu: 1 sheet = 1 item
+        if (wrapperId === 'wrapper_suhu') return await suhuExportExcelItems(suhuExportItems('item'), photoMode);
         return await exportGenericExcelLegacy(title, wrapperId, photoMode);
       } catch (e) {
         console.error('Export Excel gagal', e);
@@ -3357,6 +3967,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     };
 
     let activeSuhuCategory = 'ruang';
+    let activeSuhuItemId = '1';          // item/ruangan yang sedang tampil (1 halaman = 1 item)
     let suhuBatchCounters = { pemorsian: 1 };
     let suhuRuangColumns = 1;
 
@@ -3990,6 +4601,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
     // ==== Auto Save Cache & Firebase Cloud untuk form Suhu ====
     function autoSaveCurrentSuhuToCache() {
+        // Mode multi-tanggal: simpan setiap tanggal yang berubah (hanya tanggal dirty).
+        if (window.suhuMultiRendered) { suhuMultiAutoSave(); return; }
         // Disimpan HANYA ke tanggal yang isinya sedang tampil, dan HANYA jika ada input manual.
         const dateKey = window.suhuRenderedDate;
         if (!dateKey) return;
@@ -4003,13 +4616,15 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         let existing = allData[dateKey] ? { ...allData[dateKey] } : {};
 
         inputs.forEach(inp => {
-            if (inp.id && inp.id !== 'suhu_tanggal') {
+            if (inp.id && inp.id !== 'suhu_tanggal' && inp.type !== 'checkbox') {
                 existing[inp.id] = inp.value;
             }
         });
 
         existing.suhuRuangColumns = suhuRuangColumns;
         existing.suhuBatchCounters = suhuBatchCounters;
+        // Peta foto aktif sudah memuat seluruh foto tanggal ini (termasuk item lain) + unggahan baru,
+        // sehingga penulisan ini tidak menghapus foto item lain pada tanggal yang sama.
         existing.photos = { ...(window.suhuPhotosMap || {}) };
 
         allData[dateKey] = existing;
@@ -4028,6 +4643,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function switchSuhuCategoryView(catKey) {
       autoSaveCurrentSuhuToCache();
       activeSuhuCategory = catKey;
+      if (catKey === 'ruang' || catKey === 'penyimpanan') {
+        const items = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === catKey);
+        if (!items.some(c => c.id === activeSuhuItemId)) activeSuhuItemId = items[0] ? items[0].id : null;
+      }
       ['ruang', 'penyimpanan', 'pemorsian'].forEach(c => {
         const btn = document.getElementById(`btnCat_${c}`);
         if (btn) btn.className = (c === catKey) 
@@ -4041,20 +4660,367 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const inView = document.getElementById('suhuSubViewInput');
       const histView = document.getElementById('suhuSubViewHistory');
       if (viewType === 'input') {
-        inView.classList.remove('hidden');
-        if(histView) histView.classList.add('hidden');
+        if (inView) inView.classList.remove('hidden');
+        if (histView) histView.classList.add('hidden');
         document.getElementById('btnTabSuhuInput').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200 whitespace-nowrap";
         document.getElementById('btnTabSuhuHistory').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 whitespace-nowrap";
       } else {
-        if(histView) histView.classList.remove('hidden');
-        inView.classList.add('hidden');
+        if (histView) histView.classList.remove('hidden');
+        if (inView) inView.classList.add('hidden');
         document.getElementById('btnTabSuhuHistory').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200 whitespace-nowrap";
         document.getElementById('btnTabSuhuInput').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 whitespace-nowrap";
+        initSuhuRangeDefaults();
+        onSuhuHistKategoriChange();      // sekaligus render rekap periode
+        loadSuhuRangeMissing(false);     // ambil tanggal pada rentang yang belum termuat
       }
     }
 
     // =====================================================================
-    // PERIODE SIKLUS FLEKSIBEL — rentang tanggal bebas (tanpa batas 10/20 hari)
+    // MONITOR RIWAYAT PERIODE (MULTI-HARI) — rekap kronologis per tanggal & per objek
+    // Dibaca dari path Firebase yang sama (sppg_log_suhu/{tanggal}); tidak mengubah data.
+    // =====================================================================
+    let suhuHistLoading = false;
+    window.__suhuRangePhotos = {};
+
+    function suhuHistEsc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+    function suhuHistShortDate(d) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '')) return d || '-';
+      const p = d.split('-');
+      try { return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }); }
+      catch (e) { return d; }
+    }
+    function suhuHistDateText(d) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '')) return '';
+      const p = d.split('-');
+      try { return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', { weekday: 'long' }); }
+      catch (e) { return ''; }
+    }
+    function suhuHistCatLabel(g) {
+      return ({ ruang: 'Suhu Ruangan', penyimpanan: 'Suhu Penyimpanan', pemorsian: 'Suhu Pemorsian' })[g] || g;
+    }
+
+    function initSuhuRangeDefaults() {
+      const s = document.getElementById('suhuRangeStart');
+      const e = document.getElementById('suhuRangeEnd');
+      if (!s || !e) return;
+      if (!e.value) e.value = getLocalDateKey();
+      if (!s.value) {
+        const d = new Date(e.value + 'T00:00:00');
+        if (isNaN(d.getTime())) d.setTime(Date.now());
+        d.setDate(d.getDate() - 6);
+        s.value = suhuYmd(d);
+      }
+    }
+
+    // Tombol pintas: 7 hari terakhir / 14 hari terakhir / bulan ini
+    function setSuhuRangeQuick(n) {
+      const s = document.getElementById('suhuRangeStart');
+      const e = document.getElementById('suhuRangeEnd');
+      if (!s || !e) return;
+      const end = getLocalDateKey();
+      const d = new Date(end + 'T00:00:00');
+      if (n === 'month') d.setDate(1);
+      else d.setDate(d.getDate() - (Math.max(1, parseInt(n, 10) || 7) - 1));
+      s.value = suhuYmd(d);
+      e.value = end;
+      loadSuhuRangeMissing(true);
+    }
+
+    function onSuhuHistKategoriChange() {
+      const sel = document.getElementById('suhuHistItem');
+      if (!sel) return;
+      const cat = (document.getElementById('suhuHistKategori') || {}).value || 'all';
+      const cur = sel.value;
+      const cats = (cat === 'all') ? ['ruang', 'penyimpanan', 'pemorsian'] : [cat];
+      let html = '<option value="all">Semua Objek</option>';
+      cats.forEach(g => {
+        SUHU_ITEMS_CONFIG.filter(c => c.groupKey === g).forEach(cfg => {
+          const prefix = (cat === 'all') ? (suhuHistCatLabel(g) + ' — ') : '';
+          html += `<option value="${cfg.id}">${suhuHistEsc(prefix + suhuItemShortName(cfg))}</option>`;
+        });
+      });
+      sel.innerHTML = html;
+      if (Array.from(sel.options).some(o => o.value === cur)) sel.value = cur;
+      renderSuhuHistory();
+    }
+
+    function clearSuhuHistFilter() {
+      const c = document.getElementById('suhuHistKategori'); if (c) c.value = 'all';
+      const s = document.getElementById('suhuRangeStart'); if (s) s.value = '';
+      const e = document.getElementById('suhuRangeEnd'); if (e) e.value = '';
+      initSuhuRangeDefaults();
+      onSuhuHistKategoriChange();
+      const i = document.getElementById('suhuHistItem'); if (i) i.value = 'all';
+      renderSuhuHistory();
+      loadSuhuRangeMissing(false);
+    }
+
+    // Muat hanya tanggal-tanggal pada rentang yang belum ada di cache (bukan seluruh node Firebase)
+    async function loadSuhuRangeMissing(manual) {
+      initSuhuRangeDefaults();
+      const dates = suhuPeriodDates();
+      if (!dates.length) {
+        if (manual) alert('Rentang tanggal belum valid. Isi Tanggal Mulai dan Tanggal Akhir (mulai ≤ akhir).');
+        return;
+      }
+      const need = dates.filter(d => !window.dbLoaded['sppg_log_suhu/' + d]);
+      if (!need.length) { if (manual) renderSuhuHistory(); return; }
+      if (suhuHistLoading) return;
+      const btn = document.getElementById('btnSuhuHistLoadAll');
+      suhuHistLoading = true;
+      if (btn) { btn.disabled = true; btn.dataset.old = btn.textContent; btn.textContent = '⏳ Memuat ' + need.length + ' tanggal…'; }
+      try {
+        autoSaveCurrentSuhuToCache();
+        for (const d of need) {
+          try {
+            const v = await window.fbGet('sppg_log_suhu/' + d);
+            if (!window.dbCache['sppg_log_suhu'] || typeof window.dbCache['sppg_log_suhu'] !== 'object') window.dbCache['sppg_log_suhu'] = {};
+            window.dbCache['sppg_log_suhu'][d] = v || null;
+            window.dbLoaded['sppg_log_suhu/' + d] = true;
+          } catch (e) { console.warn('Gagal memuat data suhu ' + d, e); }
+        }
+      } finally {
+        suhuHistLoading = false;
+        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.old || '⬇ Muat Data Periode'; }
+      }
+      renderSuhuHistory();
+    }
+
+    // Ringkasan satu objek pada satu tanggal: kelengkapan, kepatuhan, hasil ukur, foto, keterangan
+    function suhuHistItemSummary(entry, cfg) {
+      const out = { filled: 0, total: 0, ok: null, measure: [], ket: [], photos: [], state: 'kosong' };
+      const photoMap = (entry && entry.photos) || {};
+      const pushPhoto = (key) => {
+        const f = photoMap[key];
+        const b64 = f ? (typeof f === 'string' ? f : f.base64) : null;
+        if (b64) out.photos.push({ key: key, b64: b64 });
+      };
+
+      if (cfg.groupKey === 'pemorsian') {
+        const nb = Math.max(parseInt((entry && entry.suhuBatchCounters || {}).pemorsian, 10) || 1, 1);
+        let anyNum = false, allOk = true;
+        for (let b = 1; b <= nb; b++) {
+          (cfg.template || []).forEach(sub => {
+            out.total++;
+            const uid = cfg.id + '_' + sub.key + '_b' + b;
+            pushPhoto('suhu_foto_' + uid);
+            const v = entry ? entry['suhu_val_' + uid] : undefined;
+            const t = entry ? entry['suhu_waktu_' + uid] : undefined;
+            if (v !== undefined && v !== null && String(v).trim() !== '') {
+              out.filled++;
+              out.measure.push((sub.labelName ? sub.labelName + ' ' : '') + (t ? t + ' · ' : '') + v + '°C');
+              const num = parseFloat(String(v).replace(',', '.'));
+              if (!isNaN(num)) {
+                anyNum = true;
+                const std = entry ? entry['suhu_std_' + uid] : undefined;
+                if (!suhuValueOk(num, parseSuhuLimit(std || sub.std), sub.min, sub.max)) allOk = false;
+              }
+            }
+            const k = entry ? entry['suhu_cat_' + uid] : '';
+            if (k) out.ket.push(k);
+          });
+        }
+        out.ok = anyNum ? allOk : null;
+      } else {
+        const cols = Math.max(parseInt(entry && entry.suhuRuangColumns, 10) || 1, 1);
+        const std = (entry && entry['suhu_std_' + cfg.id]) || cfg.std;
+        const lim = parseSuhuLimit(std);
+        let anyNum = false, allOk = true;
+        out.total = cols;
+        for (let c = 1; c <= cols; c++) {
+          const v = entry ? entry['suhu_val_' + c + '_' + cfg.id] : undefined;
+          const t = entry ? entry['suhu_waktu_' + c + '_' + cfg.id] : undefined;
+          if (v !== undefined && v !== null && String(v).trim() !== '') {
+            out.filled++;
+            out.measure.push('T' + String(c).padStart(2, '0') + ' ' + (t ? t + ' · ' : '') + v + '°C');
+            const num = parseFloat(String(v).replace(',', '.'));
+            if (!isNaN(num)) {
+              anyNum = true;
+              if (!suhuValueOk(num, lim, cfg.min, cfg.max)) allOk = false;
+            }
+          }
+        }
+        out.ok = anyNum ? allOk : null;
+        pushPhoto('suhu_foto_' + cfg.id);
+        const k = entry ? entry['suhu_cat_' + cfg.id] : '';
+        if (k) out.ket.push(k);
+      }
+
+      if (out.filled === 0) out.state = out.photos.length ? 'sebagian' : 'kosong';
+      else out.state = (out.filled >= out.total) ? 'lengkap' : 'sebagian';
+      return out;
+    }
+
+    function renderSuhuHistory() {
+      const box = document.getElementById('suhuHistoryContent');
+      if (!box || window.__suhuCapturing) return;
+      initSuhuRangeDefaults();
+      autoSaveCurrentSuhuToCache();
+
+      const dates = suhuPeriodDates();
+      const catSel = (document.getElementById('suhuHistKategori') || {}).value || 'all';
+      const itemSel = (document.getElementById('suhuHistItem') || {}).value || 'all';
+      const cats = (catSel === 'all') ? ['ruang', 'penyimpanan', 'pemorsian'] : [catSel];
+      const items = [];
+      cats.forEach(g => SUHU_ITEMS_CONFIG.filter(c => c.groupKey === g).forEach(c => {
+        if (itemSel === 'all' || c.id === itemSel) items.push(c);
+      }));
+
+      const info = document.getElementById('suhuRangeInfo');
+      if (!dates.length) {
+        if (info) info.textContent = 'Rentang belum valid';
+        box.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">Isi Tanggal Mulai dan Tanggal Akhir (mulai ≤ akhir) untuk menampilkan rekap periode.</div>`;
+        return;
+      }
+      if (info) {
+        info.textContent = suhuHistShortDate(dates[0]) + ' – ' + suhuHistShortDate(dates[dates.length - 1])
+          + ' · ' + dates.length + ' hari · ' + items.length + ' objek';
+      }
+
+      const all = window.dbCache['sppg_log_suhu'] || {};
+      const missing = dates.filter(d => !window.dbLoaded['sppg_log_suhu/' + d]);
+      window.__suhuRangePhotos = {};
+
+      let rows = '';
+      let nLengkap = 0, nSebagian = 0, nKosong = 0;
+      dates.forEach(d => {
+        const entry = all[d] || null;
+        items.forEach(cfg => {
+          const sm = suhuHistItemSummary(entry, cfg);
+          if (sm.state === 'lengkap') nLengkap++;
+          else if (sm.state === 'sebagian') nSebagian++;
+          else nKosong++;
+
+          const stateBadge = sm.state === 'lengkap'
+            ? '<span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">LENGKAP</span>'
+            : sm.state === 'sebagian'
+              ? '<span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">SEBAGIAN</span>'
+              : '<span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">KOSONG</span>';
+          const okBadge = sm.ok === null ? ''
+            : (sm.ok
+              ? '<span class="inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-300">SESUAI</span>'
+              : '<span class="inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">TIDAK SESUAI</span>');
+
+          const thumbs = sm.photos.map(p => {
+            const key = d + '|' + p.key;
+            window.__suhuRangePhotos[key] = p.b64;
+            return `<img data-photokey="${key}" alt="Bukti foto" class="suhu-range-thumb w-9 h-12 object-cover rounded border border-emerald-300 cursor-pointer shadow-sm" onclick="suhuHistPreview(this.getAttribute('data-photokey'))" title="Klik untuk melihat bukti foto">`;
+          }).join('');
+
+          const measure = sm.measure.length ? sm.measure.join(' · ') : '—';
+          const ket = sm.ket.length ? sm.ket.join('; ') : '—';
+
+          rows += `<tr class="border-b border-slate-100 hover:bg-slate-50">
+            <td data-label="Tanggal" class="p-3 align-top whitespace-nowrap">
+              <div class="font-bold text-slate-700">${suhuHistShortDate(d)}</div>
+              <div class="text-[10px] text-slate-400">${suhuHistEsc(suhuHistDateText(d))}</div>
+            </td>
+            <td data-label="Ruangan / Unit" class="p-3 align-top">
+              <div class="font-bold text-slate-800">${suhuHistEsc(suhuItemShortName(cfg))}</div>
+              <div class="text-[9px] font-bold text-slate-500 uppercase tracking-wide">${suhuHistEsc(suhuHistCatLabel(cfg.groupKey))}</div>
+            </td>
+            <td data-label="Hasil Suhu" class="p-3 align-top text-slate-600 min-w-[170px]">${suhuHistEsc(measure)}</td>
+            <td data-label="Status" class="p-3 align-top text-center whitespace-nowrap">${stateBadge}${okBadge ? '<br>' + okBadge : ''}</td>
+            <td data-label="Catatan" class="p-3 align-top text-slate-600 max-w-[220px] break-words">${suhuHistEsc(ket)}</td>
+            <td data-label="Bukti Foto" class="p-3 align-top text-center whitespace-nowrap">${thumbs || '<span class="text-slate-300">—</span>'}</td>
+            <td data-label="Aksi" class="p-3 align-top text-center whitespace-nowrap">
+              <button type="button" onclick="jumpToSuhuDateItem('${d}','${cfg.id}')" class="text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1.5 rounded-lg shadow-sm transition-colors">✏️ Buka / Edit</button>
+            </td>
+          </tr>`;
+        });
+      });
+
+      const totalRows = dates.length * items.length;
+      const summary = `<div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[9px] font-black uppercase tracking-wider text-slate-400">Total Baris</div><div class="text-lg font-black text-slate-800">${totalRows}</div></div>
+        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200"><div class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Lengkap</div><div class="text-lg font-black text-emerald-700">${nLengkap}</div></div>
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200"><div class="text-[9px] font-black uppercase tracking-wider text-amber-600">Sebagian</div><div class="text-lg font-black text-amber-700">${nSebagian}</div></div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[9px] font-black uppercase tracking-wider text-slate-400">Kosong</div><div class="text-lg font-black text-slate-600">${nKosong}</div></div>
+        <div class="p-3 rounded-xl ${missing.length ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'} border"><div class="text-[9px] font-black uppercase tracking-wider ${missing.length ? 'text-rose-500' : 'text-slate-400'}">Belum Dimuat</div><div class="text-lg font-black ${missing.length ? 'text-rose-600' : 'text-slate-600'}">${missing.length}</div></div>
+      </div>`;
+
+      const missingNote = missing.length
+        ? `<div class="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-semibold">
+             <span>⚠️ ${missing.length} tanggal pada rentang ini belum dimuat dari server (baris "KOSONG" bisa jadi karena datanya belum diambil).</span>
+             <button type="button" onclick="loadSuhuRangeMissing(true)" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg text-[10px]">⬇ Muat ${missing.length} Tanggal</button>
+           </div>`
+        : '';
+
+      box.innerHTML = `${summary}${missingNote}
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs min-w-[900px]">
+              <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th class="p-3 text-left">Tanggal</th>
+                  <th class="p-3 text-left">Nama Ruangan / Unit</th>
+                  <th class="p-3 text-left">Hasil Pengukuran Suhu</th>
+                  <th class="p-3 text-center">Kelengkapan / Kepatuhan</th>
+                  <th class="p-3 text-left">Keterangan / Tindakan Koreksi</th>
+                  <th class="p-3 text-center">Bukti Foto</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>${rows || `<tr><td colspan="7" class="p-8 text-center text-xs text-slate-400">Tidak ada objek yang cocok dengan filter yang dipilih.</td></tr>`}</tbody>
+            </table>
+          </div>
+        </div>`;
+
+      box.querySelectorAll('img[data-photokey]').forEach(im => {
+        const b = window.__suhuRangePhotos[im.getAttribute('data-photokey')];
+        if (b) im.src = b; else im.remove();
+      });
+      // Mode kartu di ponsel: pakai label ringkas agar tidak terpotong (label otomatis global memakai judul kolom penuh).
+      setTimeout(() => {
+        const tb = document.querySelector('#suhuHistoryContent table');
+        if (!tb) return;
+        const shortLabels = ['Tanggal', 'Ruangan / Unit', 'Hasil Suhu', 'Status', 'Catatan', 'Bukti Foto', 'Aksi'];
+        tb.querySelectorAll('tbody tr').forEach(tr => {
+          Array.prototype.forEach.call(tr.children, (td, i) => { if (shortLabels[i]) td.setAttribute('data-label', shortLabels[i]); });
+        });
+      }, 80);
+    }
+
+    function suhuHistPreview(key) {
+      const b64 = (window.__suhuRangePhotos || {})[key];
+      if (!b64) return;
+      const cap = document.getElementById('photoReviewLabel');
+      if (cap) { cap.textContent = 'Bukti Foto Pemantauan Suhu'; cap.classList.remove('hidden'); }
+      const img = document.getElementById('photoReviewImg');
+      if (img) img.src = b64;
+      const m = document.getElementById('photoReviewModal');
+      if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
+    }
+
+    // Dari rekap periode langsung ke Tab 1 pada tanggal + objek yang dipilih
+    function jumpToSuhuDateItem(dateKey, itemId) {
+      const cfg = SUHU_ITEMS_CONFIG.find(c => c.id === itemId) || getActiveSuhuItemCfg();
+      if (!cfg) return;
+      autoSaveCurrentSuhuToCache();
+      const dEl = document.getElementById('suhu_tanggal');
+      if (dEl) dEl.value = dateKey;
+      if (window.subscribeItem) window.subscribeItem('sppg_log_suhu', dateKey);
+      const entry = (window.dbCache['sppg_log_suhu'] || {})[dateKey] || null;
+      suhuRuangColumns = (entry && parseInt(entry.suhuRuangColumns, 10)) || 1;
+      suhuBatchCounters = (entry && entry.suhuBatchCounters) || { pemorsian: 1 };
+      activeSuhuCategory = cfg.groupKey;
+      activeSuhuItemId = cfg.id;
+      toggleSuhuSubView('input');
+      ['ruang', 'penyimpanan', 'pemorsian'].forEach(c => {
+        const btn = document.getElementById('btnCat_' + c);
+        if (btn) btn.className = (c === cfg.groupKey)
+          ? "p-3.5 rounded-xl border transition-all duration-300 text-center shadow-md bg-gradient-to-r from-slate-900 to-slate-800 text-white transform scale-105"
+          : "p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md";
+      });
+      applySuhuDateFields(dateKey, entry);
+      renderSuhuTable();
+      const nav = document.getElementById('suhuItemNav');
+      if (nav && nav.scrollIntoView) setTimeout(() => { try { nav.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }, 250);
+    }
+
+    // =====================================================================
     // Satu pengaturan bersama (sppg_siklus_period) dipakai Frekuensi Bahan (01.03),
     // Master Bahan, dan Siklus Menu (01.04) sehingga ketiganya selalu sinkron.
     // Format simpan: { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' }.
@@ -4911,11 +5877,724 @@ function applySuhuDateFields(dateKey, data) {
     const el = document.getElementById(id);
     if (el) el.value = (data && data[id] !== undefined) ? data[id] : '';
   });
+  // Tanggal pemantauan periodik: muat dari data tanggal ini (kosong bila belum pernah disimpan)
+  const ps = document.getElementById('suhu_period_start');
+  const pe = document.getElementById('suhu_period_end');
+  const pA = data && data['suhu_period_start'];
+  const pB = data && data['suhu_period_end'];
+  const pOk = suhuPeriodValid(pA, pB);
+  const act = window.suhuActivePeriod;
+  const inActiveRange = !!(act && suhuPeriodValid(act.start, act.end) && dateKey >= act.start && dateKey <= act.end);
+  if (pOk) {
+    // Tanggal ini punya periode tersimpan -> aktifkan mode periodik
+    if (ps) ps.value = pA;
+    if (pe) pe.value = pB;
+    window.suhuActivePeriod = { start: pA, end: pB };
+    setSuhuMode('periodik');
+    suhuShowPeriodStatus(pA, pB);
+  } else if (inActiveRange) {
+    // Masih di dalam rentang yang sedang aktif -> pertahankan mode & isian
+    setSuhuMode('periodik');
+    if (ps && !ps.value) ps.value = act.start;
+    if (pe && !pe.value) pe.value = act.end;
+    suhuShowPeriodStatus(act.start, act.end);
+  } else {
+    if (ps) ps.value = '';
+    if (pe) pe.value = '';
+    window.suhuActivePeriod = null;
+    if (suhuIsPeriodicMode()) setSuhuMode('harian');
+    suhuHideDateNav();
+    suhuShowPeriodStatus('', '');
+  }
+  suhuValidatePeriod(false);
   const sel = document.getElementById('suhu_siklus_active');
   if (sel) {
     const idx = getSuhuCycleIndexForDate(weeks, dateKey);
     if (sel.querySelector(`option[value="${idx}"]`)) sel.value = idx;
   }
+}
+
+// ---- Bantuan Tanggal Pemantauan Periodik ----
+function suhuPeriodValid(a, b) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(a || '') && /^\d{4}-\d{2}-\d{2}$/.test(b || '') && a <= b;
+}
+function suhuPeriodDays(a, b) {
+  if (!suhuPeriodValid(a, b)) return 0;
+  const p1 = a.split('-'), p2 = b.split('-');
+  const d1 = Date.UTC(+p1[0], +p1[1] - 1, +p1[2]);
+  const d2 = Date.UTC(+p2[0], +p2[1] - 1, +p2[2]);
+  return Math.round((d2 - d1) / 86400000) + 1;
+}
+// Daftar tanggal YYYY-MM-DD dari awal s.d. akhir (inklusif)
+function suhuDateKeysBetween(a, b) {
+  const out = [];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(a || '') || !/^\d{4}-\d{2}-\d{2}$/.test(b || '') || a > b) return out;
+  const d = new Date(a + 'T00:00:00');
+  const end = new Date(b + 'T00:00:00');
+  let guard = 0;
+  while (d <= end && guard < 400) { out.push(suhuYmd(d)); d.setDate(d.getDate() + 1); guard++; }
+  return out;
+}
+
+// ==== MODE MULTI-TANGGAL (kategori Ruangan / Penyimpanan pada mode Periodik) ====
+// Seluruh tanggal dalam rentang dirender sekaligus di #tbody_suhu_monitoring.
+function suhuMultiId(base, dateKey) { return base + '__' + dateKey; }
+function suhuMultiDateFromId(id) {
+  const m = /__(\d{4}-\d{2}-\d{2})$/.exec(String(id || ''));
+  return m ? m[1] : null;
+}
+function suhuMultiBaseId(id) {
+  const d = suhuMultiDateFromId(id);
+  if (!d) return null;
+  return String(id).slice(0, -(d.length + 2));
+}
+function suhuPeriodicMultiActive() {
+  if (window.__suhuCapturing) return false; // export/cetak selalu memakai render 1 tanggal
+  if (!suhuIsPeriodicMode()) return false;
+  if (activeSuhuCategory !== 'ruang' && activeSuhuCategory !== 'penyimpanan') return false;
+  const r = window.suhuActivePeriod;
+  return !!(r && suhuPeriodValid(r.start, r.end));
+}
+function suhuMultiActiveDates() {
+  const r = window.suhuActivePeriod || {};
+  let dates = suhuDateKeysBetween(r.start, r.end);
+  if (!dates.length && Array.isArray(window.suhuMultiDates)) dates = window.suhuMultiDates.slice();
+  return dates;
+}
+function suhuDateLabelShort(key) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(key || '')) return '';
+  const p = key.split('-');
+  const dt = new Date(+p[0], +p[1] - 1, +p[2]);
+  const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const dow = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+  return String(dt.getDate()).padStart(2, '0') + ' ' + mon[dt.getMonth()] + ' ' + dt.getFullYear() + ' (' + dow[dt.getDay()] + ')';
+}
+function suhuSessionLabel(c) {
+  return ['Pagi', 'Siang', 'Sore'][c - 1] || ('Sesi ' + c);
+}
+function suhuAttr(v) {
+  return String(v === undefined || v === null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+// Baca isian DOM milik SATU tanggal -> node database tanggal itu (key tanpa akhiran tanggal).
+function suhuMultiReadDateFromDom(dateKey) {
+  const allData = window.dbCache['sppg_log_suhu'] = window.dbCache['sppg_log_suhu'] || {};
+  const entry = allData[dateKey] ? { ...allData[dateKey] } : {};
+  const dateRows = document.querySelectorAll('#tbody_suhu_monitoring tr[data-suhu-date="' + dateKey + '"]');
+  dateRows.forEach(tr => {
+    tr.querySelectorAll('input, select, textarea').forEach(inp => {
+      if (!inp.id || inp.type === 'file') return;
+      const base = suhuMultiBaseId(inp.id);
+      if (base) entry[base] = inp.value;
+    });
+  });
+  // Jumlah sesi per tanggal: jangan pernah menurunkan jumlah kolom yang sudah tersimpan/tertampil.
+  entry.suhuRuangColumns = Math.max(
+    parseInt(entry.suhuRuangColumns, 10) || 1,
+    dateRows.length || 1,
+    suhuRuangColumns || 1
+  );
+  entry.suhuBatchCounters = suhuBatchCounters;
+  const act = window.suhuActivePeriod;
+  const startKey = (act && act.start) || window.suhuMultiStart;
+  if (dateKey === startKey) {
+    ['suhu_supervisor', 'suhu_pemeriksa', 'suhu_penyetuju'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) entry[id] = el.value;
+    });
+    if (act && suhuPeriodValid(act.start, act.end)) {
+      entry.suhu_period_start = act.start;
+      entry.suhu_period_end = act.end;
+    }
+  }
+  allData[dateKey] = entry;
+  return entry;
+}
+// Pisahkan peta foto gabungan (key berakhiran __tanggal) menjadi foto milik satu tanggal.
+function suhuMultiPhotosForDate(dateKey) {
+  const suffix = '__' + dateKey;
+  const out = {};
+  const map = window.suhuPhotosMap || {};
+  Object.keys(map).forEach(k => {
+    if (k.length > suffix.length && k.slice(-suffix.length) === suffix) {
+      out[k.slice(0, -suffix.length)] = map[k];
+    }
+  });
+  return out;
+}
+function suhuMultiSaveDate(dateKey, toFirebase) {
+  const path = 'sppg_log_suhu/' + dateKey;
+  if (window.dbLoaded && !window.dbLoaded[path]) return false; // jangan timpa tanggal yang belum termuat
+  const entry = suhuMultiReadDateFromDom(dateKey);
+  entry.photos = suhuMultiPhotosForDate(dateKey);
+  if (window.suhuDirty) window.suhuDirty[dateKey] = false;
+  try { localStorage.setItem('sppg_photos_' + dateKey, JSON.stringify(entry.photos)); } catch (e) {}
+  if (toFirebase && typeof window.fbSet === 'function') {
+    try {
+      const p = window.fbSet(path, entry);
+      if (p && p.catch) p.catch(e => console.warn('Gagal menyimpan suhu ' + dateKey, e));
+    } catch (e) { console.warn('Gagal menyimpan suhu ' + dateKey, e); }
+  }
+  return true;
+}
+// Autosave multi-tanggal: hanya tanggal yang ditandai dirty yang ditulis.
+function suhuMultiAutoSave() {
+  suhuMultiActiveDates().forEach(d => {
+    if (!window.suhuDirty || !window.suhuDirty[d]) return;
+    suhuMultiSaveDate(d, true);
+  });
+}
+// Tombol "Simpan Log Data" pada mode multi-tanggal.
+async function suhuSaveMultiPeriodic(alertMsg) {
+  if (window.suhuSavingMulti) return;
+  const act = window.suhuActivePeriod || {};
+  const dates = suhuDateKeysBetween(act.start, act.end);
+  if (!dates.length) { alert('Tanggal Pemantauan Periodik belum valid. Tentukan Tanggal Awal dan Tanggal Akhir lalu tekan ✓ OK.'); return; }
+  const today = getLocalDateKey();
+  const past = dates.filter(d => d < today);
+  if (past.length && !confirm('⚠️ PERHATIAN: Anda akan menyimpan data untuk ' + past.length + ' tanggal yang TELAH BERLALU (' + past[0] + ' s.d. ' + past[past.length - 1] + ').\n\nApakah Anda yakin ingin melanjutkan?')) return;
+  window.suhuSavingMulti = true;
+  let saved = 0, skipped = 0, failed = 0;
+  try {
+    for (const d of dates) {
+      const path = 'sppg_log_suhu/' + d;
+      if (window.dbLoaded && !window.dbLoaded[path]) { skipped++; continue; }
+      const entry = suhuMultiReadDateFromDom(d);
+      entry.photos = suhuMultiPhotosForDate(d);
+      if (window.suhuDirty) window.suhuDirty[d] = false;
+      try { localStorage.setItem('sppg_photos_' + d, JSON.stringify(entry.photos)); } catch (e) {}
+      if (typeof window.fbSet === 'function') {
+        try { await window.fbSet(path, entry); saved++; }
+        catch (e) { failed++; console.warn('Gagal menyimpan suhu ' + d, e); }
+      } else { saved++; }
+    }
+  } finally { window.suhuSavingMulti = false; }
+  renderSuhuItemPills(null, dates);
+  suhuRefreshPeriodPanel();
+  if (typeof suhuValidatePeriod === 'function') suhuValidatePeriod(false);
+  let msg = alertMsg + ' (' + saved + ' tanggal tersimpan).';
+  if (skipped) msg += '\n\n⚠️ ' + skipped + ' tanggal belum termuat dari server sehingga tidak ditimpa. Tekan ✓ OK pada periode lalu simpan kembali.';
+  if (failed) msg += '\n\n⚠️ ' + failed + ' tanggal gagal ditulis ke server. Periksa koneksi lalu simpan kembali.';
+  alert(msg);
+}
+// Status satu tanggal: Belum Diisi / Sesuai / Tidak Sesuai (semua sesi).
+function suhuMultiStatusHtml(cfg, entry, cols) {
+  const stdVal = (entry && entry['suhu_std_' + cfg.id] !== undefined) ? entry['suhu_std_' + cfg.id] : cfg.std;
+  const limit = parseSuhuLimit(stdVal);
+  let any = false, ok = true;
+  for (let c = 1; c <= cols; c++) {
+    const raw = String(entry && entry['suhu_val_' + c + '_' + cfg.id] !== undefined ? entry['suhu_val_' + c + '_' + cfg.id] : '').trim();
+    if (!raw) continue;
+    any = true;
+    if (!suhuValueOk(parseFloat(raw.replace(',', '.')), limit, cfg.min, cfg.max)) ok = false;
+  }
+  if (!any) return '<span class="text-amber-700 font-extrabold bg-amber-100 border border-amber-300 px-2 py-1 rounded-lg text-[10px] uppercase tracking-wider">Belum Diisi</span>';
+  return ok ? '<span class="text-emerald-600 font-bold">Sesuai</span>' : '<span class="text-red-600 font-bold animate-pulse">Tidak Sesuai</span>';
+}
+function suhuMultiEvalDate(cfgId, dateKey) {
+  const statusEl = document.getElementById('suhu_status_' + cfgId + '__' + dateKey);
+  if (!statusEl) return;
+  const cfg = (getSuhuCategoryItems(activeSuhuCategory) || []).find(c => c.id === cfgId) || null;
+  const stdEl = document.getElementById('suhu_std_' + cfgId + '__' + dateKey);
+  const limit = parseSuhuLimit(stdEl ? stdEl.value : (cfg ? cfg.std : ''));
+  let any = false, ok = true;
+  document.querySelectorAll('#tbody_suhu_monitoring tr[data-suhu-date="' + dateKey + '"] input.suhu-multi-val').forEach(inp => {
+    const raw = String(inp.value || '').trim();
+    if (!raw) return;
+    any = true;
+    if (!suhuValueOk(parseFloat(raw.replace(',', '.')), limit, cfg ? cfg.min : null, cfg ? cfg.max : null)) ok = false;
+  });
+  if (!any) {
+    statusEl.innerHTML = '<span class="text-amber-700 font-extrabold bg-amber-100 border border-amber-300 px-2 py-1 rounded-lg text-[10px] uppercase tracking-wider">Belum Diisi</span>';
+    return;
+  }
+  setSuhuStatusHtml(statusEl, ok);
+}
+function suhuMultiSessionFilled(tr) {
+  const t = tr.querySelector('input.suhu-multi-time');
+  const v = tr.querySelector('input.suhu-multi-val');
+  return !!(t && v && String(t.value).trim() !== '' && String(v.value).trim() !== '');
+}
+function suhuMultiPaintSession(tr) {
+  const t = tr.querySelector('input.suhu-multi-time');
+  const v = tr.querySelector('input.suhu-multi-val');
+  const filled = suhuMultiSessionFilled(tr);
+  [t, v].forEach(inp => {
+    if (!inp) return;
+    inp.style.backgroundColor = filled ? '#ecfdf5' : '#fffbeb';
+    inp.style.borderColor = filled ? '#a7f3d0' : '#fcd34d';
+    inp.style.color = filled ? '' : '#92400e';
+  });
+  const badge = tr.querySelector('.suhu-session-badge');
+  if (badge) badge.classList.toggle('hidden', filled);
+  tr.classList.toggle('suhu-row-empty', !filled);
+}
+function suhuMultiCellInput(el) {
+  const tr = el && el.closest ? el.closest('tr[data-suhu-date]') : null;
+  if (!tr) return;
+  const d = tr.getAttribute('data-suhu-date');
+  suhuMultiPaintSession(tr);
+  const cfg = getActiveSuhuItemCfg();
+  if (cfg) suhuMultiEvalDate(cfg.id, d);
+  suhuRefreshPeriodPanel();
+}
+// Statistik kelengkapan berdasarkan isi tabel yang sedang tampil.
+function suhuMultiDateStats() {
+  const cfg = getActiveSuhuItemCfg();
+  const groups = new Map();
+  document.querySelectorAll('#tbody_suhu_monitoring tr[data-suhu-date]').forEach(tr => {
+    const d = tr.getAttribute('data-suhu-date');
+    if (!groups.has(d)) groups.set(d, []);
+    groups.get(d).push(tr);
+  });
+  const out = { total: 0, filled: 0, empty: 0, completeDates: 0, dateCount: groups.size, groups: [] };
+  groups.forEach((rows, d) => {
+    let f = 0;
+    rows.forEach(tr => { if (suhuMultiSessionFilled(tr)) f++; });
+    let hasPhoto = false;
+    if (cfg) {
+      const pd = window.suhuPhotosMap && window.suhuPhotosMap[suhuMultiId('suhu_foto_' + cfg.id, d)];
+      hasPhoto = !!(pd && (typeof pd === 'string' ? pd : pd.base64));
+    }
+    const complete = rows.length > 0 && f === rows.length && hasPhoto;
+    if (complete) out.completeDates++;
+    out.total += rows.length;
+    out.filled += f;
+    out.groups.push({ key: d, rows: rows, filled: f, total: rows.length, complete: complete });
+  });
+  out.empty = Math.max(0, out.total - out.filled);
+  return out;
+}
+function suhuPeriodPanelHtml() {
+  const r = window.suhuActivePeriod || {};
+  const dates = suhuDateKeysBetween(r.start, r.end);
+  const range = dates.length
+    ? (suhuLongDateKey(r.start) + (dates.length > 1 ? ' s.d. ' + suhuLongDateKey(r.end) : ''))
+    : '';
+  return `
+    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Panel Evaluasi Kelengkapan Periode</span>
+        <span id="suhuPanelSessionsInfo" class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-full">${dates.length} tanggal${dates.length > 1 ? ' · ' + (dates.length * Math.max(suhuRuangColumns, 1)) + ' sesi' : ''}</span>
+      </div>
+      <p class="text-[10px] font-semibold text-slate-500">${range}</p>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
+          <div class="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700">Sudah Terisi</div>
+          <div class="text-lg font-black text-emerald-700 leading-tight"><span id="suhuPanelFilled">0</span><span class="text-[10px] font-bold"> sesi</span></div>
+        </div>
+        <div class="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-center">
+          <div class="text-[9px] font-extrabold uppercase tracking-wider text-amber-700">Belum Diisi</div>
+          <div class="text-lg font-black text-amber-700 leading-tight"><span id="suhuPanelEmpty">0</span><span class="text-[10px] font-bold"> sesi</span></div>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center">
+          <div class="text-[9px] font-extrabold uppercase tracking-wider text-slate-600">Tanggal Lengkap</div>
+          <div class="text-lg font-black text-slate-700 leading-tight"><span id="suhuPanelDates">0</span><span class="text-[10px] font-bold"> / ${dates.length}</span></div>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" id="suhuPanelBtnAll" onclick="suhuPeriodFilter('all')" class="text-[11px] font-bold px-3 py-2 rounded-xl border transition-colors">Tampilkan Semua Tanggal</button>
+        <button type="button" id="suhuPanelBtnEmpty" onclick="suhuPeriodFilter('empty')" class="text-[11px] font-bold px-3 py-2 rounded-xl border transition-colors">Hanya yang Belum Diisi</button>
+      </div>
+    </div>`;
+}
+function suhuPaintPeriodFilterButtons() {
+  const mode = window.suhuPeriodFilterMode || 'all';
+  const a = document.getElementById('suhuPanelBtnAll');
+  const b = document.getElementById('suhuPanelBtnEmpty');
+  if (a) a.className = 'text-[11px] font-bold px-3 py-2 rounded-xl border transition-colors ' +
+    (mode === 'all' ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50');
+  if (b) b.className = 'text-[11px] font-bold px-3 py-2 rounded-xl border transition-colors ' +
+    (mode === 'empty' ? 'bg-amber-500 text-white border-amber-500 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50');
+}
+function suhuRefreshPeriodPanel() {
+  const filled = document.getElementById('suhuPanelFilled');
+  if (!filled) return;
+  const st = suhuMultiDateStats();
+  filled.textContent = st.filled;
+  const empty = document.getElementById('suhuPanelEmpty');
+  if (empty) empty.textContent = st.empty;
+  const done = document.getElementById('suhuPanelDates');
+  if (done) done.textContent = st.completeDates;
+  const info = document.getElementById('suhuPanelSessionsInfo');
+  if (info && st.dateCount > 0) info.textContent = st.dateCount + ' tanggal · ' + st.total + ' sesi';
+  suhuPaintPeriodFilterButtons();
+}
+function suhuPeriodFilter(mode) {
+  window.suhuPeriodFilterMode = (mode === 'empty') ? 'empty' : 'all';
+  const st = suhuMultiDateStats();
+  st.groups.forEach(g => {
+    const hide = (window.suhuPeriodFilterMode === 'empty' && g.complete);
+    g.rows.forEach(tr => tr.classList.toggle('hidden', hide));
+  });
+  const note = document.getElementById('suhuFilterEmptyNote');
+  if (note) {
+    const noneVisible = window.suhuPeriodFilterMode === 'empty' && st.groups.length > 0 && st.groups.every(g => g.complete);
+    note.classList.toggle('hidden', !noneVisible);
+  }
+  suhuPaintPeriodFilterButtons();
+}
+function suhuRenderPeriodPanel() {
+  const box = document.getElementById('suhuDateNavBox');
+  if (!box) return;
+  box.innerHTML = suhuPeriodPanelHtml();
+  box.classList.remove('hidden');
+  suhuRefreshPeriodPanel();
+  suhuPaintPeriodFilterButtons();
+}
+
+
+// ==== MODE TANGGAL PEMANTAUAN: 1 HARI (HARI H) vs PERIODIK (RENTANG) ====
+function suhuIsPeriodicMode() {
+  const cp = document.getElementById('suhu_mode_periodik');
+  return !!(cp && cp.checked);
+}
+// Saling mengunci: hanya satu mode aktif. Input milik mode yang tidak aktif dinonaktifkan.
+function setSuhuMode(mode) {
+  const ch = document.getElementById('suhu_mode_harian');
+  const cp = document.getElementById('suhu_mode_periodik');
+  if (!ch || !cp) return;
+  const periodic = mode === 'periodik';
+  const wasMulti = !!window.suhuMultiRendered;
+  // Keluar dari mode multi-tanggal: simpan isian setiap tanggal lebih dulu.
+  if (!periodic && wasMulti) {
+    try { autoSaveCurrentSuhuToCache(); } catch (e) {}
+  }
+  ch.checked = !periodic;
+  cp.checked = periodic;
+  const d = document.getElementById('suhu_tanggal');
+  if (d) d.disabled = periodic;
+  // Pada mode periodik, navigasi tanggal memakai bilah tanggal (bukan dropdown siklus)
+  const cyc = document.getElementById('suhu_siklus_active');
+  if (cyc) cyc.disabled = periodic;
+  ['suhu_period_start', 'suhu_period_end'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !periodic;
+  });
+  const okBtn = document.querySelector('button[onclick="applySuhuPeriod()"]');
+  if (okBtn) okBtn.disabled = !periodic;
+  if (periodic) {
+    suhuBuildDateNav();
+    const ps = document.getElementById('suhu_period_start');
+    const pe = document.getElementById('suhu_period_end');
+    if (ps && pe && suhuPeriodValid(ps.value, pe.value)) {
+      suhuValidatePeriod(false); // tampilkan kembali badge periode yang aktif
+    } else {
+      const hint = document.getElementById('suhuPeriodHint');
+      if (hint) {
+        hint.textContent = 'Isi Tanggal Awal dan Tanggal Akhir, lalu tekan ✓ OK untuk memuat seluruh tanggal dalam rentang.';
+        hint.className = 'text-[10px] text-slate-400 mt-2';
+      }
+    }
+    // Kembali ke mode periodik saat periode masih aktif -> tampilkan lagi seluruh tanggal.
+    if (!wasMulti && !window.__suhuCapturing && suhuPeriodicMultiActive()) renderSuhuTable();
+  } else {
+    suhuHideDateNav();
+    suhuShowPeriodStatus('', '');
+    const hint = document.getElementById('suhuPeriodHint');
+    if (hint) {
+      hint.textContent = 'Mode 1 hari (Hari H) aktif. Centang "Tanggal Pemantauan Periodik" untuk memakai rentang tanggal.';
+      hint.className = 'text-[10px] text-slate-400 mt-2';
+    }
+    // Tabel multi-tanggal harus diganti kembali menjadi tampilan 1 tanggal.
+    if (wasMulti) renderSuhuTable();
+  }
+}
+
+// ==== BILAH NAVIGASI TANGGAL / PANEL EVALUASI PERIODE ====
+function suhuDateNavStaticHtml() {
+  return `<div class="flex flex-wrap items-center justify-between gap-2">
+      <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Tanggal dalam Periode</span>
+      <span id="suhuDateNavInfo" class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-full"></span>
+    </div>
+    <div id="suhuDateNav" class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1"></div>`;
+}
+function suhuHideDateNav() {
+  const box = document.getElementById('suhuDateNavBox');
+  if (box) { box.classList.add('hidden'); box.innerHTML = ''; }
+  const info = document.getElementById('suhuDateNavInfo');
+  if (info) info.textContent = '';
+}
+function suhuBuildDateNav() {
+  const box = document.getElementById('suhuDateNavBox');
+  if (!box) return;
+  // Kategori Ruangan/Penyimpanan pada mode periodik: panel evaluasi (bukan navigasi satu-satu)
+  if (suhuPeriodicMultiActive()) { suhuRenderPeriodPanel(); return; }
+  const r = window.suhuActivePeriod || {};
+  const dates = suhuDateKeysBetween(r.start, r.end);
+  if (!dates.length) { suhuHideDateNav(); return; }
+  if (!document.getElementById('suhuDateNav')) box.innerHTML = suhuDateNavStaticHtml();
+  const wrap = document.getElementById('suhuDateNav');
+  const info = document.getElementById('suhuDateNavInfo');
+  const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  if (wrap) {
+    wrap.innerHTML = dates.map(k => {
+      const dd = k.slice(8, 10), mm = mon[parseInt(k.slice(5, 7), 10) - 1] || '';
+      return `<button type="button" data-suhu-date="${k}" onclick="suhuNavGo('${k}')" class="shrink-0 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-colors">${dd} ${mm}</button>`;
+    }).join('');
+  }
+  if (info) info.textContent = dates.length + ' tanggal · ' + suhuLongDateKey(r.start) + ' s.d. ' + suhuLongDateKey(r.end);
+  box.classList.remove('hidden');
+  suhuMarkDateNav();
+}
+function suhuMarkDateNav() {
+  const cur = (document.getElementById('suhu_tanggal') || {}).value;
+  const wrap = document.getElementById('suhuDateNav');
+  if (!wrap) return;
+  let activeBtn = null;
+  document.querySelectorAll('#suhuDateNav [data-suhu-date]').forEach(b => {
+    const on = b.getAttribute('data-suhu-date') === cur;
+    b.className = 'shrink-0 px-3 py-1.5 rounded-lg border text-[11px] font-bold transition-colors ' +
+      (on ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50');
+    if (on) activeBtn = b;
+  });
+  // Geser bilah navigasi (bukan halaman) agar tanggal aktif terlihat
+  if (wrap && activeBtn) {
+    const target = activeBtn.offsetLeft - (wrap.clientWidth / 2) + (activeBtn.offsetWidth / 2);
+    wrap.scrollLeft = Math.max(0, target);
+  }
+}
+// Pindah tanggal lewat bilah navigasi (mode periodik)
+function suhuNavGo(dateKey) {
+  const d = document.getElementById('suhu_tanggal');
+  if (!d || !dateKey) return;
+  if (d.value === dateKey) { suhuMarkDateNav(); return; }
+  d.value = dateKey;
+  handleSuhuDateChange();
+  suhuMarkDateNav();
+}
+
+function suhuShowPeriodStatus(a, b) {
+  const box = document.getElementById('suhuPeriodStatus');
+  const txt = document.getElementById('suhuPeriodStatusText');
+  if (!box || !txt) return;
+  if (!suhuPeriodValid(a, b)) {
+    box.classList.add('hidden');
+    box.classList.remove('flex');
+    txt.textContent = '';
+    return;
+  }
+  const label = (a === b) ? suhuLongDateKey(a) : (suhuLongDateKey(a) + ' s.d. ' + suhuLongDateKey(b));
+  txt.textContent = '✅ Periode Aktif: ' + label + ' (' + suhuPeriodDays(a, b) + ' Hari)';
+  box.classList.remove('hidden');
+  box.classList.add('flex');
+}
+
+// Tombol OK: terapkan rentang, muat SELURUH tanggal dalam rentang, lalu simpan periodik ke Firebase
+async function applySuhuPeriod() {
+  const a = document.getElementById('suhu_period_start');
+  const b = document.getElementById('suhu_period_end');
+  if (!a || !b) return;
+  const start = a.value, end = b.value;
+  if (!start || !end) {
+    alert('Tanggal Awal dan Tanggal Akhir wajib diisi untuk menerapkan Tanggal Pemantauan Periodik.');
+    return;
+  }
+  if (end < start) {
+    alert('Tanggal Akhir tidak boleh lebih awal dari Tanggal Awal.');
+    return;
+  }
+  const dates = suhuDateKeysBetween(start, end);
+  if (!dates.length) {
+    alert('Rentang tanggal tidak valid. Periksa Tanggal Awal dan Tanggal Akhir.');
+    return;
+  }
+  if (dates.length > 62 && !confirm('Rentang ini mencakup ' + dates.length + ' hari sehingga seluruh data akan dimuat dari server dan bisa memakan waktu. Lanjutkan?')) return;
+
+  // 0) Bila tabel multi-tanggal sedang tampil, simpan dulu isian setiap tanggal.
+  if (window.suhuMultiRendered) { try { autoSaveCurrentSuhuToCache(); } catch (e) {} }
+
+  // 0b) Pastikan mode periodik yang aktif
+  setSuhuMode('periodik');
+
+  // 1) Bila tanggal awal berbeda, pindahkan Tanggal Pemantauan ke tanggal awal
+  const dateInp = document.getElementById('suhu_tanggal');
+  if (dateInp && dateInp.value !== start) {
+    // Simpan isian tanggal lama TANPA ikut menyimpan nilai periodik yang baru diketik
+    // (nilai periodik itu milik tanggal awal, bukan tanggal lama).
+    const oldKey = window.suhuRenderedDate || dateInp.value;
+    const oldEntry = ((window.dbCache['sppg_log_suhu'] || {})[oldKey]) || {};
+    a.value = oldEntry['suhu_period_start'] || '';
+    b.value = oldEntry['suhu_period_end'] || '';
+    autoSaveCurrentSuhuToCache();
+    dateInp.value = start;
+    // Sinkronkan dropdown siklus bila tanggal awal ada pada daftar siklus menu
+    const sel = document.getElementById('suhu_siklus_active');
+    if (sel) {
+      const idx = getSuhuDateKeyList(getSuhuWeeks()).indexOf(start);
+      if (idx !== -1 && sel.querySelector(`option[value="${idx}"]`)) sel.value = String(idx);
+    }
+    handleSuhuDateChange();                       // muat data tanggal awal
+    if (dateInp.value !== start) {                // dibatalkan pada konfirmasi pindah tanggal
+      a.value = start; b.value = end;
+      return;
+    }
+  }
+
+  // 2) Muat data SELURUH tanggal dalam rentang dari Firebase (paralel per tanggal)
+  const okBtn = document.querySelector('button[onclick="applySuhuPeriod()"]');
+  const okHtml = okBtn ? okBtn.innerHTML : null;
+  if (okBtn) { okBtn.disabled = true; okBtn.innerHTML = '⏳ Memuat...'; }
+  window.dbCache['sppg_log_suhu'] = window.dbCache['sppg_log_suhu'] || {};
+  window.dbLoaded = window.dbLoaded || {};
+  let failed = 0;
+  try {
+    for (const d of dates) {
+      const p = 'sppg_log_suhu/' + d;
+      if (window.dbLoaded[p]) continue;
+      if (typeof window.fbGet !== 'function') { failed++; continue; }
+      try {
+        const v = await window.fbGet(p);
+        window.dbCache['sppg_log_suhu'][d] = (v && typeof v === 'object') ? v : null;
+        window.dbLoaded[p] = true;
+      } catch (e) {
+        failed++;
+        console.warn('Gagal memuat data suhu ' + d, e);
+      }
+    }
+  } finally {
+    if (okBtn) { okBtn.disabled = false; if (okHtml !== null) okBtn.innerHTML = okHtml; }
+  }
+
+  // 3) Simpan metadata periodik pada tanggal awal (data lama tetap utuh)
+  const dateKey = start;
+  const path = 'sppg_log_suhu/' + dateKey;
+  const prev = (window.dbCache['sppg_log_suhu'] || {})[dateKey];
+  const merged = (prev && typeof prev === 'object') ? { ...prev } : {};
+  merged.suhu_period_start = start;
+  merged.suhu_period_end = end;
+  window.dbCache['sppg_log_suhu'][dateKey] = merged;
+  if (window.suhuDirty) window.suhuDirty[dateKey] = false;
+  if (typeof window.fbSet === 'function') {
+    try { await window.fbSet(path, merged); }
+    catch (e) {
+      console.error('Gagal menyimpan periode suhu', e);
+      alert('Periode diterapkan di layar, tetapi gagal disimpan ke server. Periksa koneksi lalu tekan OK kembali.');
+    }
+  }
+
+  // 4) Aktifkan rentang + bilah navigasi tanggal, lalu tampilkan tanggal awal
+  a.value = start;
+  b.value = end;
+  window.suhuActivePeriod = { start: start, end: end };
+  applySuhuDateFields(start, merged);
+  renderSuhuTable();
+  suhuBuildDateNav();
+  suhuShowPeriodStatus(start, end);
+
+  // 5) Konfirmasi + info kegagalan muat (bila ada)
+  const label = (start === end) ? suhuLongDateKey(start) : (suhuLongDateKey(start) + ' s.d. ' + suhuLongDateKey(end));
+  const multiView = (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan');
+  let msg = 'Tanggal Pemantauan Periodik ' + label + ' (' + dates.length + ' hari) berhasil diterapkan.\n\n';
+  if (multiView) {
+    msg += 'Seluruh ' + dates.length + ' tanggal kini ditampilkan sekaligus di dalam tabel (kolom tanggal digabung per hari). '
+      + 'Gunakan Panel Evaluasi Kelengkapan Periode di atas tabel untuk memantau sesi yang sudah/belum diisi.';
+  } else {
+    msg += 'Seluruh ' + dates.length + ' tanggal sudah dimuat dan dapat dicek/diedit lewat pilihan tanggal di atas tabel.';
+  }
+  if (failed) msg += '\n\n⚠️ ' + failed + ' tanggal gagal dimuat dari server. Periksa koneksi lalu tekan ✓ OK kembali.';
+  alert(msg);
+}
+
+// Hapus periode pada tanggal aktif -> kembali ke mode 1 hari
+async function clearSuhuPeriod() {
+  const dateInp = document.getElementById('suhu_tanggal');
+  const dateKey = (dateInp && dateInp.value) || window.suhuRenderedDate;
+  if (!dateKey) return;
+  if (!confirm('Hapus Tanggal Pemantauan Periodik pada tanggal ini dan kembali ke mode 1 hari?')) return;
+  const a = document.getElementById('suhu_period_start');
+  const b = document.getElementById('suhu_period_end');
+  if (a) a.value = '';
+  if (b) b.value = '';
+  const path = 'sppg_log_suhu/' + dateKey;
+  window.dbCache['sppg_log_suhu'] = window.dbCache['sppg_log_suhu'] || {};
+  // Nonaktifkan periode lebih dulu agar autosave tidak menulis ulang metadata periode.
+  window.suhuActivePeriod = null;
+  if (window.dbLoaded && window.dbLoaded[path]) {
+    markSuhuDirty(dateKey);
+    autoSaveCurrentSuhuToCache();                // ikut menyimpan isian lain & foto, tanpa kehilangan data
+    const entry = window.dbCache['sppg_log_suhu'][dateKey] ? { ...window.dbCache['sppg_log_suhu'][dateKey] } : {};
+    delete entry.suhu_period_start;
+    delete entry.suhu_period_end;
+    window.dbCache['sppg_log_suhu'][dateKey] = entry;
+    if (typeof window.fbSet === 'function') {
+      try { await window.fbSet(path, entry); }
+      catch (e) { console.warn('Gagal menghapus periode suhu', e); }
+    }
+  } else if (typeof window.fbGet === 'function') {
+    try {
+      const v = await window.fbGet(path);
+      const entry = (v && typeof v === 'object') ? { ...v } : {};
+      delete entry.suhu_period_start;
+      delete entry.suhu_period_end;
+      window.dbCache['sppg_log_suhu'][dateKey] = entry;
+      window.dbLoaded[path] = true;
+      if (typeof window.fbSet === 'function') await window.fbSet(path, entry);
+    } catch (e) { console.warn('Gagal menghapus periode suhu', e); }
+  }
+  suhuHideDateNav();
+  setSuhuMode('harian');
+  suhuShowPeriodStatus('', '');
+  suhuValidatePeriod(false);
+  alert('Tanggal Pemantauan Periodik dihapus. Laporan kembali memakai Tanggal Pemantauan (1 hari).');
+}
+
+// Validasi rentang tanggal pemantauan periodik
+function suhuValidatePeriod(interactive) {
+  const a = document.getElementById('suhu_period_start');
+  const b = document.getElementById('suhu_period_end');
+  if (!a || !b) return true;
+  const hint = document.getElementById('suhuPeriodHint');
+  const st = document.getElementById('suhuPeriodStatus');
+
+  // Badge hanya ditampilkan bila isi input sama dengan periode yang SUDAH tersimpan
+  const dateKey = (document.getElementById('suhu_tanggal') || {}).value;
+  const saved = ((window.dbCache && window.dbCache['sppg_log_suhu']) || {})[dateKey] || {};
+  const act = window.suhuActivePeriod;
+  const activeOk = !!(act && suhuPeriodValid(act.start, act.end) && a.value === act.start && b.value === act.end);
+  const savedOk = suhuPeriodValid(saved['suhu_period_start'], saved['suhu_period_end'])
+    && a.value === saved['suhu_period_start'] && b.value === saved['suhu_period_end'];
+  if (st) {
+    st.classList.add('hidden');
+    st.classList.remove('flex');
+  }
+
+  if (!a.value || !b.value) {
+    [a, b].forEach(el => el.classList.remove('border-red-400', 'bg-red-50', 'text-red-700'));
+    if (hint) {
+      hint.textContent = suhuIsPeriodicMode()
+        ? 'Isi Tanggal Awal dan Tanggal Akhir, lalu tekan ✓ OK untuk memuat seluruh tanggal dalam rentang.'
+        : 'Mode 1 hari (Hari H) aktif. Centang "Tanggal Pemantauan Periodik" untuk memakai rentang tanggal.';
+      hint.className = 'text-[10px] text-slate-400 mt-2';
+    }
+    return true;
+  }
+
+  const bad = b.value < a.value;
+  if (bad && interactive) {
+    // Tanggal akhir lebih awal -> kosongkan dan beri peringatan
+    b.value = '';
+    [a, b].forEach(el => el.classList.remove('border-red-400', 'bg-red-50', 'text-red-700'));
+    if (hint) {
+      hint.textContent = '⚠️ Tanggal Akhir tidak boleh lebih awal dari Tanggal Awal. Tanggal Akhir dikosongkan, silakan pilih ulang.';
+      hint.className = 'text-[10px] font-bold text-red-600 mt-2';
+    }
+    alert('Tanggal Akhir tidak boleh lebih awal dari Tanggal Awal. Tanggal Akhir dikosongkan, silakan pilih ulang.');
+    return false;
+  }
+  [a, b].forEach(el => {
+    el.classList.toggle('border-red-400', bad);
+    el.classList.toggle('bg-red-50', bad);
+    el.classList.toggle('text-red-700', bad);
+  });
+  if (hint) {
+    hint.textContent = bad
+      ? '⚠️ Tanggal Akhir tidak boleh lebih awal dari Tanggal Awal.'
+      : 'Rentang ini tampil pada cetak/export. Kosongkan bila pemantauan hanya 1 hari.';
+    hint.className = bad ? 'text-[10px] font-bold text-red-600 mt-2' : 'text-[10px] text-slate-400 mt-2';
+  }
+  if (suhuIsPeriodicMode() && (savedOk || activeOk)) suhuShowPeriodStatus(a.value, b.value);
+  return !bad;
 }
 
 // Saat DROPDOWN SIKLUS diubah -> tanggal ikut berubah -> petugas ikut dimuat
@@ -4979,13 +6658,17 @@ function bindSuhuDirtyTracking() {
       const el = e.target;
       if (!el || el.type === 'file') return;
       if (el.id === 'suhu_tanggal' || el.id === 'suhu_siklus_active') return; // navigasi, bukan isian
-      markSuhuDirty();
+      if (el.id === 'suhu_mode_harian' || el.id === 'suhu_mode_periodik') return; // pilihan mode, bukan data
+      // Mode multi-tanggal: tandai tanggal milik baris yang diedit.
+      const row = el.closest ? el.closest('tr[data-suhu-date]') : null;
+      markSuhuDirty(row ? row.getAttribute('data-suhu-date') : undefined);
     }, true);
   });
 }
 
 function initSuhuModule() {
   bindSuhuDirtyTracking();
+  setSuhuMode('harian'); // default: mode 1 hari (Hari H)
   const tglElem = document.getElementById('suhu_tanggal');
   if (tglElem) {
     if (!tglElem.value) tglElem.value = getLocalDateKey(); // tanggal lokal, bukan UTC
@@ -5073,6 +6756,232 @@ function initSuhuModule() {
 
 // BAGIAN B  --  GANTI function renderSuhuTable() LAMA DENGAN BLOK INI
 // =====================================================================
+// ===== HELPER: ITEM AKTIF, NAMA RINGKAS, STATUS KELENGKAPAN =====
+function getSuhuCategoryItems(catKey) {
+  return SUHU_ITEMS_CONFIG.filter(c => c.groupKey === catKey);
+}
+function getActiveSuhuItemCfg() {
+  if (activeSuhuCategory !== 'ruang' && activeSuhuCategory !== 'penyimpanan') return null;
+  const items = getSuhuCategoryItems(activeSuhuCategory);
+  return items.find(c => c.id === activeSuhuItemId) || items[0] || null;
+}
+// Nama ringkas untuk laporan (tanpa awalan "Suhu Ruang")
+function suhuItemShortName(cfg) {
+  if (!cfg) return '';
+  if (cfg.groupKey === 'ruang') return String(cfg.area || '').replace(/^Suhu\s*Ruang\s+/i, '').trim();
+  return String(cfg.area || '').trim();
+}
+// Nama pendek untuk judul worksheet (batas Excel 31 karakter, termasuk prefix tanggal)
+function suhuSheetShortName(cfg) {
+  if (!cfg) return '';
+  if (cfg.groupKey === 'pemorsian') return 'Pemorsian';
+  const n = suhuItemShortName(cfg);
+  return n.length > 24 ? n.slice(0, 24).replace(/\s+\S*$/, '') : n;
+}
+// Apakah item ini sudah punya data suhu tersimpan pada tanggal aktif?
+function suhuItemHasData(cfg, savedData) {
+  if (!cfg || !savedData) return false;
+  if (savedData['suhu_foto_' + cfg.id]) return true;
+  if (savedData.photos && savedData.photos['suhu_foto_' + cfg.id]) return true;
+  if (cfg.groupKey === 'ruang' || cfg.groupKey === 'penyimpanan') {
+    const cols = parseInt(savedData.suhuRuangColumns, 10) || suhuRuangColumns || 1;
+    for (let c = 1; c <= Math.max(cols, 1); c++) {
+      const v = savedData['suhu_val_' + c + '_' + cfg.id];
+      if (v !== undefined && v !== null && String(v).trim() !== '') return true;
+    }
+    return false;
+  }
+  // Pemorsian: semua komponen batch
+  const nb = parseInt((savedData.suhuBatchCounters || {}).pemorsian, 10) || 1;
+  for (let b = 1; b <= nb; b++) {
+    for (const sub of (cfg.template || [])) {
+      const v = savedData['suhu_val_' + cfg.id + '_' + sub.key + '_b' + b];
+      if (v !== undefined && v !== null && String(v).trim() !== '') return true;
+    }
+  }
+  return false;
+}
+
+// Render tombol pill pemilih item (muncul saat kategori Ruangan / Penyimpanan aktif)
+// datesArray diisi pada mode multi-tanggal: item dianggap terisi bila ada data di salah satu tanggal.
+function renderSuhuItemPills(savedData, datesArray) {
+  const nav = document.getElementById('suhuItemNav');
+  const box = document.getElementById('suhuItemPills');
+  const info = document.getElementById('suhuItemNavInfo');
+  if (!nav || !box) return;
+
+  const perItem = (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan');
+  if (!perItem) { nav.classList.add('hidden'); return; }
+  nav.classList.remove('hidden');
+
+  const items = getSuhuCategoryItems(activeSuhuCategory);
+  if (!items.some(c => c.id === activeSuhuItemId)) activeSuhuItemId = items[0] ? items[0].id : null;
+
+  const multiDates = (Array.isArray(datesArray) && datesArray.length) ? datesArray : null;
+  let filled = 0;
+  box.innerHTML = items.map(cfg => {
+    const done = multiDates
+      ? multiDates.some(d => suhuItemHasData(cfg, ((window.dbCache['sppg_log_suhu'] || {})[d]) || null))
+      : suhuItemHasData(cfg, savedData);
+    if (done) filled++;
+    const active = cfg.id === activeSuhuItemId;
+    const base = active
+      ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white border-slate-900 shadow-md'
+      : (done ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50');
+    const dot = done
+      ? '<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 shadow-sm"></span>'
+      : '<span class="inline-block w-2 h-2 rounded-full bg-slate-300"></span>';
+    return `<button type="button" onclick="selectSuhuItem('${cfg.id}')" class="suhu-item-pill flex items-center gap-2 px-3.5 py-2.5 rounded-full border text-[11px] font-bold transition-all whitespace-nowrap ${base}">
+      ${dot}<span>${suhuItemShortName(cfg)}</span>${done ? '<span class="text-[10px]">✓</span>' : ''}</button>`;
+  }).join('');
+
+  if (info) {
+    info.textContent = filled + '/' + items.length + ' terisi';
+    info.className = (filled === items.length && items.length)
+      ? 'text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full'
+      : 'text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full';
+  }
+}
+
+function selectSuhuItem(itemId) {
+  if (itemId === activeSuhuItemId) return;
+  autoSaveCurrentSuhuToCache();
+  activeSuhuItemId = itemId;
+  renderSuhuTable();
+}
+
+function suhuRenderMultiTable(thead, tbody, startKey) {
+  const act = window.suhuActivePeriod || {};
+  const dates = suhuDateKeysBetween(act.start, act.end);
+  const allData = window.dbCache['sppg_log_suhu'] || {};
+  const cfg = getActiveSuhuItemCfg();
+  if (!dates.length || !cfg) return false;
+
+  // Peta foto gabungan: seluruh tanggal (dan seluruh item) dalam satu map ber-ID unik.
+  const merged = {};
+  dates.forEach(d => {
+    const entry = allData[d] || {};
+    const ph = entry.photos || {};
+    Object.keys(ph).forEach(base => { merged[suhuMultiId(base, d)] = ph[base]; });
+  });
+  window.suhuPhotosMap = merged;
+  window.suhuPhotosSnapshot = { ...merged };
+  window.suhuPhotosDate = null;
+
+  // Siklus menu mengikuti tanggal awal
+  const weeks = populateSuhuSiklusOptions();
+  const siklusSelect = document.getElementById('suhu_siklus_active');
+  if (siklusSelect && startKey) {
+    const idx = getSuhuCycleIndexForDate(weeks, startKey);
+    if (siklusSelect.querySelector(`option[value="${idx}"]`)) siklusSelect.value = idx;
+  }
+
+  thead.innerHTML = `
+  <tr>
+    <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
+    <th class="p-3 border-b border-slate-600 w-36 text-center whitespace-nowrap">TANGGAL</th>
+    <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
+    <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
+    <th class="p-3 border-b border-slate-600 w-24 text-center">SESI</th>
+    <th class="p-3 border-b border-slate-600 w-24 text-center whitespace-nowrap">WAKTU</th>
+    <th class="p-3 border-b border-slate-600 w-28 text-center">SUHU</th>
+    <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
+    <th class="p-3 border-b border-slate-600 w-28 text-center">STATUS</th>
+    <th class="p-3 border-b border-slate-600">KETERANGAN</th>
+  </tr>`;
+
+  let html = '';
+  let dateNo = 1;
+  dates.forEach(d => {
+    const entry = allData[d] || {};
+    const cols = Math.max(1, parseInt(entry.suhuRuangColumns, 10) || 1, suhuRuangColumns);
+    const photoBase = 'suhu_foto_' + cfg.id;
+    const photoId = suhuMultiId(photoBase, d);
+    const hasPhoto = !!merged[photoId];
+    const fotoHtml = getPhotoCellHtml(photoId, suhuMultiId('suhu_val_1_' + cfg.id, d), suhuMultiId('suhu_waktu_1_' + cfg.id, d));
+    const statusHtml = suhuMultiStatusHtml(cfg, entry, cols);
+    const stdVal = (entry['suhu_std_' + cfg.id] !== undefined) ? entry['suhu_std_' + cfg.id] : cfg.std;
+    const ketVal = entry['suhu_cat_' + cfg.id] || '';
+
+    for (let c = 1; c <= cols; c++) {
+      const timeBase = `suhu_waktu_${c}_${cfg.id}`;
+      const valBase = `suhu_val_${c}_${cfg.id}`;
+      const timeId = suhuMultiId(timeBase, d);
+      const valId = suhuMultiId(valBase, d);
+      const timeVal = entry[timeBase] !== undefined ? entry[timeBase] : '';
+      const valVal = entry[valBase] !== undefined ? entry[valBase] : '';
+      const filled = String(timeVal).trim() !== '' && String(valVal).trim() !== '';
+      const cellStyle = filled
+        ? 'background-color:#ecfdf5;border-color:#a7f3d0'
+        : 'background-color:#fffbeb;border-color:#fcd34d';
+
+      html += `<tr data-suhu-date="${d}" class="hover:bg-slate-50 border-b border-slate-100 ${filled ? '' : 'suhu-row-empty'}">`;
+      if (c === 1) {
+        html += `<td rowspan="${cols}" data-label="No" data-label-lock="1" class="p-3 text-center font-bold text-slate-400 align-middle">${dateNo}</td>
+          <td rowspan="${cols}" data-label="Tanggal" data-label-lock="1" class="p-2 text-center align-middle whitespace-nowrap">
+            <div class="font-black text-slate-800 text-sm">${suhuDateLabelShort(d)}</div>
+            <div class="text-[9px] font-bold text-slate-400 mt-0.5">${d}</div>
+          </td>
+          <td rowspan="${cols}" data-label="Ruangan / Unit" data-label-lock="1" class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap align-middle">${cfg.area}</td>
+          <td rowspan="${cols}" data-label="Bukti Foto" data-label-lock="1" class="p-2 text-center align-middle ${hasPhoto ? '' : 'suhu-photo-empty'}">
+            <div class="${hasPhoto ? '' : 'rounded-xl border-2 border-dashed border-amber-300 p-2'}" ${hasPhoto ? '' : 'style="background-color:#fffbeb"'}>
+              ${hasPhoto ? '' : '<div class="mb-1"><span class="inline-block text-[9px] font-extrabold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full">Belum Diisi</span></div>'}
+              ${fotoHtml}
+            </div>
+          </td>`;
+      }
+      html += `<td data-label="Sesi" data-label-lock="1" class="p-2 text-center align-middle whitespace-nowrap">
+          ${c > 1 ? `<div class="md:hidden text-[9px] font-bold text-slate-400 mb-0.5">${suhuDateLabelShort(d)}</div>` : ''}
+          <div class="text-[10px] font-black uppercase tracking-wider text-slate-500">${suhuSessionLabel(c)}</div>
+          <span class="suhu-session-badge ${filled ? 'hidden ' : ''}inline-block mt-1 text-[9px] font-extrabold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full">Belum Diisi</span>
+        </td>
+        <td data-label="Waktu" data-label-lock="1" class="p-2 text-center whitespace-nowrap"><input type="time" id="${timeId}" value="${suhuAttr(timeVal)}" oninput="suhuMultiCellInput(this)" class="suhu-multi-time w-full min-w-[100px] border-2 rounded-xl p-3 min-h-[50px] text-center text-base md:text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400" style="${cellStyle}"></td>
+        <td data-label="Suhu" data-label-lock="1" class="p-2 text-center"><input type="number" step="0.1" id="${valId}" value="${suhuAttr(valVal)}" oninput="suhuMultiCellInput(this)" class="suhu-multi-val w-full min-w-[100px] border-2 rounded-xl p-3 min-h-[50px] text-center font-black text-blue-700 text-lg md:text-base shadow-sm focus:ring-2 focus:ring-blue-400" style="${cellStyle}"></td>`;
+      if (c === 1) {
+        html += `<td rowspan="${cols}" data-label="Batas Suhu" data-label-lock="1" class="p-2 text-center align-middle"><input type="text" id="${suhuMultiId('suhu_std_' + cfg.id, d)}" value="${suhuAttr(stdVal)}" oninput="suhuMultiEvalDate('${cfg.id}','${d}')" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
+          <td rowspan="${cols}" data-label="Status" data-label-lock="1" class="p-3 text-center font-bold text-sm align-middle" id="${suhuMultiId('suhu_status_' + cfg.id, d)}">${statusHtml}</td>
+          <td rowspan="${cols}" data-label="Keterangan" data-label-lock="1" class="p-2 align-middle"><input type="text" id="${suhuMultiId('suhu_cat_' + cfg.id, d)}" value="${suhuAttr(ketVal)}" placeholder="Keterangan..." class="w-full min-w-[150px] border-2 border-slate-200 rounded-xl p-3 min-h-[50px] text-sm bg-white text-slate-700 shadow-sm focus:ring-2 focus:ring-slate-400"></td>`;
+      }
+      html += `</tr>`;
+    }
+    dateNo++;
+  });
+
+  html += `
+    <tr class="hidden-print border-t border-slate-200 suhu-multi-add-row">
+      <td colspan="10" class="p-5 text-center bg-slate-50/80">
+        <button type="button" onclick="addSuhuRuangColumn()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
+          <span>➕</span> Tambah Waktu Pengukuran (Ke-${suhuRuangColumns + 1})
+        </button>
+      </td>
+    </tr>
+    <tr id="suhuFilterEmptyNote" class="hidden">
+      <td colspan="10" class="p-6 text-center text-[11px] font-bold text-emerald-700 bg-emerald-50">Semua tanggal pada periode ini sudah lengkap terisi.</td>
+    </tr>`;
+
+  tbody.innerHTML = html;
+  window.suhuMultiRendered = true;
+  window.suhuMultiDates = dates.slice();
+  window.suhuMultiStart = startKey || dates[0];
+  window.suhuRenderedDate = window.suhuMultiStart;
+  window.currentSuhuDate = window.suhuMultiStart;
+  // Tanggal acuan header selalu tanggal awal periode saat seluruh tanggal ditampilkan.
+  const dateInp = document.getElementById('suhu_tanggal');
+  if (dateInp && window.suhuMultiStart) dateInp.value = window.suhuMultiStart;
+
+  // Warnai sel + hitung status setiap tanggal
+  tbody.querySelectorAll('tr[data-suhu-date]').forEach(tr => suhuMultiPaintSession(tr));
+  dates.forEach(d => suhuMultiEvalDate(cfg.id, d));
+
+  renderSuhuItemPills(null, dates);
+  suhuRenderPeriodPanel();
+  if (window.suhuPeriodFilterMode === 'empty') suhuPeriodFilter('empty');
+
+  const histView = document.getElementById('suhuSubViewHistory');
+  if (histView && !histView.classList.contains('hidden')) renderSuhuHistory();
+  return true;
+}
+
 function renderSuhuTable() {
   const thead = document.getElementById('suhu_table_header');
   const tbody = document.getElementById('tbody_suhu_monitoring');
@@ -5080,23 +6989,50 @@ function renderSuhuTable() {
 
   const dateKey = document.getElementById('suhu_tanggal')?.value;
 
+  // Mode periodik (Ruangan/Penyimpanan): seluruh tanggal dirender sekaligus.
+  if (suhuPeriodicMultiActive()) {
+    if (suhuRenderMultiTable(thead, tbody, (window.suhuActivePeriod || {}).start)) return;
+  }
+  window.suhuMultiRendered = false;
+  window.suhuMultiDates = [];
+
   let savedData = null;
   if (dateKey) {
     const allData = window.dbCache['sppg_log_suhu'] || {};
     savedData = allData[dateKey];
   }
 
-  // Foto 100% milik tanggal ini (tidak digabung dengan foto tanggal lain)
+  // Foto milik tanggal ini. Saat tetap pada tanggal yang sama, perubahan lokal yang belum
+  // tersimpan (tambah/hapus foto) dipertahankan, tanpa membangkitkan foto yang sudah dihapus
+  // dari server oleh perangkat lain.
+  const samePhotoDate = (window.suhuPhotosDate === dateKey);
   if (savedData) {
-    window.suhuPhotosMap = { ...(savedData.photos || {}) };
+    const savedPhotos = savedData.photos || {};
+    if (samePhotoDate) {
+      const prevSnap = window.suhuPhotosSnapshot || {};
+      const curMap = window.suhuPhotosMap || {};
+      const merged = { ...savedPhotos };
+      Object.keys(prevSnap).forEach(k => { if (!(k in curMap)) delete merged[k]; });          // hapus lokal
+      Object.keys(curMap).forEach(k => { if (!(k in prevSnap)) merged[k] = curMap[k]; });     // tambah/ubah lokal
+      window.suhuPhotosMap = merged;
+      window.suhuPhotosSnapshot = { ...savedPhotos };
+    } else {
+      window.suhuPhotosMap = { ...savedPhotos };
+      window.suhuPhotosSnapshot = { ...savedPhotos };
+    }
   } else if (dateKey) {
-    try {
-      const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
-      window.suhuPhotosMap = lsPhotos ? JSON.parse(lsPhotos) : {};
-    } catch (e) { window.suhuPhotosMap = {}; }
+    if (!samePhotoDate) {
+      try {
+        const lsPhotos = localStorage.getItem('sppg_photos_' + dateKey);
+        window.suhuPhotosMap = lsPhotos ? JSON.parse(lsPhotos) : {};
+      } catch (e) { window.suhuPhotosMap = {}; }
+      window.suhuPhotosSnapshot = { ...window.suhuPhotosMap };
+    }
   } else {
     window.suhuPhotosMap = {};
+    window.suhuPhotosSnapshot = {};
   }
+  window.suhuPhotosDate = dateKey || null;
 
   // [DIUBAH] Segarkan dropdown siklus dari data realtime, lalu terapkan pilihan tersimpan
   const weeks = populateSuhuSiklusOptions();
@@ -5111,7 +7047,15 @@ function renderSuhuTable() {
   let htmlBody = '';
   let rowNo = 1;
 
-  const filteredConfigs = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
+  // Kategori Ruangan / Penyimpanan: hanya 1 item yang dirender (1 lembar = 1 item)
+  let filteredConfigs;
+  if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
+    const items = getSuhuCategoryItems(activeSuhuCategory);
+    if (!items.some(c => c.id === activeSuhuItemId)) activeSuhuItemId = items[0] ? items[0].id : null;
+    filteredConfigs = items.filter(c => c.id === activeSuhuItemId);
+  } else {
+    filteredConfigs = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === activeSuhuCategory);
+  }
   const realtimeNowTime = getRealtimeTimeString();
 
   if (activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan') {
@@ -5237,9 +7181,12 @@ function renderSuhuTable() {
 
   // RESTORE DATA INPUTS
   if (savedData) {
+    // Kolom header (tanggal, mode, periode) dikelola applySuhuDateFields — jangan ditimpa di sini.
+    const SKIP_RESTORE = { suhu_siklus_active: 1, suhu_tanggal: 1, suhu_period_start: 1, suhu_period_end: 1, suhu_supervisor: 1, suhu_pemeriksa: 1, suhu_penyetuju: 1 };
     Object.keys(savedData).forEach(id => {
+      if (SKIP_RESTORE[id]) return;
       const el = document.getElementById(id);
-      if (el && el.type !== 'file' && id !== 'suhu_siklus_active') el.value = savedData[id];
+      if (el && el.type !== 'file') el.value = savedData[id];
     });
   }
   // Keterangan otomatis: komponen yang tidak ada pada Siklus Menu hari ini
@@ -5252,11 +7199,25 @@ function renderSuhuTable() {
   document.querySelectorAll('#tbody_suhu_monitoring input[type="number"]').forEach(inp => {
     inp.dispatchEvent(new Event('input'));
   });
+  // Segarkan navigasi pill item + indikator kelengkapan harian
+  renderSuhuItemPills(savedData || null);
+  // Selaraskan bilah navigasi tanggal / panel periode dengan mode yang aktif
+  if (suhuIsPeriodicMode()) suhuBuildDateNav();
+  // Jika sub-view histori sedang terbuka, ikut diperbarui
+  const histView = document.getElementById('suhuSubViewHistory');
+  if (histView && !histView.classList.contains('hidden')) renderSuhuHistory();
 }
 
     function saveGenericForm(formId, storageKey, alertMsg) {
        const form = document.getElementById(formId);
        if(!form) return;
+
+       // Mode multi-tanggal (Ruangan/Penyimpanan periodik): simpan setiap tanggal ke node-nya sendiri.
+       if (formId === 'formSuhuDoc' && typeof suhuPeriodicMultiActive === 'function' && suhuPeriodicMultiActive()) {
+           suhuSaveMultiPeriodic(alertMsg);
+           return;
+       }
+
        const inputs = form.querySelectorAll('input, select, textarea');
        
        let dateInput = Array.from(inputs).find(inp => inp.type === 'date');
@@ -5288,7 +7249,7 @@ function renderSuhuTable() {
        let mergedData = allData[dateKey] ? { ...allData[dateKey] } : {};
 
        inputs.forEach(inp => { 
-           if(inp.id && inp.type !== 'file') {
+           if(inp.id && inp.type !== 'file' && inp.type !== 'checkbox') {
                mergedData[inp.id] = inp.value; 
            }
        });
@@ -5296,7 +7257,11 @@ function renderSuhuTable() {
        if (formId === 'formSuhuDoc') {
            mergedData.suhuRuangColumns = suhuRuangColumns;
            mergedData.suhuBatchCounters = suhuBatchCounters;
-           mergedData.photos = { ...(window.suhuPhotosMap || {}) };
+           // ZERO DATA LOSS: foto di-MERGE dengan foto tanggal ini yang sudah tersimpan,
+           // sehingga menyimpan 1 ruangan/alat tidak menghapus foto item lain.
+           const prevPhotos = (allData[dateKey] && allData[dateKey].photos) ? allData[dateKey].photos : {};
+           mergedData.photos = { ...prevPhotos, ...(window.suhuPhotosMap || {}) };
+           window.suhuPhotosMap = mergedData.photos;
            window.suhuDirty[dateKey] = false;
        }
 
@@ -5310,6 +7275,9 @@ function renderSuhuTable() {
            window.fbSet(storageKey, allData);
        }
        alert(alertMsg + " (Tersimpan Real-Time di Server)");
+       if (formId === 'formSuhuDoc' && typeof suhuValidatePeriod === 'function') {
+           suhuValidatePeriod(false); // tampilkan kembali badge periode yang baru disimpan
+       }
     }
 
     // [BARU] Isi Shift & Auditor SESUAI tanggal yang dipilih (tanggal tanpa data = kosong)
@@ -6634,6 +8602,7 @@ function renderSuhuTable() {
           t.querySelectorAll('tbody tr').forEach(function (tr) {
             Array.prototype.forEach.call(tr.children, function (td, i) {
               if (td.colSpan > 1) return;
+              if (td.getAttribute('data-label-lock') === '1') return; // label eksplisit (tabel multi-tanggal)
               var l = heads[i];
               if (l !== undefined && td.getAttribute('data-label') !== l) td.setAttribute('data-label', l);
             });
@@ -9612,11 +11581,13 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       // Menentukan nama/tujuan foto dari input yang dipakai (area suhu, menu, tahap, dll).
       window.photoLabelFor = function (input) {
         var id = (input && input.id) || '', title = '', sub = '', m, tr = input && input.closest ? input.closest('tr') : null;
+        var multiDate = (m = id.match(/__(\d{4}-\d{2}-\d{2})$/)) ? m[1] : null;
+        if (multiDate) id = id.slice(0, -(multiDate.length + 2)); // ID multi-tanggal: pakai ID dasar
         try {
           if ((m = id.match(/^suhu_foto_(\d+)(?:_(\w+?)_b(\d+))?$/))) {
             var cfg = (typeof SUHU_ITEMS_CONFIG !== 'undefined' ? SUHU_ITEMS_CONFIG : []).filter(function (c) { return c.id === m[1]; })[0];
             if (m[2]) {
-              var cat = document.getElementById('suhu_cat_' + id.replace('suhu_foto_', ''));
+              var cat = document.getElementById('suhu_cat_' + id.replace('suhu_foto_', '') + (multiDate ? '__' + multiDate : ''));
               title = cat && cat.dataset.menu ? cat.dataset.menu : '';
               var lab = tr && tr.querySelector('td div.text-\\[10px\\]');
               sub = (cfg ? cfg.cat : 'Suhu') + (lab ? ' - ' + clean(lab.firstChild ? lab.firstChild.textContent : lab.textContent) : '') + (m[3] > 1 ? ' (Batch ' + m[3] + ')' : '');
@@ -9640,6 +11611,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
             sub = 'Uji Organoleptik & Suhu Memasak';
           }
         } catch (e) { console.warn('photoLabelFor', e); }
+        if (multiDate) sub = (sub ? sub + ' · ' : '') + multiDate;
         return { title: title || 'Foto Dokumentasi', sub: sub };
       };
       function coverDraw(ctx, src, sw, sh, dw, dh) {
