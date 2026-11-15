@@ -369,6 +369,14 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
+
+  /* Sorotan sementara panel "Cetak Label Reminder Alergi Peserta Didik" saat
+     tombol pada kotak #sd_reminder ditekan (navigasi, bukan langsung cetak). */
+  #sd_label_panel{scroll-margin-top:96px}
+  #sd_label_panel.sd-panel-highlight{
+    border-color:rgba(165,180,252,.95) !important;
+    box-shadow:0 0 0 3px rgba(129,140,248,.95),0 0 0 9px rgba(99,102,241,.35),0 30px 70px -25px rgba(0,0,0,.85) !important;
+  }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1097,6 +1105,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                   <option value="PAUD">PAUD / TK / KB / RA</option>
                   <option value="SD">SD / MI</option>
                   <option value="SMP">SMP / MTs</option>
+                  <option value="SMA">SMA / MA</option>
                   <option value="POSYANDU">Posyandu (3B)</option>
                 </select>
               </div>
@@ -1303,7 +1312,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <!-- CETAK LABEL -->
         <!-- EDIT KHUSUS: PANEL HASIL CETAK LABEL REMINDER ALERGI (FM-SGR-SPPG-01.01) -->
   <!-- MODERAN, WARNA BERVARIASI, & ATRAKTIF -->
-  <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-6 md:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-6 relative overflow-hidden text-white">
+  <div id="sd_label_panel" class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-6 md:p-8 rounded-3xl border border-indigo-500/30 shadow-2xl space-y-6 relative overflow-hidden text-white">
     <!-- Hiasan Glow Latar Belakang -->
     <div class="absolute -right-16 -top-16 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -2898,7 +2907,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const num = code.replace('FM-SGR-SPPG-', '');
       const judul = judulOverride || WORD_KOP_JUDUL[num] || '';
       // docValue '' = kolom di samping "No. dokumen" sengaja dikosongkan (diisi manual oleh pengguna)
-      const shownDoc = docValue === undefined ? code : docValue;
+      const shownDoc = (docValue === undefined && typeof docNoResolve === 'function') ? docNoResolve(code)
+        : (docValue === undefined ? code : docValue);
       let logoHtml = '';
       const logo = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
       if (logo) {
@@ -3395,6 +3405,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           if (!template || n > maxPairs) { maxPairs = n; template = pg.tableEl; }
         });
         if (!template) return;
+        // Deteksi posisi kolom dari header tabel hasil capture, agar tetap benar
+        // baik untuk Pemorsian (ada kolom KOMPONEN) maupun Ruang/Penyimpanan
+        // (kolom Area sudah dihapus, sehingga BUKTI FOTO ada di indeks 2).
+        const headRow = template.querySelector('thead tr') || template.querySelector('tr');
+        const headCells = headRow ? Array.from(headRow.children) : [];
+        let fotoIdx = headCells.findIndex(c => /BUKTI\s*FOTO/i.test(String(c.textContent || '').trim()));
+        if (fotoIdx < 0) fotoIdx = (headCells.length >= 4 && /AREA|KOMPONEN|RUANGAN/i.test(String((headCells[2] || {}).textContent || ''))) ? 3 : 2;
         const merged = template.cloneNode(true);
         const tbody = merged.querySelector('tbody');
         if (!tbody) return;
@@ -3409,7 +3426,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           );
           rows.forEach(tr => {
             const tds = Array.from(tr.children).filter(x => x.tagName === 'TD' || x.tagName === 'TH');
-            if (tds.length < 4 + (2 * srcPairs) + 3) return;
+            const pairStart = fotoIdx + 1;
+            const tail = pairStart + (2 * srcPairs);
+            if (tds.length < tail + 3) return;
             const row = document.createElement('tr');
             if (tr.className) row.className = tr.className;
             const noCell = tds[0].cloneNode(true);
@@ -3419,18 +3438,16 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             const dateInp = dateCell.querySelector('input[type="date"]');
             if (dateInp) dateInp.value = pg.date;
             row.appendChild(dateCell);
-            row.appendChild(tds[2].cloneNode(true));
-            row.appendChild(tds[3].cloneNode(true));
+            for (let k = 2; k <= fotoIdx; k++) row.appendChild(tds[k].cloneNode(true));
             for (let i = 0; i < maxPairs; i++) {
               if (i < srcPairs) {
-                row.appendChild(tds[4 + (2 * i)].cloneNode(true));
-                row.appendChild(tds[5 + (2 * i)].cloneNode(true));
+                row.appendChild(tds[pairStart + (2 * i)].cloneNode(true));
+                row.appendChild(tds[pairStart + (2 * i) + 1].cloneNode(true));
               } else {
                 row.appendChild(document.createElement('td'));
                 row.appendChild(document.createElement('td'));
               }
             }
-            const tail = 4 + (2 * srcPairs);
             row.appendChild(tds[tail].cloneNode(true));
             row.appendChild(tds[tail + 1].cloneNode(true));
             row.appendChild(tds[tail + 2].cloneNode(true));
@@ -3703,7 +3720,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <body>
           <div class="Section1">
           ${kopCode ? exportWordKop(kopCode, docName, files, wrapperId === 'wrapper_suhu' ? suhuKopJudul() : undefined)
-            : isMasterBahan ? exportWordKop('FM-SGR-DST', docName, files, 'MASTER BAHAN', '00', '')
+            : isMasterBahan ? exportWordKop('FM-SGR-DST', docName, files, 'MASTER BAHAN', '00', (typeof docNoGet === 'function' ? docNoGet('MASTER') : ''))
             : `<div class="header">
             <h2 style="margin:0;">NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</h2>
             <h3 style="margin:5px 0;">TANGGAL: ${dateText}</h3>
@@ -3872,9 +3889,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           Object.keys(rowPt).forEach(k => { ws.getRow(HDR_ROWS + Number(k)).height = rowPt[k]; });
 
           if (isMasterBahan) {
-            // Kop baku yang sama dengan modul lain; kolom di samping "No. dokumen" dikosongkan (diisi manual).
+            // Kop baku yang sama dengan modul lain; kolom "No. dokumen" diambil dari input modul
+            // Master Bahan (default kosong, dapat diisi manual oleh pengguna).
             rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 1], title: [2, masterLastC - 2], lab: masterLastC - 1, val: masterLastC,
-              judul: 'MASTER BAHAN', noDoc: '', tgl: KOP_TGL_BAKU, colon: false });
+              judul: 'MASTER BAHAN', noDoc: (typeof docNoGet === 'function' ? docNoGet('MASTER') : ''), tgl: KOP_TGL_BAKU, colon: false });
             rptDateLine(ws, 4, 1, masterLastC);
           }
 
@@ -4105,7 +4123,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       rptBorder(ws, r, o.title[0], r + 2, o.title[1], 'box');
       const pre = o.colon ? ': ' : '';
       const labW = widthOf(o.lab, o.lab), valW = widthOf(o.val, o.val);
-      [['No. dokumen', o.noDoc], ['No. revisi', o.rev || '00'], ['Tanggal', KOP_TGL_BAKU]] /* tanggal kop tetap */.forEach((p, i) => {
+      const noDocShown = (typeof docNoResolve === 'function') ? docNoResolve(o.noDoc) : o.noDoc;
+      [['No. dokumen', noDocShown], ['No. revisi', o.rev || '00'], ['Tanggal', KOP_TGL_BAKU]] /* tanggal kop tetap */.forEach((p, i) => {
         const lab = String(p[0]), val = String(pre + p[1]);
         rptPut(ws, r + i, o.lab, lab, { size: fitSize(lab, labW, false, 11, 9) });
         rptPut(ws, r + i, o.val, val, { size: fitSize(val, valW, false, 11, 9) });
@@ -5514,6 +5533,11 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const missing = dates.filter(d => !window.dbLoaded['sppg_log_suhu/' + d]);
       window.__suhuRangePhotos = {};
 
+      // Kolom objek (Ruangan / Unit) hanya ditampilkan bila rekap mencakup lebih dari
+      // satu kategori. Untuk filter khusus Ruang atau Penyimpanan, kolom ini dihapus
+      // dan nama objek dipindah sebagai sub-teks pada kolom Tanggal.
+      const showObjCol = !(catSel === 'ruang' || catSel === 'penyimpanan');
+
       let rows = '';
       let nLengkap = 0, nSebagian = 0, nKosong = 0;
       dates.forEach(d => {
@@ -5543,15 +5567,20 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           const measure = sm.measure.length ? sm.measure.join(' · ') : '—';
           const ket = sm.ket.length ? sm.ket.join('; ') : '—';
 
+          const objCell = showObjCol
+            ? `<td data-label="Ruangan / Unit" class="p-3 align-top">
+              <div class="font-bold text-slate-800">${suhuHistEsc(suhuItemShortName(cfg))}</div>
+              <div class="text-[9px] font-bold text-slate-500 uppercase tracking-wide">${suhuHistEsc(suhuHistCatLabel(cfg.groupKey))}</div>
+            </td>`
+            : '';
+
           rows += `<tr class="border-b border-slate-100 hover:bg-slate-50">
             <td data-label="Tanggal" class="p-3 align-top whitespace-nowrap">
               <div class="font-bold text-slate-700">${suhuHistShortDate(d)}</div>
               <div class="text-[10px] text-slate-400">${suhuHistEsc(suhuHistDateText(d))}</div>
+              ${showObjCol ? '' : `<div class="text-[10px] font-bold text-slate-600 mt-1">${suhuHistEsc(suhuItemShortName(cfg))}</div>`}
             </td>
-            <td data-label="Ruangan / Unit" class="p-3 align-top">
-              <div class="font-bold text-slate-800">${suhuHistEsc(suhuItemShortName(cfg))}</div>
-              <div class="text-[9px] font-bold text-slate-500 uppercase tracking-wide">${suhuHistEsc(suhuHistCatLabel(cfg.groupKey))}</div>
-            </td>
+            ${objCell}
             <td data-label="Hasil Suhu" class="p-3 align-top text-slate-600 min-w-[170px]">${suhuHistEsc(measure)}</td>
             <td data-label="Status" class="p-3 align-top text-center whitespace-nowrap">${stateBadge}${okBadge ? '<br>' + okBadge : ''}</td>
             <td data-label="Catatan" class="p-3 align-top text-slate-600 max-w-[220px] break-words">${suhuHistEsc(ket)}</td>
@@ -5586,7 +5615,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase text-[10px] tracking-wider">
                 <tr>
                   <th class="p-3 text-left">Tanggal</th>
-                  <th class="p-3 text-left">Nama Ruangan / Unit</th>
+                  ${showObjCol ? '<th class="p-3 text-left">Nama Ruangan / Unit</th>' : ''}
                   <th class="p-3 text-left">Hasil Pengukuran Suhu</th>
                   <th class="p-3 text-center">Kelengkapan / Kepatuhan</th>
                   <th class="p-3 text-left">Keterangan / Tindakan Koreksi</th>
@@ -5594,7 +5623,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                   <th class="p-3 text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody>${rows || `<tr><td colspan="7" class="p-8 text-center text-xs text-slate-400">Tidak ada objek yang cocok dengan filter yang dipilih.</td></tr>`}</tbody>
+              <tbody>${rows || `<tr><td colspan="${showObjCol ? 7 : 6}" class="p-8 text-center text-xs text-slate-400">Tidak ada objek yang cocok dengan filter yang dipilih.</td></tr>`}</tbody>
             </table>
           </div>
         </div>`;
@@ -5607,7 +5636,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       setTimeout(() => {
         const tb = document.querySelector('#suhuHistoryContent table');
         if (!tb) return;
-        const shortLabels = ['Tanggal', 'Ruangan / Unit', 'Hasil Suhu', 'Status', 'Catatan', 'Bukti Foto', 'Aksi'];
+        const shortLabels = showObjCol
+          ? ['Tanggal', 'Ruangan / Unit', 'Hasil Suhu', 'Status', 'Catatan', 'Bukti Foto', 'Aksi']
+          : ['Tanggal', 'Hasil Suhu', 'Status', 'Catatan', 'Bukti Foto', 'Aksi'];
         tb.querySelectorAll('tbody tr').forEach(tr => {
           Array.prototype.forEach.call(tr.children, (td, i) => { if (shortLabels[i]) td.setAttribute('data-label', shortLabels[i]); });
         });
@@ -7514,7 +7545,6 @@ function suhuRenderMultiTable(thead, tbody, startKey) {
   <tr>
     <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
     <th class="p-3 border-b border-slate-600 w-36 text-center whitespace-nowrap">TANGGAL</th>
-    <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
     <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
     <th class="p-3 border-b border-slate-600 w-24 text-center">SESI</th>
     <th class="p-3 border-b border-slate-600 w-24 text-center whitespace-nowrap">WAKTU</th>
@@ -7556,7 +7586,6 @@ function suhuRenderMultiTable(thead, tbody, startKey) {
             <div class="font-black text-slate-800 text-sm">${suhuDateLabelShort(d)}</div>
             <div class="text-[9px] font-bold text-slate-400 mt-0.5">${d}</div>
           </td>
-          <td rowspan="${cols}" data-label="Ruangan / Unit" data-label-lock="1" class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap align-middle">${cfg.area}</td>
           <td rowspan="${cols}" data-label="Bukti Foto" data-label-lock="1" class="p-2 text-center align-middle ${hasPhoto ? '' : 'suhu-photo-empty'}">
             <div class="${hasPhoto ? '' : 'rounded-xl border-2 border-dashed border-amber-300 p-2'}" ${hasPhoto ? '' : 'style="background-color:#fffbeb"'}>
               ${hasPhoto ? '' : '<div class="mb-1"><span class="inline-block text-[9px] font-extrabold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full">Belum Diisi</span></div>'}
@@ -7583,14 +7612,14 @@ function suhuRenderMultiTable(thead, tbody, startKey) {
 
   html += `
     <tr class="hidden-print border-t border-slate-200 suhu-multi-add-row">
-      <td colspan="10" class="p-5 text-center bg-slate-50/80">
+      <td colspan="9" class="p-5 text-center bg-slate-50/80">
         <button type="button" onclick="addSuhuRuangColumn()" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2.5 px-6 min-h-[48px] rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all flex mx-auto items-center gap-2 hover:-translate-y-0.5">
           <span>➕</span> Tambah Waktu Pengukuran (Ke-${suhuRuangColumns + 1})
         </button>
       </td>
     </tr>
     <tr id="suhuFilterEmptyNote" class="hidden">
-      <td colspan="10" class="p-6 text-center text-[11px] font-bold text-emerald-700 bg-emerald-50">Semua tanggal pada periode ini sudah lengkap terisi.</td>
+      <td colspan="9" class="p-6 text-center text-[11px] font-bold text-emerald-700 bg-emerald-50">Semua tanggal pada periode ini sudah lengkap terisi.</td>
     </tr>`;
 
   tbody.innerHTML = html;
@@ -7703,7 +7732,6 @@ function renderSuhuTable() {
   <tr>
     <th class="p-3 border-b border-slate-600 text-center w-12">NO</th>
     <th class="p-3 border-b border-slate-600 w-32 text-center whitespace-nowrap">TANGGAL</th>
-    <th class="p-3 border-b border-slate-600 w-[1%]">AREA / RUANGAN</th>
     <th class="p-3 border-b border-slate-600 w-44 text-center">BUKTI FOTO</th>
     ${dynamicHeaders}
         <th class="p-3 border-b border-slate-600 w-32 text-center">BATAS SUHU</th>
@@ -7729,7 +7757,6 @@ function renderSuhuTable() {
         <tr class="hover:bg-slate-50 border-b border-slate-100">
           <td class="p-3 text-center font-bold text-slate-400">${rowNo++}</td>
           <td class="p-2 text-center whitespace-nowrap"><input type="date" id="suhu_tgl_${cfg.id}" value="${dateKey || getLocalDateKey()}" class="w-full min-w-[130px] border-2 border-slate-200 rounded-xl p-2 text-center text-sm bg-white font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-400"></td>
-          <td class="p-3 font-bold text-slate-800 bg-slate-50/50 w-[1%] whitespace-nowrap">${cfg.area}</td>
           <td class="p-2 text-center">${fotoHtml}</td>
           ${dynamicCells}
           <td class="p-2 text-center"><input type="text" id="suhu_std_${cfg.id}" value="${cfg.std}" oninput="evalSuhuStatus('${cfg.id}', ${cfg.min}, ${cfg.max})" class="w-full border-2 border-amber-100 hover:border-amber-300 rounded-xl p-3 min-h-[50px] text-center font-extrabold text-sm bg-amber-50 text-amber-700 focus:bg-white transition-colors"></td>
@@ -7738,7 +7765,7 @@ function renderSuhuTable() {
         </tr>`;
     });
 
-        let totalCols = 7 + (2 * suhuRuangColumns);   // +1 kolom TANGGAL
+        let totalCols = 6 + (2 * suhuRuangColumns);   // NO + TANGGAL + FOTO + BATAS + STATUS + KET
     htmlBody += `
       <tr class="hidden-print border-t border-slate-200">
         <td colspan="${totalCols}" class="p-5 text-center bg-slate-50/80">
@@ -8679,7 +8706,7 @@ function renderSuhuTable() {
       box.innerHTML = `<div class="font-bold text-amber-900 mb-2">⚠️ Menu hari ke-${idx + 1} (${sdEsc(rptLongDate(dateKey))}) mengandung: ${found.map(f => '<b>' + sdEsc(sdTitle(f)) + '</b>').join(', ')}</div>
         <div class="flex flex-wrap gap-2">` + found.map(f => {
           const n = list.filter(s => sdMatches(s, f)).length;
-          return `<button type="button" onclick="sdPrintLabels('${f}')" ${n ? '' : 'disabled'} class="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 disabled:opacity-40 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-rose-500/30 transition-all">🏷️ Cetak Label ALERGI ${sdEsc(f)} (${n} anak)</button>`;
+          return `<button type="button" onclick="sdGoToLabelPanel('${f}')" ${n ? '' : 'disabled'} title="Buka panel pengaturan Cetak Label di bawah" class="bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 disabled:opacity-40 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-rose-500/30 transition-all">🏷️ Cetak Label ALERGI ${sdEsc(f)} (${n} anak)</button>`;
         }).join('') + '</div>';
     }
 
@@ -8715,6 +8742,33 @@ function renderSuhuTable() {
       if (sel && Array.from(sel.options).some(o => o.value === kw)) { sel.value = kw; sdRenderLabelPanel(); }
       setTimeout(() => { document.getElementById('sd_lbl_info')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
     }
+
+    // Navigasi dari kotak "Reminder Menu & Label Alergi" (#sd_reminder) menuju panel
+    // "Cetak Label Reminder Alergi Peserta Didik" di bagian bawah halaman.
+    // Tidak mencetak langsung: hanya menyiapkan pilihan jenis alergi, memperbarui
+    // Live Preview, lalu menyorot panel agar pengguna dapat mengatur opsi label dahulu.
+    function sdGoToLabelPanel(alergiUtama) {
+      const panel = document.getElementById('sd_label_panel');
+      const sel = document.getElementById('sd_lbl_alergi');
+      const kw = sdNorm(alergiUtama).toUpperCase();
+      if (sel && kw) {
+        const same = o => String(o.value || '').toUpperCase() === kw;
+        let opt = Array.from(sel.options).find(same);
+        if (!opt) {
+          sel.insertAdjacentHTML('beforeend', `<option value="${sdEsc(kw)}">${sdEsc(sdTitle(kw))}</option>`);
+          opt = Array.from(sel.options).find(same);
+        }
+        if (opt) sel.value = opt.value;
+      }
+      if (typeof sdRenderLabelPanel === 'function') sdRenderLabelPanel();
+      if (!panel) return;
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      panel.classList.add('sd-panel-highlight');
+      clearTimeout(window.__sdLabelHighlightTimer);
+      window.__sdLabelHighlightTimer = setTimeout(() => panel.classList.remove('sd-panel-highlight'), 1600);
+      setTimeout(() => { try { if (sel) sel.focus({ preventScroll: true }); } catch (e) {} }, 500);
+    }
+    window.sdGoToLabelPanel = sdGoToLabelPanel;
 
     // ---------------------------------------------------------------- LABEL 5 x 7 CM
     const SD_LABEL_CSS = `
@@ -10964,8 +11018,8 @@ function renderSuhuTable() {
     // Terhubung ke: data alergi per anak (kolom Anak Alergi, daftar sekolah, panel Inspeksi Alergen 22.01, ringkasan laporan 01.01)
     // =====================================================================
     const PMB_PATH = 'sppg_penerima_manfaat';
-    const PMB_RANK = { PAUD: 0, SD: 1, SMP: 2, POSYANDU: 3 };
-    const PMB_LABEL = { PAUD: 'PAUD/TK', SD: 'SD/MI', SMP: 'SMP/MTs', POSYANDU: 'Posyandu' };
+    const PMB_RANK = { PAUD: 0, SD: 1, SMP: 2, SMA: 3, POSYANDU: 4 };
+    const PMB_LABEL = { PAUD: 'PAUD/TK', SD: 'SD/MI', SMP: 'SMP/MTs', SMA: 'SMA/MA', POSYANDU: 'Posyandu' };
     const PMB_FIELDS = ['kl', 'kp', 'bl', 'bp', 'tl', 'tp', 'org', 'bumil', 'busui'];
     const PMB_JM = ['kj', 'bj'];   // Jumlah PM (opsional) porsi kecil / besar siswa; kosong = pakai L+P
     const PMB_GROUPS = { kecil: ['kl', 'kp'], besar: ['bl', 'bp'], td: ['tl', 'tp'], org: ['org'], ibu: ['bumil', 'busui'] };
@@ -10973,6 +11027,7 @@ function renderSuhuTable() {
       PAUD:     { kecil: 'Siswa — Porsi Kecil',     besar: null,                        td: 1, org: 1, ibu: 0 },
       SD:       { kecil: 'Kelas 1–3 — Porsi Kecil', besar: 'Kelas 4–6 — Porsi Besar',  td: 1, org: 1, ibu: 0 },
       SMP:      { kecil: null,                      besar: 'Kelas 7–9 — Porsi Besar',  td: 1, org: 1, ibu: 0 },
+      SMA:      { kecil: null,                      besar: 'Kelas 10–12 — Porsi Besar', td: 1, org: 1, ibu: 0 },
       POSYANDU: { kecil: 'Balita — Porsi Kecil',    besar: null,                        td: 0, org: 1, ibu: 1 }
     };
     let pmbEditId = null;
@@ -11042,6 +11097,7 @@ function renderSuhuTable() {
   const warn = (pm, lp) => pm !== lp ? ' ⚠L+P=' + lp : '';
   if (it.jenis === 'SD') return 'Kls 1–3: ' + c.kecil + ' (L ' + c.kl + '/P ' + c.kp + ')' + warn(c.kecil, c.lpKecil) + ' · Kls 4–6: ' + c.bs + ' (L ' + c.bl + '/P ' + c.bp + ')' + warn(c.bs, c.lpBesar) + ' · Tendik ' + c.td + ' · Organo ' + c.org;
   if (it.jenis === 'SMP') return 'Kls 7–9: ' + c.bs + ' (L ' + c.bl + '/P ' + c.bp + ')' + warn(c.bs, c.lpBesar) + ' · Tendik ' + c.td + ' · Organo ' + c.org;
+  if (it.jenis === 'SMA') return 'Kls 10–12: ' + c.bs + ' (L ' + c.bl + '/P ' + c.bp + ')' + warn(c.bs, c.lpBesar) + ' · Tendik ' + c.td + ' · Organo ' + c.org;
   return 'Siswa ' + c.kecil + ' (L ' + c.kl + '/P ' + c.kp + ')' + warn(c.kecil, c.lpKecil) + ' · Tendik ' + c.td + ' · Organo ' + c.org;
 }
     function pmbSorted(items) {
@@ -11112,6 +11168,7 @@ function renderSuhuTable() {
         if (kn.some(n => n >= 1 && n <= 3)) return 'SD1';
         return 'SD';
       }
+      if (/\bSMA\b|\bSMK\b|\bMA\b/.test(u)) return 'SMA';
       if (/\bSMP\b|\bMTS\b/.test(u)) return 'SMP';
       if (/\bPAUD\b|\bTK\b|\bKB\b|\bRA\b/.test(u)) return 'PAUD';
       if (/\bSD\b|\bMI\b/.test(u)) {
@@ -11130,7 +11187,7 @@ function renderSuhuTable() {
       if (typeof sdGetAll !== 'function' || typeof sdTokens !== 'function') return out;
       const byName = {};
       pmbData().items.forEach(it => { byName[pmbNorm(it.nama)] = it; });
-      const fromSchool = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', POSYANDU: 'B3UNK' };
+      const fromSchool = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', SMA: 'SMA', POSYANDU: 'B3UNK' };
       sdGetAll().forEach(s => {
         const toks = sdTokens(s.alergi);
         if (!toks.length) return;
@@ -11166,6 +11223,7 @@ function renderSuhuTable() {
       const sd1J = sum('SD', c => c.kecil);
       const sd2J = sum('SD', c => c.bs);
       const smpJ = sum('SMP', c => c.siswa);
+      const smaJ = sum('SMA', c => c.siswa);
       const sdLegacy = (ag.SD && ag.SD.n) ? ag.SD : null;
       const mergeSD = !!sdLegacy;
       const sdKondisi = [];
@@ -11176,13 +11234,14 @@ function renderSuhuTable() {
         { jenjang: 'PAUD / TK', jumlah: paudJ, kondisi: sasaranKondisiText(ag.PAUD, paudJ), kondisiSpan: 1 },
         { jenjang: 'SD / MI Kelas 1–3', jumlah: sd1J, kondisi: mergeSD ? (sdKondisi.join('\n') || '-') : sasaranKondisiText(ag.SD1, sd1J), kondisiSpan: mergeSD ? 2 : 1 },
         { jenjang: 'SD / MI Kelas 4–6', jumlah: sd2J, kondisi: mergeSD ? '' : sasaranKondisiText(ag.SD2, sd2J), kondisiSpan: mergeSD ? 0 : 1 },
-        { jenjang: 'SMP / MTs', jumlah: smpJ, kondisi: sasaranKondisiText(ag.SMP, smpJ), kondisiSpan: 1 }
+        { jenjang: 'SMP / MTs', jumlah: smpJ, kondisi: sasaranKondisiText(ag.SMP, smpJ), kondisiSpan: 1 },
+        { jenjang: 'SMA / MA', jumlah: smaJ, kondisi: sasaranKondisiText(ag.SMA, smaJ), kondisiSpan: 1 }
       ];
       const notes = [];
       if (!items.length) notes.push('Database Penerima Manfaat (menu 1) belum terisi sehingga kolom Jumlah Peserta Didik bernilai 0; angka Kondisi Khusus tetap diambil dari Data Alergi (menu 3).');
       if (mergeSD) notes.push('Data alergi jenjang SD/MI tanpa rincian kelas digabung pada sel Kondisi Khusus SD/MI.');
       if (ag.B3UNK && ag.B3UNK.n) notes.push(ag.B3UNK.n + ' data alergi sasaran 3B (Posyandu) tidak dihitung pada laporan peserta didik.');
-      if (ag.LAIN && ag.LAIN.n) notes.push(ag.LAIN.n + ' data alergi berjenjang di luar cakupan laporan (SMA/SMK/MA/lainnya) tidak dihitung.');
+      if (ag.LAIN && ag.LAIN.n) notes.push(ag.LAIN.n + ' data alergi berjenjang di luar cakupan laporan (SMK/lainnya) tidak dihitung.');
       return { rows, notes };
     }
     function sasaran3BReport() {
@@ -11198,7 +11257,7 @@ function renderSuhuTable() {
       const notes = [];
       if (!items.length) notes.push('Database Penerima Manfaat belum memuat data Posyandu (3B) sehingga kolom Jumlah Sasaran bernilai 0.');
       if (ag.B3UNK && ag.B3UNK.n) notes.push(ag.B3UNK.n + ' data alergi sasaran 3B belum dirinci kelompoknya; lengkapi jenjang (Balita / Ibu Hamil / Ibu Menyusui) di menu Data Alergi.');
-      const luar = ['PAUD', 'SD1', 'SD2', 'SD', 'SMP', 'LAIN'].reduce((n, k) => n + ((ag[k] && ag[k].n) || 0), 0);
+      const luar = ['PAUD', 'SD1', 'SD2', 'SD', 'SMP', 'SMA', 'LAIN'].reduce((n, k) => n + ((ag[k] && ag[k].n) || 0), 0);
       if (luar) notes.push(luar + ' data alergi peserta didik tidak dihitung pada laporan 3B.');
       return { rows, notes };
     }
@@ -11276,11 +11335,20 @@ function renderSuhuTable() {
       const AM = pmbAlergiMap();
 
       // ---- tabel sekolah ----
-      let h = '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🏫 Peserta Didik dan Guru/Tendik</div><button type="button" onclick="pmbAddRowSk()" class="hidden-print bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1950px]"><thead><tr>' +
+      let h = '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🏫 Peserta Didik dan Guru/Tendik</div>' +
+        '<div class="hidden-print flex flex-wrap items-center gap-1.5">' +
+        '<select id="pmb_add_group" title="Pilih kelompok untuk baris baru" class="border-2 border-slate-200 rounded-lg px-2 py-1.5 text-[11px] font-bold bg-white text-slate-700 cursor-pointer">' +
+        '<option value="PAUD">PAUD/TK</option><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option></select>' +
+        '<button type="button" onclick="pmbAddRowSk(document.getElementById(\'pmb_add_group\').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button>' +
+        '</div></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1950px]"><thead><tr>' +
         ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Tendik Laki-Laki', 'Tendik Perempuan', 'Total Tendik', 'Uji Organoleptik', 'Jumlah Siswa, Guru/Tendik & Organoleptik', 'Porsi Kecil', 'Porsi Besar', 'Anak Alergi', 'Aksi'].map((x, i) => '<th' + (i === 15 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
       sk.forEach((it, idx) => {
         const c = pmbCalc(it), id = it.id;
-        const lines = it.jenis === 'SD' ? [['1,2,3', 'kl', 'kp', 'kj', c.lpKecil], ['4,5,6', 'bl', 'bp', 'bj', c.lpBesar]] : it.jenis === 'SMP' ? [['7,8,9', 'bl', 'bp', 'bj', c.lpBesar]] : [['PAUD', 'kl', 'kp', 'kj', c.lpKecil]];
+        const lines = it.jenis === 'SD'
+          ? [['1,2,3', 'kl', 'kp', 'kj', c.lpKecil], ['4,5,6', 'bl', 'bp', 'bj', c.lpBesar]]
+          : (it.jenis === 'SMP' || it.jenis === 'SMA')
+            ? [[it.jenis === 'SMA' ? '10,11,12' : '7,8,9', 'bl', 'bp', 'bj', c.lpBesar]]
+            : [['PAUD', 'kl', 'kp', 'kj', c.lpKecil]];
         const rs = lines.length;
         lines.forEach((ln, k) => {
           const pmVal = hasV(it[ln[3]]) ? it[ln[3]] : '';
@@ -11330,6 +11398,8 @@ h += '</tbody></table></div></div>';
       h += `<tr class="pmb-total"><td colspan="2">TOTAL (${SM.length} sampel)</td><td data-smptotal="1">${pmbSampelTotal()}</td><td>Porsi Besar</td><td></td><td class="hidden-print"></td></tr></tbody></table></div></div>`;
       h += pmbOrphanNote(d.items);
       host.innerHTML = h;
+      const agSel = document.getElementById('pmb_add_group');
+      if (agSel && window.__pmbAddGroup && Array.from(agSel.options).some(o => o.value === window.__pmbAddGroup)) agSel.value = window.__pmbAddGroup;
       pmbRefreshComputed();
     }
 
@@ -11375,9 +11445,13 @@ h += '</tbody></table></div></div>';
         if (el) { try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} el.focus(); try { el.select(); } catch (e) {} }
       }, 80);
     }
-    function pmbAddRowSk() {
-      if (!confirm('Apakah Anda yakin ingin menambahkan baris baru pada tabel Peserta Didik dan Guru/Tendik?')) return;
-      const d = pmbData(), it = { id: pmbNewId(), jenis: 'PAUD', nama: '' };
+    function pmbAddRowSk(group) {
+      const j = (['PAUD', 'SD', 'SMP', 'SMA'].indexOf(String(group || '').toUpperCase()) >= 0)
+        ? String(group).toUpperCase() : 'PAUD';
+      const label = PMB_LABEL[j] || j;
+      if (!confirm('Apakah Anda yakin ingin menambahkan baris baru pada tabel Peserta Didik dan Guru/Tendik (kelompok ' + label + ')?')) return;
+      window.__pmbAddGroup = j;
+      const d = pmbData(), it = { id: pmbNewId(), jenis: j, nama: '' };
       PMB_FIELDS.forEach(k => { it[k] = 0; });
       PMB_JM.forEach(k => { it[k] = null; });
       const list = d.items.slice(); list.push(it);
@@ -11460,7 +11534,7 @@ h += '</tbody></table></div></div>';
       const m = { nama: 'Nama', kj: 'Jumlah Siswa yang Mendapat MBG (porsi kecil)', bj: 'Jumlah Siswa yang Mendapat MBG (porsi besar)', tl: 'Tendik Laki-Laki', tp: 'Tendik Perempuan', org: 'Uji Organoleptik', bumil: 'Ibu Hamil', busui: 'Ibu Menyusui' };
       if (pos) { m.kl = 'Balita Laki-Laki'; m.kp = 'Balita Perempuan'; }
       else {
-        const kc = it.jenis === 'SD' ? 'Kelas 1–3' : 'Siswa', bc = it.jenis === 'SMP' ? 'Kelas 7–9' : 'Kelas 4–6';
+        const kc = it.jenis === 'SD' ? 'Kelas 1–3' : 'Siswa', bc = it.jenis === 'SMA' ? 'Kelas 10–12' : (it.jenis === 'SMP' ? 'Kelas 7–9' : 'Kelas 4–6');
         m.kl = kc + ' Laki-Laki'; m.kp = kc + ' Perempuan'; m.bl = bc + ' Laki-Laki'; m.bp = bc + ' Perempuan';
       }
       return m[f] || f;
@@ -11577,7 +11651,7 @@ h += '</tbody></table></div></div>';
       if (!host) return;
       const items = pmbData().items;
       const z = () => ({ l: 0, p: 0, j: 0 });
-      const g = { sampel: z(), paud: z(), sd1: z(), balita: z(), sd2: z(), smp: z(), td: z(), org: z(), bumil: z(), busui: z() };
+      const g = { sampel: z(), paud: z(), sd1: z(), balita: z(), sd2: z(), smp: z(), sma: z(), td: z(), org: z(), bumil: z(), busui: z() };
       const mism = [];
       items.forEach(it => {
         const c = pmbCalc(it);
@@ -11585,13 +11659,14 @@ h += '</tbody></table></div></div>';
         if (it.jenis === 'PAUD') add('paud', c.kl, c.kp, c.kecil);
         else if (it.jenis === 'SD') add('sd1', c.kl, c.kp, c.kecil), add('sd2', c.bl, c.bp, c.bs);
         else if (it.jenis === 'SMP') add('smp', c.bl, c.bp, c.bs);
+        else if (it.jenis === 'SMA') add('sma', c.bl, c.bp, c.bs);
         else { add('balita', c.kl, c.kp, c.kecil); g.bumil.j += c.bumil; g.busui.j += c.busui; }
         g.org.j += c.org;   // organoleptik bisa ada di posyandu juga
 if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lpKecil || c.bs !== c.lpBesar) mism.push(it.nama); }
       });
       g.sampel.j = pmbSampelTotal();   // sampel bahan makanan (porsi besar)
       const kecil = g.paud.j + g.sd1.j + g.balita.j;
-      const besar = g.sd2.j + g.smp.j + g.td.j + g.org.j + g.sampel.j + g.bumil.j + g.busui.j;
+      const besar = g.sd2.j + g.smp.j + g.sma.j + g.td.j + g.org.j + g.sampel.j + g.bumil.j + g.busui.j;
       const total = kecil + besar;
       const pct = v => total ? (v * 100 / total).toFixed(1).replace('.', ',') + '%' : '-';
       const dash = '<span style="color:#94a3b8">-</span>';
@@ -11606,17 +11681,17 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       let h = '<div><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2">A. Rincian per Kelompok Penerima Manfaat</div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table><thead><tr><th>Kelompok</th><th>Laki-Laki</th><th>Perempuan</th><th>Jumlah</th><th>% dari Total</th></tr></thead><tbody>' +
         row('kecil', 'PAUD / TK / KB / RA — siswa', g.paud, 1) + row('kecil', 'SD / MI kelas 1–3', g.sd1, 1) + row('kecil', 'Balita (posyandu)', g.balita, 1) +
         `<tr class="sub"><td>PORSI KECIL</td><td></td><td></td><td>${kecil}</td><td>${pct(kecil)}</td></tr>` +
-        row('besar', 'SD / MI kelas 4–6', g.sd2, 1) + row('besar', 'SMP / MTs kelas 7–9', g.smp, 1) + row('besar', 'Pendidik &amp; tenaga kependidikan', g.td, 1) +
+        row('besar', 'SD / MI kelas 4–6', g.sd2, 1) + row('besar', 'SMP / MTs kelas 7–9', g.smp, 1) + row('besar', 'SMA / MA kelas 10–12', g.sma, 1) + row('besar', 'Pendidik &amp; tenaga kependidikan', g.td, 1) +
         row('besar', 'Uji organoleptik', g.org, 0) + row('besar', 'Sampel bahan makanan', g.sampel, 0) + row('besar', 'Ibu hamil', g.bumil, 0) + row('besar', 'Ibu menyusui', g.busui, 0) +
         `<tr class="sub"><td>PORSI BESAR</td><td></td><td></td><td>${besar}</td><td>${pct(besar)}</td></tr>` +
         `<tr class="grand"><td>TOTAL PORSI</td><td></td><td></td><td>${total}</td><td>100%</td></tr></tbody></table></div>` +
         (mism.length ? `<p class="text-[11px] text-amber-700 font-medium mt-2">⚠ Jumlah PM berbeda dari laki-laki + perempuan pada: ${pmbEsc(mism.join(', '))}. Kolom "Jumlah" memakai jumlah PM.</p>` : '') + '</div>';
 
       // B. per jenis satuan
-      const jenisRows = ['PAUD', 'SD', 'SMP', 'POSYANDU'].map(j => {
+      const jenisRows = ['PAUD', 'SD', 'SMP', 'SMA', 'POSYANDU'].map(j => {
         const its = items.filter(i => i.jenis === j); let k = 0, b = 0;
         its.forEach(i => { const c = pmbCalc(i); k += c.porsiKecil; b += c.porsiBesar; });
-        return `<tr><td>${{ PAUD: 'PAUD / TK / KB / RA', SD: 'SD / MI', SMP: 'SMP / MTs', POSYANDU: 'Posyandu (3B)' }[j]}</td><td class="n">${its.length}</td><td class="n">${k}</td><td class="n">${b}</td><td class="n" style="font-weight:900">${k + b}</td><td class="n">${pct(k + b)}</td></tr>`;
+        return `<tr><td>${{ PAUD: 'PAUD / TK / KB / RA', SD: 'SD / MI', SMP: 'SMP / MTs', SMA: 'SMA / MA', POSYANDU: 'Posyandu (3B)' }[j]}</td><td class="n">${its.length}</td><td class="n">${k}</td><td class="n">${b}</td><td class="n" style="font-weight:900">${k + b}</td><td class="n">${pct(k + b)}</td></tr>`;
       }).join('') + `<tr><td>Sampel Bahan Makanan</td><td class="n">${pmbSampel().length}</td><td class="n">0</td><td class="n">${g.sampel.j}</td><td class="n" style="font-weight:900">${g.sampel.j}</td><td class="n">${pct(g.sampel.j)}</td></tr>`;
       h += `<div><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2">B. Rincian per Jenis Satuan</div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table><thead><tr><th>Jenis</th><th>Jumlah Satuan</th><th>Porsi Kecil</th><th>Porsi Besar</th><th>Total Porsi</th><th>% dari Total</th></tr></thead><tbody>${jenisRows}<tr class="grand"><td>TOTAL</td><td>${items.length}</td><td>${kecil}</td><td>${besar}</td><td>${total}</td><td>100%</td></tr></tbody></table></div></div>`;
 
@@ -11672,7 +11747,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       pmbSave({ tanggal: d.tanggal, items: list });
       // sinkronisasi wajib: nama dan jenjang pada Data Alergi mengikuti satuan ini
       if (old && typeof sdGetAll === 'function' && typeof sdSave === 'function') {
-        const jenjangMap = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', POSYANDU: 'BALITA' };
+        const jenjangMap = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', SMA: 'SMA', POSYANDU: 'BALITA' };
         const all = sdGetAll(); let ch = false;
         all.forEach(s => {
           if (pmbNorm(s.sekolah) !== pmbNorm(old.nama)) return;
@@ -11764,7 +11839,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         let r = 3; const T = new Array(NC + 1).fill(0);
         sk.forEach((it, idx) => {
           const c = pmbCalc(it);
-          const lines = it.jenis === 'SD' ? [['1,2,3', c.kl, c.kp, c.kecil], ['4,5,6', c.bl, c.bp, c.bs]] : it.jenis === 'SMP' ? [['7,8,9', c.bl, c.bp, c.bs]] : [['', c.kl, c.kp, c.kecil]];
+          const lines = it.jenis === 'SD' ? [['1,2,3', c.kl, c.kp, c.kecil], ['4,5,6', c.bl, c.bp, c.bs]] : (it.jenis === 'SMP' || it.jenis === 'SMA') ? [[it.jenis === 'SMA' ? '10,11,12' : '7,8,9', c.bl, c.bp, c.bs]] : [['', c.kl, c.kp, c.kecil]];
           const r2 = r + lines.length - 1;
           lines.forEach((ln, k) => {
             rptPut(ws, r + k, 3, ln[0], C); rptPut(ws, r + k, 4, ln[3], C); rptPut(ws, r + k, 5, ln[1], C); rptPut(ws, r + k, 6, ln[2], C);
@@ -11859,6 +11934,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         const j = pmbNorm(typeof sdNormJenjang === 'function' ? sdNormJenjang(s.jenjang) : s.jenjang);
         if (/BALITA|BUMIL|HAMIL|MENYUSUI|BUSUI|POSYANDU/.test(j) || /POSYANDU/.test(pmbNorm(s.sekolah))) return 'POSYANDU';
         if (/PAUD|TK|KB|RA/.test(j)) return 'PAUD';
+        if (/SMA|SMK|\bMA\b/.test(j)) return 'SMA';
         if (/SMP|MTS/.test(j)) return 'SMP';
         return 'SD';
       }
@@ -11920,13 +11996,88 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       }
       window.sdFillSekolahSelect = sdFillSekolahSelect;
 
-      // Pilih satuan -> jenjang mengikuti jenis satuan (Posyandu = Balita).
+      // Pilih satuan -> jenjang mengikuti jenis satuan.
+      // Untuk Posyandu, semua kelompok sasaran yang tersedia (Balita, Ibu Hamil, Ibu Menyusui)
+      // ikut disinkronkan ke pilihan jenjang & filter tabel Data Alergi.
+      function sdUnitGroupOptions(unit) {
+        if (!unit) return [];
+        if (unit.jenis === 'POSYANDU') {
+          const c = pmbCalc(unit);
+          return [
+            { label: 'Balita', count: c.porsiKecil },
+            { label: 'Ibu Hamil', count: c.bumil },
+            { label: 'Ibu Menyusui', count: c.busui }
+          ];
+        }
+        return [{ label: { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', SMA: 'SMA' }[unit.jenis] || '', count: 0 }];
+      }
+      window.sdUnitGroupOptions = sdUnitGroupOptions;
+
+      function sdEnsureJenjangChoices(groups) {
+        const dl = document.getElementById('sd_dl_jenjang');
+        if (!dl) return;
+        const have = Array.from(dl.options).map(o => String(o.value).toUpperCase());
+        (groups || []).forEach(g => {
+          if (!g || !g.label) return;
+          if (have.indexOf(String(g.label).toUpperCase()) === -1) {
+            const op = document.createElement('option');
+            op.value = g.label;
+            dl.appendChild(op);
+            have.push(String(g.label).toUpperCase());
+          }
+        });
+      }
+
       window.sdOnSekolahPick = function (v) {
         const unit = pmbData().items.find(i => pmbNorm(i.nama) === pmbNorm(v));
         const jj = document.getElementById('sd_f_jenjang');
         if (!unit || !jj) return;
-        const map = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', POSYANDU: 'BALITA' };
-        if (!jj.value.trim() || unit.jenis === 'POSYANDU') jj.value = map[unit.jenis] || '';
+        const groups = sdUnitGroupOptions(unit);
+        sdEnsureJenjangChoices(groups);
+
+        const labels = groups.map(g => String(g.label).toUpperCase());
+        const cur = sdNorm(jj.value).toUpperCase();
+        const isValidForUnit = labels.indexOf(cur) !== -1;
+        if (unit.jenis === 'POSYANDU') {
+          // Jangan menimpa pilihan yang sudah valid (mis. saat mengubah data Ibu Hamil).
+          if (!isValidForUnit) {
+            const withTarget = groups.filter(g => g.count > 0);
+            jj.value = (withTarget.length === 1) ? withTarget[0].label : '';
+          }
+          jj.placeholder = 'Balita / Ibu Hamil / Ibu Menyusui';
+        } else if (!cur) {
+          jj.value = groups[0] ? groups[0].label : '';
+        }
+
+        // Filter tabel Data Alergi: sediakan pilihan jenjang unit ini dan
+        // bersihkan filter yang tidak valid agar tabel tidak tampak kosong.
+        const fj = document.getElementById('sd_filter_jenjang');
+        if (fj) {
+          const vals = Array.from(fj.options).map(o => String(o.value).toUpperCase());
+          groups.forEach(g => {
+            const u = String(g.label).toUpperCase();
+            if (g.label && vals.indexOf(u) === -1) {
+              const op = document.createElement('option');
+              op.value = u;
+              op.textContent = g.label;
+              fj.appendChild(op);
+              vals.push(u);
+            }
+          });
+          if (fj.value && vals.indexOf(String(fj.value).toUpperCase()) === -1) fj.value = '';
+        }
+
+        // Tampilkan data alergi milik satuan yang dipilih.
+        const q = document.getElementById('sd_q');
+        if (q) { q.value = unit.nama; sdPage = 1; sdRenderTable(); }
+
+        const hint = document.getElementById('sd_sekolah_sync');
+        if (hint) {
+          const avail = groups.filter(g => g.count > 0);
+          const listTxt = (avail.length ? avail : groups).map(g =>
+            g.label + (g.count > 0 ? ' (' + g.count + ')' : '')).join(' · ');
+          hint.innerHTML = '🔗 Kelompok sasaran tersedia: <b>' + sdEsc(listTxt) + '</b>';
+        }
       };
 
       // 2) setiap simpan/ubah data alergi -> pastikan satuannya ada di database
@@ -13940,6 +14091,136 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     });
   }
   sync(); setInterval(sync, 400);
+})();
+</script>
+<script>
+/* ============================================================
+   NOMOR DOKUMEN DINAMIS PER MODUL
+   - Setiap modul memiliki input "Nomor Dokumen" (kecuali Food Waste
+     yang sudah punya input sendiri di #fw_docno).
+   - Nilai disimpan di localStorage (sppg_docno_<kode>) dan menjadi
+     sumber utama pada kop laporan Excel, Word, dan Cetak.
+   ============================================================ */
+(function () {
+  var DOCNO_DEFAULTS = {
+    '01.01': 'FM-SGR-SPPG-01.01',
+    '01.02': 'FM-SGR-SPPG-01.02',
+    '01.03': 'FM-SGR-SPPG-01.03',
+    '01.04': 'FM-SGR-SPPG-01.04',
+    '03.05': 'FM-SGR-SPPG-03.05',
+    '05.01': 'FM-SGR-SPPG-05.01',
+    '05.03': 'FM-SGR-SPPG-05.03',
+    '06.01': 'FM-SGR-SPPG-06.01',
+    '21.01': 'FM-SGR-SPPG-21.01',
+    '22.01': 'FM-SGR-SPPG-22.01',
+    'MASTER': ''   // Master Bahan: default kosong (diisi manual bila perlu)
+  };
+  window.DOCNO_DEFAULTS = DOCNO_DEFAULTS;
+
+  function lsKey(k) { return 'sppg_docno_' + k; }
+
+  window.docNoDefault = function (key) {
+    return Object.prototype.hasOwnProperty.call(DOCNO_DEFAULTS, key) ? DOCNO_DEFAULTS[key] : '';
+  };
+
+  window.docNoGet = function (key) {
+    try {
+      var v = localStorage.getItem(lsKey(key));
+      if (v === null) return window.docNoDefault(key);
+      return v;
+    } catch (e) {
+      return window.docNoDefault(key);
+    }
+  };
+
+  window.docNoSet = function (key, val) {
+    try { localStorage.setItem(lsKey(key), String(val == null ? '' : val)); } catch (e) {}
+  };
+
+  // Ubah kode baku statis menjadi nilai input modul (bila kode dikenali).
+  window.docNoResolve = function (staticCode) {
+    if (!staticCode) return staticCode;
+    var k = String(staticCode).replace(/^FM-SGR-SPPG-/, '');
+    if (!Object.prototype.hasOwnProperty.call(DOCNO_DEFAULTS, k)) return staticCode;
+    return window.docNoGet(k);
+  };
+
+  window.docNoInput = function (el, key) {
+    window.docNoSet(key, el.value);
+  };
+
+  window.docNoMount = function (key, sectionOrEl, label, opts) {
+    opts = opts || {};
+    var host = sectionOrEl;
+    var bar = document.createElement('div');
+    bar.className = 'docno-bar hidden-print flex flex-wrap items-center gap-2 px-4 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm';
+    bar.setAttribute('data-docno-key', key);
+
+    var title = document.createElement('span');
+    title.className = 'text-[10px] font-black uppercase tracking-widest text-slate-500';
+    title.textContent = 'Nomor Dokumen';
+    bar.appendChild(title);
+
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.id = 'docno_inp_' + key.replace(/[^A-Za-z0-9]/g, '_');
+    inp.value = window.docNoGet(key);
+    inp.placeholder = opts.placeholder || window.docNoDefault(key) || 'Isi nomor dokumen...';
+    inp.className = 'flex-1 min-w-[220px] border-2 border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 bg-slate-50 focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all';
+    inp.setAttribute('aria-label', 'Nomor Dokumen ' + (label || key));
+    inp.oninput = function () { window.docNoSet(key, inp.value); };
+    bar.appendChild(inp);
+
+    if (opts.hint !== false) {
+      var hint = document.createElement('span');
+      hint.className = 'text-[10px] text-slate-400 font-medium';
+      hint.textContent = 'Dipakai otomatis pada kop Excel, Word & Cetak.';
+      bar.appendChild(hint);
+    }
+    if (opts.before && opts.before.parentNode) {
+      opts.before.parentNode.insertBefore(bar, opts.before);
+    } else if (host) {
+      host.insertAdjacentElement('afterend', bar);
+    }
+    return bar;
+  };
+
+  var MODULES = [
+    { key: '01.01', sec: 'sec-sasaran-didik',   label: 'Pendataan Sasaran Peserta Didik' },
+    { key: '01.03', sec: 'sec-frekuensi-bahan', label: 'Frekuensi Bahan' },
+    { key: 'MASTER', sec: 'sec-master-bahan-20', label: 'Master Bahan', placeholder: 'FM-SGR-DST (opsional)', hint: false },
+    { key: '01.04', sec: 'sec-siklus-menu-20',  label: 'Siklus Menu' },
+    { key: '06.01', sec: 'sec-pemorsian',       label: 'Pemorsian & Berat (06.01)' },
+    { key: '03.05', sec: 'sec-suhu-ruangan',    label: 'Pemantauan Suhu' },
+    { key: '21.01', sec: 'sec-inspeksi-silang', label: 'Kontaminasi Silang' },
+    { key: '22.01', sec: 'sec-inspeksi-alergen', label: 'Manajemen Alergen' },
+    { key: '05.03', sec: 'sec-pendinginan',     label: 'Pemantauan di Cooling Area' },
+    { key: '05.01', sec: 'sec-uji-organoleptik', label: 'Uji Organoleptik & Suhu Memasak' }
+  ];
+
+  window.docNoMountAll = function () {
+    MODULES.forEach(function (m) {
+      var sec = document.getElementById(m.sec);
+      if (!sec) return;
+      if (sec.querySelector('.docno-bar[data-docno-key="' + m.key + '"]')) return;
+      // Tempatkan tepat setelah baris tombol "Kembali ke Dashboard" (anak pertama section).
+      var first = sec.firstElementChild;
+      window.docNoMount(m.key, first, m.label, { placeholder: m.placeholder, hint: m.hint !== false });
+    });
+    // Sub-laporan 3B (FM-SGR-SPPG-01.02) berada di dalam modul Pendataan Sasaran.
+    var lap2 = document.getElementById('pmr_lap2');
+    if (lap2 && !document.querySelector('.docno-bar[data-docno-key="01.02"]')) {
+      window.docNoMount('01.02', null, 'Pendataan Sasaran 3B', { before: lap2 });
+    }
+    // Food Waste memakai input yang sudah ada (#fw_docno) — pastikan nilainya sinkron.
+    var fw = document.getElementById('fw_docno');
+    if (fw && !fw.value) {
+      try { var v = localStorage.getItem('sppg_food_waste_docno'); if (v) fw.value = v; } catch (e) {}
+    }
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', window.docNoMountAll);
+  else window.docNoMountAll();
 })();
 </script>
 </body>
