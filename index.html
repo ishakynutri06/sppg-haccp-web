@@ -1650,14 +1650,43 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
   <!-- MODAL PILIHAN CAKUPAN EXPORT MODUL PEMANTAUAN SUHU (1 HALAMAN = 1 ITEM) -->
   <div id="suhuExportScopeModal" class="fixed inset-0 z-[130] hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="text-center space-y-1">
         <div class="text-3xl">📑</div>
         <h3 class="text-lg font-bold text-slate-800">Cakupan Export Laporan Suhu</h3>
         <p class="text-[11px] text-slate-500" id="suhuExportScopeInfo">Pilih cakupan data yang akan diekspor:</p>
       </div>
-      <button type="button" onclick="resolveSuhuExportScope('item')" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all">📄 Cetak/Export Objek Aktif (1 Halaman)<br><span class="text-[11px] font-medium opacity-90">Hanya 1 ruangan / alat yang sedang dibuka</span></button>
-      <button type="button" onclick="resolveSuhuExportScope('all')" class="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-black text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-slate-800/30 transition-all">📚 Cetak/Export Semua Objek Kategori Ini (Terpisah Per Halaman)<br><span class="text-[11px] font-medium opacity-90">Terpisah per halaman (Word) / per sheet (Excel)</span></button>
+      <div id="suhuExportDatePanel" class="hidden space-y-3 text-left border-t border-slate-200 pt-3">
+        <div class="grid grid-cols-2 gap-2">
+          <label class="suhu-export-mode-label flex items-start gap-2 rounded-xl border border-slate-200 px-3 py-2 cursor-pointer transition-colors">
+            <input type="radio" name="suhuExportDateMode" value="single" class="mt-0.5 accent-indigo-600" onchange="suhuExportDateModeChanged()">
+            <span class="text-[11px] font-bold text-slate-700 leading-tight">Tanggal Tertentu<span class="block font-medium text-slate-500">1 hari</span></span>
+          </label>
+          <label class="suhu-export-mode-label flex items-start gap-2 rounded-xl border border-slate-200 px-3 py-2 cursor-pointer transition-colors">
+            <input type="radio" name="suhuExportDateMode" value="range" class="mt-0.5 accent-indigo-600" onchange="suhuExportDateModeChanged()">
+            <span class="text-[11px] font-bold text-slate-700 leading-tight">Rentang Tanggal<span class="block font-medium text-slate-500">Periode</span></span>
+          </label>
+        </div>
+        <div id="suhuExportSingleWrap" class="space-y-1">
+          <label for="suhuExportSingleDate" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Tanggal yang dicetak/diexport</label>
+          <input type="date" id="suhuExportSingleDate" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400" onchange="updateSuhuExportDateSummary()" oninput="updateSuhuExportDateSummary()">
+        </div>
+        <div id="suhuExportRangeWrap" class="hidden">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="space-y-1">
+              <label for="suhuExportRangeStart" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Mulai Tanggal</label>
+              <input type="date" id="suhuExportRangeStart" class="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400" onchange="updateSuhuExportDateSummary()" oninput="updateSuhuExportDateSummary()">
+            </div>
+            <div class="space-y-1">
+              <label for="suhuExportRangeEnd" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500">Sampai Tanggal</label>
+              <input type="date" id="suhuExportRangeEnd" class="w-full rounded-xl border border-slate-300 px-2 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400" onchange="updateSuhuExportDateSummary()" oninput="updateSuhuExportDateSummary()">
+            </div>
+          </div>
+        </div>
+        <div id="suhuExportDateSummary" class="rounded-xl border px-3 py-2 text-[11px] leading-relaxed bg-slate-50 border-slate-200 text-slate-600"></div>
+      </div>
+      <button type="button" id="suhuExportScopeItemBtn" onclick="resolveSuhuExportScope('item')" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">📄 Cetak/Export Objek Aktif (1 Halaman)<br><span class="text-[11px] font-medium opacity-90">Hanya 1 ruangan / alat yang sedang dibuka</span></button>
+      <button type="button" id="suhuExportScopeAllBtn" onclick="resolveSuhuExportScope('all')" class="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-black text-white font-bold py-3 rounded-xl text-sm shadow-lg shadow-slate-800/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">📚 Cetak/Export Semua Objek Kategori Ini (Terpisah Per Halaman)<br><span class="text-[11px] font-medium opacity-90">Terpisah per halaman (Word) / per sheet (Excel)</span></button>
       <button type="button" onclick="resolveSuhuExportScope(null)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-sm transition-all">Batal</button>
     </div>
   </div>
@@ -2616,37 +2645,197 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     }
 
     let suhuExportKind = null;
+
+    // ==== Pilihan tanggal khusus Export/Cetak Suhu Ruangan & Penyimpanan ====
+    function suhuExportDatePanelActive() {
+      return activeSuhuCategory === 'ruang' || activeSuhuCategory === 'penyimpanan';
+    }
+    function suhuExportKindLabel(kind) {
+      return kind === 'print' ? 'Cetak' : (kind === 'word' ? 'Export Word' : 'Export Excel');
+    }
+    function suhuExportCategoryLabel() {
+      return ({ ruang: '1. Suhu Ruangan', penyimpanan: '2. Suhu Penyimpanan', pemorsian: '3. Suhu Pemorsian' })[activeSuhuCategory] || '';
+    }
+    function suhuExportRadioMode() {
+      const el = document.querySelector('input[name="suhuExportDateMode"]:checked');
+      return el && el.value === 'range' ? 'range' : 'single';
+    }
+    function suhuExportDateValue(id) {
+      const el = document.getElementById(id);
+      const v = el ? String(el.value || '') : '';
+      return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '';
+    }
+    // Hasil pilihan tanggal modal: { ok, mode, dates, start, end, msg }
+    function suhuExportDateSelection() {
+      const mode = suhuExportRadioMode();
+      if (mode === 'range') {
+        const s = suhuExportDateValue('suhuExportRangeStart');
+        const e = suhuExportDateValue('suhuExportRangeEnd');
+        if (!s || !e) return { ok: false, mode: mode, msg: 'Tanggal Mulai dan Sampai Tanggal wajib diisi.' };
+        if (s > e) return { ok: false, mode: mode, msg: 'Rentang tanggal tidak valid: Mulai Tanggal (' + suhuLongDateKey(s) + ') tidak boleh melebihi Sampai Tanggal (' + suhuLongDateKey(e) + ').' };
+        const dates = suhuDateKeysBetween(s, e);
+        if (!dates.length) return { ok: false, mode: mode, msg: 'Rentang tanggal tidak valid.' };
+        return { ok: true, mode: mode, dates: dates, start: s, end: e };
+      }
+      const d = suhuExportDateValue('suhuExportSingleDate');
+      if (!d) return { ok: false, mode: 'single', msg: 'Tanggal yang akan dicetak/diexport belum dipilih.' };
+      return { ok: true, mode: 'single', dates: [d], start: d, end: d };
+    }
+    function suhuExportIndoWeekday(key) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(key || '')) return '';
+      const p = key.split('-');
+      return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    }
+    function suhuSetExportScopeButtonsEnabled(on) {
+      ['suhuExportScopeItemBtn', 'suhuExportScopeAllBtn'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.disabled = !on;
+      });
+    }
+    function suhuExportPaintModeLabels() {
+      document.querySelectorAll('#suhuExportDatePanel .suhu-export-mode-label').forEach(l => {
+        const inp = l.querySelector('input');
+        const on = !!(inp && inp.checked);
+        l.classList.toggle('border-indigo-500', on);
+        l.classList.toggle('bg-indigo-50', on);
+      });
+    }
+    function suhuExportDateModeChanged() {
+      const mode = suhuExportRadioMode();
+      const single = document.getElementById('suhuExportSingleWrap');
+      const range = document.getElementById('suhuExportRangeWrap');
+      if (single) single.classList.toggle('hidden', mode !== 'single');
+      if (range) range.classList.toggle('hidden', mode !== 'range');
+      suhuExportPaintModeLabels();
+      updateSuhuExportDateSummary();
+    }
+    // Ringkasan konfirmasi: aksi, kategori, dan tanggal/rentang yang akan diproses.
+    function updateSuhuExportDateSummary() {
+      if (!suhuExportDatePanelActive()) return;
+      const box = document.getElementById('suhuExportDateSummary');
+      if (!box) return;
+      const kind = suhuExportKind || 'excel';
+      const sel = suhuExportDateSelection();
+      const head = '<div class="font-bold">' + suhuHistEsc(suhuExportKindLabel(kind)) + ' — ' + suhuHistEsc(suhuExportCategoryLabel()) + '</div>';
+      if (!sel.ok) {
+        box.className = 'rounded-xl border px-3 py-2 text-[11px] leading-relaxed bg-rose-50 border-rose-300 text-rose-700';
+        box.innerHTML = head + '<div class="mt-1 font-semibold">⚠️ ' + suhuHistEsc(sel.msg) + '</div>';
+        suhuSetExportScopeButtonsEnabled(false);
+        return;
+      }
+      const action = kind === 'print' ? 'dicetak' : (kind === 'word' ? 'diexport ke Word' : 'diexport ke Excel');
+      let body;
+      if (sel.mode === 'range') {
+        body = '<div class="mt-1">Periode yang akan ' + action + ': <span class="font-bold">' + suhuHistEsc(suhuLongDateKey(sel.start)) + ' s.d. ' + suhuHistEsc(suhuLongDateKey(sel.end)) + ' (' + sel.dates.length + ' hari)</span></div>';
+      } else {
+        body = '<div class="mt-1">Tanggal yang akan ' + action + ': <span class="font-bold">' + suhuHistEsc(suhuExportIndoWeekday(sel.start)) + '</span></div>';
+      }
+      box.className = 'rounded-xl border px-3 py-2 text-[11px] leading-relaxed bg-emerald-50 border-emerald-300 text-emerald-800';
+      box.innerHTML = head + body;
+      suhuSetExportScopeButtonsEnabled(true);
+    }
+    // Siapkan panel tanggal saat modal dibuka. Mengembalikan true bila panel aktif.
+    function suhuExportInitDatePanel() {
+      const panel = document.getElementById('suhuExportDatePanel');
+      if (!panel) return false;
+      if (!suhuExportDatePanelActive()) {
+        panel.classList.add('hidden');
+        suhuSetExportScopeButtonsEnabled(true);
+        return false;
+      }
+      panel.classList.remove('hidden');
+      const tgl = suhuDocDateKey();
+      const single = document.getElementById('suhuExportSingleDate');
+      if (single) single.value = tgl;
+      let start = tgl, end = tgl, periodic = false;
+      if (suhuIsPeriodicMode()) {
+        const ps = (document.getElementById('suhu_period_start') || {}).value || '';
+        const pe = (document.getElementById('suhu_period_end') || {}).value || '';
+        if (suhuDateKeysBetween(ps, pe).length) { periodic = true; start = ps; end = pe; }
+      }
+      const rs = document.getElementById('suhuExportRangeStart');
+      const re = document.getElementById('suhuExportRangeEnd');
+      if (rs) rs.value = periodic ? start : tgl;
+      if (re) re.value = periodic ? end : tgl;
+      const rSingle = document.querySelector('input[name="suhuExportDateMode"][value="single"]');
+      const rRange = document.querySelector('input[name="suhuExportDateMode"][value="range"]');
+      if (rSingle) rSingle.checked = !periodic;
+      if (rRange) rRange.checked = periodic;
+      suhuExportDateModeChanged();
+      return true;
+    }
+
     function openSuhuExportMenu(kind) {
       suhuExportKind = kind;
       const m = document.getElementById('suhuExportScopeModal');
       const info = document.getElementById('suhuExportScopeInfo');
-      if (info) {
-        const catLabel = ({ ruang: '1. Suhu Ruangan', penyimpanan: '2. Suhu Penyimpanan', pemorsian: '3. Suhu Pemorsian' })[activeSuhuCategory] || '';
-        const cfg = getActiveSuhuItemCfg();
-        const act = kind === 'print' ? 'Cetak' : 'Export';
-        let rangeInfo = '';
-        if (suhuIsPeriodicMode()) {
-          const ds = suhuDateKeysBetween((document.getElementById('suhu_period_start') || {}).value, (document.getElementById('suhu_period_end') || {}).value);
-          rangeInfo = ds.length
-            ? ' — periode ' + ds[0] + ' s.d. ' + ds[ds.length - 1] + ' (' + ds.length + ' hari)'
-            : ' — rentang tanggal belum valid';
-        } else {
-          rangeInfo = ' — tanggal ' + suhuDocDateKey();
+      const catLabel = suhuExportCategoryLabel();
+      const cfg = getActiveSuhuItemCfg();
+      const act = kind === 'print' ? 'Cetak' : 'Export';
+      if (suhuExportDatePanelActive()) {
+        if (info) info.textContent = act + ' ' + catLabel + (cfg ? ' — objek aktif: ' + suhuItemShortName(cfg) : '') + ' — pilih objek dan tanggal laporan di bawah ini.';
+        suhuExportInitDatePanel();
+      } else {
+        const panel = document.getElementById('suhuExportDatePanel');
+        if (panel) panel.classList.add('hidden');
+        suhuSetExportScopeButtonsEnabled(true);
+        if (info) {
+          let rangeInfo = '';
+          if (suhuIsPeriodicMode()) {
+            const ds = suhuDateKeysBetween((document.getElementById('suhu_period_start') || {}).value, (document.getElementById('suhu_period_end') || {}).value);
+            rangeInfo = ds.length
+              ? ' — periode ' + ds[0] + ' s.d. ' + ds[ds.length - 1] + ' (' + ds.length + ' hari)'
+              : ' — rentang tanggal belum valid';
+          } else {
+            rangeInfo = ' — tanggal ' + suhuDocDateKey();
+          }
+          info.textContent = act + ' ' + catLabel + (cfg ? ' — objek aktif: ' + suhuItemShortName(cfg) : '') + rangeInfo;
         }
-        info.textContent = act + ' ' + catLabel + (cfg ? ' — objek aktif: ' + suhuItemShortName(cfg) : '') + rangeInfo;
       }
       if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
     }
 
-    async function resolveSuhuExportScope(scope) {
+    function hideSuhuExportScopeModal() {
       const m = document.getElementById('suhuExportScopeModal');
       if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
-      if (!scope) return;
+    }
+
+    async function resolveSuhuExportScope(scope) {
+      if (!scope) { hideSuhuExportScopeModal(); return; }
+
+      // Khusus Ruangan/Penyimpanan: tanggal ditentukan dari panel modal.
+      const isRS = suhuExportDatePanelActive();
+      let sel = null;
+      if (isRS) {
+        sel = suhuExportDateSelection();
+        if (!sel.ok) { updateSuhuExportDateSummary(); alert(sel.msg); return; } // modal tetap terbuka
+      }
+      hideSuhuExportScopeModal();
       const kind = suhuExportKind; suhuExportKind = null;
       const items = suhuExportItems(scope);
       if (!items.length) return alert('Item tidak ditemukan');
       const title = 'Pemantauan Suhu (FM-SGR-SPPG-03.05)';
 
+      if (isRS) {
+        const dates = sel.dates;
+        const totalPages = dates.length * items.length;
+        if (totalPages > 120 && !confirm('Laporan ini akan menghasilkan ' + totalPages + ' halaman/lembar kerja. Lanjutkan?')) return;
+        const photoMode = await askExportPhotoMode();
+        if (!photoMode) return;
+        const ext = kind === 'word' ? 'doc' : 'xlsx';
+        const fileName = (sel.mode === 'range')
+          ? suhuRangeExportFileName(ext, items, photoMode, sel.start, sel.end)
+          : suhuSingleExportFileName(ext, items, photoMode, sel.start);
+        const opt = { dates: dates, withNote: true, fileName: fileName };
+        if (kind === 'word') return await suhuExportWordItems(title, items, photoMode, opt);
+        if (kind === 'print') {
+          if (typeof window.printExport === 'function') return await window.printExport(function () { return suhuExportExcelItems(items, photoMode, opt); });
+          return await suhuExportExcelItems(items, photoMode, opt);
+        }
+        return await suhuExportExcelItems(items, photoMode, opt);
+      }
+
+      // ==== PEMORSIAN: perilaku lama tidak berubah ====
       // ==== MODE PERIODIK: seluruh tanggal dalam rentang ====
       if (suhuIsPeriodicMode()) {
         const dates = suhuDateKeysBetween(
@@ -2925,13 +3114,25 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       }
     }
 
-    // Nama file export mode periodik: SUHU RUANGAN_<objek>_2026-11-01_sd_2026-11-15_DENGAN GAMBAR.xlsx
-    function suhuRangeExportFileName(ext, items, photoMode) {
+    // Nama file export 1 tanggal untuk Ruangan/Penyimpanan:
+    // SUHU RUANGAN_<objek>_2026-11-10_DENGAN GAMBAR.xlsx
+    function suhuSingleExportFileName(ext, items, photoMode, dateKey) {
       const base = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', pemorsian: 'SUHU PEMORSIAN' })[activeSuhuCategory] || 'SUHU RUANGAN';
       const label = suhuExportItemLabel(items);
       let name = base + (label ? '_' + String(label).toUpperCase().replace(/[\\/:*?"<>|]/g, '-').trim() : '');
-      const s = (document.getElementById('suhu_period_start') || {}).value || '';
-      const e = (document.getElementById('suhu_period_end') || {}).value || '';
+      name += '_' + dateKey;
+      name += '_' + (photoMode === 'none' ? 'TANPA' : 'DENGAN') + ' GAMBAR';
+      return name + '.' + ext;
+    }
+
+    // Nama file export mode periodik: SUHU RUANGAN_<objek>_2026-11-01_sd_2026-11-15_DENGAN GAMBAR.xlsx
+    // startKey/endKey opsional (dipakai pilihan rentang di modal Export).
+    function suhuRangeExportFileName(ext, items, photoMode, startKey, endKey) {
+      const base = ({ ruang: 'SUHU RUANGAN', penyimpanan: 'SUHU PENYIMPANAN', pemorsian: 'SUHU PEMORSIAN' })[activeSuhuCategory] || 'SUHU RUANGAN';
+      const label = suhuExportItemLabel(items);
+      let name = base + (label ? '_' + String(label).toUpperCase().replace(/[\\/:*?"<>|]/g, '-').trim() : '');
+      const s = startKey || (document.getElementById('suhu_period_start') || {}).value || '';
+      const e = endKey || (document.getElementById('suhu_period_end') || {}).value || '';
       name += '_' + s + '_sd_' + e;
       name += '_' + (photoMode === 'none' ? 'TANPA' : 'DENGAN') + ' GAMBAR';
       return name + '.' + ext;
