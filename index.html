@@ -2986,9 +2986,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                 cfg: cfg,
                 cat: activeSuhuCategory,
                 clone: built.clone,
-                tableEl: tableEl,
-                note: withNote ? ('TANGGAL PEMANTAUAN : ' + suhuLongDateKey(d)) : '',
-                period: suhuPeriodLabel(d)
+                tableEl: tableEl
               });
             }
           }
@@ -3014,7 +3012,102 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       return (items.length === 1) ? suhuItemShortName(items[0]) : 'SEMUA ITEM';
     }
 
-    // Susun 1 halaman Word per entri pages (kop + blok keterangan + tabel)
+    // Gabungkan hasil capture per tanggal menjadi SATU tabel per objek.
+    // - Tanggal diurutkan kronologis (terlama -> terbaru).
+    // - Kolom waktu/suhu dinormalkan ke jumlah sesi terbanyak agar tabel tetap lurus.
+    // - Nomor baris diurutkan ulang dari 1 untuk setiap objek.
+    function suhuExportWaktuCount(table) {
+      const hr = table ? (table.querySelector('thead tr') || table.querySelector('tr')) : null;
+      if (!hr) return 1;
+      let n = 0;
+      Array.from(hr.children).forEach(c => {
+        if (c.tagName === 'TH' && /^WAKTU$/i.test(String(c.textContent || '').trim())) n++;
+      });
+      return Math.max(1, n);
+    }
+
+    let suhuMergeUid = 0;
+    function suhuMergeCapturedPages(pages, photoMode) {
+      const groups = new Map();
+      (pages || []).forEach(pg => {
+        if (!pg || !pg.cfg) return;
+        const key = pg.cfg.id;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(pg);
+      });
+      const out = [];
+      groups.forEach(list => {
+        list.sort((a, b) => (a.date < b.date ? -1 : (a.date > b.date ? 1 : 0)));
+        let maxPairs = 1;
+        let template = null;
+        list.forEach(pg => {
+          const n = suhuExportWaktuCount(pg.tableEl);
+          if (!template || n > maxPairs) { maxPairs = n; template = pg.tableEl; }
+        });
+        if (!template) return;
+        const merged = template.cloneNode(true);
+        const tbody = merged.querySelector('tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        let rowNo = 1;
+        list.forEach(pg => {
+          const src = pg.tableEl;
+          if (!src) return;
+          const srcPairs = suhuExportWaktuCount(src);
+          const rows = Array.from(src.querySelectorAll('tbody tr')).filter(tr =>
+            !tr.classList.contains('hidden-print') && !tr.querySelector('td[colspan]')
+          );
+          rows.forEach(tr => {
+            const tds = Array.from(tr.children).filter(x => x.tagName === 'TD' || x.tagName === 'TH');
+            if (tds.length < 4 + (2 * srcPairs) + 3) return;
+            const row = document.createElement('tr');
+            if (tr.className) row.className = tr.className;
+            const noCell = tds[0].cloneNode(true);
+            noCell.textContent = String(rowNo++);
+            row.appendChild(noCell);
+            const dateCell = tds[1].cloneNode(true);
+            const dateInp = dateCell.querySelector('input[type="date"]');
+            if (dateInp) dateInp.value = pg.date;
+            row.appendChild(dateCell);
+            row.appendChild(tds[2].cloneNode(true));
+            row.appendChild(tds[3].cloneNode(true));
+            for (let i = 0; i < maxPairs; i++) {
+              if (i < srcPairs) {
+                row.appendChild(tds[4 + (2 * i)].cloneNode(true));
+                row.appendChild(tds[5 + (2 * i)].cloneNode(true));
+              } else {
+                row.appendChild(document.createElement('td'));
+                row.appendChild(document.createElement('td'));
+              }
+            }
+            const tail = 4 + (2 * srcPairs);
+            row.appendChild(tds[tail].cloneNode(true));
+            row.appendChild(tds[tail + 1].cloneNode(true));
+            row.appendChild(tds[tail + 2].cloneNode(true));
+            tbody.appendChild(row);
+          });
+        });
+        // Clone bersih untuk Word (input -> teks, foto -> marker), memakai pembersih tabel yang sudah ada.
+        const tmp = document.createElement('div');
+        tmp.id = '__suhu_merge_tmp_' + (++suhuMergeUid);
+        tmp.style.display = 'none';
+        tmp.appendChild(merged.cloneNode(true));
+        document.body.appendChild(tmp);
+        let clean = null;
+        try { clean = getCleanTableHtml(tmp.id, photoMode === 'none'); }
+        finally { tmp.remove(); }
+        out.push({
+          date: list[0].date,
+          cfg: list[0].cfg,
+          cat: list[0].cat,
+          clone: clean && clean.clone ? clean.clone : null,
+          tableEl: merged
+        });
+      });
+      return out;
+    }
+
+    // Susun 1 halaman Word per objek (seluruh tanggal menyatu dalam satu tabel)
     async function suhuExportWordPages(title, pages, photoMode, fileName) {
       const docName = 'dokumen';
       const files = [];
@@ -3023,20 +3116,18 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const pageCss = 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm;';
 
       let body = '';
-      for (let i = 0; i < pages.length; i++) {
-        const pg = pages[i];
+      let pageIdx = 0;
+      const mergedPages = suhuMergeCapturedPages(pages, photoMode);
+      for (let i = 0; i < mergedPages.length; i++) {
+        const pg = mergedPages[i];
+        if (!pg.clone) continue;
         if (photoMode !== 'none') await exportEmbedWordPhotos(pg.clone, files, docName);
         // Kop lengkap di setiap halaman; file logo hanya didaftarkan sekali.
-        const kopHtml = exportWordKop(kopCode, docName, i === 0 ? files : [], suhuKopJudul(pg.cat));
+        const kopHtml = exportWordKop(kopCode, docName, pageIdx === 0 ? files : [], suhuKopJudul(pg.cat));
         const hdrHtml = suhuHeaderBlockHtml(suhuReportHeaderLines([pg.cfg.id], pg.cat));
-        const noteLines = [];
-        if (pg.note) noteLines.push(pg.note);
-        if (pg.period) noteLines.push('TANGGAL PEMANTAUAN PERIODIK : ' + pg.period);
-        const noteHtml = noteLines.length
-          ? `<div style="font-weight:bold;font-size:10.5pt;margin:0 0 6px 0;">${noteLines.map(suhuHistEsc).join('<br>')}</div>`
-          : '';
-        const breakHtml = (i > 0) ? `<br clear="all" style="mso-special-character:line-break;page-break-before:always">` : '';
-        body += `${breakHtml}<div class="Section1">${kopHtml}${hdrHtml}${noteHtml}${pg.clone.innerHTML}</div>`;
+        const breakHtml = (pageIdx > 0) ? `<br clear="all" style="mso-special-character:line-break;page-break-before:always">` : '';
+        body += `${breakHtml}<div class="Section1">${kopHtml}${hdrHtml}${pg.clone.innerHTML}</div>`;
+        pageIdx++;
       }
 
       const html = `
@@ -3063,21 +3154,15 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       exportDownloadBlob(blob, fileName);
     }
 
-    // Susun 1 worksheet per entri pages (kop + 6 baris keterangan + tabel)
+    // Susun 1 worksheet per objek (kop + 6 baris keterangan + tabel seluruh tanggal)
     async function suhuExportExcelPages(pages, photoMode, fileName) {
-      const multiDate = new Set(pages.map(p => p.date)).size > 1;
-      const sections = pages.map(pg => ({
+      const mergedPages = suhuMergeCapturedPages(pages, photoMode);
+      const sections = mergedPages.filter(pg => pg.tableEl).map(pg => ({
         tableEl: pg.tableEl,
         headerLines: suhuReportHeaderLines([pg.cfg.id], pg.cat),
         kopJudul: suhuKopJudul(pg.cat),
-        sheetName: (multiDate ? (pg.date.slice(8, 10) + '-' + pg.date.slice(5, 7) + ' ') : '') + suhuSheetShortName(pg.cfg),
-        dateText: suhuLongDateKey(pg.date),
-        extraLines: (() => {
-          const lines = [];
-          if (pg.note) lines.push(pg.note);
-          if (pg.period) lines.push('TANGGAL PEMANTAUAN PERIODIK : ' + pg.period);
-          return lines;
-        })()
+        sheetName: suhuSheetShortName(pg.cfg),
+        dateText: suhuLongDateKey(pg.date)
       }));
       await exportGenericExcelLegacy('Pemantauan Suhu (FM-SGR-SPPG-03.05)', 'wrapper_suhu', photoMode, { sections: sections, fileName: fileName });
     }
@@ -3321,10 +3406,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           const dateText = sec.dateText || exportGetDocDateText(wrapperId);
           const suhuHdr = sec.headerLines || (wrapperId === 'wrapper_suhu' ? suhuReportHeaderLines() : []);
           const isSuhu = suhuHdr.length > 0;
-          // Baris keterangan tambahan (mis. TANGGAL PEMANTAUAN pada export rentang tanggal)
-          const extraLines = Array.isArray(sec.extraLines) ? sec.extraLines.filter(Boolean) : [];
-          // Suhu: 3 baris kop baku + 1 kosong + blok keterangan + 1 kosong. Lainnya: 3 baris judul + 1 kosong.
-          const HDR_ROWS = isSuhu ? 4 + suhuHdr.length + extraLines.length : 4;
+          // Suhu: 3 baris kop baku + 1 kosong + blok 6 baris keterangan + 1 kosong.
+          const HDR_ROWS = isSuhu ? 4 + suhuHdr.length : 4;
           const kopJudul = sec.kopJudul || suhuKopJudul();
           let sheetName = String(sec.sheetName || ('Bagian ' + tIdx)).replace(/[\\\/\?\*\[\]:]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 31) || ('Bagian ' + tIdx);
           if (usedSheetNames.has(sheetName.toLowerCase())) sheetName = (sheetName.slice(0, 27) + ' ' + tIdx);
@@ -3339,10 +3422,6 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (3 baris)
             suhuHdr.forEach(l => {
               const row = ws.addRow([l[0] + (l[0].length < 18 ? ' '.repeat(18 - l[0].length) : '') + ': ' + l[1]]);
-              row.getCell(1).font = { name: 'Calibri', size: 11, bold: true };
-            });
-            extraLines.forEach(txt => {
-              const row = ws.addRow([txt]);
               row.getCell(1).font = { name: 'Calibri', size: 11, bold: true };
             });
             ws.addRow([]);
@@ -3486,7 +3565,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             ws.getColumn(lastC).width = Math.max(ws.getColumn(lastC).width || 0, 20);
             ws.getColumn(lastC - 1).width = Math.max(ws.getColumn(lastC - 1).width || 0, 14);
             // Baris 4 sudah digabung oleh rptKop di bawah; gabung baris keterangan berikutnya selebar tabel.
-            for (let i = 1; i < suhuHdr.length + extraLines.length; i++) {
+            for (let i = 1; i < suhuHdr.length; i++) {
               ws.mergeCells(4 + i, 1, 4 + i, lastC);
               ws.getCell(4 + i, 1).alignment = { horizontal: 'left', vertical: 'middle', wrapText: false };
             }
