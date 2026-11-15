@@ -421,6 +421,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         <button id="nav-suhu-ruangan" onclick="switchTab('suhu-ruangan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🌡️</span> <span>Pemantauan Suhu (FM-SGR-SPPG-03.05)</span></button>
         <button id="nav-pendinginan" onclick="switchTab('pendinginan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">❄️</span> <span>Pemantauan di Cooling Area (FM-SGR-SPPG-05.03)</span></button>
         <button id="nav-uji-organoleptik" onclick="switchTab('uji-organoleptik')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🍽️</span> <span>Uji Organoleptik &amp; Suhu Masak (FM-SGR-SPPG-05.01)</span></button>
+        <button id="nav-food-waste" onclick="switchTab('food-waste')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">♻️</span> <span>Food Waste (Sisa Makanan Ompreng)</span></button>
         <button id="nav-inspeksi-silang" onclick="switchTab('inspeksi-silang')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🛡️</span> <span>Kontaminasi Silang (FM-SGR-SPPG-21.01)</span></button>
         <button id="nav-inspeksi-alergen" onclick="switchTab('inspeksi-alergen')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white shadow-lg shadow-amber-900/40 hover:-translate-y-0.5 transition-all duration-300 border border-amber-500/50"><span class="text-base drop-shadow-md">⚠️</span> <span>Manajemen Alergen (FM-SGR-SPPG-22.01)</span></button>
         <button id="nav-backup-data" onclick="switchTab('backup-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">💾</span> <span>Backup & Restore Data</span></button>
@@ -636,48 +637,159 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
     <!-- PEMORSIAN (FM-SGR-SPPG-06.01) -->
     <section id="sec-pemorsian" class="tab-content hidden space-y-6">
+      <style>
+        #sec-pemorsian{--pm-emerald:#059669;--pm-teal:#0d9488;--pm-amber:#f59e0b;--pm-sky:#0284c7;--pm-ink:#0f3d2e}
+        #sec-pemorsian .pm-shell{background:linear-gradient(140deg,#f0fdf4 0%,#f8fafc 46%,#eff6ff 100%);border:1px solid #e2e8f0}
+        #sec-pemorsian .pm-hero{position:relative;overflow:hidden;border-radius:1.4rem;padding:1.05rem 1.15rem 1.1rem 1.35rem;border:1px solid #d1fae5;background:linear-gradient(120deg,#ecfdf5 0%,#f0fdfa 48%,#fffbeb 100%);box-shadow:0 18px 38px -34px rgba(6,78,59,.65)}
+        #sec-pemorsian .pm-hero:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,var(--pm-emerald),var(--pm-teal) 55%,var(--pm-amber))}
+        #sec-pemorsian .pm-kicker{display:inline-flex;align-items:center;gap:.35rem;font-size:9.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#047857;background:#fff;border:1px solid #a7f3d0;padding:.3rem .62rem;border-radius:999px;box-shadow:0 4px 10px -8px rgba(5,150,105,.8)}
+        #sec-pemorsian .pm-title{font-size:1.28rem;line-height:1.15;font-weight:900;color:#0f172a;letter-spacing:-.015em;margin-top:.55rem}
+        #sec-pemorsian .pm-title-accent{background:linear-gradient(90deg,#047857,#0d9488 55%,#0284c7);-webkit-background-clip:text;background-clip:text;color:transparent}
+        #sec-pemorsian .pm-sub{font-size:11px;font-weight:600;color:#64748b;margin-top:.3rem;max-width:46rem}
+        #sec-pemorsian .pm-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
+        #sec-pemorsian .pm-chip{display:inline-flex;align-items:center;gap:.25rem;font-size:9.5px;font-weight:800;padding:.22rem .5rem;border-radius:.55rem;border:1px solid #e2e8f0;background:#fff;color:#475569}
+        #sec-pemorsian .pm-chip-em{border-color:#a7f3d0;background:#ecfdf5;color:#047857}
+        #sec-pemorsian .pm-chip-sky{border-color:#bae6fd;background:#f0f9ff;color:#0369a1}
+        #sec-pemorsian .pm-chip-amber{border-color:#fde68a;background:#fffbeb;color:#b45309}
+        #sec-pemorsian .pm-picker{position:relative;overflow:hidden;border-radius:1.15rem;padding:.9rem 1rem;border:1px solid #bae6fd;background:linear-gradient(125deg,#f0f9ff 0%,#ecfdf5 55%,#fffbeb 100%);box-shadow:0 14px 30px -30px rgba(2,132,199,.85)}
+        #sec-pemorsian .pm-picker:after{content:"";position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:999px;background:radial-gradient(circle,#fde68a 0%,rgba(253,230,138,0) 70%);opacity:.55;pointer-events:none}
+        #sec-pemorsian .pm-picker-label{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:baseline;gap:.35rem;font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#0f766e}
+        #sec-pemorsian .pm-picker-hint{font-size:9.5px;font-weight:700;letter-spacing:.02em;text-transform:none;color:#94a3b8}
+        #sec-pemorsian .pm-select-wrap{position:relative;z-index:1;margin-top:.4rem;max-width:100%}
+        #sec-pemorsian .pm-select{width:100%;appearance:none;-webkit-appearance:none;border:1.5px solid #7dd3fc;border-radius:.85rem;padding:.7rem 2.3rem .7rem .85rem;font-size:12.5px;font-weight:800;color:#0f172a;background:#fff;cursor:pointer;box-shadow:0 8px 18px -18px rgba(2,132,199,.9);transition:border-color .15s,box-shadow .15s}
+        #sec-pemorsian .pm-select:hover{border-color:#38bdf8}
+        #sec-pemorsian .pm-select:focus{outline:none;border-color:var(--pm-teal);box-shadow:0 0 0 3px rgba(13,148,136,.16)}
+        #sec-pemorsian .pm-select-arrow{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);font-size:11px;font-weight:900;color:#0f766e;pointer-events:none}
+        #sec-pemorsian .pm-legend{display:flex;flex-wrap:wrap;gap:.32rem .7rem;font-size:9.5px;font-weight:800;color:#475569;position:relative;z-index:1}
+        #sec-pemorsian .pm-legend span{display:inline-flex;align-items:center;gap:.3rem}
+        #sec-pemorsian .pm-dot{width:.5rem;height:.5rem;border-radius:999px;display:inline-block;box-shadow:0 0 0 2px #fff}
+        #sec-pemorsian .pm-dot-0{background:#059669}#sec-pemorsian .pm-dot-1{background:#e11d48}#sec-pemorsian .pm-dot-2{background:#d97706}#sec-pemorsian .pm-dot-3{background:#65a30d}#sec-pemorsian .pm-dot-4{background:#ea580c}#sec-pemorsian .pm-dot-5{background:#0284c7}
+        #sec-pemorsian #wrapper_pemorsian{background:linear-gradient(180deg,#ffffff,#f8fafc);border:1px solid #d7e6e0;border-radius:1.25rem;box-shadow:0 22px 45px -40px rgba(6,78,59,.75)}
+        #sec-pemorsian #wrapper_pemorsian table{width:100%;min-width:1000px;border-collapse:separate;border-spacing:0;font-size:11px}
+        #sec-pemorsian #wrapper_pemorsian thead th{background:linear-gradient(135deg,#0f3d2e,#0f766e 60%,#0d9488);color:#fff;font-size:9.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:.7rem .45rem;border:0;text-align:center;white-space:nowrap}
+        #sec-pemorsian #wrapper_pemorsian thead th:first-child{border-radius:.85rem 0 0 .85rem}
+        #sec-pemorsian #wrapper_pemorsian thead th:last-child{border-radius:0 .85rem .85rem 0}
+        #sec-pemorsian #wrapper_pemorsian thead th.pm-th-std{background:linear-gradient(135deg,#047857,#10b981)}
+        #sec-pemorsian #wrapper_pemorsian thead th.pm-th-avg{background:linear-gradient(135deg,#0369a1,#0ea5e9)}
+        #sec-pemorsian #wrapper_pemorsian tbody td{padding:.5rem .4rem;border-bottom:1px solid #eef3f1;vertical-align:middle;color:#334155}
+        #sec-pemorsian #wrapper_pemorsian tbody tr:last-child td{border-bottom:0}
+        #sec-pemorsian #wrapper_pemorsian tbody tr:nth-child(even) td{background:#fbfdfc}
+        #sec-pemorsian #wrapper_pemorsian tbody tr:hover td{background:#f0fdfa}
+        #sec-pemorsian #wrapper_pemorsian tbody tr[data-nomenu="1"] td{background:#fafafa}
+        #sec-pemorsian #wrapper_pemorsian tbody td.pm-stdcol{background:#f0fdf4!important}
+        #sec-pemorsian #wrapper_pemorsian tbody td.pm-avgcol{background:#f0f9ff!important}
+        #sec-pemorsian #wrapper_pemorsian tbody tr:hover td.pm-stdcol{background:#dcfce7!important}
+        #sec-pemorsian #wrapper_pemorsian tbody tr:hover td.pm-avgcol{background:#e0f2fe!important}
+        #sec-pemorsian #wrapper_pemorsian tbody td.pm-nocol{font-weight:900;color:#94a3b8;text-align:center}
+        #sec-pemorsian .pm-cat{display:inline-flex;align-items:center;font-size:9px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .45rem;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+        #sec-pemorsian .pm-cat-0{background:#ecfdf5;border-color:#6ee7b7;color:#047857}
+        #sec-pemorsian .pm-cat-1{background:#fff1f2;border-color:#fda4af;color:#be123c}
+        #sec-pemorsian .pm-cat-2{background:#fffbeb;border-color:#fcd34d;color:#b45309}
+        #sec-pemorsian .pm-cat-3{background:#f7fee7;border-color:#bef264;color:#4d7c0f}
+        #sec-pemorsian .pm-cat-4{background:#fff7ed;border-color:#fdba74;color:#c2410c}
+        #sec-pemorsian .pm-cat-5{background:#f0f9ff;border-color:#7dd3fc;color:#0369a1}
+        #sec-pemorsian .pm-menu{display:inline-block;margin-top:.22rem;font-size:10.5px;font-weight:900;letter-spacing:.03em;text-transform:uppercase;color:#0f766e}
+        #sec-pemorsian .pm-menu.is-empty{color:#94a3b8;font-style:italic;font-weight:800;text-transform:none}
+        #sec-pemorsian .pm-field{position:relative;display:flex;align-items:center;min-width:5.2rem}
+        #sec-pemorsian .pm-input{width:100%;min-width:0;border:1.5px solid #d7e3ee;border-radius:.7rem;padding:.42rem 1.85rem .42rem .45rem;font-size:11.5px;font-weight:800;text-align:right;color:#0f172a;background:#fff;font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s,background .15s}
+        #sec-pemorsian .pm-input:hover{border-color:#cbd5e1}
+        #sec-pemorsian .pm-input:focus{outline:none;border-color:var(--pm-teal);box-shadow:0 0 0 3px rgba(13,148,136,.15);background:#fff}
+        #sec-pemorsian .pm-input::-webkit-outer-spin-button,#sec-pemorsian .pm-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+        #sec-pemorsian .pm-input{-moz-appearance:textfield;appearance:textfield}
+        #sec-pemorsian .pm-input-std{color:#065f46;background:#f7fefb;border-color:#a7f3d0}
+        #sec-pemorsian .pm-input-std:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.16)}
+        #sec-pemorsian .pm-input-smp{color:#1d4ed8}
+        #sec-pemorsian .pm-unit{position:absolute;right:.5rem;top:50%;transform:translateY(-50%);font-size:8.5px;font-weight:900;letter-spacing:.03em;color:#94a3b8;pointer-events:none;text-transform:uppercase}
+        #sec-pemorsian .pm-avg{display:inline-block;min-width:3rem;font-size:12px;font-weight:900;color:#0f3d2e;font-variant-numeric:tabular-nums}
+        #sec-pemorsian .pm-badge{display:inline-flex;align-items:center;justify-content:center;gap:.3rem;padding:.28rem .55rem;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;border:1px solid transparent;white-space:nowrap;line-height:1.25}
+        #sec-pemorsian .pm-badge-ok{background:#ecfdf5;border-color:#6ee7b7;color:#047857}
+        #sec-pemorsian .pm-badge-under{background:#fffbeb;border-color:#fcd34d;color:#b45309}
+        #sec-pemorsian .pm-badge-over{background:#fff1f2;border-color:#fda4af;color:#be123c}
+        #sec-pemorsian .pm-badge-none{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
+        @media (min-width:768px){#sec-pemorsian .pm-title{font-size:1.5rem}}
+        @media (max-width:767px){
+          #sec-pemorsian .pm-hero{padding:.95rem 1rem 1rem 1.15rem;border-radius:1.1rem}
+          #sec-pemorsian .pm-title{font-size:1.12rem}
+          #sec-pemorsian .pm-chips{display:none}
+          #sec-pemorsian #wrapper_pemorsian{border-radius:1rem;box-shadow:0 14px 30px -30px rgba(6,78,59,.7)}
+          #sec-pemorsian #wrapper_pemorsian tbody td{background:transparent!important;padding:.55rem .8rem!important}
+          #sec-pemorsian #wrapper_pemorsian tbody td.pm-stdcol{background:#f0fdf4!important}
+          #sec-pemorsian #wrapper_pemorsian tbody td.pm-avgcol{background:#f0f9ff!important}
+          #sec-pemorsian #wrapper_pemorsian tbody td.pm-comp{display:block;text-align:left}
+          #sec-pemorsian #wrapper_pemorsian tbody td.pm-comp::before{display:none}
+          #sec-pemorsian .pm-field{flex:1 1 auto}
+          #sec-pemorsian .pm-select{font-size:12px}
+          #sec-pemorsian .pm-actions{width:100%}
+          #sec-pemorsian .pm-actions > button{flex:1 1 calc(50% - .3rem);min-width:0;padding-left:.5rem;padding-right:.5rem;white-space:nowrap}
+        }
+      </style>
       <div class="flex items-center justify-between">
-        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-emerald-50 border border-emerald-100 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
           <span>←</span> Kembali ke Dashboard
         </button>
       </div>
-      <div class="bg-white p-4 md:p-8 rounded-3xl shadow-xl shadow-slate-200/30 border border-slate-100 space-y-6">
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-100 pb-4 gap-4">
-          <div>
-            <div class="text-[10px] font-extrabold text-emerald-600 tracking-widest uppercase bg-emerald-50 w-fit px-2 py-0.5 rounded">Monitoring Gizi</div>
-            <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">⚖️ Checklist Pemorsian (FM-SGR-SPPG-06.01)</h2>
-          </div>
-          <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-            <button onclick="exportGenericExcel('Pemorsian', 'wrapper_pemorsian')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
+      <div class="pm-shell p-4 md:p-8 rounded-3xl shadow-xl shadow-emerald-900/5 space-y-5">
+        <div class="pm-hero">
+          <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div class="min-w-0">
+              <div class="pm-kicker"><span>⚖️</span> Monitoring Gizi · FM-SGR-SPPG-06.01</div>
+              <h2 class="pm-title">Checklist Pemorsian <span class="pm-title-accent">&amp; Berat Porsi</span></h2>
+              <p class="pm-sub">Standar gramasi tiap komponen menu, 3 sampel porsi + foto, rata-rata dan kesesuaian dihitung otomatis.</p>
+              <div class="pm-chips">
+                <span class="pm-chip pm-chip-em">Standar otomatis 200 gr · Makanan Pokok</span>
+                <span class="pm-chip pm-chip-sky">Komponen lain 0 gr</span>
+                <span class="pm-chip pm-chip-amber">Semua nilai dapat diubah manual</span>
+              </div>
+            </div>
+            <div class="pm-actions flex flex-wrap gap-2 w-full lg:w-auto">
+              <button onclick="exportGenericExcel('Pemorsian', 'wrapper_pemorsian')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Excel</button>
             <button onclick="exportGenericWord('Checklist Pemorsian Dan Berat Porsi (FM-SGR-SPPG-06.01)', 'wrapper_pemorsian')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Word</button>
             <button onclick="savePemorsianLog()" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-lg shadow-slate-800/30 hover:-translate-y-0.5 transition-all">Simpan Pemorsian</button>
+            </div>
           </div>
         </div>
-        
-        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
-            <label class="block font-bold text-slate-700 text-xs uppercase tracking-wider">Pilih Hari Siklus Menu Aktif (Otomatis Tanggal Realtime):</label>
-            <select id="selectSiklusPemorsian" onchange="onPemorsianDayChange(this)" class="border-2 border-slate-200 p-3 rounded-xl text-sm font-bold w-full lg:w-1/2 bg-white text-slate-800 cursor-pointer shadow-sm"></select>
+
+        <div class="pm-picker">
+          <div class="flex flex-col md:flex-row md:items-end gap-4">
+            <div class="w-full md:w-1/2">
+              <label for="selectSiklusPemorsian" class="pm-picker-label">Pilih Hari Siklus Menu Aktif <span class="pm-picker-hint">otomatis mengikuti tanggal realtime</span></label>
+              <div class="pm-select-wrap">
+                <select id="selectSiklusPemorsian" onchange="onPemorsianDayChange(this)" class="pm-select"></select>
+                <span class="pm-select-arrow">▾</span>
+              </div>
+            </div>
+            <div class="w-full md:w-1/2">
+              <div class="pm-legend">
+                <span><i class="pm-dot pm-dot-0"></i>Makanan Pokok</span>
+                <span><i class="pm-dot pm-dot-1"></i>Lauk Hewani</span>
+                <span><i class="pm-dot pm-dot-2"></i>Lauk Nabati</span>
+                <span><i class="pm-dot pm-dot-3"></i>Sayur</span>
+                <span><i class="pm-dot pm-dot-4"></i>Buah</span>
+                <span><i class="pm-dot pm-dot-5"></i>Susu</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="md:hidden text-[10px] text-slate-400 italic mb-2 flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
-        <div id="wrapper_pemorsian" class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm w-full">
-          <table class="w-full text-xs text-left min-w-[1000px]">
-            <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase font-bold tracking-wider text-[11px]">
+        <div class="md:hidden text-[10px] text-slate-400 italic flex items-center gap-1"><span>👆</span> Geser tabel ke kiri/kanan</div>
+        <div id="wrapper_pemorsian" class="overflow-x-auto w-full">
+          <table class="w-full text-xs text-left">
+            <thead class="uppercase font-bold text-white">
               <tr>
-                <th class="p-3 text-center border-b border-slate-600 w-12">No</th>
-                <th class="p-3 border-b border-slate-600">Komponen Menu</th>
-                <th class="p-3 text-center border-b border-slate-600 w-28">Standar (gr)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">S1 (gr)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">FOTO S1</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">S2 (gr)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">FOTO S2</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">S3 (gr)</th>
-                <th class="p-3 text-center border-b border-slate-600 w-24">FOTO S3</th>
-                <th class="p-3 text-center border-b border-slate-600 w-28">Rata-Rata</th>
-                <th class="p-3 text-center border-b border-slate-600 w-44">Keterangan</th>
+                <th class="w-12">No</th>
+                <th>Komponen Menu</th>
+                <th class="pm-th-std w-28">Standar (gr)</th>
+                <th class="w-24">S1 (gr)</th>
+                <th class="w-24">FOTO S1</th>
+                <th class="w-24">S2 (gr)</th>
+                <th class="w-24">FOTO S2</th>
+                <th class="w-24">S3 (gr)</th>
+                <th class="w-24">FOTO S3</th>
+                <th class="pm-th-avg w-28">Rata-Rata</th>
+                <th class="w-44">Keterangan</th>
               </tr>
             </thead>
-            <tbody id="tbody_pemorsian_b1" class="divide-y divide-slate-100"></tbody>
+            <tbody id="tbody_pemorsian_b1"></tbody>
           </table>
         </div>
       </div>
@@ -1575,6 +1687,244 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     </section>
 
     <!-- BACKUP DATA -->
+    <!-- FOOD WASTE (SISA MAKANAN OMPRENG) -->
+        <section id="sec-food-waste" class="tab-content hidden space-y-6">
+      <style>
+        #sec-food-waste{--fw-ink:#0f3d2e;--fw-teal:#0f766e;--fw-emerald:#059669;--fw-line:#dbe7e1;--fw-soft:#f0fdf4}
+        #sec-food-waste .fw-shell{background:linear-gradient(140deg,#f0fdf4 0%,#f8fafc 42%,#ecfdf5 100%);border:1px solid #e2e8f0}
+        #sec-food-waste .fw-eyebrow{letter-spacing:.18em}
+        #sec-food-waste .fw-kpi{position:relative;overflow:hidden;border-radius:1.15rem;padding:1rem 1.1rem;border:1px solid var(--fw-line);background:#fff;box-shadow:0 10px 24px -18px rgba(15,61,46,.45)}
+        #sec-food-waste .fw-kpi:after{content:"";position:absolute;right:-28px;top:-28px;width:96px;height:96px;border-radius:999px;background:currentColor;opacity:.06}
+        #sec-food-waste .fw-kpi-ico{width:2.4rem;height:2.4rem;border-radius:.85rem;display:flex;align-items:center;justify-content:center;font-size:1.15rem;background:var(--fw-soft);border:1px solid var(--fw-line)}
+        #sec-food-waste .fw-kpi-label{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#64748b;margin-top:.7rem}
+        #sec-food-waste .fw-kpi-value{font-size:1.55rem;line-height:1.15;font-weight:900;color:#0f172a;margin-top:.15rem;font-variant-numeric:tabular-nums}
+        #sec-food-waste .fw-kpi-sub{font-size:10.5px;font-weight:700;color:#64748b;margin-top:.25rem}
+        #sec-food-waste .fw-tone-emerald{color:#047857;background:linear-gradient(160deg,#ffffff,#f0fdf4)}
+        #sec-food-waste .fw-tone-amber{color:#b45309;background:linear-gradient(160deg,#ffffff,#fffbeb)}
+        #sec-food-waste .fw-tone-sky{color:#0369a1;background:linear-gradient(160deg,#ffffff,#f0f9ff)}
+        #sec-food-waste .fw-tone-teal{color:#0f766e;background:linear-gradient(160deg,#ffffff,#f0fdfa)}
+        #sec-food-waste .fw-tone-rose{color:#be123c;background:linear-gradient(160deg,#ffffff,#fff1f2)}
+        #sec-food-waste .fw-block{background:#fff;border:1px solid var(--fw-line);border-radius:1.25rem;padding:1rem;box-shadow:0 8px 24px -20px rgba(15,61,46,.35)}
+        #sec-food-waste .fw-block-head{display:flex;align-items:flex-start;gap:.65rem;margin-bottom:.85rem}
+        #sec-food-waste .fw-block-no{width:1.7rem;height:1.7rem;border-radius:.6rem;background:linear-gradient(135deg,#0f766e,#059669);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 12px -8px rgba(5,150,105,.9)}
+        #sec-food-waste .fw-block-title{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#0f3d2e}
+        #sec-food-waste .fw-block-sub{font-size:10.5px;font-weight:600;color:#64748b;margin-top:1px}
+        #sec-food-waste .fw-label{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#475569;margin-bottom:.35rem}
+        #sec-food-waste .fw-input,#sec-food-waste .fw-select{width:100%;border:1px solid #cbd5e1;border-radius:.8rem;padding:.65rem .75rem;font-size:12.5px;font-weight:700;color:#0f172a;background:#fff;transition:border-color .15s,box-shadow .15s}
+        #sec-food-waste .fw-input:focus,#sec-food-waste .fw-select:focus{outline:none;border-color:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,.14)}
+        #sec-food-waste .fw-field-wrap{position:relative}
+        #sec-food-waste .fw-field-wrap .fw-input{padding-right:3.4rem;text-align:right;font-variant-numeric:tabular-nums}
+        #sec-food-waste .fw-unit{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;color:#64748b;pointer-events:none}
+        #sec-food-waste .fw-cat{border-radius:1rem;border:1px solid #e2e8f0;border-top:3px solid #94a3b8;padding:.85rem;background:#fff;box-shadow:0 6px 18px -18px rgba(15,23,42,.35)}
+        #sec-food-waste .fw-cat-top{display:flex;align-items:flex-start;gap:.5rem}
+        #sec-food-waste .fw-cat-no{min-width:1.45rem;height:1.45rem;border-radius:.5rem;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}
+        #sec-food-waste .fw-cat-name{font-size:11px;font-weight:900;color:#0f172a;line-height:1.15}
+        #sec-food-waste .fw-cat-desc{font-size:9.5px;font-weight:600;color:#94a3b8;margin-top:1px}
+        #sec-food-waste .fw-cat-1{border-top-color:#059669;background:linear-gradient(180deg,#ffffff,#f0fdf4)}
+        #sec-food-waste .fw-cat-2{border-top-color:#e11d48;background:linear-gradient(180deg,#ffffff,#fff1f2)}
+        #sec-food-waste .fw-cat-3{border-top-color:#d97706;background:linear-gradient(180deg,#ffffff,#fffbeb)}
+        #sec-food-waste .fw-cat-4{border-top-color:#65a30d;background:linear-gradient(180deg,#ffffff,#f7fee7)}
+        #sec-food-waste .fw-cat-5{border-top-color:#ea580c;background:linear-gradient(180deg,#ffffff,#fff7ed)}
+        #sec-food-waste .fw-cat-6{border-top-color:#0284c7;background:linear-gradient(180deg,#ffffff,#f0f9ff)}
+        #sec-food-waste .fw-menu-badge{display:block;margin:.6rem 0 .5rem;font-size:10px;font-weight:800;line-height:1.3;color:#0f766e;background:#ecfdf5;border:1px dashed #6ee7b7;border-radius:.55rem;padding:.35rem .5rem;min-height:1.9rem}
+        #sec-food-waste .fw-menu-badge.is-empty{color:#94a3b8;background:#f8fafc;border-color:#e2e8f0;font-style:italic;font-weight:700}
+        #sec-food-waste .fw-livebar{position:relative;overflow:hidden;border-radius:1rem;padding:.85rem 1rem;border:1px solid #99f6e4;background:linear-gradient(120deg,#ecfdf5,#f0fdfa 55%,#eff6ff);box-shadow:0 10px 22px -20px rgba(13,148,136,.55)}
+        #sec-food-waste .fw-livebar:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#0f766e,#34d399)}
+        #sec-food-waste .fw-live-item{display:flex;flex-direction:column;gap:1px;min-width:7rem}
+        #sec-food-waste .fw-live-lab{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#64748b}
+        #sec-food-waste .fw-live-val{font-size:1rem;font-weight:900;color:#0f3d2e;font-variant-numeric:tabular-nums;line-height:1.15}
+        #sec-food-waste .fw-pills{display:inline-flex;flex-wrap:wrap;gap:.25rem;padding:.25rem;border-radius:.9rem;border:1px solid #dbe7e1;background:#f8fafc;width:100%}
+        #sec-food-waste .fw-pill{flex:1 1 auto;min-width:7.5rem;border:0;border-radius:.7rem;padding:.55rem .7rem;font-size:10.5px;font-weight:800;color:#475569;background:transparent;cursor:pointer;transition:all .18s;text-align:center}
+        #sec-food-waste .fw-pill:hover{background:#fff;color:#0f766e}
+        #sec-food-waste .fw-pill.is-active{background:linear-gradient(135deg,#0f766e,#059669);color:#fff;box-shadow:0 8px 16px -10px rgba(5,150,105,.9)}
+        #sec-food-waste .fw-pills-3 .fw-pill{min-width:5.5rem}
+        #sec-food-waste .fw-table-card{border:1px solid #e2e8f0;border-radius:1rem;background:#fff;box-shadow:0 10px 24px -22px rgba(15,23,42,.45);overflow:hidden}
+        #sec-food-waste .fw-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:.4rem}
+        #fw_qty_table table,#fw_pct_table table{width:100%;min-width:880px;border-collapse:separate;border-spacing:0;font-size:10.5px}
+        #fw_qty_table thead th,#fw_pct_table thead th{background:linear-gradient(135deg,#0f3d2e,#0f766e);color:#fff;font-weight:800;font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;padding:.55rem .4rem;border:0;text-align:center;white-space:nowrap}
+        #fw_qty_table thead th:first-child,#fw_pct_table thead th:first-child{border-radius:.6rem 0 0 .6rem}
+        #fw_qty_table thead th:last-child,#fw_pct_table thead th:last-child{border-radius:0 .6rem .6rem 0}
+        #fw_qty_table tbody td,#fw_pct_table tbody td{padding:.5rem .4rem;border-bottom:1px solid #eef2f7;vertical-align:middle;color:#334155}
+        #fw_qty_table tbody tr:nth-child(even) td,#fw_pct_table tbody tr:nth-child(even) td{background:#f8fafc}
+        #fw_qty_table tbody tr:hover td,#fw_pct_table tbody tr:hover td{background:#f0fdfa}
+        #fw_qty_table td.n,#fw_pct_table td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;color:#0f172a;white-space:nowrap}
+        #fw_qty_table td.c,#fw_pct_table td.c{text-align:center;white-space:nowrap}
+        #fw_qty_table tr.fw-total td,#fw_pct_table tr.fw-total td{background:#ecfdf5!important;border-top:2px solid #6ee7b7;border-bottom:0;font-weight:900;color:#065f46}
+        #sec-food-waste .fw-badge{display:inline-block;padding:.2rem .5rem;border-radius:999px;font-size:9.5px;font-weight:800;line-height:1.3;border:1px solid transparent;white-space:nowrap}
+        #sec-food-waste .fw-badge-feed{background:#f0fdf4;border-color:#86efac;color:#15803d}
+        #sec-food-waste .fw-badge-maggot{background:#f5f3ff;border-color:#c4b5fd;color:#6d28d9}
+        #sec-food-waste .fw-badge-kompos{background:#fffbeb;border-color:#fcd34d;color:#b45309}
+        #sec-food-waste .fw-badge-tps{background:#f8fafc;border-color:#cbd5e1;color:#475569}
+        #sec-food-waste .fw-badge-ok{background:#ecfdf5;border-color:#6ee7b7;color:#047857}
+        #sec-food-waste .fw-badge-bad{background:#fff1f2;border-color:#fda4af;color:#be123c}
+        #sec-food-waste .fw-action{display:inline-flex;align-items:center;justify-content:center;width:1.65rem;height:1.65rem;border-radius:.5rem;border:1px solid #e2e8f0;background:#fff;font-size:.8rem;transition:all .15s}
+        #sec-food-waste .fw-action:hover{transform:translateY(-1px);box-shadow:0 6px 12px -8px rgba(15,23,42,.5)}
+        #sec-food-waste .fw-action-edit{color:#0369a1;border-color:#bae6fd;background:#f0f9ff}
+        #sec-food-waste .fw-action-del{color:#be123c;border-color:#fecdd3;background:#fff1f2}
+        @media (max-width:640px){#sec-food-waste .fw-kpi-value{font-size:1.3rem}#sec-food-waste .fw-pill{min-width:auto}}
+        @media (max-width:480px){#sec-food-waste .fw-kpi{padding:.8rem .8rem}#sec-food-waste .fw-kpi-value{font-size:1.02rem;white-space:nowrap}#sec-food-waste .fw-kpi-label{font-size:9px;letter-spacing:.05em}#sec-food-waste .fw-kpi-sub{font-size:9.5px}#sec-food-waste .fw-kpi-ico{width:2rem;height:2rem;font-size:1rem}}
+        @media print{#sec-food-waste .hidden,#sec-food-waste .hidden-print{display:none!important}}
+      </style>
+
+      <div class="flex items-center justify-between">
+        <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
+          <span>←</span> Kembali ke Dashboard
+        </button>
+      </div>
+
+      <div class="fw-shell rounded-3xl shadow-xl shadow-emerald-900/5 p-4 md:p-8 space-y-6">
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 border-b border-emerald-100/70 pb-5">
+          <div>
+            <div class="text-[10px] font-extrabold text-emerald-700 tracking-widest uppercase bg-emerald-50 w-fit px-2.5 py-1 rounded-full border border-emerald-200 fw-eyebrow">Sisa Makanan Ompreng</div>
+            <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2 tracking-tight">FOOD WASTE <span class="text-emerald-700">(Sisa Makanan Ompreng)</span></h2>
+            <p class="text-[11px] md:text-xs text-slate-500 font-medium mt-1 max-w-3xl">Rekap harian dapur secara menyeluruh &middot; 6 kategori baku &middot; rekapitulasi harian, pekanan, bulanan &middot; kuantitas (gram/kg) atau persentase (%) &middot; nama menu tersinkron otomatis dengan Siklus Menu.</p>
+          </div>
+          <div class="hidden-print flex flex-wrap gap-2 w-full lg:w-auto">
+            <button type="button" data-print-added="1" onclick="fwExportExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button>
+            <button type="button" onclick="printExport(function(){ return fwExportExcel(); })" class="flex-1 lg:flex-none bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/30 transition-all flex justify-center gap-1.5 items-center"><span>🖨️</span> Cetak</button>
+          </div>
+        </div>
+
+        <div class="hidden-print flex flex-wrap items-center gap-2 rounded-xl border border-emerald-100 bg-white/80 px-3 py-2">
+          <label for="fw_docno" class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Nomor Dokumen</label>
+          <input type="text" id="fw_docno" oninput="fwSetDocNo(this.value)" placeholder="(boleh dikosongkan)" class="border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold bg-slate-50 text-slate-800 w-44 focus:outline-none focus:border-emerald-400">
+          <span class="text-[10px] font-semibold text-slate-400">Dipakai pada kop Excel/Cetak laporan.</span>
+        </div>
+
+        <div id="fw_stats" class="grid grid-cols-2 xl:grid-cols-4 gap-3 text-xs"></div>
+
+        <form id="fw_form" onsubmit="fwSubmit(event)" class="hidden-print space-y-4">
+          <div class="fw-block">
+            <div class="fw-block-head">
+              <div class="fw-block-no">1</div>
+              <div><div class="fw-block-title">Informasi Umum &amp; Distribusi</div><div class="fw-block-sub">Tanggal pencatatan, total berat porsi terdistribusi, tindak lanjut, dan catatan penyebab sisa.</div></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label for="fw_tanggal" class="fw-label">Tanggal</label>
+                <input type="date" id="fw_tanggal" onchange="fwOnDateChange()" class="fw-input">
+              </div>
+              <div>
+                <label for="fw_distribusi" class="fw-label">Total Berat Porsi Terdistribusi</label>
+                <div class="fw-field-wrap">
+                  <input type="number" min="0" step="0.01" id="fw_distribusi" oninput="fwUpdateLive()" placeholder="0" class="fw-input">
+                  <span class="fw-unit">gram</span>
+                </div>
+              </div>
+              <div>
+                <label for="fw_lanjut" class="fw-label">Tindak Lanjut Sisa</label>
+                <select id="fw_lanjut" class="fw-select">
+                  <option value="Pakan Ternak">Pakan Ternak</option>
+                  <option value="Budidaya Maggot BSF">Budidaya Maggot BSF</option>
+                  <option value="Kompos">Kompos</option>
+                  <option value="TPS/Pembuangan">TPS/Pembuangan</option>
+                </select>
+              </div>
+              <div>
+                <label for="fw_catatan" class="fw-label">Catatan / Penyebab Sisa</label>
+                <input type="text" id="fw_catatan" placeholder="mis. nasi terlalu banyak, sayur kurang diminati" class="fw-input">
+              </div>
+            </div>
+          </div>
+
+          <div class="fw-block">
+            <div class="fw-block-head">
+              <div class="fw-block-no">2</div>
+              <div><div class="fw-block-title">Input Berat Sisa per Kategori Menu</div><div class="fw-block-sub">Isi berat sisa (gram) tiap kategori. Nama menu mengikuti tanggal dan Siklus Menu secara otomatis.</div></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 text-xs">
+              <div class="fw-cat fw-cat-1">
+                <div class="fw-cat-top"><span class="fw-cat-no">1</span><div><div class="fw-cat-name">Makanan Pokok</div><div class="fw-cat-desc">Nasi putih / pengganti</div></div></div>
+                <div id="fw_menu_pokok" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_pokok" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
+              </div>
+              <div class="fw-cat fw-cat-2">
+                <div class="fw-cat-top"><span class="fw-cat-no">2</span><div><div class="fw-cat-name">Lauk Hewani</div><div class="fw-cat-desc">Ayam, telur, ikan, udang</div></div></div>
+                <div id="fw_menu_hewan" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_hewan" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
+              </div>
+              <div class="fw-cat fw-cat-3">
+                <div class="fw-cat-top"><span class="fw-cat-no">3</span><div><div class="fw-cat-name">Lauk Nabati</div><div class="fw-cat-desc">Tahu, tempe, kacang</div></div></div>
+                <div id="fw_menu_nabati" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_nabati" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
+              </div>
+              <div class="fw-cat fw-cat-4">
+                <div class="fw-cat-top"><span class="fw-cat-no">4</span><div><div class="fw-cat-name">Sayur</div><div class="fw-cat-desc">Sayur segar / tumis</div></div></div>
+                <div id="fw_menu_sayur" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_sayur" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
+              </div>
+              <div class="fw-cat fw-cat-5">
+                <div class="fw-cat-top"><span class="fw-cat-no">5</span><div><div class="fw-cat-name">Buah</div><div class="fw-cat-desc">Buah potong / segar</div></div></div>
+                <div id="fw_menu_buah" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_buah" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
+              </div>
+              <div class="fw-cat fw-cat-6">
+                <div class="fw-cat-top"><span class="fw-cat-no">6</span><div><div class="fw-cat-name">Susu</div><div class="fw-cat-desc">Susu / minuman</div></div></div>
+                <div id="fw_menu_susu" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_susu" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="fw_live" class="fw-livebar text-[11px] font-bold text-slate-700">
+            <span class="text-slate-400 font-medium">Total sisa dan persentase akan dihitung otomatis setelah berat diisi.</span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button type="submit" class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-600/25 transition-all">💾 Simpan Log</button>
+            <button type="button" id="fw_btn_cancel" onclick="fwResetForm()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-6 py-2.5 rounded-xl text-xs transition-all">Batal Ubah</button>
+          </div>
+        </form>
+
+        <div class="hidden-print fw-block">
+          <div class="fw-block-head">
+            <div class="fw-block-no">3</div>
+            <div><div class="fw-block-title">Periode, Metode &amp; Rekapitulasi</div><div class="fw-block-sub">Atur rentang tanggal, pilih metode tampilan, lalu pilih jenis rekap.</div></div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="fw-label">Periode Mulai</label>
+                <input type="date" id="fw_start" onchange="fwOnFilterChange()" class="fw-input">
+              </div>
+              <div>
+                <label class="fw-label">Periode Akhir</label>
+                <input type="date" id="fw_end" onchange="fwOnFilterChange()" class="fw-input">
+              </div>
+            </div>
+            <div>
+              <div class="fw-label">Metode Tampilan &amp; Cetak</div>
+              <div class="fw-pills" role="tablist" aria-label="Metode rekap">
+                <button type="button" id="fw_method_qty" onclick="fwSetMethod('qty')" class="fw-pill" role="tab">A. Kuantitas (Gram / Kg)</button>
+                <button type="button" id="fw_method_pct" onclick="fwSetMethod('pct')" class="fw-pill" role="tab">B. Persentase (%)</button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <div class="fw-label">Jenis Rekapitulasi</div>
+            <div class="fw-pills fw-pills-3" role="tablist" aria-label="Jenis rekap">
+              <button type="button" id="fw_tab_harian" onclick="fwSetTab('harian')" class="fw-pill" role="tab">1. Rekap Harian</button>
+              <button type="button" id="fw_tab_pekanan" onclick="fwSetTab('pekanan')" class="fw-pill" role="tab">2. Rekap Pekanan</button>
+              <button type="button" id="fw_tab_bulanan" onclick="fwSetTab('bulanan')" class="fw-pill" role="tab">3. Rekap Bulanan</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="fw_report" class="space-y-4">
+          <div id="fw_qty_block" class="space-y-3">
+            <div id="fw_qty_summary" class="grid grid-cols-2 xl:grid-cols-4 gap-3 text-xs"></div>
+            <div class="fw-table-card"><div id="fw_qty_table" class="fw-table-wrap"></div></div>
+          </div>
+          <div id="fw_pct_block" class="hidden hidden-print space-y-3">
+            <div id="fw_pct_summary" class="grid grid-cols-2 xl:grid-cols-4 gap-3 text-xs"></div>
+            <div class="fw-table-card"><div id="fw_pct_table" class="fw-table-wrap"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+
     <section id="sec-backup-data" class="tab-content hidden space-y-6">
       <div class="flex items-center justify-between">
         <button onclick="switchTab('overview')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all shadow-sm cursor-pointer hover:-translate-x-0.5">
@@ -4873,6 +5223,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         if (tabId === 'sasaran-didik') renderSasaran();
         if (tabId === 'pendinginan') initPendinginan();
         if (tabId === 'uji-organoleptik') initUjiOrganoleptik();
+        if (tabId === 'food-waste') initFoodWaste();
       }
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('nav-active', b.id === 'nav-' + tabId));
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.scrollTop = 0;
@@ -5816,14 +6167,14 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         const statusCell = tr.querySelector('.status-cell');
         
         if (statusCell && tr.dataset.nomenu === '1') {
-            statusCell.innerHTML = '<span class="text-slate-500 font-bold">TIDAK TERSEDIA MENU</span>';
+            statusCell.innerHTML = '<span class="pm-badge pm-badge-none">TIDAK TERSEDIA MENU</span>';
         } else if (statusCell && count > 0 && !isNaN(std) && std > 0) {
             if (avg > std * 1.10) {
-                statusCell.innerHTML = '<span class="text-red-600 font-bold">Melebihi Standar</span>';
+                statusCell.innerHTML = '<span class="pm-badge pm-badge-over">Melebihi Standar</span>';
             } else if (avg < std * 0.90) {
-                statusCell.innerHTML = '<span class="text-amber-600 font-bold">Kurang Standar</span>';
+                statusCell.innerHTML = '<span class="pm-badge pm-badge-under">Kurang Standar</span>';
             } else {
-                statusCell.innerHTML = '<span class="text-emerald-600 font-bold">Sesuai Standar</span>';
+                statusCell.innerHTML = '<span class="pm-badge pm-badge-ok">Sesuai Standar</span>';
             }
         } else if (statusCell) {
             statusCell.innerHTML = '-';
@@ -5882,32 +6233,35 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
 
       let html = '';
       let no = 1;
+      // Nilai standar bawaan: Makanan Pokok 200 gr, komponen lain 0 gr (semua tetap bisa diubah manual)
+      const pickVal = (v, def) => (v === undefined || v === null || String(v).trim() === '') ? def : v;
 
       KELOMPOK_LIST_MENU.forEach((k, i) => {
         let item = getSuhuMenuName(weeks, k, idx);
         const noMenu = (item === '-');   // komponen ini tidak ada pada Siklus Menu hari tsb
+        const defVal = (k === 'KARBO') ? 200 : 0;
 
-        let std = dayData[i] ? dayData[i].std : (noMenu ? '' : 200);
-        let s1 = dayData[i] ? dayData[i].s1 : (noMenu ? '' : 200);
-        let s2 = dayData[i] ? dayData[i].s2 : (noMenu ? '' : 200);
-        let s3 = dayData[i] ? dayData[i].s3 : (noMenu ? '' : 200);
+        let std = noMenu ? '' : pickVal(dayData[i] && dayData[i].std, defVal);
+        let s1 = noMenu ? '' : pickVal(dayData[i] && dayData[i].s1, defVal);
+        let s2 = noMenu ? '' : pickVal(dayData[i] && dayData[i].s2, defVal);
+        let s3 = noMenu ? '' : pickVal(dayData[i] && dayData[i].s3, defVal);
 
         let fs1 = dayData[i] ? (dayData[i].fs1 || '') : '';
         let fs2 = dayData[i] ? (dayData[i].fs2 || '') : '';
         let fs3 = dayData[i] ? (dayData[i].fs3 || '') : '';
 
         html += `<tr class="border-b border-slate-100"${noMenu ? ' data-nomenu="1"' : ''}>
-            <td class="p-3 text-center font-bold text-slate-500">${no++}</td>
-            <td class="p-3 font-semibold text-slate-600">${KELOMPOK_LABELS_MENU[k]}: <br><span class="text-blue-700 font-bold uppercase">${noMenu ? 'TIDAK TERSEDIA MENU' : item}</span></td>
-            <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl p-2 font-black text-slate-700 std-val bg-slate-50 text-center" value="${std}" oninput="calcAvgPemorsian(this)"></td>
-            <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600 sample-val" value="${s1}" oninput="calcAvgPemorsian(this)"></td>
-            <td class="p-2 text-center">${buildPemorsianUploadHtml(`pemorsian_foto_s1_${idx}_${i}`, fs1)}</td>
-            <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600 sample-val" value="${s2}" oninput="calcAvgPemorsian(this)"></td>
-            <td class="p-2 text-center">${buildPemorsianUploadHtml(`pemorsian_foto_s2_${idx}_${i}`, fs2)}</td>
-            <td class="p-2 text-center"><input type="number" class="w-full border-2 border-slate-200 rounded-xl text-center p-2 font-bold text-indigo-600 sample-val" value="${s3}" oninput="calcAvgPemorsian(this)"></td>
-            <td class="p-2 text-center">${buildPemorsianUploadHtml(`pemorsian_foto_s3_${idx}_${i}`, fs3)}</td>
-            <td class="p-3 text-center font-black text-slate-800 avg-cell bg-slate-50/50">0.00</td>
-            <td class="p-3 text-center font-bold status-cell text-xs">-</td>
+            <td class="pm-nocol">${no++}</td>
+            <td class="pm-comp"><b class="pm-cat pm-cat-${i}">${KELOMPOK_LABELS_MENU[k]}</b><br><span class="pm-menu${noMenu ? ' is-empty' : ''}">${noMenu ? 'TIDAK TERSEDIA MENU' : item}</span></td>
+            <td class="pm-stdcol" data-label="Standar (gr)"><div class="pm-field"><input type="number" class="pm-input pm-input-std std-val" value="${std}" oninput="calcAvgPemorsian(this)"><span class="pm-unit hidden-print">gr</span></div></td>
+            <td class="pm-smpcol" data-label="S1 (gr)"><div class="pm-field"><input type="number" class="pm-input pm-input-smp sample-val" value="${s1}" oninput="calcAvgPemorsian(this)"><span class="pm-unit hidden-print">gr</span></div></td>
+            <td class="pm-fotocol" data-label="Foto S1">${buildPemorsianUploadHtml(`pemorsian_foto_s1_${idx}_${i}`, fs1)}</td>
+            <td class="pm-smpcol" data-label="S2 (gr)"><div class="pm-field"><input type="number" class="pm-input pm-input-smp sample-val" value="${s2}" oninput="calcAvgPemorsian(this)"><span class="pm-unit hidden-print">gr</span></div></td>
+            <td class="pm-fotocol" data-label="Foto S2">${buildPemorsianUploadHtml(`pemorsian_foto_s2_${idx}_${i}`, fs2)}</td>
+            <td class="pm-smpcol" data-label="S3 (gr)"><div class="pm-field"><input type="number" class="pm-input pm-input-smp sample-val" value="${s3}" oninput="calcAvgPemorsian(this)"><span class="pm-unit hidden-print">gr</span></div></td>
+            <td class="pm-fotocol" data-label="Foto S3">${buildPemorsianUploadHtml(`pemorsian_foto_s3_${idx}_${i}`, fs3)}</td>
+            <td class="pm-avgcol" data-label="Rata-Rata"><span class="avg-cell pm-avg">0.00</span></td>
+            <td class="pm-ketcol" data-label="Keterangan"><span class="status-cell">-</span></td>
         </tr>`;
       });
 
@@ -10631,11 +10985,17 @@ function renderSuhuTable() {
     const PMB_SMP_N = 4;
     function pmbSampel() {
       const v = window.dbCache && window.dbCache[PMB_PATH];
-      const raw = v && v.sampel ? (Array.isArray(v.sampel) ? v.sampel : Object.values(v.sampel)) : [];
+      const hasKey = !!(v && v.sampel !== undefined && v.sampel !== null);
+      const raw = hasKey ? (Array.isArray(v.sampel) ? v.sampel : Object.values(v.sampel)) : [];
       const out = [];
-      for (let i = 0; i < PMB_SMP_N; i++) {
-        const r = raw[i] || {};
-        out.push({ id: 'smp' + (i + 1), nama: (r.nama && String(r.nama).trim()) ? r.nama : 'Sampel Bahan Makanan ' + (i + 1), jumlah: (r.jumlah !== undefined && r.jumlah !== null && r.jumlah !== '') ? pmbN(r.jumlah) : 1 });
+      const n = hasKey ? raw.length : PMB_SMP_N;   // data lama tanpa key = 4 baris bawaan
+      for (let i = 0; i < n; i++) {
+        const r = raw[i];
+        if (r) {
+          out.push({ id: r.id || ('smp' + (i + 1)), nama: String(r.nama == null ? '' : r.nama), jumlah: (r.jumlah !== undefined && r.jumlah !== null && r.jumlah !== '') ? pmbN(r.jumlah) : 0 });
+        } else {
+          out.push({ id: 'smp' + (i + 1), nama: 'Sampel Bahan Makanan ' + (i + 1), jumlah: 1 });
+        }
       }
       return out;
     }
@@ -10651,12 +11011,13 @@ function renderSuhuTable() {
       const v = window.dbCache && window.dbCache[PMB_PATH];
       if (!v) return { tanggal: '', items: [] };
       const items = v.items ? (Array.isArray(v.items) ? v.items : Object.values(v.items)) : [];
-      return { tanggal: v.tanggal || '', items: items.filter(x => x && x.nama) };
+      return { tanggal: v.tanggal || '', items: items.filter(x => x && (x.id || String(x.nama || '').trim())) };
     }
     function pmbSave(d) {
       const keep = window.dbCache[PMB_PATH];
       if (d.sampel === undefined && keep && keep.sampel) d.sampel = keep.sampel;   // jangan hilangkan data sampel
       window.dbCache[PMB_PATH] = d;
+      try { localStorage.setItem('sppg_penerima_manfaat_cache', JSON.stringify(d)); } catch (e) {}
       if (typeof window.fbSet === 'function') window.fbSet(PMB_PATH, (d.items.length || d.tanggal || d.sampel) ? d : null);
     }
     function pmbCalc(it) {
@@ -10875,13 +11236,13 @@ function renderSuhuTable() {
     }
 
     // ---------- tampilan ----------
-    function pmbRender() {
+    function pmbRender(force) {
       if (!document.getElementById('pmb_box')) return;
       const d = pmbData();
       const tg = document.getElementById('pmb_tanggal');
       if (tg && document.activeElement !== tg) tg.value = d.tanggal || '';
       pmbRenderStats();
-      pmbRenderTable();
+      pmbRenderTable(force);
       pmbRenderRincian();
       pmbRenderLaporan();
     }
@@ -10898,11 +11259,11 @@ function renderSuhuTable() {
       document.getElementById('pmb_stats2').textContent = 'Siswa ' + t.siswa + ' · Tendik ' + t.tendik + ' · Uji organoleptik ' + t.org + ' · Balita ' + t.balita + ' · Ibu hamil ' + t.bumil + ' · Ibu menyusui ' + t.busui + ' · Sampel bahan makanan ' + t.smp + ' · Anak/ibu alergi ' + (() => { const am = pmbAlergiMap(); return d.items.reduce((n, i) => n + ((am[pmbNorm(i.nama)] || { n: 0 }).n), 0); })();
     }
     const PMB_CALC_KEYS = { siswa: 'siswa', td: 'td', total: 'total', pk: 'porsiKecil', pb: 'porsiBesar', sl: 'siswaL', sp: 'siswaP', tl: 'tl', tp: 'tp', org: 'org', bumil: 'bumil', busui: 'busui', kl: 'kl', kp: 'kp' };
-    function pmbRenderTable() {
+    function pmbRenderTable(force) {
       const host = document.getElementById('pmb_tables');
       if (!host) return;
       const ae = document.activeElement;
-      if (ae && ae.tagName === 'INPUT' && host.contains(ae)) { pmbRefreshComputed(); return; }   // jangan bangun ulang saat sedang mengetik
+      if (!force && ae && ae.tagName === 'INPUT' && host.contains(ae)) { pmbRefreshComputed(); return; }   // jangan bangun ulang saat sedang mengetik
       const d = pmbData();
       const q = (document.getElementById('pmb_q')?.value || '').trim().toUpperCase();
       const ok = it => !q || pmbNorm(it.nama).includes(q);
@@ -10915,8 +11276,8 @@ function renderSuhuTable() {
       const AM = pmbAlergiMap();
 
       // ---- tabel sekolah ----
-      let h = '<div><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2">🏫 Peserta Didik dan Guru/Tendik</div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1950px]"><thead><tr>' +
-        ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Tendik Laki-Laki', 'Tendik Perempuan', 'Total Tendik', 'Uji Organoleptik', 'Jumlah Siswa, Guru/Tendik & Organoleptik', 'Porsi Kecil', 'Porsi Besar', 'Anak Alergi', 'Aksi'].map(x => '<th>' + x + '</th>').join('') + '</tr></thead><tbody>';
+      let h = '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🏫 Peserta Didik dan Guru/Tendik</div><button type="button" onclick="pmbAddRowSk()" class="hidden-print bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1950px]"><thead><tr>' +
+        ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Tendik Laki-Laki', 'Tendik Perempuan', 'Total Tendik', 'Uji Organoleptik', 'Jumlah Siswa, Guru/Tendik & Organoleptik', 'Porsi Kecil', 'Porsi Besar', 'Anak Alergi', 'Aksi'].map((x, i) => '<th' + (i === 15 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
       sk.forEach((it, idx) => {
         const c = pmbCalc(it), id = it.id;
         const lines = it.jenis === 'SD' ? [['1,2,3', 'kl', 'kp', 'kj', c.lpKecil], ['4,5,6', 'bl', 'bp', 'bj', c.lpBesar]] : it.jenis === 'SMP' ? [['7,8,9', 'bl', 'bp', 'bj', c.lpBesar]] : [['PAUD', 'kl', 'kp', 'kj', c.lpKecil]];
@@ -10931,7 +11292,7 @@ function renderSuhuTable() {
           if (k === 0) {
             h += calc(id, 'siswa', c.siswa, rs) + `<td rowspan="${rs}">${inp(id, 'tl', it.tl || '', 'number', '0')}</td><td rowspan="${rs}">${inp(id, 'tp', it.tp || '', 'number', '0')}</td>` +
               calc(id, 'td', c.td, rs) + `<td rowspan="${rs}">${inp(id, 'org', it.org || '', 'number', '0')}</td>` + calc(id, 'total', c.total, rs) + calc(id, 'pk', c.porsiKecil, rs) + calc(id, 'pb', c.porsiBesar, rs) + `<td rowspan="${rs}" class="pmb-calc" data-id="${id}" data-alg="1">${pmbAlgHtml(it, AM)}</td>` +
-              `<td rowspan="${rs}" class="text-center"><button type="button" title="Hapus" onclick="pmbDelete('${id}')" class="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td>`;
+              `<td rowspan="${rs}" class="text-center hidden-print"><button type="button" title="Hapus" onclick="pmbDeleteRow('${id}')" class="hidden-print px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td>`;
           }
           h += '</tr>';
         });
@@ -10942,29 +11303,31 @@ function renderSuhuTable() {
 
       // ---- tabel posyandu ----
       // ---- tabel posyandu ----
-h += '<div><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2">🤱 Non Peserta Didik (3B) — Posyandu</div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1450px]"><thead><tr>' +
-  ['No.', 'Nama Posyandu', 'Ibu Hamil', 'Ibu Menyusui', 'Balita Laki-Laki', 'Balita Perempuan', 'Uji Organoleptik', 'Total Jumlah Peserta 3B', 'Porsi Kecil', 'Porsi Besar', 'Ibu/Balita Alergi', 'Aksi'].map(x => '<th>' + x + '</th>').join('') + '</tr></thead><tbody>';
+h += '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🤱 Non Peserta Didik (3B) — Posyandu</div><button type="button" onclick="pmbAddRowPo()" class="hidden-print bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1450px]"><thead><tr>' +
+  ['No.', 'Nama Posyandu', 'Ibu Hamil', 'Ibu Menyusui', 'Balita Laki-Laki', 'Balita Perempuan', 'Uji Organoleptik', 'Total Jumlah Peserta 3B', 'Porsi Kecil', 'Porsi Besar', 'Ibu/Balita Alergi', 'Aksi'].map((x, i) => '<th' + (i === 11 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
 po.forEach((it, idx) => {
   const c = pmbCalc(it), id = it.id;
   h += `<tr><td class="text-center font-bold text-slate-500">${idx + 1}</td><td>${inp(id, 'nama', it.nama, 'text', '', 't')}</td>` +
     `<td>${inp(id, 'bumil', it.bumil || '', 'number', '0')}</td><td>${inp(id, 'busui', it.busui || '', 'number', '0')}</td><td>${inp(id, 'kl', it.kl || '', 'number', '0')}</td><td>${inp(id, 'kp', it.kp || '', 'number', '0')}</td>` +
     `<td>${inp(id, 'org', it.org || '', 'number', '0')}</td>` +
     calc(id, 'total', c.total, 1) + calc(id, 'pk', c.porsiKecil, 1) + calc(id, 'pb', c.porsiBesar, 1) + `<td class="pmb-calc" data-id="${id}" data-alg="1">${pmbAlgHtml(it, AM)}</td>` +
-    `<td class="text-center"><button type="button" title="Hapus" onclick="pmbDelete('${id}')" class="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td></tr>`;
+    `<td class="text-center hidden-print"><button type="button" title="Hapus" onclick="pmbDeleteRow('${id}')" class="hidden-print px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td></tr>`;
 });
 if (!po.length) h += `<tr><td colspan="11" class="text-center text-slate-400 p-6">${d.items.length ? 'Tidak ada data yang cocok.' : 'Belum ada posyandu.'}</td></tr>`;
 else h += `<tr class="pmb-total"><td colspan="2">TOTAL</td>${T('bumil', 'T-po')}${T('busui', 'T-po')}${T('kl', 'T-po')}${T('kp', 'T-po')}${T('org', 'T-po')}${T('total', 'T-po')}${T('pk', 'T-po')}${T('pb', 'T-po')}<td data-id="T-po" data-alg="1"></td><td></td></tr>`;
 h += '</tbody></table></div></div>';
       // ---- tabel 3: sampel bahan makanan ----
       const SM = pmbSampel();
-      h += '<div><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2">🧪 Sampel Bahan Makanan (Porsi Besar)</div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[700px]"><thead><tr>' +
-        ['No.', 'Nama Sampel Bahan Makanan', 'Jumlah Porsi', 'Jenis Porsi', 'Anak/Ibu Alergi Bahan Ini'].map(x => '<th>' + x + '</th>').join('') + '</tr></thead><tbody>';
+      h += '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🧪 Sampel Bahan Makanan (Porsi Besar)</div><button type="button" onclick="pmbAddRowSmp()" class="hidden-print bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[850px]"><thead><tr>' +
+        ['No.', 'Nama Sampel Bahan Makanan', 'Jumlah Porsi', 'Jenis Porsi', 'Anak/Ibu Alergi Bahan Ini', 'Aksi'].map((x, i) => '<th' + (i === 5 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
+      if (!SM.length) h += '<tr><td colspan="6" class="text-center text-slate-400 p-6">Belum ada baris sampel. Klik "+ Tambah Baris" untuk menambahkan.</td></tr>';
       SM.forEach((r, i) => {
         h += `<tr><td class="text-center font-bold text-slate-500">${i + 1}</td><td><input type="text" data-sid="${r.id}" data-sf="nama" value="${pmbEsc(r.nama)}" class="pmb-cell t"></td>` +
-          `<td><input type="number" min="0" data-sid="${r.id}" data-sf="jumlah" value="${r.jumlah}" placeholder="1" class="pmb-cell"></td><td class="pmb-calc">Porsi Besar</td>` +
-          `<td class="pmb-calc" data-salg="${r.id}">${pmbSampelAlg(r.nama)}</td></tr>`;
+          `<td><input type="number" min="0" data-sid="${r.id}" data-sf="jumlah" value="${r.jumlah}" placeholder="0" class="pmb-cell"></td><td class="pmb-calc">Porsi Besar</td>` +
+          `<td class="pmb-calc" data-salg="${r.id}">${pmbSampelAlg(r.nama)}</td>` +
+          `<td class="text-center hidden-print"><button type="button" title="Hapus" onclick="pmbDeleteRowSmp('${r.id}')" class="hidden-print px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td></tr>`;
       });
-      h += `<tr class="pmb-total"><td colspan="2">TOTAL (${PMB_SMP_N} sampel)</td><td data-smptotal="1">${pmbSampelTotal()}</td><td>Porsi Besar</td><td></td></tr></tbody></table></div></div>`;
+      h += `<tr class="pmb-total"><td colspan="2">TOTAL (${SM.length} sampel)</td><td data-smptotal="1">${pmbSampelTotal()}</td><td>Porsi Besar</td><td></td><td class="hidden-print"></td></tr></tbody></table></div></div>`;
       h += pmbOrphanNote(d.items);
       host.innerHTML = h;
       pmbRefreshComputed();
@@ -11001,6 +11364,75 @@ h += '</tbody></table></div></div>';
         el.classList.toggle('warn', el.value !== '' && pmbN(el.value) !== lp);
       });
     }
+    // ---------- tambah / hapus baris pada 3 tabel Data Sekolah & Posyandu ----------
+    function pmbNewId() { return 'row' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+    function pmbFocusCell(id, sid) {
+      setTimeout(function () {
+        const sel = (sid != null)
+          ? '#pmb_tables input[data-sid="' + sid + '"][data-sf="nama"]'
+          : '#pmb_tables input[data-id="' + id + '"][data-f="nama"]';
+        const el = document.querySelector(sel);
+        if (el) { try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} el.focus(); try { el.select(); } catch (e) {} }
+      }, 80);
+    }
+    function pmbAddRowSk() {
+      if (!confirm('Apakah Anda yakin ingin menambahkan baris baru pada tabel Peserta Didik dan Guru/Tendik?')) return;
+      const d = pmbData(), it = { id: pmbNewId(), jenis: 'PAUD', nama: '' };
+      PMB_FIELDS.forEach(k => { it[k] = 0; });
+      PMB_JM.forEach(k => { it[k] = null; });
+      const list = d.items.slice(); list.push(it);
+      pmbSave({ tanggal: d.tanggal, items: list });
+      pmbRender(true);
+      pmbFocusCell(it.id, null);
+    }
+    function pmbAddRowPo() {
+      if (!confirm('Apakah Anda yakin ingin menambahkan baris baru pada tabel Non Peserta Didik (3B) — Posyandu?')) return;
+      const d = pmbData(), it = { id: pmbNewId(), jenis: 'POSYANDU', nama: '' };
+      PMB_FIELDS.forEach(k => { it[k] = 0; });
+      PMB_JM.forEach(k => { it[k] = null; });
+      const list = d.items.slice(); list.push(it);
+      pmbSave({ tanggal: d.tanggal, items: list });
+      pmbRender(true);
+      pmbFocusCell(it.id, null);
+    }
+    function pmbAddRowSmp() {
+      if (!confirm('Apakah Anda yakin ingin menambahkan baris baru pada tabel Sampel Bahan Makanan (Porsi Besar)?')) return;
+      const list = pmbSampel();
+      const id = 'smp' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      list.push({ id: id, nama: '', jumlah: 0 });
+      pmbSampelSave(list);
+      pmbRender(true);
+      pmbFocusCell(null, id);
+    }
+    function pmbDeleteRow(id) {
+      const d = pmbData(), it = d.items.find(x => x.id === id);
+      if (!it) return;
+      const isPo = it.jenis === 'POSYANDU';
+      const tName = isPo ? 'Non Peserta Didik (3B) — Posyandu' : 'Peserta Didik dan Guru/Tendik';
+      const tList = pmbSorted(d.items).filter(x => isPo ? x.jenis === 'POSYANDU' : x.jenis !== 'POSYANDU');
+      const no = tList.findIndex(x => x.id === id) + 1;
+      const linked = (typeof sdGetAll === 'function') ? sdGetAll().filter(s => pmbNorm(s.sekolah) === pmbNorm(it.nama)) : [];
+      let msg = 'Apakah Anda yakin ingin menghapus baris ke-' + no + ' (' + (it.nama || '(tanpa nama)') + ') dari tabel ' + tName + '?';
+      if (linked.length) msg += '\n\nCatatan: ' + linked.length + ' data alergi dengan asal "' + it.nama + '" akan ikut dihapus agar tetap sinkron.';
+      if (!confirm(msg)) return;
+      pmbSave({ tanggal: d.tanggal, items: d.items.filter(x => x.id !== id) });
+      if (linked.length && typeof sdSave === 'function') sdSave(sdGetAll().filter(s => pmbNorm(s.sekolah) !== pmbNorm(it.nama)));
+      if (pmbEditId === id) pmbReset();
+      pmbRender(true);
+      if (typeof renderSasaran === 'function') {
+        try { sdRenderLists(sdGetAll()); sdRenderStats(sdGetAll()); sdRenderTable(); } catch (e) {}
+      }
+    }
+    function pmbDeleteRowSmp(id) {
+      const list = pmbSampel(), i = list.findIndex(x => x.id === id);
+      if (i < 0) return;
+      const r = list[i];
+      if (!confirm('Apakah Anda yakin ingin menghapus baris ke-' + (i + 1) + ' (' + (r.nama || '(tanpa nama)') + ') dari tabel Sampel Bahan Makanan (Porsi Besar)?')) return;
+      list.splice(i, 1);
+      pmbSampelSave(list);
+      pmbRender(true);
+    }
+
     // ---------- konfirmasi perubahan data tabel ----------
     function pmbConfirm(o) {
       return new Promise(res => {
@@ -11058,15 +11490,16 @@ h += '</tbody></table></div></div>';
       if (f === 'nama' && !newV) { alert('Nama sampel tidak boleh kosong.'); revert(); return; }
       if (String(oldV) === String(newV)) { revert(); return; }
       const before = pmbSampelTotal(), after = before - row.jumlah + (f === 'jumlah' ? newV : row.jumlah);
-      const arrow = (x, y) => '<span class="font-bold text-slate-500">' + pmbEsc(x) + '</span> → <span class="font-black text-indigo-700">' + pmbEsc(y) + '</span>';
-      const ok = await pmbConfirm({ html: '<div class="text-xs text-slate-500 font-bold uppercase">Sampel Bahan Makanan — Porsi Besar</div><div class="font-black text-slate-800">' + pmbEsc(row.nama) + '</div>' +
-        '<div class="p-3 rounded-xl bg-indigo-50 border border-indigo-200"><div class="text-[11px] font-extrabold uppercase text-indigo-800 mb-1">' + (f === 'nama' ? 'Nama Sampel' : 'Jumlah Porsi Besar') + '</div><div class="text-base">' + arrow(oldV, newV) + '</div></div>' +
-        (before !== after ? '<div class="text-xs text-slate-600">Total porsi sampel: ' + arrow(before, after) + '</div>' : '') + '<div class="text-xs text-slate-500">Simpan perubahan ini ke database?</div>' });
-      if (!ok) { revert(); return; }
+      const listNo = pmbSampel().findIndex(x => x.id === sid) + 1;
+      let msg = 'Simpan perubahan pada tabel Sampel Bahan Makanan (Porsi Besar)?\n\n' +
+        'Baris ke-' + listNo + ' (' + (row.nama || '(tanpa nama)') + ')\n' +
+        (f === 'nama' ? 'Nama Sampel' : 'Jumlah Porsi Besar') + ': ' + oldV + ' → ' + newV;
+      if (before !== after) msg += '\nTotal porsi sampel: ' + before + ' → ' + after;
+      if (!confirm(msg)) { revert(); return; }
       const list = pmbSampel(), r2 = list.find(x => x.id === sid); if (!r2) return;
       r2[f] = newV; pmbSampelSave(list);
       const e = el(); if (e) e.value = newV;
-      pmbRenderStats(); pmbRefreshComputed(); pmbRenderRincian();
+      pmbRenderStats(); pmbRefreshComputed(); pmbRenderRincian(); pmbRenderLaporan();
     }
     document.addEventListener('change', function (e) {
       const t = e.target;
@@ -11088,21 +11521,22 @@ h += '</tbody></table></div></div>';
       const oldD = pmbShow(it, f), newD = pmbShow(clone, f);
       if (String(oldD) === String(newD)) { revert(); return; }
       const a = pmbCalc(it), b = pmbCalc(clone);
-      const arrow = (x, y) => '<span class="font-bold text-slate-500">' + pmbEsc(x) + '</span> → <span class="font-black text-indigo-700">' + pmbEsc(y) + '</span>';
-      let html = '<div class="text-xs text-slate-500 font-bold uppercase">' + pmbEsc(PMB_LABEL[it.jenis] || '') + '</div><div class="font-black text-slate-800">' + pmbEsc(it.nama) + '</div>' +
-        '<div class="p-3 rounded-xl bg-indigo-50 border border-indigo-200"><div class="text-[11px] font-extrabold uppercase text-indigo-800 mb-1">' + pmbEsc(pmbFieldLabel(it, f)) + '</div><div class="text-base">' + arrow(oldD, newD) + '</div></div>';
+      const isPo = it.jenis === 'POSYANDU';
+      const tName = isPo ? 'Non Peserta Didik (3B) — Posyandu' : 'Peserta Didik dan Guru/Tendik';
+      const tList = pmbSorted(d.items).filter(x => isPo ? x.jenis === 'POSYANDU' : x.jenis !== 'POSYANDU');
+      const rowNo = tList.findIndex(x => x.id === id) + 1;
+      let msg = 'Simpan perubahan pada tabel ' + tName + '?\n\n' +
+        'Baris ke-' + rowNo + ' (' + (it.nama || '(tanpa nama)') + ')\n' +
+        pmbFieldLabel(it, f) + ': ' + oldD + ' → ' + newD;
       if (f !== 'nama') {
-        html += '<div class="text-xs text-slate-600 space-y-0.5">' +
-          (a.total !== b.total ? '<div>Total porsi: ' + arrow(a.total, b.total) + '</div>' : '') +
-          (a.porsiKecil !== b.porsiKecil ? '<div>Porsi kecil: ' + arrow(a.porsiKecil, b.porsiKecil) + '</div>' : '') +
-          (a.porsiBesar !== b.porsiBesar ? '<div>Porsi besar: ' + arrow(a.porsiBesar, b.porsiBesar) + '</div>' : '') + '</div>';
+        if (a.total !== b.total) msg += '\nTotal jumlah peserta: ' + a.total + ' → ' + b.total;
+        if (a.porsiKecil !== b.porsiKecil) msg += '\nPorsi kecil: ' + a.porsiKecil + ' → ' + b.porsiKecil;
+        if (a.porsiBesar !== b.porsiBesar) msg += '\nPorsi besar: ' + a.porsiBesar + ' → ' + b.porsiBesar;
       } else {
         const nAl = (typeof sdGetAll === 'function') ? sdGetAll().filter(s => pmbNorm(s.sekolah) === pmbNorm(it.nama)).length : 0;
-        if (nAl) html += '<div class="text-xs text-rose-700 font-semibold">🛡️ ' + nAl + ' data alergi dengan asal "' + pmbEsc(it.nama) + '" akan ikut diperbarui ke nama baru.</div>';
+        if (nAl) msg += '\n\n' + nAl + ' data alergi dengan asal "' + it.nama + '" akan ikut diperbarui ke nama baru.';
       }
-      html += '<div class="text-xs text-slate-500">Simpan perubahan ini ke database?</div>';
-      const ok = await pmbConfirm({ html });
-      if (!ok) { revert(); return; }
+      if (!confirm(msg)) { revert(); return; }
       const d2 = pmbData(), it2 = d2.items.find(x => x.id === id);
       if (!it2) return;
       const oldName = it2.nama;
@@ -11115,7 +11549,7 @@ h += '</tbody></table></div></div>';
       pmbSave({ tanggal: d2.tanggal, items: d2.items });
       const el = inputEl(); if (el) el.value = pmbInputVal(it2, f);
       ['kj', 'bj'].forEach(k => { const e2 = document.querySelector('#pmb_tables input[data-id="' + id + '"][data-f="' + k + '"]'); if (e2) e2.value = pmbInputVal(it2, k); });
-      pmbRenderStats(); pmbRefreshComputed(); pmbRenderRincian();
+      pmbRenderStats(); pmbRefreshComputed(); pmbRenderRincian(); pmbRenderLaporan();
       if (f === 'nama' && typeof sdRenderLists === 'function') { try { sdRenderLists(sdGetAll()); } catch (e) {} try { sdRenderTable(); } catch (e) {} }
     }
     document.addEventListener('change', function (e) {
@@ -11183,7 +11617,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         const its = items.filter(i => i.jenis === j); let k = 0, b = 0;
         its.forEach(i => { const c = pmbCalc(i); k += c.porsiKecil; b += c.porsiBesar; });
         return `<tr><td>${{ PAUD: 'PAUD / TK / KB / RA', SD: 'SD / MI', SMP: 'SMP / MTs', POSYANDU: 'Posyandu (3B)' }[j]}</td><td class="n">${its.length}</td><td class="n">${k}</td><td class="n">${b}</td><td class="n" style="font-weight:900">${k + b}</td><td class="n">${pct(k + b)}</td></tr>`;
-      }).join('') + `<tr><td>Sampel Bahan Makanan</td><td class="n">${PMB_SMP_N}</td><td class="n">0</td><td class="n">${g.sampel.j}</td><td class="n" style="font-weight:900">${g.sampel.j}</td><td class="n">${pct(g.sampel.j)}</td></tr>`;
+      }).join('') + `<tr><td>Sampel Bahan Makanan</td><td class="n">${pmbSampel().length}</td><td class="n">0</td><td class="n">${g.sampel.j}</td><td class="n" style="font-weight:900">${g.sampel.j}</td><td class="n">${pct(g.sampel.j)}</td></tr>`;
       h += `<div><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2">B. Rincian per Jenis Satuan</div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table><thead><tr><th>Jenis</th><th>Jumlah Satuan</th><th>Porsi Kecil</th><th>Porsi Besar</th><th>Total Porsi</th><th>% dari Total</th></tr></thead><tbody>${jenisRows}<tr class="grand"><td>TOTAL</td><td>${items.length}</td><td>${kecil}</td><td>${besar}</td><td>${total}</td><td>100%</td></tr></tbody></table></div></div>`;
 
       // C. integrasi alergi per satuan
@@ -11546,6 +11980,699 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       };
 
     })();
+
+    // =====================================================================
+    // FOOD WASTE (SISA MAKANAN OMPRENG) — FM-SGR-SPPG-07.01
+    // Rekap harian dapur menyeluruh (tanpa satuan sekolah & tanpa ompreng).
+    // Firebase: 'sppg_food_waste' = { items: [ {id,tanggal,
+    //   distribusi,pokok,hewan,nabati,sayur,buah,susu,lanjut,catatan} ] }
+    // Berat dalam gram. Cermin LocalStorage: 'sppg_food_waste_cache'.
+    // =====================================================================
+    const FW_PATH = 'sppg_food_waste';
+    const FW_CATS = [
+      { k: 'pokok',  label: 'Makanan Pokok', s: 'Pokok',  sk: 'KARBO' },
+      { k: 'hewan',  label: 'Lauk Hewani',   s: 'Hewani', sk: 'PH' },
+      { k: 'nabati', label: 'Lauk Nabati',   s: 'Nabati', sk: 'PN' },
+      { k: 'sayur',  label: 'Sayur',         s: 'Sayur',  sk: 'SAYUR' },
+      { k: 'buah',   label: 'Buah',          s: 'Buah',   sk: 'BUAH' },
+      { k: 'susu',   label: 'Susu',          s: 'Susu',   sk: 'SUSU' }
+    ];
+    const FW_MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const FW_MONTHS_S = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const FW_DEFAULT_DOCNO = 'FM-SGR-SPPG-07.01';
+    let fwTab = 'harian';
+    let fwMethod = 'qty';
+    let fwEditId = null;
+    let fwInited = false;
+    let fwRemoteLoaded = false;
+    let fwPeriodTouched = false;
+    let fwDayKey = '';
+    let fwDayTimer = null;
+
+    const fwNum = v => { const n = parseFloat(v); return isNaN(n) || n < 0 ? 0 : n; };
+    const fwRound = (n, d) => { const p = Math.pow(10, d); return Math.round((Number(n) + Number.EPSILON) * p) / p; };
+    const fwFmt = (n, d) => (isFinite(n) ? Number(n) : 0).toLocaleString('id-ID', { minimumFractionDigits: d, maximumFractionDigits: d });
+    const fwG = g => { const v = fwRound(g, 2); return fwFmt(v, Math.abs(v - Math.round(v)) < 0.005 ? 0 : 1); };
+    const fwKg = g => fwFmt(g / 1000, 2);
+    const fwPct = p => fwFmt(p, 1) + '%';
+    const fwCatPct = (v, dist) => dist > 0 ? (fwNum(v) * 100 / dist) : 0;
+    const fwEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fwNewId = () => 'fw' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+    function fwDate(key) { const p = String(key || '').split('-'); return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)); }
+    function fwDateLong(key) { const d = fwDate(key); return isNaN(d.getTime()) ? (key || '-') : d.getDate() + ' ' + FW_MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
+    function fwDateShort(key) { const d = fwDate(key); return isNaN(d.getTime()) ? (key || '-') : String(d.getDate()).padStart(2, '0') + ' ' + FW_MONTHS_S[d.getMonth()] + ' ' + d.getFullYear(); }
+    function fwWeekStart(key) { const d = fwDate(key); const w = (d.getDay() + 6) % 7; d.setDate(d.getDate() - w); return getLocalDateKey(d); }
+    function fwWeekEnd(ws) { const d = fwDate(ws); d.setDate(d.getDate() + 6); return getLocalDateKey(d); }
+
+    // ---------- data & sinkronisasi ----------
+    function fwItems() {
+      const v = window.dbCache && window.dbCache[FW_PATH];
+      if (!v) return [];
+      const arr = v.items ? (Array.isArray(v.items) ? v.items : Object.values(v.items)) : [];
+      return arr.filter(x => x && typeof x === 'object').map(x => {
+        const o = {
+          id: x.id || fwNewId(), tanggal: String(x.tanggal || ''),
+          distribusi: fwNum(x.distribusi),
+          lanjut: String(x.lanjut || ''), catatan: String(x.catatan || '')
+        };
+        FW_CATS.forEach(c => { o[c.k] = fwNum(x[c.k]); });
+        return o;
+      }).filter(x => x.tanggal);
+    }
+    function fwSetCache(list) {
+      window.dbCache = window.dbCache || {};
+      const d = { items: list };
+      window.dbCache[FW_PATH] = d;
+      try { localStorage.setItem('sppg_food_waste_cache', JSON.stringify(d)); } catch (e) {}
+      return d;
+    }
+    function fwPersist(list) {
+      const d = fwSetCache(list);
+      if (typeof window.fbSet === 'function') window.fbSet(FW_PATH, list.length ? d : null);
+    }
+    function fwCacheLoad() {
+      if (window.dbCache && window.dbCache[FW_PATH]) return;
+      try {
+        const raw = localStorage.getItem('sppg_food_waste_cache');
+        if (!raw) return;
+        const v = JSON.parse(raw);
+        if (v && v.items) { window.dbCache = window.dbCache || {}; window.dbCache[FW_PATH] = v; }
+      } catch (e) {}
+    }
+    function fwMergeRemote(remote) {
+      if (!remote) return;
+      const arr = remote.items ? (Array.isArray(remote.items) ? remote.items : Object.values(remote.items)) : [];
+      if (!arr.length) return;
+      const cur = fwItems();
+      const out = arr.filter(x => x && x.tanggal).map(x => Object.assign({}, x, { id: x.id || fwNewId() }));
+      cur.forEach(r => {
+        const i = out.findIndex(x => x.id === r.id);
+        if (i >= 0) out[i] = r; else out.push(r);
+      });
+      fwSetCache(out);
+    }
+
+    // ---------- agregasi ----------
+    function fwAgg(list) {
+      const o = { n: 0, distribusi: 0 };
+      FW_CATS.forEach(c => { o[c.k] = 0; });
+      (list || []).forEach(r => {
+        o.n++;
+        o.distribusi += fwNum(r.distribusi);
+        FW_CATS.forEach(c => { o[c.k] += fwNum(r[c.k]); });
+      });
+      o.sisa = 0;
+      FW_CATS.forEach(c => { o.sisa += o[c.k]; });
+      o.pct = o.distribusi > 0 ? (o.sisa * 100 / o.distribusi) : 0;
+      o.catPct = {};
+      FW_CATS.forEach(c => { o.catPct[c.k] = fwCatPct(o[c.k], o.distribusi); });
+      return o;
+    }
+    function fwIndText(p) { return p <= 20 ? 'Baik' : 'Perlu Evaluasi'; }
+    function fwIndBadge(p) {
+      const ok = p <= 20;
+      return '<span class="fw-badge ' + (ok ? 'fw-badge-ok' : 'fw-badge-bad') + '">' + fwIndText(p) + ' · ' + fwPct(p) + '</span>';
+    }
+    function fwLanjutBadge(v) {
+      const s = String(v || '').trim();
+      if (!s) return '<span class="fw-badge fw-badge-tps">—</span>';
+      const l = s.toLowerCase();
+      const cls = l.indexOf('maggot') >= 0 ? 'maggot' : l.indexOf('kompos') >= 0 ? 'kompos' : l.indexOf('pakan') >= 0 ? 'feed' : 'tps';
+      return '<span class="fw-badge fw-badge-' + cls + '">' + fwEsc(s) + '</span>';
+    }
+    function fwGroups(rows) {
+      if (fwTab === 'harian') {
+        return (rows || []).map(r => {
+          const g = fwAgg([r]);
+          g._row = r; g.key = r.id; g.label = fwDateShort(r.tanggal); g.sort = r.tanggal + '|' + r.id;
+          return g;
+        });
+      }
+      const map = {};
+      (rows || []).forEach(r => {
+        let key, label, sort;
+        if (fwTab === 'pekanan') {
+          const ws = fwWeekStart(r.tanggal), we = fwWeekEnd(ws);
+          key = ws; sort = ws; label = fwDateShort(ws) + ' – ' + fwDateShort(we);
+        } else {
+          key = r.tanggal.slice(0, 7); sort = key;
+          const y = key.slice(0, 4), m = parseInt(key.slice(5, 7), 10) || 1;
+          label = FW_MONTHS[m - 1] + ' ' + y;
+        }
+        if (!map[key]) map[key] = { key: key, label: label, sort: sort, list: [] };
+        map[key].list.push(r);
+      });
+      return Object.keys(map).map(k => {
+        const g = map[k];
+        Object.assign(g, fwAgg(g.list));
+        return g;
+      }).sort((a, b) => a.sort < b.sort ? -1 : a.sort > b.sort ? 1 : 0);
+    }
+    function fwFilteredRows() {
+      const s = (document.getElementById('fw_start') || {}).value || '';
+      const e = (document.getElementById('fw_end') || {}).value || '';
+      return fwItems().filter(r => (!s || r.tanggal >= s) && (!e || r.tanggal <= e))
+        .sort((a, b) => a.tanggal === b.tanggal ? String(b.id).localeCompare(String(a.id)) : (a.tanggal < b.tanggal ? -1 : 1));
+    }
+    function fwPeriodText() {
+      const s = (document.getElementById('fw_start') || {}).value || '';
+      const e = (document.getElementById('fw_end') || {}).value || '';
+      if (s || e) return (s ? fwDateShort(s) : '…') + ' – ' + (e ? fwDateShort(e) : '…');
+      const items = fwItems();
+      if (!items.length) return '-';
+      let a = items[0].tanggal, b = items[0].tanggal;
+      items.forEach(r => { if (r.tanggal < a) a = r.tanggal; if (r.tanggal > b) b = r.tanggal; });
+      return fwDateShort(a) + ' – ' + fwDateShort(b);
+    }
+    function fwDefaultPeriod() {
+      const items = fwItems();
+      let s, e;
+      if (items.length) {
+        s = items[0].tanggal; e = items[0].tanggal;
+        items.forEach(r => { if (r.tanggal < s) s = r.tanggal; if (r.tanggal > e) e = r.tanggal; });
+      } else {
+        const d = new Date();
+        s = getLocalDateKey(new Date(d.getFullYear(), d.getMonth(), 1));
+        e = getLocalDateKey(d);
+      }
+      const a = document.getElementById('fw_start'), b = document.getElementById('fw_end');
+      if (a && b && items.length && !fwPeriodTouched) { a.value = s; b.value = e; return; }
+      if (a && !a.value) a.value = s;
+      if (b && !b.value) b.value = e;
+    }
+    function fwOnFilterChange() { fwPeriodTouched = true; fwRenderAll(); }
+
+    // ---------- nomor dokumen ----------
+    function fwDocNo() {
+      const el = document.getElementById('fw_docno');
+      if (el && el.dataset.touched === '1') return el.value.trim();
+      let v = null;
+      try { v = localStorage.getItem('sppg_food_waste_docno'); } catch (e) {}
+      return v === null ? FW_DEFAULT_DOCNO : String(v).trim();
+    }
+    function fwSetDocNo(v) {
+      const el = document.getElementById('fw_docno');
+      if (el) el.dataset.touched = '1';
+      try { localStorage.setItem('sppg_food_waste_docno', v || ''); } catch (e) {}
+      const k = document.getElementById('fw_kop_docno');
+      if (k) k.textContent = (v || '').trim() || '—';
+    }
+    function fwLoadDocNo() {
+      const el = document.getElementById('fw_docno');
+      if (!el) return;
+      let v = null;
+      try { v = localStorage.getItem('sppg_food_waste_docno'); } catch (e) {}
+      if (v !== null) { el.value = v; el.dataset.touched = '1'; }
+      else { el.value = FW_DEFAULT_DOCNO; }
+      const k = document.getElementById('fw_kop_docno');
+      if (k) k.textContent = fwDocNo() || '—';
+    }
+
+    // ---------- nama menu otomatis per kategori (Siklus Menu) ----------
+    function fwMenuLabel(v) {
+      const s = String(v == null ? '' : v).trim();
+      if (!s || s === '-' || s === '0') return '';
+      return s.toLowerCase().replace(/(^|[\s\-\/\(])([a-z0-9])/g, (m, p, c) => p + c.toUpperCase());
+    }
+    function fwMenuNameFor(dateKey, sk) {
+      if (!dateKey) return '';
+      try {
+        const weeks = getSuhuWeeks();
+        const idx = getSuhuDateKeyList(weeks).indexOf(dateKey);
+        if (idx < 0) return '';
+        return fwMenuLabel(getSuhuMenuName(weeks, sk, idx));
+      } catch (e) { return ''; }
+    }
+    function fwRenderMenuBadges() {
+      const date = (document.getElementById('fw_tanggal') || {}).value || '';
+      FW_CATS.forEach(c => {
+        const el = document.getElementById('fw_menu_' + c.k);
+        if (!el) return;
+        const nm = date ? fwMenuNameFor(date, c.sk) : '';
+        if (nm) { el.textContent = 'Menu: ' + nm; el.classList.remove('is-empty'); }
+        else { el.textContent = 'Menu belum diatur di Siklus Menu'; el.classList.add('is-empty'); }
+      });
+    }
+
+    // ---------- form ----------
+    function fwReadForm() {
+      const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+      const o = {
+        tanggal: val('fw_tanggal'),
+        distribusi: fwNum(val('fw_distribusi')),
+        lanjut: val('fw_lanjut') || 'Pakan Ternak',
+        catatan: String(val('fw_catatan') || '').trim()
+      };
+      FW_CATS.forEach(c => { o[c.k] = fwNum(val('fw_w_' + c.k)); });
+      return o;
+    }
+    function fwUpdateLive() {
+      const box = document.getElementById('fw_live');
+      if (!box) return;
+      const raw = id => { const el = document.getElementById(id); return el ? String(el.value).trim() : ''; };
+      const anyFilled = !!raw('fw_distribusi') || FW_CATS.some(c => !!raw('fw_w_' + c.k));
+      const f = fwReadForm();
+      const sisa = FW_CATS.reduce((n, c) => n + f[c.k], 0);
+      const pct = f.distribusi > 0 ? sisa * 100 / f.distribusi : 0;
+      if (!anyFilled) {
+        box.innerHTML = '<span class="text-slate-400 font-medium">Total sisa dan persentase akan dihitung otomatis setelah berat diisi.</span>';
+        return;
+      }
+      box.innerHTML =
+        '<div class="flex flex-wrap items-center gap-x-6 gap-y-2">' +
+          '<div class="fw-live-item"><span class="fw-live-lab">Total Sisa</span><span class="fw-live-val">' + fwG(sisa) + ' g</span></div>' +
+          '<div class="fw-live-item"><span class="fw-live-lab">Total Sisa (Kg)</span><span class="fw-live-val">' + fwKg(sisa) + ' kg</span></div>' +
+          '<div class="fw-live-item"><span class="fw-live-lab">Terdistribusi</span><span class="fw-live-val">' + fwG(f.distribusi) + ' g</span></div>' +
+          '<div class="fw-live-item"><span class="fw-live-lab">Persentase Sisa</span><span class="fw-live-val">' + fwPct(pct) + '</span></div>' +
+          '<div class="ml-auto">' + fwIndBadge(pct) + '</div>' +
+        '</div>' +
+        '<div class="mt-2 flex flex-wrap gap-1.5 text-[10px] font-bold text-slate-500">' +
+          FW_CATS.map(c => '<span class="px-1.5 py-0.5 rounded-md bg-white/70 border border-emerald-100">' + c.label + ' ' + (f.distribusi > 0 ? fwPct(f[c.k] * 100 / f.distribusi) : '0%') + '</span>').join('') +
+        '</div>';
+    }
+    // Reset form harian (hanya tampilan form, riwayat Firebase tidak disentuh)
+    function fwResetDailyInputs() {
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      set('fw_distribusi', '0');
+      FW_CATS.forEach(c => set('fw_w_' + c.k, '0'));
+      set('fw_catatan', '');
+      fwEditId = null;
+      const title = document.getElementById('fw_form_title');
+      if (title) title.textContent = '✍️ Tambah Log Food Waste';
+      const btn = document.getElementById('fw_btn_cancel');
+      if (btn) btn.classList.add('hidden');
+    }
+    function fwOnDateChange() {
+      fwResetDailyInputs();
+      fwRenderMenuBadges();
+      fwUpdateLive();
+    }
+
+    // Pengawas pergantian hari (tengah malam): reset form otomatis tanpa menghapus riwayat
+    function fwCheckDayChange() {
+      const today = getLocalDateKey();
+      if (!fwDayKey) { fwDayKey = today; return; }
+      if (today === fwDayKey) return;
+      fwDayKey = today;
+      const tgl = document.getElementById('fw_tanggal');
+      if (tgl) tgl.value = today;
+      fwResetDailyInputs();
+      fwRenderMenuBadges();
+      fwUpdateLive();
+      try { fwRenderAll(); } catch (e) {}
+    }
+
+    function fwResetForm(silent) {
+      fwEditId = null;
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      set('fw_distribusi', '');
+      FW_CATS.forEach(c => set('fw_w_' + c.k, ''));
+      set('fw_catatan', ''); set('fw_lanjut', 'Pakan Ternak');
+      set('fw_tanggal', getLocalDateKey());
+      const title = document.getElementById('fw_form_title');
+      if (title) title.textContent = '✍️ Tambah Log Food Waste';
+      const btn = document.getElementById('fw_btn_cancel');
+      if (btn) btn.classList.add('hidden');
+      fwRenderMenuBadges(); fwUpdateLive();
+      if (silent !== true) {
+        const f = document.getElementById('fw_form');
+        if (f) { try { f.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
+      }
+    }
+    function fwEdit(id) {
+      const r = fwItems().find(x => x.id === id);
+      if (!r) return;
+      const set = (cid, v) => { const el = document.getElementById(cid); if (el) el.value = v; };
+      fwEditId = id;
+      set('fw_tanggal', r.tanggal);
+      set('fw_distribusi', r.distribusi ? String(r.distribusi) : '');
+      FW_CATS.forEach(c => set('fw_w_' + c.k, r[c.k] ? String(r[c.k]) : ''));
+      set('fw_lanjut', r.lanjut || 'Pakan Ternak');
+      set('fw_catatan', r.catatan || '');
+      const title = document.getElementById('fw_form_title');
+      if (title) title.textContent = '✏️ Ubah Log Food Waste';
+      const btn = document.getElementById('fw_btn_cancel');
+      if (btn) btn.classList.remove('hidden');
+      fwRenderMenuBadges(); fwUpdateLive();
+      const f = document.getElementById('fw_form');
+      if (f) { try { f.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
+    }
+    function fwExpandPeriod(date) {
+      if (!date) return;
+      const s = document.getElementById('fw_start'), e = document.getElementById('fw_end');
+      if (s && s.value && date < s.value) s.value = date;
+      if (e && e.value && date > e.value) e.value = date;
+    }
+    function fwSubmit(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const f = fwReadForm();
+      if (!f.tanggal) { alert('Tanggal wajib diisi.'); return; }
+      const sisa = FW_CATS.reduce((n, c) => n + f[c.k], 0);
+      const pct = f.distribusi > 0 ? sisa * 100 / f.distribusi : 0;
+      const d = fwItems();
+      if (fwEditId) {
+        const old = d.find(x => x.id === fwEditId);
+        if (!old) { fwResetForm(true); return; }
+        let msg = 'Apakah Anda yakin ingin menyimpan perubahan data Food Waste?\n\n' +
+          'Tanggal: ' + fwDateLong(f.tanggal) +
+          '\nTotal sisa: ' + fwG(sisa) + ' g (' + fwPct(pct) + ')';
+        if (old.tanggal !== f.tanggal) msg += '\nTanggal: ' + fwDateLong(old.tanggal) + ' → ' + fwDateLong(f.tanggal);
+        if (!confirm(msg)) return;
+        fwPersist(d.map(x => x.id === fwEditId ? Object.assign({}, f, { id: fwEditId }) : x));
+      } else {
+        const msg = 'Apakah Anda yakin ingin menambahkan data Food Waste?\n\n' +
+          'Tanggal: ' + fwDateLong(f.tanggal) +
+          '\nTotal sisa: ' + fwG(sisa) + ' g (' + fwPct(pct) + ')';
+        if (!confirm(msg)) return;
+        d.push(Object.assign({ id: fwNewId() }, f));
+        fwPersist(d);
+      }
+      fwExpandPeriod(f.tanggal);
+      fwResetForm(true);
+      fwRenderAll();
+    }
+    function fwDelete(id) {
+      const r = fwItems().find(x => x.id === id);
+      if (!r) return;
+      if (!confirm('Apakah Anda yakin ingin menghapus data Food Waste tanggal ' + fwDateLong(r.tanggal) + '?')) return;
+      fwPersist(fwItems().filter(x => x.id !== id));
+      if (fwEditId === id) fwResetForm(true);
+      fwRenderAll();
+    }
+
+    // ---------- tab & metode ----------
+    function fwStyleToggle(id, active) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.toggle('is-active', !!active);
+    }
+    function fwSetMethod(m) {
+      fwMethod = (m === 'pct') ? 'pct' : 'qty';
+      try { localStorage.setItem('sppg_food_waste_method', fwMethod); } catch (e) {}
+      [['fw_qty_block', 'qty'], ['fw_pct_block', 'pct']].forEach(p => {
+        const el = document.getElementById(p[0]);
+        if (!el) return;
+        const on = fwMethod === p[1];
+        el.classList.toggle('hidden', !on);
+        el.classList.toggle('hidden-print', !on);
+      });
+      fwStyleToggle('fw_method_qty', fwMethod === 'qty');
+      fwStyleToggle('fw_method_pct', fwMethod === 'pct');
+      const sub = document.getElementById('fw_kop_subtitle');
+      if (sub) sub.textContent = 'Metode Rekapitulasi: ' + (fwMethod === 'qty' ? 'Kuantitas (Gram/Kg)' : 'Persentase (%)');
+      fwRenderAll();
+    }
+    function fwSetTab(t) {
+      fwTab = (t === 'pekanan' || t === 'bulanan') ? t : 'harian';
+      fwStyleToggle('fw_tab_harian', fwTab === 'harian');
+      fwStyleToggle('fw_tab_pekanan', fwTab === 'pekanan');
+      fwStyleToggle('fw_tab_bulanan', fwTab === 'bulanan');
+      fwRenderAll();
+    }
+
+    // ---------- render statistik & laporan ----------
+    function fwKpi(icon, lab, val, sub, tone) {
+      return '<div class="fw-kpi fw-tone-' + tone + '">' +
+        '<div class="fw-kpi-ico">' + icon + '</div>' +
+        '<div class="fw-kpi-label">' + lab + '</div>' +
+        '<div class="fw-kpi-value">' + val + '</div>' +
+        '<div class="fw-kpi-sub">' + sub + '</div>' +
+      '</div>';
+    }
+    function fwCard(lab, val, sub, cls) {
+      return '<div class="p-3.5 rounded-2xl border ' + cls + ' shadow-sm"><div class="text-[10px] font-extrabold uppercase tracking-wider opacity-70">' + lab +
+        '</div><div class="text-xl font-black mt-1 leading-tight">' + val + '</div><div class="text-[10px] font-bold opacity-70 mt-0.5">' + sub + '</div></div>';
+    }
+    function fwRenderStats(rows) {
+      const box = document.getElementById('fw_stats');
+      if (!box) return;
+      const a = fwAgg(rows);
+      box.innerHTML =
+        fwKpi('🗓️', 'Total Log', fwFmt(a.n, 0) + ' entri', fwPeriodText(), 'sky') +
+        fwKpi('🍽️', 'Total Terdistribusi', fwG(a.distribusi) + '&nbsp;g', fwKg(a.distribusi) + '&nbsp;kg', 'teal') +
+        fwKpi('🥗', 'Total Sisa Makanan', fwG(a.sisa) + '&nbsp;g', fwKg(a.sisa) + '&nbsp;kg', 'amber') +
+        fwKpi('📉', 'Persentase Sisa', fwPct(a.pct), fwIndText(a.pct) + ' · ambang ≤ 20%', a.pct <= 20 ? 'emerald' : 'rose');
+    }
+    function fwSummaryCards(a, isQty) {
+      return fwKpi('⚖️', 'Total Sisa (Gram)', fwG(a.sisa) + '&nbsp;g', 'dari ' + fwFmt(a.n, 0) + ' entri', 'amber') +
+        fwKpi('📦', 'Total Sisa (Kg)', fwKg(a.sisa) + '&nbsp;kg', '1 kg = 1.000 gram', 'teal') +
+        fwKpi('🍽️', 'Porsi Terdistribusi', fwG(a.distribusi) + '&nbsp;g', fwKg(a.distribusi) + '&nbsp;kg', 'sky') +
+        fwKpi('📉', 'Persentase Sisa', fwPct(a.pct), fwIndText(a.pct) + ' · ' + (isQty ? 'kuantitas' : 'persentase'), a.pct <= 20 ? 'emerald' : 'rose');
+    }
+    function fwTableHtml(groups, agg, isQty) {
+      const cols = [];
+      const catH = c => (c.s || c.label) + (isQty ? ' (g)' : ' (%)');
+      if (fwTab === 'harian') {
+        cols.push({ t: 'No.', a: 'c' }, { t: 'Tanggal', a: 'c' }, { t: 'Distribusi (g)', a: 'n' });
+      } else {
+        cols.push({ t: 'No.', a: 'c' }, { t: 'Periode', a: 'l' }, { t: 'Jumlah Log', a: 'n' }, { t: 'Distribusi (g)', a: 'n' });
+      }
+      FW_CATS.forEach(c => cols.push({ t: catH(c), a: 'n' }));
+      if (isQty) {
+        cols.push({ t: 'Total Sisa (g)', a: 'n' }, { t: 'Total Sisa (kg)', a: 'n' }, { t: fwTab === 'harian' ? '% Sisa' : 'Rata-rata %', a: 'n' });
+      } else {
+        cols.push({ t: 'Total Sisa (g)', a: 'n' }, { t: '% Sisa', a: 'n' }, { t: 'Indikator', a: 'c' });
+      }
+      if (fwTab === 'harian') {
+        cols.push({ t: 'Tindak Lanjut', a: 'l' }, { t: 'Catatan', a: 'l' }, { t: 'Aksi', a: 'c', np: true });
+      }
+      const totalCols = cols.length;
+      const td = (i, inner) => {
+        const c = cols[i];
+        return '<td data-label="' + fwEsc(c.t) + '" class="' + c.a + (c.np ? ' hidden-print' : '') + '">' + inner + '</td>';
+      };
+      const tail = (base, sisa, pct) => isQty
+        ? td(base, fwG(sisa)) + td(base + 1, fwKg(sisa)) + td(base + 2, fwPct(pct))
+        : td(base, fwG(sisa)) + td(base + 1, fwPct(pct)) + td(base + 2, fwIndBadge(pct));
+      const body = [];
+      if (!groups.length) {
+        body.push('<tr><td colspan="' + totalCols + '" class="c" style="color:#94a3b8;padding:18px">Belum ada data Food Waste pada periode ini.</td></tr>');
+      } else {
+        groups.forEach((g, i) => {
+          const t = [];
+          if (fwTab === 'harian') {
+            const r = g._row;
+            t.push(td(0, i + 1), td(1, fwDateShort(r.tanggal)), td(2, fwG(r.distribusi)));
+            FW_CATS.forEach((c, j) => t.push(td(3 + j, isQty ? fwG(r[c.k]) : fwPct(fwCatPct(r[c.k], r.distribusi)))));
+            t.push(tail(9, g.sisa, g.pct));
+            t.push(td(12, fwLanjutBadge(r.lanjut)), td(13, fwEsc(r.catatan || '-')),
+              td(14, '<button type="button" title="Ubah" onclick="fwEdit(\'' + r.id + '\')" class="fw-action fw-action-edit hidden-print">✏️</button> ' +
+                '<button type="button" title="Hapus" onclick="fwDelete(\'' + r.id + '\')" class="fw-action fw-action-del hidden-print">🗑️</button>'));
+          } else {
+            t.push(td(0, i + 1), td(1, fwEsc(g.label)), td(2, fwFmt(g.n, 0)), td(3, fwG(g.distribusi)));
+            FW_CATS.forEach((c, j) => t.push(td(4 + j, isQty ? fwG(g[c.k]) : fwPct(g.catPct[c.k]))));
+            t.push(tail(10, g.sisa, g.pct));
+          }
+          body.push('<tr>' + t.join('') + '</tr>');
+        });
+        const t = [];
+        if (fwTab === 'harian') {
+          t.push('<td colspan="2" class="c">TOTAL</td>', td(2, fwG(agg.distribusi)));
+          FW_CATS.forEach((c, j) => t.push(td(3 + j, isQty ? fwG(agg[c.k]) : fwPct(agg.catPct[c.k]))));
+          t.push(tail(9, agg.sisa, agg.pct));
+          t.push(td(12, ''), td(13, ''), td(14, ''));
+        } else {
+          t.push('<td colspan="2" class="c">TOTAL</td>', td(2, fwFmt(agg.n, 0)), td(3, fwG(agg.distribusi)));
+          FW_CATS.forEach((c, j) => t.push(td(4 + j, isQty ? fwG(agg[c.k]) : fwPct(agg.catPct[c.k]))));
+          t.push(tail(10, agg.sisa, agg.pct));
+        }
+        body.push('<tr class="fw-total">' + t.join('') + '</tr>');
+      }
+      const head = '<thead><tr>' + cols.map(c => '<th' + (c.np ? ' class="hidden-print"' : '') + '>' + c.t + '</th>').join('') + '</tr></thead>';
+      return '<table class="w-full">' + head + '<tbody>' + body.join('') + '</tbody></table>';
+    }
+
+    function fwRenderReport(rows) {
+      const groups = fwGroups(rows);
+      const a = fwAgg(rows);
+      const kd = document.getElementById('fw_kop_docno');
+      if (kd) kd.textContent = fwDocNo() || '—';
+      const kp = document.getElementById('fw_kop_period');
+      if (kp) kp.textContent = fwPeriodText();
+      const ks = document.getElementById('fw_kop_subtitle');
+      if (ks) ks.textContent = 'Metode Rekapitulasi: ' + (fwMethod === 'qty' ? 'Kuantitas (Gram/Kg)' : 'Persentase (%)');
+      const qs = document.getElementById('fw_qty_summary');
+      if (qs) qs.innerHTML = fwSummaryCards(a, true);
+      const qt = document.getElementById('fw_qty_table');
+      if (qt) qt.innerHTML = fwTableHtml(groups, a, true);
+      const ps = document.getElementById('fw_pct_summary');
+      if (ps) ps.innerHTML = fwSummaryCards(a, false);
+      const pt = document.getElementById('fw_pct_table');
+      if (pt) pt.innerHTML = fwTableHtml(groups, a, false);
+    }
+    function fwRenderAll() {
+      if (!document.getElementById('fw_report')) return;
+      fwDefaultPeriod();
+      const rows = fwFilteredRows();
+      fwRenderStats(rows);
+      fwRenderReport(rows);
+    }
+
+    // ---------- export Excel / cetak ----------
+    function fwFileKey(v) { return String(v || 'awal').replace(/[\\/:*?"<>|]/g, '-'); }
+    async function fwExportExcel() {
+      try {
+        if (typeof ExcelJS === 'undefined') { alert('Library Excel belum termuat. Muat ulang halaman lalu coba lagi.'); return; }
+        const rows = fwFilteredRows();
+        const groups = fwGroups(rows);
+        const agg = fwAgg(rows);
+        const isQty = fwMethod === 'qty';
+        const tabName = fwTab === 'harian' ? 'REKAP HARIAN' : fwTab === 'pekanan' ? 'REKAP PEKANAN' : 'REKAP BULANAN';
+        const methodName = isQty ? 'Kuantitas (Gram/Kg)' : 'Persentase (%)';
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('FOOD WASTE');
+
+        let heads, widths, aligns, fmts;
+        if (fwTab === 'harian') {
+          heads = ['No.', 'Tanggal', 'Distribusi (g)'];
+          widths = [5, 14, 14];
+          aligns = ['center', 'center', 'right'];
+          fmts = [null, null, '#,##0'];
+          FW_CATS.forEach(c => { heads.push(c.label + (isQty ? ' (g)' : ' (%)')); widths.push(isQty ? 13 : 11); aligns.push('right'); fmts.push(isQty ? '#,##0.0' : '0.0"%"'); });
+          if (isQty) {
+            heads.push('Total Sisa (g)', 'Total Sisa (kg)', '% Sisa');
+            widths.push(14, 14, 9); aligns.push('right', 'right', 'right'); fmts.push('#,##0.0', '0.00', '0.0"%"');
+          } else {
+            heads.push('Total Sisa (g)', '% Sisa', 'Indikator');
+            widths.push(14, 9, 18); aligns.push('right', 'right', 'center'); fmts.push('#,##0.0', '0.0"%"', null);
+          }
+          heads.push('Tindak Lanjut', 'Catatan');
+          widths.push(20, 32); aligns.push('left', 'left'); fmts.push(null, null);
+        } else {
+          heads = ['No.', 'Periode', 'Jumlah Log', 'Distribusi (g)'];
+          widths = [5, 30, 10, 14];
+          aligns = ['center', 'left', 'right', 'right'];
+          fmts = [null, null, '#,##0', '#,##0'];
+          FW_CATS.forEach(c => { heads.push(c.label + (isQty ? ' (g)' : ' (%)')); widths.push(isQty ? 13 : 11); aligns.push('right'); fmts.push(isQty ? '#,##0.0' : '0.0"%"'); });
+          if (isQty) {
+            heads.push('Total Sisa (g)', 'Total Sisa (kg)', 'Rata-rata %');
+            widths.push(14, 14, 11); aligns.push('right', 'right', 'right'); fmts.push('#,##0.0', '0.00', '0.0"%"');
+          } else {
+            heads.push('Total Sisa (g)', '% Sisa', 'Indikator');
+            widths.push(14, 9, 18); aligns.push('right', 'right', 'center'); fmts.push('#,##0.0', '0.0"%"', null);
+          }
+        }
+        const lastCol = heads.length;
+        widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+
+        const titleEnd = Math.max(6, lastCol - 5);
+        const lab = titleEnd + 1, val = titleEnd + 2;
+        rptKop(wb, ws, { r: 1, logo: [2, 4], title: [5, titleEnd], lab: lab, val: val,
+          judul: 'FOOD WASTE (SISA MAKANAN OMPRENG)', noDoc: fwDocNo() || '', tgl: KOP_TGL_BAKU, colon: false });
+        for (let i = 0; i < 3; i++) {
+          rptMerge(ws, 1 + i, val, 1 + i, lastCol);
+          rptBorder(ws, 1 + i, val, 1 + i, lastCol, 'grid');
+        }
+        rptMerge(ws, 4, 1, 4, lastCol);
+        rptPut(ws, 4, 1, 'Periode: ' + fwPeriodText() + '  ·  Metode Rekapitulasi: ' + methodName, { size: 10, bold: true, h: 'center' });
+        rptBorder(ws, 4, 1, 4, lastCol, 'box');
+        rptMerge(ws, 5, 1, 5, lastCol);
+        rptPut(ws, 5, 1, 'Jenis Rekapitulasi: ' + tabName, { size: 10, h: 'center' });
+        rptBorder(ws, 5, 1, 5, lastCol, 'box');
+
+        let r = 7;
+        heads.forEach((h, i) => rptPut(ws, r, i + 1, h, { size: 10, bold: true, h: 'center' }));
+        rptFill(ws, r, 1, r, lastCol, 'FFE0E7FF');
+        rptBorder(ws, r, 1, r, lastCol, 'grid');
+        ws.getRow(r).height = 34;
+        r++;
+
+        const writeRow = vals => {
+          vals.forEach((o, i) => rptPut(ws, r, i + 1, o.v, { size: 9, h: o.h, numFmt: o.nf || undefined }));
+          rptBorder(ws, r, 1, r, lastCol, 'grid');
+          r++;
+        };
+
+        if (!groups.length) {
+          rptMerge(ws, r, 1, r, lastCol);
+          rptPut(ws, r, 1, 'Belum ada data Food Waste pada periode ini.', { size: 10, italic: true, h: 'center' });
+          rptBorder(ws, r, 1, r, lastCol, 'grid');
+          r++;
+        } else {
+          groups.forEach((g, idx) => {
+            const out = [];
+            if (fwTab === 'harian') {
+              const x = g._row;
+              out.push({ v: idx + 1, h: 'center' }, { v: fwDateShort(x.tanggal), h: 'center' }, { v: x.distribusi, h: 'right', nf: '#,##0' });
+              FW_CATS.forEach(c => out.push({ v: isQty ? fwRound(x[c.k], 2) : fwRound(fwCatPct(x[c.k], x.distribusi), 1), h: 'right', nf: isQty ? '#,##0.0' : '0.0"%"' }));
+              if (isQty) out.push({ v: fwRound(g.sisa, 2), h: 'right', nf: '#,##0.0' }, { v: fwRound(g.sisa / 1000, 2), h: 'right', nf: '0.00' }, { v: fwRound(g.pct, 1), h: 'right', nf: '0.0"%"' });
+              else out.push({ v: fwRound(g.sisa, 2), h: 'right', nf: '#,##0.0' }, { v: fwRound(g.pct, 1), h: 'right', nf: '0.0"%"' }, { v: fwIndText(g.pct), h: 'center' });
+              out.push({ v: x.lanjut || '-', h: 'left' }, { v: x.catatan || '-', h: 'left' });
+            } else {
+              out.push({ v: idx + 1, h: 'center' }, { v: g.label, h: 'left' }, { v: g.n, h: 'right', nf: '#,##0' },
+                { v: g.distribusi, h: 'right', nf: '#,##0' });
+              FW_CATS.forEach(c => out.push({ v: isQty ? fwRound(g[c.k], 2) : fwRound(g.catPct[c.k], 1), h: 'right', nf: isQty ? '#,##0.0' : '0.0"%"' }));
+              if (isQty) out.push({ v: fwRound(g.sisa, 2), h: 'right', nf: '#,##0.0' }, { v: fwRound(g.sisa / 1000, 2), h: 'right', nf: '0.00' }, { v: fwRound(g.pct, 1), h: 'right', nf: '0.0"%"' });
+              else out.push({ v: fwRound(g.sisa, 2), h: 'right', nf: '#,##0.0' }, { v: fwRound(g.pct, 1), h: 'right', nf: '0.0"%"' }, { v: fwIndText(g.pct), h: 'center' });
+            }
+            writeRow(out);
+          });
+
+          const span = 2;
+          rptMerge(ws, r, 1, r, span);
+          rptPut(ws, r, 1, 'TOTAL', { size: 10, bold: true, h: 'center' });
+          const tv = [];
+          if (fwTab === 'harian') {
+            tv.push({ v: agg.distribusi, nf: '#,##0' });
+          } else {
+            tv.push({ v: agg.n, nf: '#,##0' }, { v: agg.distribusi, nf: '#,##0' });
+          }
+          FW_CATS.forEach(c => tv.push({ v: isQty ? fwRound(agg[c.k], 2) : fwRound(agg.catPct[c.k], 1), nf: isQty ? '#,##0.0' : '0.0"%"' }));
+          if (isQty) tv.push({ v: fwRound(agg.sisa, 2), nf: '#,##0.0' }, { v: fwRound(agg.sisa / 1000, 2), nf: '0.00' }, { v: fwRound(agg.pct, 1), nf: '0.0"%"' });
+          else tv.push({ v: fwRound(agg.sisa, 2), nf: '#,##0.0' }, { v: fwRound(agg.pct, 1), nf: '0.0"%"' }, { v: fwIndText(agg.pct), h: 'center' });
+          if (fwTab === 'harian') { tv.push({ v: '' }, { v: '' }); }
+          tv.forEach((o, i) => rptPut(ws, r, span + 1 + i, o.v, { size: 10, bold: true, h: o.h || 'right', numFmt: o.nf || undefined }));
+          rptFill(ws, r, 1, r, lastCol, 'FFE2E8F0');
+          rptBorder(ws, r, 1, r, lastCol, 'grid');
+          r++;
+        }
+
+        const colL = ws.getColumn(lastCol).letter;
+        rptPage(ws, true, 'A1:' + colL + (r - 1));
+        const s = (document.getElementById('fw_start') || {}).value || '';
+        const e = (document.getElementById('fw_end') || {}).value || '';
+        const fname = 'FOOD WASTE_' + tabName + '_' + (isQty ? 'KUANTITAS' : 'PERSENTASE') + '_' + fwFileKey(s) + '_sd_' + fwFileKey(e) + '.xlsx';
+        await rptDownload(wb, fname);
+      } catch (err) {
+        console.error('Export Food Waste gagal', err);
+        alert('Export Excel Food Waste gagal: ' + (err && err.message ? err.message : err));
+      }
+    }
+
+    // ---------- init ----------
+    function initFoodWaste() {
+      if (!document.getElementById('fw_form')) return;
+      fwCacheLoad();
+      fwLoadDocNo();
+      let m = 'qty';
+      try { const sm = localStorage.getItem('sppg_food_waste_method'); if (sm === 'pct') m = 'pct'; } catch (e) {}
+      if (!fwInited) {
+        fwInited = true;
+        fwTab = 'harian';
+        const tgl = document.getElementById('fw_tanggal');
+        if (tgl && !tgl.value) tgl.value = getLocalDateKey();
+        fwDefaultPeriod();
+        fwResetForm(true);
+      } else {
+        fwDefaultPeriod();
+      }
+      fwSetMethod(m);
+      fwSetTab(fwTab);
+      fwRenderMenuBadges();
+      fwRenderAll();
+      fwDayKey = getLocalDateKey();
+      if (!fwDayTimer) {
+        fwDayTimer = setInterval(fwCheckDayChange, 30000);
+        document.addEventListener('visibilitychange', function () { if (!document.hidden) fwCheckDayChange(); });
+      }
+      if (!fwRemoteLoaded && typeof window.fbGet === 'function') {
+        fwRemoteLoaded = true;
+        window.fbGet(FW_PATH).then(function (v) {
+          if (v) { fwMergeRemote(v); fwDefaultPeriod(); fwRenderAll(); }
+        }).catch(function (e) { console.warn('Sinkron Food Waste gagal', e); });
+      }
+    }
   </script>
 
   <script>
