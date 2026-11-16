@@ -6569,25 +6569,22 @@ function applySuhuDateFields(dateKey, data) {
   const act = window.suhuActivePeriod;
   const inActiveRange = !!(act && suhuPeriodValid(act.start, act.end) && dateKey >= act.start && dateKey <= act.end);
   if (pOk) {
-    // Tanggal ini punya periode tersimpan -> aktifkan mode periodik
+    // Tanggal ini punya periode tersimpan. Nilainya tetap dibaca untuk isian periodik
+    // dan label cetak/export (suhuPeriodLabel), TETAPI tidak boleh mengubah mode tampilan.
+    // Mode hanya berubah lewat tindakan eksplisit pengguna (checkbox / tombol ✓ OK).
     if (ps) ps.value = pA;
     if (pe) pe.value = pB;
     window.suhuActivePeriod = { start: pA, end: pB };
-    setSuhuMode('periodik');
-    suhuShowPeriodStatus(pA, pB);
   } else if (inActiveRange) {
-    // Masih di dalam rentang yang sedang aktif -> pertahankan mode & isian
-    setSuhuMode('periodik');
+    // Masih di dalam rentang yang sedang aktif -> pertahankan isian & rentang,
+    // tanpa memindahkan mode harian/periodik.
     if (ps && !ps.value) ps.value = act.start;
     if (pe && !pe.value) pe.value = act.end;
-    suhuShowPeriodStatus(act.start, act.end);
   } else {
     if (ps) ps.value = '';
     if (pe) pe.value = '';
     window.suhuActivePeriod = null;
-    if (suhuIsPeriodicMode()) setSuhuMode('harian');
     suhuHideDateNav();
-    suhuShowPeriodStatus('', '');
   }
   suhuValidatePeriod(false);
   const sel = document.getElementById('suhu_siklus_active');
