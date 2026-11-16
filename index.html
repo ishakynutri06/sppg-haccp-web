@@ -832,9 +832,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               <div class="text-[10px] font-extrabold text-amber-600 tracking-widest uppercase bg-amber-50 w-fit px-2 py-0.5 rounded">Keamanan Pangan</div>
               <h2 class="text-xl md:text-2xl font-black text-slate-800 mt-2">PEMANTAUAN SUHU (FM-SGR-SPPG-03.05)</h2>
             </div>
-            <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs shadow-inner w-full lg:w-auto overflow-x-auto">
-              <button type="button" id="btnTabSuhuInput" onclick="toggleSuhuSubView('input')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200 whitespace-nowrap">📝 Input dan Pantau</button>
-              <button type="button" id="btnTabSuhuHistory" onclick="toggleSuhuSubView('history')" class="flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 whitespace-nowrap">📅 Monitor Riwayat Periode</button>
+            <div class="grid grid-cols-2 lg:flex lg:items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-[11px] sm:text-xs shadow-inner w-full lg:w-auto">
+              <button type="button" id="btnTabSuhuInput" onclick="toggleSuhuSubView('input')" class="w-full lg:w-auto px-3 sm:px-5 py-2.5 rounded-xl font-bold text-center leading-tight transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200">📝 Input dan Pantau</button>
+              <button type="button" id="btnTabSuhuHistory" onclick="toggleSuhuSubView('history')" class="w-full lg:w-auto px-3 sm:px-5 py-2.5 rounded-xl font-bold text-center leading-tight transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50">📅 Monitor Riwayat Periode</button>
             </div>
           </div>
         </div>
@@ -946,53 +946,97 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         </div>
 
         <!-- SUB-VIEW 2: MONITOR RIWAYAT PERIODE (MULTI-HARI / HARI-HARI BELAKANG) -->
-        <div id="suhuSubViewHistory" class="space-y-6 hidden">
-          <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <span class="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Monitor Riwayat Periode (Multi-Hari)</span>
-              <span id="suhuRangeInfo" class="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">—</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-              <div>
-                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Mulai</label>
-                <input type="date" id="suhuRangeStart" onchange="renderSuhuHistory()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
+        <div id="suhuSubViewHistory" class="space-y-4 hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div class="p-4 md:p-5 space-y-5">
+              <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100">
+                      <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10"/></svg>
+                    </span>
+                    <h3 class="text-sm font-semibold text-slate-800">Monitor Riwayat Periode</h3>
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-1">Rekap kronologis per tanggal &amp; objek pemantauan langsung dari <span class="font-medium text-slate-600">sppg_log_suhu/{tanggal}</span>.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span id="suhuRangeInfo" class="inline-flex items-center text-[10px] font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full tabular-nums">—</span>
+                  <span class="inline-flex items-center gap-1.5 text-[10px] font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Read-only
+                  </span>
+                </div>
               </div>
-              <div>
-                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Tanggal Akhir</label>
-                <input type="date" id="suhuRangeEnd" onchange="renderSuhuHistory()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div>
+                  <label for="suhuRangeStart" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Tanggal Mulai</label>
+                  <input type="date" id="suhuRangeStart" onchange="suhuHistRefresh()" class="w-full h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800 cursor-pointer focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                </div>
+                <div>
+                  <label for="suhuRangeEnd" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Tanggal Akhir</label>
+                  <input type="date" id="suhuRangeEnd" onchange="suhuHistRefresh()" class="w-full h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800 cursor-pointer focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                </div>
+                <div>
+                  <label for="suhuHistKategori" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Kategori</label>
+                  <select id="suhuHistKategori" onchange="onSuhuHistKategoriChange()" class="w-full h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800 cursor-pointer focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="all">Semua Kategori</option>
+                    <option value="ruang">1. Suhu Ruangan</option>
+                    <option value="penyimpanan">2. Suhu Penyimpanan</option>
+                    <option value="pemorsian">3. Suhu Pemorsian</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="suhuHistItem" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Objek Pemantauan</label>
+                  <select id="suhuHistItem" onchange="suhuHistRefresh()" class="w-full h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800 cursor-pointer focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20">
+                    <option value="all">Semua Objek</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Kategori</label>
-                <select id="suhuHistKategori" onchange="onSuhuHistKategoriChange()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
-                  <option value="all">Semua Kategori</option>
-                  <option value="ruang">1. Suhu Ruangan</option>
-                  <option value="penyimpanan">2. Suhu Penyimpanan</option>
-                  <option value="pemorsian">3. Suhu Pemorsian</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-extrabold text-slate-700 mb-2 uppercase tracking-wider text-[10px]">Objek Pemantauan</label>
-                <select id="suhuHistItem" onchange="renderSuhuHistory()" class="w-full border-2 border-slate-200 rounded-xl p-3 min-h-[48px] text-sm font-bold bg-slate-50 text-slate-800 cursor-pointer">
-                  <option value="all">Semua Objek</option>
-                </select>
+
+              <div class="flex flex-col lg:flex-row lg:items-center gap-2">
+                <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 lg:w-28 shrink-0">Rentang cepat</span>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" onclick="setSuhuRangeQuick(7)" class="h-9 px-3 rounded-lg border border-slate-200 bg-white text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors">7 Hari Terakhir</button>
+                  <button type="button" onclick="setSuhuRangeQuick(14)" class="h-9 px-3 rounded-lg border border-slate-200 bg-white text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors">14 Hari Terakhir</button>
+                  <button type="button" onclick="setSuhuRangeQuick('month')" class="h-9 px-3 rounded-lg border border-slate-200 bg-white text-[11px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition-colors">Bulan Ini</button>
+                  <button type="button" onclick="clearSuhuHistFilter()" class="h-9 px-3 rounded-lg border border-slate-200 bg-white text-[11px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors">↺ Reset</button>
+                  <button type="button" id="btnSuhuHistLoadAll" onclick="loadSuhuRangeMissing(true, true)" class="h-9 px-3 rounded-lg border border-emerald-200 bg-emerald-50 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors inline-flex items-center gap-1.5">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582M20 20v-5h-.581M5.07 9A8 8 0 0119 8.5M18.93 15A8 8 0 015 15.5"/></svg>
+                    Muat Ulang
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" onclick="setSuhuRangeQuick(7)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">7 Hari Terakhir</button>
-              <button type="button" onclick="setSuhuRangeQuick(14)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">14 Hari Terakhir</button>
-              <button type="button" onclick="setSuhuRangeQuick('month')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">Bulan Ini</button>
-              <button type="button" onclick="clearSuhuHistFilter()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3.5 py-2.5 rounded-xl text-[11px] transition-all">↺ Reset</button>
-              <button type="button" id="btnSuhuHistLoadAll" onclick="loadSuhuRangeMissing(true)" class="bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-4 py-2.5 rounded-xl text-[11px] shadow-md transition-all">⬇ Muat Data Periode</button>
+
+            <div class="border-t border-slate-200 bg-slate-50/60 px-4 py-3.5 md:px-5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div>
+                <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Aksi Dokumen</div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Cetak, Word, atau Excel untuk seluruh tanggal &amp; objek pada rentang ini.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="openSuhuPeriodExport('print')" class="flex-1 sm:flex-none h-10 px-4 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors inline-flex items-center justify-center gap-1.5">
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9V4h12v5M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v7H6z"/></svg>
+                  Cetak Laporan
+                </button>
+                <button type="button" onclick="openSuhuPeriodExport('word')" class="flex-1 sm:flex-none h-10 px-4 rounded-lg bg-blue-600 text-xs font-semibold text-white hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-1.5">
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg>
+                  Export Word
+                </button>
+                <button type="button" onclick="openSuhuPeriodExport('excel')" class="flex-1 sm:flex-none h-10 px-4 rounded-lg bg-emerald-600 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors inline-flex items-center justify-center gap-1.5">
+                  <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v16H4zM4 10h16M10 4v16M16 4v16"/></svg>
+                  Export Excel
+                </button>
+              </div>
             </div>
-            <div class="flex flex-wrap gap-2 pt-3 border-t border-slate-100">
-              <button type="button" onclick="openSuhuPeriodExport('print')" class="flex-1 lg:flex-none bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>🖨️</span> Cetak Laporan Periode</button>
-              <button type="button" onclick="openSuhuPeriodExport('word')" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word Periode</button>
-              <button type="button" onclick="openSuhuPeriodExport('excel')" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel Periode</button>
-            </div>
-            <p class="text-[10px] text-slate-400 italic leading-relaxed">Rekap kronologis per tanggal &amp; per objek pemantauan, dibaca langsung dari <span class="font-semibold">sppg_log_suhu/{tanggal}</span> tanpa mengubah data. Setiap kombinasi 1 tanggal + 1 objek dicetak pada halaman/lembar kerja terpisah dengan kop FM-SGR-SPPG-03.05 lengkap.</p>
           </div>
-          <div id="suhuHistoryContent" class="space-y-5">
-            <div class="p-6 text-center text-xs text-slate-400 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">Memuat histori…</div>
+
+          <div id="suhuHistLoading" class="hidden items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-2.5 text-[11px] font-medium text-emerald-800">
+            <span class="inline-block h-3.5 w-3.5 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin"></span>
+            <span data-loading-text>Memuat data periode…</span>
+          </div>
+
+          <div id="suhuHistoryContent" class="space-y-4">
+            <div class="p-8 text-center text-xs text-slate-400 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">Memuat histori…</div>
           </div>
         </div>
       </div>
@@ -5308,6 +5352,15 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         }
     }
 
+    function suhuApplyCategoryButtons(catKey) {
+      ['ruang', 'penyimpanan', 'pemorsian'].forEach(c => {
+        const btn = document.getElementById(`btnCat_${c}`);
+        if (btn) btn.className = (c === catKey)
+            ? "p-3.5 rounded-xl border transition-all duration-300 text-center shadow-md bg-gradient-to-r from-slate-900 to-slate-800 text-white transform scale-105"
+            : "p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md";
+      });
+    }
+
     function switchSuhuCategoryView(catKey) {
       autoSaveCurrentSuhuToCache();
       activeSuhuCategory = catKey;
@@ -5315,12 +5368,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         const items = SUHU_ITEMS_CONFIG.filter(c => c.groupKey === catKey);
         if (!items.some(c => c.id === activeSuhuItemId)) activeSuhuItemId = items[0] ? items[0].id : null;
       }
-      ['ruang', 'penyimpanan', 'pemorsian'].forEach(c => {
-        const btn = document.getElementById(`btnCat_${c}`);
-        if (btn) btn.className = (c === catKey) 
-            ? "p-3.5 rounded-xl border transition-all duration-300 text-center shadow-md bg-gradient-to-r from-slate-900 to-slate-800 text-white transform scale-105" 
-            : "p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md";
-      });
+      suhuApplyCategoryButtons(catKey);
       renderSuhuTable();
     }
 
@@ -5330,16 +5378,16 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       if (viewType === 'input') {
         if (inView) inView.classList.remove('hidden');
         if (histView) histView.classList.add('hidden');
-        document.getElementById('btnTabSuhuInput').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200 whitespace-nowrap";
-        document.getElementById('btnTabSuhuHistory').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 whitespace-nowrap";
+        document.getElementById('btnTabSuhuInput').className = "w-full lg:w-auto px-3 sm:px-5 py-2.5 rounded-xl font-bold text-center leading-tight transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200";
+        document.getElementById('btnTabSuhuHistory').className = "w-full lg:w-auto px-3 sm:px-5 py-2.5 rounded-xl font-bold text-center leading-tight transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50";
       } else {
         if (histView) histView.classList.remove('hidden');
         if (inView) inView.classList.add('hidden');
-        document.getElementById('btnTabSuhuHistory').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200 whitespace-nowrap";
-        document.getElementById('btnTabSuhuInput').className = "flex-1 lg:flex-none px-5 py-2.5 rounded-xl font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 whitespace-nowrap";
+        document.getElementById('btnTabSuhuHistory').className = "w-full lg:w-auto px-3 sm:px-5 py-2.5 rounded-xl font-bold text-center leading-tight transition-all duration-300 bg-white text-indigo-700 shadow shadow-slate-200";
+        document.getElementById('btnTabSuhuInput').className = "w-full lg:w-auto px-3 sm:px-5 py-2.5 rounded-xl font-bold text-center leading-tight transition-all duration-300 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50";
         initSuhuRangeDefaults();
-        onSuhuHistKategoriChange();      // sekaligus render rekap periode
-        loadSuhuRangeMissing(false);     // ambil tanggal pada rentang yang belum termuat
+        // Buka monitor: render dari cache lalu otomatis ambil tanggal yang belum termuat
+        onSuhuHistKategoriChange();
       }
     }
 
@@ -5393,7 +5441,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       else d.setDate(d.getDate() - (Math.max(1, parseInt(n, 10) || 7) - 1));
       s.value = suhuYmd(d);
       e.value = end;
-      loadSuhuRangeMissing(true);
+      suhuHistRefresh();
     }
 
     function onSuhuHistKategoriChange() {
@@ -5411,63 +5459,125 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       });
       sel.innerHTML = html;
       if (Array.from(sel.options).some(o => o.value === cur)) sel.value = cur;
-      renderSuhuHistory();
+      suhuHistRefresh();
     }
 
     function clearSuhuHistFilter() {
       const c = document.getElementById('suhuHistKategori'); if (c) c.value = 'all';
       const s = document.getElementById('suhuRangeStart'); if (s) s.value = '';
       const e = document.getElementById('suhuRangeEnd'); if (e) e.value = '';
+      const i = document.getElementById('suhuHistItem'); if (i) i.value = 'all';
       initSuhuRangeDefaults();
       onSuhuHistKategoriChange();
-      const i = document.getElementById('suhuHistItem'); if (i) i.value = 'all';
+    }
+
+    // Perbarui tampilan lalu otomatis ambil tanggal yang belum ada di cache.
+    function suhuHistRefresh() {
       renderSuhuHistory();
       loadSuhuRangeMissing(false);
     }
 
-    // Muat hanya tanggal-tanggal pada rentang yang belum ada di cache (bukan seluruh node Firebase)
-    async function loadSuhuRangeMissing(manual) {
+    function suhuHistShowLoading(on, count) {
+      const el = document.getElementById('suhuHistLoading');
+      if (!el) return;
+      if (on) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+        const txt = el.querySelector('[data-loading-text]');
+        if (txt) txt.textContent = count
+          ? 'Memuat ' + count + ' tanggal dari server…'
+          : 'Memuat data periode…';
+      } else {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      }
+    }
+
+    // Muat tanggal pada rentang yang belum ada di cache (force=true -> muat ulang semua).
+    // Hanya membaca Firebase; tidak pernah menulis ke sppg_log_suhu/{tanggal}.
+    async function loadSuhuRangeMissing(manual, force) {
       initSuhuRangeDefaults();
       const dates = suhuPeriodDates();
       if (!dates.length) {
         if (manual) alert('Rentang tanggal belum valid. Isi Tanggal Mulai dan Tanggal Akhir (mulai ≤ akhir).');
+        suhuHistShowLoading(false);
+        renderSuhuHistory();
         return;
       }
-      const need = dates.filter(d => !window.dbLoaded['sppg_log_suhu/' + d]);
-      if (!need.length) { if (manual) renderSuhuHistory(); return; }
-      if (suhuHistLoading) return;
+      const need = dates.filter(d => force || !(window.dbLoaded && window.dbLoaded['sppg_log_suhu/' + d]));
+      if (!need.length) {
+        suhuHistShowLoading(false);
+        renderSuhuHistory();
+        return;
+      }
+      if (suhuHistLoading) {
+        // Ada permintaan berjalan; ulangi sekali lagi setelah selesai agar rentang terbaru ikut termuat.
+        window.suhuHistLoadPending = true;
+        return;
+      }
       const btn = document.getElementById('btnSuhuHistLoadAll');
       suhuHistLoading = true;
-      if (btn) { btn.disabled = true; btn.dataset.old = btn.textContent; btn.textContent = '⏳ Memuat ' + need.length + ' tanggal…'; }
+      window.suhuHistLoadError = 0;
+      suhuHistShowLoading(true, need.length);
+      if (btn) btn.disabled = true;
+      // Tampilkan status "sedang memuat" pada tabel/kartu ringkasan.
+      renderSuhuHistory();
       try {
-        autoSaveCurrentSuhuToCache();
-        for (const d of need) {
+        const results = await Promise.all(need.map(async d => {
+          if (typeof window.fbGet !== 'function') return { d: d, ok: false };
           try {
             const v = await window.fbGet('sppg_log_suhu/' + d);
-            if (!window.dbCache['sppg_log_suhu'] || typeof window.dbCache['sppg_log_suhu'] !== 'object') window.dbCache['sppg_log_suhu'] = {};
-            window.dbCache['sppg_log_suhu'][d] = v || null;
-            window.dbLoaded['sppg_log_suhu/' + d] = true;
-          } catch (e) { console.warn('Gagal memuat data suhu ' + d, e); }
+            return { d: d, v: v, ok: true };
+          } catch (e) {
+            console.warn('Gagal memuat data suhu ' + d, e);
+            return { d: d, ok: false };
+          }
+        }));
+        if (!window.dbCache['sppg_log_suhu'] || typeof window.dbCache['sppg_log_suhu'] !== 'object') {
+          window.dbCache['sppg_log_suhu'] = {};
         }
+        if (!window.dbLoaded || typeof window.dbLoaded !== 'object') window.dbLoaded = {};
+        results.forEach(r => {
+          if (!r.ok) { window.suhuHistLoadError = (window.suhuHistLoadError || 0) + 1; return; }
+          window.dbCache['sppg_log_suhu'][r.d] = r.v || null;
+          window.dbLoaded['sppg_log_suhu/' + r.d] = true;
+        });
       } finally {
         suhuHistLoading = false;
-        if (btn) { btn.disabled = false; btn.textContent = btn.dataset.old || '⬇ Muat Data Periode'; }
+        suhuHistShowLoading(false);
+        if (btn) btn.disabled = false;
       }
       renderSuhuHistory();
+      if (window.suhuHistLoadPending) {
+        window.suhuHistLoadPending = false;
+        loadSuhuRangeMissing(false);
+      }
     }
 
     // Ringkasan satu objek pada satu tanggal: kelengkapan, kepatuhan, hasil ukur, foto, keterangan
     function suhuHistItemSummary(entry, cfg) {
       const out = { filled: 0, total: 0, ok: null, measure: [], ket: [], photos: [], state: 'kosong' };
       const photoMap = (entry && entry.photos) || {};
+      // Nama field disamakan 100% dengan form Input dan Pantau:
+      //   suhu_val_<kolom>_<id>, suhu_waktu_..., suhu_std_..., suhu_cat_..., foto suhu_foto_<id>
+      // Data lama yang menyimpan foto langsung di root entry (bukan di entry.photos) tetap terbaca.
       const pushPhoto = (key) => {
-        const f = photoMap[key];
-        const b64 = f ? (typeof f === 'string' ? f : f.base64) : null;
+        const f = photoMap[key] || (entry ? entry[key] : null);
+        const b64 = f ? (typeof f === 'string' ? f : (f.base64 || f.dataUrl)) : null;
         if (b64) out.photos.push({ key: key, b64: b64 });
       };
 
       if (cfg.groupKey === 'pemorsian') {
-        const nb = Math.max(parseInt((entry && entry.suhuBatchCounters || {}).pemorsian, 10) || 1, 1);
+        let nb = Math.max(parseInt((entry && entry.suhuBatchCounters || {}).pemorsian, 10) || 1, 1);
+        // Data lama tanpa suhuBatchCounters: hitung batch dari kunci yang benar-benar tersimpan.
+        if (entry) {
+          const pre = 'suhu_val_' + cfg.id + '_';
+          Object.keys(entry).forEach(k => {
+            if (k.indexOf(pre) !== 0) return;
+            const m = k.match(/_b(\d+)$/);
+            if (m) nb = Math.max(nb, parseInt(m[1], 10) || 1);
+          });
+        }
         let anyNum = false, allOk = true;
         for (let b = 1; b <= nb; b++) {
           (cfg.template || []).forEach(sub => {
@@ -5492,7 +5602,16 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         }
         out.ok = anyNum ? allOk : null;
       } else {
-        const cols = Math.max(parseInt(entry && entry.suhuRuangColumns, 10) || 1, 1);
+        let cols = Math.max(parseInt(entry && entry.suhuRuangColumns, 10) || 1, 1);
+        // Data lama tanpa suhuRuangColumns: pakai jumlah kolom terbanyak yang tersimpan.
+        if (entry) {
+          const pre = 'suhu_val_', post = '_' + cfg.id;
+          Object.keys(entry).forEach(k => {
+            if (k.indexOf(pre) !== 0 || k.slice(-post.length) !== post) return;
+            const mid = k.slice(pre.length, k.length - post.length);
+            if (/^\d+$/.test(mid)) cols = Math.max(cols, parseInt(mid, 10) || 1);
+          });
+        }
         const std = (entry && entry['suhu_std_' + cfg.id]) || cfg.std;
         const lim = parseSuhuLimit(std);
         let anyNum = false, allOk = true;
@@ -5521,11 +5640,31 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       return out;
     }
 
+    function suhuHistStateBadge(state) {
+      const map = {
+        lengkap: ['LENGKAP', 'bg-emerald-50 text-emerald-700 border-emerald-200'],
+        sebagian: ['SEBAGIAN', 'bg-amber-50 text-amber-700 border-amber-200'],
+        kosong: ['KOSONG', 'bg-slate-100 text-slate-600 border-slate-200'],
+        belum: ['BELUM DIMUAT', 'bg-rose-50 text-rose-700 border-rose-200']
+      };
+      const m = map[state] || map.kosong;
+      return `<span data-suhu-badge="${state}" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-semibold tracking-wide ${m[1]}"><span class="h-1.5 w-1.5 rounded-full bg-current opacity-70"></span>${m[0]}</span>`;
+    }
+
+    function suhuHistKpiCard(label, value, dotClass, id, valueClass) {
+      return `<div class="bg-white border border-slate-200 rounded-xl p-3.5 min-h-[76px] flex flex-col justify-between">
+        <div class="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <span class="h-1.5 w-1.5 rounded-full ${dotClass}"></span><span>${label}</span>
+        </div>
+        <div id="${id}" class="mt-2 text-xl leading-none font-bold tabular-nums ${valueClass || 'text-slate-800'}">${value}</div>
+      </div>`;
+    }
+
     function renderSuhuHistory() {
       const box = document.getElementById('suhuHistoryContent');
       if (!box || window.__suhuCapturing) return;
       initSuhuRangeDefaults();
-      autoSaveCurrentSuhuToCache();
+      // READ-ONLY: tidak memanggil autoSave / fbSet. Data sppg_log_suhu/{tanggal} tidak diubah.
 
       const dates = suhuPeriodDates();
       const catSel = (document.getElementById('suhuHistKategori') || {}).value || 'all';
@@ -5539,16 +5678,17 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const info = document.getElementById('suhuRangeInfo');
       if (!dates.length) {
         if (info) info.textContent = 'Rentang belum valid';
-        box.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">Isi Tanggal Mulai dan Tanggal Akhir (mulai ≤ akhir) untuk menampilkan rekap periode.</div>`;
+        box.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 font-medium bg-slate-50 rounded-2xl border border-dashed border-slate-200">Isi Tanggal Mulai dan Tanggal Akhir (mulai ≤ akhir) untuk menampilkan rekap periode.</div>`;
         return;
       }
       if (info) {
         info.textContent = suhuHistShortDate(dates[0]) + ' – ' + suhuHistShortDate(dates[dates.length - 1])
-          + ' · ' + dates.length + ' hari · ' + items.length + ' objek';
+          + ' · ' + dates.length + ' hari · ' + items.length + ' objek' + (suhuHistLoading ? ' · memuat…' : '');
       }
 
       const all = window.dbCache['sppg_log_suhu'] || {};
-      const missing = dates.filter(d => !window.dbLoaded['sppg_log_suhu/' + d]);
+      const isLoaded = d => !!(window.dbLoaded && window.dbLoaded['sppg_log_suhu/' + d]);
+      const missingDates = dates.filter(d => !isLoaded(d));
       window.__suhuRangePhotos = {};
 
       // Kolom objek (Ruangan / Unit) hanya ditampilkan bila rekap mencakup lebih dari
@@ -5557,92 +5697,131 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const showObjCol = !(catSel === 'ruang' || catSel === 'penyimpanan');
 
       let rows = '';
-      let nLengkap = 0, nSebagian = 0, nKosong = 0;
+      let nLengkap = 0, nSebagian = 0, nKosong = 0, nBelum = 0;
       dates.forEach(d => {
         const entry = all[d] || null;
+        const loaded = isLoaded(d);
         items.forEach(cfg => {
-          const sm = suhuHistItemSummary(entry, cfg);
-          if (sm.state === 'lengkap') nLengkap++;
-          else if (sm.state === 'sebagian') nSebagian++;
+          const sm = loaded
+            ? suhuHistItemSummary(entry, cfg)
+            : { filled: 0, total: 0, ok: null, measure: [], ket: [], photos: [], state: 'kosong' };
+          const state = loaded ? sm.state : 'belum';
+          if (state === 'lengkap') nLengkap++;
+          else if (state === 'sebagian') nSebagian++;
+          else if (state === 'belum') nBelum++;
           else nKosong++;
 
-          const stateBadge = sm.state === 'lengkap'
-            ? '<span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">LENGKAP</span>'
-            : sm.state === 'sebagian'
-              ? '<span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">SEBAGIAN</span>'
-              : '<span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">KOSONG</span>';
-          const okBadge = sm.ok === null ? ''
-            : (sm.ok
-              ? '<span class="inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-300">SESUAI</span>'
-              : '<span class="inline-block mt-1 text-[9px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">TIDAK SESUAI</span>');
+          const stateBadge = suhuHistStateBadge(state);
+          const okBadge = (loaded && sm.ok !== null)
+            ? (sm.ok
+              ? '<span class="inline-flex items-center mt-1 text-[9px] font-semibold px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200">SESUAI</span>'
+              : '<span class="inline-flex items-center mt-1 text-[9px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200">TIDAK SESUAI</span>')
+            : '';
 
           const thumbs = sm.photos.map(p => {
             const key = d + '|' + p.key;
             window.__suhuRangePhotos[key] = p.b64;
-            return `<img data-photokey="${key}" alt="Bukti foto" class="suhu-range-thumb w-9 h-12 object-cover rounded border border-emerald-300 cursor-pointer shadow-sm" onclick="suhuHistPreview(this.getAttribute('data-photokey'))" title="Klik untuk melihat bukti foto">`;
+            return `<img data-photokey="${suhuHistEsc(key)}" alt="Bukti foto" class="suhu-range-thumb w-9 h-11 object-cover rounded-md border border-slate-200 bg-slate-50 cursor-pointer hover:ring-2 hover:ring-emerald-300 transition-shadow" onclick="event.stopPropagation();suhuHistPreview(this.getAttribute('data-photokey'))" title="Klik untuk melihat bukti foto">`;
           }).join('');
 
-          const measure = sm.measure.length ? sm.measure.join(' · ') : '—';
-          const ket = sm.ket.length ? sm.ket.join('; ') : '—';
+          const measure = (loaded && sm.measure.length) ? sm.measure.join(' · ') : '—';
+          const progress = (loaded && sm.total)
+            ? `<div class="text-[10px] text-slate-400 mt-1 tabular-nums">${sm.filled}/${sm.total} sesi terisi</div>`
+            : (loaded ? '' : '<div class="text-[10px] text-rose-500/80 mt-1">Menunggu data server</div>');
+          const ket = (loaded && sm.ket.length) ? sm.ket.join('; ') : '—';
 
           const objCell = showObjCol
-            ? `<td data-label="Ruangan / Unit" class="p-3 align-top">
-              <div class="font-bold text-slate-800">${suhuHistEsc(suhuItemShortName(cfg))}</div>
-              <div class="text-[9px] font-bold text-slate-500 uppercase tracking-wide">${suhuHistEsc(suhuHistCatLabel(cfg.groupKey))}</div>
+            ? `<td data-label="Ruangan / Unit" class="px-3 py-3 align-top w-52">
+              <div class="text-[11px] font-semibold text-slate-800 leading-snug">${suhuHistEsc(suhuItemShortName(cfg))}</div>
+              <div class="text-[9px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">${suhuHistEsc(suhuHistCatLabel(cfg.groupKey))}</div>
             </td>`
             : '';
 
-          rows += `<tr class="border-b border-slate-100 hover:bg-slate-50">
-            <td data-label="Tanggal" class="p-3 align-top whitespace-nowrap">
-              <div class="font-bold text-slate-700">${suhuHistShortDate(d)}</div>
+          rows += `<tr data-suhu-hist-date="${d}" data-suhu-hist-item="${cfg.id}" data-suhu-state="${state}" title="Klik untuk membuka input ${suhuHistEsc(suhuHistShortDate(d))} — ${suhuHistEsc(suhuItemShortName(cfg))}" onclick="suhuHistRowClick(event,'${d}','${cfg.id}')" class="cursor-pointer transition-colors hover:bg-emerald-50/50 align-top">
+            <td data-label="Tanggal" class="px-3 py-3 align-top whitespace-nowrap w-36">
+              <div class="text-[11px] font-semibold text-slate-800 tabular-nums">${suhuHistShortDate(d)}</div>
               <div class="text-[10px] text-slate-400">${suhuHistEsc(suhuHistDateText(d))}</div>
-              ${showObjCol ? '' : `<div class="text-[10px] font-bold text-slate-600 mt-1">${suhuHistEsc(suhuItemShortName(cfg))}</div>`}
+              ${showObjCol ? '' : `<div class="text-[10px] font-medium text-slate-600 mt-1">${suhuHistEsc(suhuItemShortName(cfg))}</div>`}
             </td>
             ${objCell}
-            <td data-label="Hasil Suhu" class="p-3 align-top text-slate-600 min-w-[170px]">${suhuHistEsc(measure)}</td>
-            <td data-label="Status" class="p-3 align-top text-center whitespace-nowrap">${stateBadge}${okBadge ? '<br>' + okBadge : ''}</td>
-            <td data-label="Catatan" class="p-3 align-top text-slate-600 max-w-[220px] break-words">${suhuHistEsc(ket)}</td>
-            <td data-label="Bukti Foto" class="p-3 align-top text-center whitespace-nowrap">${thumbs || '<span class="text-slate-300">—</span>'}</td>
-            <td data-label="Aksi" class="p-3 align-top text-center whitespace-nowrap">
-              <button type="button" onclick="jumpToSuhuDateItem('${d}','${cfg.id}')" class="text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1.5 rounded-lg shadow-sm transition-colors">✏️ Buka / Edit</button>
+            <td data-label="Hasil Suhu" class="px-3 py-3 align-top text-slate-600 min-w-[190px]">
+              <div class="text-[11px] leading-relaxed tabular-nums">${suhuHistEsc(measure)}</div>
+              ${progress}
+            </td>
+            <td data-label="Status" class="px-3 py-3 align-top text-center whitespace-nowrap w-40">
+              <div class="flex flex-col items-center gap-1">${stateBadge}${okBadge}</div>
+            </td>
+            <td data-label="Catatan" class="px-3 py-3 align-top text-[11px] text-slate-500 max-w-[220px] break-words">${suhuHistEsc(ket)}</td>
+            <td data-label="Bukti Foto" class="px-3 py-3 align-top text-center whitespace-nowrap w-36">
+              ${thumbs ? `<div class="flex flex-wrap items-center justify-center gap-1 max-w-[132px] mx-auto">${thumbs}</div>` : '<span class="text-slate-300">—</span>'}
+            </td>
+            <td data-label="Aksi" class="px-3 py-3 align-top text-center whitespace-nowrap w-28">
+              <button type="button" data-suhu-jump="${d}|${cfg.id}" onclick="event.stopPropagation();jumpToSuhuDateItem('${d}','${cfg.id}')" class="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-emerald-200 bg-emerald-50 text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
+                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13L2.25 21.75l.8-2.685a4.5 4.5 0 011.13-1.897L16.862 4.487z"/></svg>
+                Buka / Edit
+              </button>
             </td>
           </tr>`;
         });
       });
 
       const totalRows = dates.length * items.length;
-      const summary = `<div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[9px] font-black uppercase tracking-wider text-slate-400">Total Baris</div><div class="text-lg font-black text-slate-800">${totalRows}</div></div>
-        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200"><div class="text-[9px] font-black uppercase tracking-wider text-emerald-600">Lengkap</div><div class="text-lg font-black text-emerald-700">${nLengkap}</div></div>
-        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200"><div class="text-[9px] font-black uppercase tracking-wider text-amber-600">Sebagian</div><div class="text-lg font-black text-amber-700">${nSebagian}</div></div>
-        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><div class="text-[9px] font-black uppercase tracking-wider text-slate-400">Kosong</div><div class="text-lg font-black text-slate-600">${nKosong}</div></div>
-        <div class="p-3 rounded-xl ${missing.length ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'} border"><div class="text-[9px] font-black uppercase tracking-wider ${missing.length ? 'text-rose-500' : 'text-slate-400'}">Belum Dimuat</div><div class="text-lg font-black ${missing.length ? 'text-rose-600' : 'text-slate-600'}">${missing.length}</div></div>
+      const summary = `<div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        ${suhuHistKpiCard('Total Baris', totalRows, 'bg-slate-700', 'suhuHistKpiTotal')}
+        ${suhuHistKpiCard('Lengkap', nLengkap, 'bg-emerald-500', 'suhuHistKpiLengkap', 'text-emerald-700')}
+        ${suhuHistKpiCard('Sebagian', nSebagian, 'bg-amber-500', 'suhuHistKpiSebagian', 'text-amber-700')}
+        ${suhuHistKpiCard('Kosong', nKosong, 'bg-slate-400', 'suhuHistKpiKosong', 'text-slate-700')}
+        ${suhuHistKpiCard('Belum Dimuat', nBelum, nBelum ? 'bg-rose-500' : 'bg-slate-300', 'suhuHistKpiBelum', nBelum ? 'text-rose-600' : 'text-slate-500')}
       </div>`;
 
-      const missingNote = missing.length
-        ? `<div class="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-semibold">
-             <span>⚠️ ${missing.length} tanggal pada rentang ini belum dimuat dari server (baris "KOSONG" bisa jadi karena datanya belum diambil).</span>
-             <button type="button" onclick="loadSuhuRangeMissing(true)" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg text-[10px]">⬇ Muat ${missing.length} Tanggal</button>
-           </div>`
-        : '';
+      const errCount = window.suhuHistLoadError || 0;
+      let missingNote = '';
+      if (missingDates.length) {
+        if (suhuHistLoading) {
+          missingNote = `<div class="flex flex-wrap items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800 font-medium">
+            <span class="inline-block h-3 w-3 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin"></span>
+            <span>Sedang mengambil ${missingDates.length} tanggal dari server…</span>
+          </div>`;
+        } else {
+          missingNote = `<div class="flex flex-wrap items-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-medium">
+            <span>${missingDates.length} tanggal belum termuat${errCount ? ' (gagal: ' + errCount + ')' : ''}. Baris bertanda BELUM DIMUAT bukan berarti kosong.</span>
+            <button type="button" onclick="loadSuhuRangeMissing(true)" class="h-7 px-2.5 rounded-md bg-amber-600 text-white text-[10px] font-semibold hover:bg-amber-700 transition-colors">Muat ${missingDates.length} Tanggal</button>
+          </div>`;
+        }
+      } else if (errCount) {
+        missingNote = `<div class="px-3.5 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-[11px] text-rose-700 font-medium">${errCount} tanggal gagal dimuat, tetapi data lain tetap ditampilkan. Periksa koneksi lalu tekan Muat Ulang.</div>`;
+      }
 
       box.innerHTML = `${summary}${missingNote}
-        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-xs min-w-[900px]">
-              <thead class="bg-gradient-to-r from-slate-800 to-slate-700 text-white uppercase text-[10px] tracking-wider">
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-4 py-3 border-b border-slate-100">
+            <div>
+              <div class="text-[11px] font-semibold text-slate-700">Rekap ${items.length} objek · ${dates.length} tanggal</div>
+              <div class="text-[10px] text-slate-400">Klik baris atau tombol Buka / Edit untuk memperbaiki data pada tanggal tersebut.</div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-[10px] font-medium text-slate-500">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Sumber: Firebase realtime
+            </span>
+          </div>
+          <div class="max-h-[68vh] overflow-auto">
+            <table id="suhuHistTable" class="w-full text-xs min-w-[980px] border-collapse">
+              <thead class="sticky top-0 z-10 bg-emerald-900 text-emerald-50">
                 <tr>
-                  <th class="p-3 text-left">Tanggal</th>
-                  ${showObjCol ? '<th class="p-3 text-left">Nama Ruangan / Unit</th>' : ''}
-                  <th class="p-3 text-left">Hasil Pengukuran Suhu</th>
-                  <th class="p-3 text-center">Kelengkapan / Kepatuhan</th>
-                  <th class="p-3 text-left">Keterangan / Tindakan Koreksi</th>
-                  <th class="p-3 text-center">Bukti Foto</th>
-                  <th class="p-3 text-center">Aksi</th>
+                  <th class="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap border-b border-emerald-950">Tanggal</th>
+                  ${showObjCol ? '<th class="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider border-b border-emerald-950">Ruangan / Unit</th>' : ''}
+                  <th class="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider border-b border-emerald-950">Hasil Pengukuran Suhu</th>
+                  <th class="px-3 py-2.5 text-center text-[10px] font-semibold uppercase tracking-wider border-b border-emerald-950">Kelengkapan / Kepatuhan</th>
+                  <th class="px-3 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider border-b border-emerald-950">Keterangan</th>
+                  <th class="px-3 py-2.5 text-center text-[10px] font-semibold uppercase tracking-wider border-b border-emerald-950">Bukti Foto</th>
+                  <th class="px-3 py-2.5 text-center text-[10px] font-semibold uppercase tracking-wider border-b border-emerald-950">Aksi</th>
                 </tr>
               </thead>
-              <tbody>${rows || `<tr><td colspan="${showObjCol ? 7 : 6}" class="p-8 text-center text-xs text-slate-400">Tidak ada objek yang cocok dengan filter yang dipilih.</td></tr>`}</tbody>
+              <tbody id="suhuHistRows" class="divide-y divide-slate-100">${rows || `<tr><td colspan="${showObjCol ? 7 : 6}" class="p-8 text-center text-xs text-slate-400">Tidak ada objek yang cocok dengan filter yang dipilih.</td></tr>`}</tbody>
             </table>
+          </div>
+          <div class="px-4 py-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400">
+            <span>Mode baca — data Firebase tidak diubah dari halaman ini.</span>
+            <span class="tabular-nums">${items.length} objek · ${dates.length} hari</span>
           </div>
         </div>`;
 
@@ -5674,30 +5853,87 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       if (m) { m.classList.remove('hidden'); m.classList.add('flex'); }
     }
 
-    // Dari rekap periode langsung ke Tab 1 pada tanggal + objek yang dipilih
-    function jumpToSuhuDateItem(dateKey, itemId) {
+    // Klik baris riwayat -> pintas ke input tanggal + objek tersebut
+    function suhuHistRowClick(ev, dateKey, itemId) {
+      const t = ev && ev.target;
+      if (t && t.closest && t.closest('button, a, img, input, select, textarea, label')) return;
+      jumpToSuhuDateItem(dateKey, itemId);
+    }
+
+    // Pastikan satu tanggal sudah ada di cache (hanya membaca Firebase).
+    async function suhuHistEnsureDate(dateKey) {
+      const path = 'sppg_log_suhu/' + dateKey;
+      if (window.dbLoaded && window.dbLoaded[path]) {
+        return (window.dbCache['sppg_log_suhu'] || {})[dateKey] || null;
+      }
+      if (typeof window.fbGet !== 'function') return null;
+      try {
+        const v = await window.fbGet(path);
+        window.dbCache['sppg_log_suhu'] = window.dbCache['sppg_log_suhu'] || {};
+        window.dbCache['sppg_log_suhu'][dateKey] = v || null;
+        window.dbLoaded = window.dbLoaded || {};
+        window.dbLoaded[path] = true;
+        return v || null;
+      } catch (e) {
+        console.warn('Gagal memuat data suhu ' + dateKey, e);
+        return null;
+      }
+    }
+
+    // Sorot kotak input tujuan selama ±2 detik setelah lompat dari riwayat.
+    function suhuHistHighlightInput(cfg) {
+      const target = document.getElementById('wrapper_suhu');
+      if (target) {
+        if (window.__suhuJumpTimer) clearTimeout(window.__suhuJumpTimer);
+        target.classList.add('ring-4', 'ring-emerald-300/70', 'ring-offset-2', 'border-emerald-400');
+        try { target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' }); }
+        catch (e) { try { target.scrollIntoView(); } catch (e2) {} }
+        window.__suhuJumpTimer = setTimeout(() => {
+          target.classList.remove('ring-4', 'ring-emerald-300/70', 'ring-offset-2', 'border-emerald-400');
+          window.__suhuJumpTimer = null;
+        }, 2200);
+      }
+      if (cfg && (cfg.groupKey === 'ruang' || cfg.groupKey === 'penyimpanan')) {
+        document.querySelectorAll('#suhuItemPills .suhu-item-pill').forEach(p => {
+          if (p.getAttribute('data-suhu-item') !== String(cfg.id)) return;
+          p.classList.add('ring-2', 'ring-emerald-400', 'ring-offset-1');
+          setTimeout(() => p.classList.remove('ring-2', 'ring-emerald-400', 'ring-offset-1'), 2200);
+        });
+      }
+    }
+
+    // Dari rekap periode langsung ke Tab 1 pada tanggal + objek yang dipilih.
+    async function jumpToSuhuDateItem(dateKey, itemId) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey || '')) return;
       const cfg = SUHU_ITEMS_CONFIG.find(c => c.id === itemId) || getActiveSuhuItemCfg();
       if (!cfg) return;
-      autoSaveCurrentSuhuToCache();
-      const dEl = document.getElementById('suhu_tanggal');
-      if (dEl) dEl.value = dateKey;
-      if (window.subscribeItem) window.subscribeItem('sppg_log_suhu', dateKey);
-      const entry = (window.dbCache['sppg_log_suhu'] || {})[dateKey] || null;
-      suhuRuangColumns = (entry && parseInt(entry.suhuRuangColumns, 10)) || 1;
-      suhuBatchCounters = (entry && entry.suhuBatchCounters) || { pemorsian: 1 };
-      activeSuhuCategory = cfg.groupKey;
-      activeSuhuItemId = cfg.id;
-      toggleSuhuSubView('input');
-      ['ruang', 'penyimpanan', 'pemorsian'].forEach(c => {
-        const btn = document.getElementById('btnCat_' + c);
-        if (btn) btn.className = (c === cfg.groupKey)
-          ? "p-3.5 rounded-xl border transition-all duration-300 text-center shadow-md bg-gradient-to-r from-slate-900 to-slate-800 text-white transform scale-105"
-          : "p-3.5 rounded-xl border border-slate-200 transition-all duration-300 text-center shadow-sm bg-white text-slate-600 hover:bg-slate-50 hover:shadow-md";
-      });
-      applySuhuDateFields(dateKey, entry);
-      renderSuhuTable();
-      const nav = document.getElementById('suhuItemNav');
-      if (nav && nav.scrollIntoView) setTimeout(() => { try { nav.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }, 250);
+      const jumpBtn = document.querySelector(`#suhuHistoryContent [data-suhu-jump="${dateKey}|${itemId}"]`);
+      if (jumpBtn) { jumpBtn.disabled = true; jumpBtn.classList.add('opacity-60'); }
+      try {
+        // Simpan dulu isian tab input yang belum tersimpan (tanggal lamanya), lalu muat tanggal tujuan.
+        autoSaveCurrentSuhuToCache();
+        await suhuHistEnsureDate(dateKey);
+
+        toggleSuhuSubView('input');
+        const dEl = document.getElementById('suhu_tanggal');
+        if (!dEl) return;
+        dEl.value = dateKey;
+        activeSuhuCategory = cfg.groupKey;
+        activeSuhuItemId = cfg.id;
+        // Selalu kembali ke mode harian (Tanggal Pemantauan) saat datang dari riwayat.
+        setSuhuMode('harian');
+        suhuApplyCategoryButtons(cfg.groupKey);
+
+        // Pindah tanggal tanpa dialog konfirmasi foto: pengguna sudah memilih baris ini.
+        window.__suhuHistJumping = true;
+        try { handleSuhuDateChange(); } finally { window.__suhuHistJumping = false; }
+
+        activeSuhuCategory = cfg.groupKey;
+        activeSuhuItemId = cfg.id;
+        setTimeout(() => suhuHistHighlightInput(cfg), 220);
+      } finally {
+        if (jumpBtn) { jumpBtn.disabled = false; jumpBtn.classList.remove('opacity-60'); }
+      }
     }
 
     // =====================================================================
@@ -7298,7 +7534,7 @@ function handleSuhuDateChange() {
   const dateInp = document.getElementById('suhu_tanggal');
   if (!dateInp || !dateInp.value) return;
   const newKey = dateInp.value;
-  if (window.suhuRenderedDate && window.suhuRenderedDate !== newKey && suhuHasPhotos()) {
+  if (window.suhuRenderedDate && window.suhuRenderedDate !== newKey && suhuHasPhotos() && !window.__suhuHistJumping) {
     if (!confirm('Tanggal ' + window.suhuRenderedDate + ' memiliki lampiran foto.\n\nYakin ingin pindah ke tanggal lain?')) {
       dateInp.value = window.suhuRenderedDate;
       const _sel = document.getElementById('suhu_siklus_active');
@@ -7511,7 +7747,7 @@ function renderSuhuItemPills(savedData, datesArray) {
     const dot = done
       ? '<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 shadow-sm"></span>'
       : '<span class="inline-block w-2 h-2 rounded-full bg-slate-300"></span>';
-    return `<button type="button" onclick="selectSuhuItem('${cfg.id}')" class="suhu-item-pill flex items-center gap-2 px-3.5 py-2.5 rounded-full border text-[11px] font-bold transition-all whitespace-nowrap ${base}">
+    return `<button type="button" data-suhu-item="${cfg.id}" onclick="selectSuhuItem('${cfg.id}')" class="suhu-item-pill flex items-center gap-2 px-3.5 py-2.5 rounded-full border text-[11px] font-bold transition-all whitespace-nowrap ${base}">
       ${dot}<span>${suhuItemShortName(cfg)}</span>${done ? '<span class="text-[10px]">✓</span>' : ''}</button>`;
   }).join('');
 
