@@ -383,6 +383,14 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
   .uji-halal-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:900;line-height:1.4;padding:2px 8px;border-radius:9999px;border:1px solid}
   .uji-halal-badge.is-halal{background:#d1fae5;color:#065f46;border-color:#34d399}
   .uji-halal-badge.is-warn{background:#fef3c7;color:#78350f;border-color:#f59e0b}
+  /* Input file foto: tetap "hidup" untuk Android (bukan display:none),
+     tetapi tidak terlihat dan tidak memakan ruang tata letak. */
+  .photo-input-sr{
+    position:absolute !important;width:1px !important;height:1px !important;
+    padding:0 !important;margin:-1px !important;overflow:hidden !important;
+    clip:rect(0,0,0,0) !important;white-space:nowrap !important;border:0 !important;
+    opacity:0 !important;
+  }
   @media print{.hidden-print{display:none !important}}
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2415,12 +2423,15 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             return;
         }
 
+        // Reset nilai agar foto yang sama / pemilihan berulang tetap memicu onchange.
+        try { input.value = ''; } catch (e) {}
         input.dataset.src = source;
         if (source === 'camera') {
             input.setAttribute('capture', 'environment');
         } else {
             input.removeAttribute('capture');
         }
+        if (input.disabled) input.disabled = false;
 
         input.click();
     }
@@ -2428,7 +2439,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function getPhotoCellHtml(fotoId, targetTempId, targetTimeId) {
         const photoData = window.suhuPhotosMap && window.suhuPhotosMap[fotoId];
         const b64 = photoData ? (typeof photoData === 'string' ? photoData : photoData.base64) : null;
-        const photoInput = `<input type="file" accept="image/*" id="${fotoId}" data-base64="${b64 || ''}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="hidden">`;
+        const photoInput = `<input type="file" accept="image/*" id="${fotoId}" data-base64="${b64 || ''}" onchange="openImageConfirmation(this, '${targetTempId}', '${targetTimeId}')" class="sr-only photo-input-sr">`;
         const sourceButtons = `
             <div class="flex flex-wrap items-center justify-center gap-1">
                 <button type="button" onclick="openPhotoSourcePicker('${fotoId}', 'camera')" class="text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-2 py-1.5 rounded-md transition-colors shadow-sm" title="Ambil foto langsung dari kamera">📷 Kamera</button>
@@ -2544,7 +2555,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                         <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" aria-label="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
                         <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" aria-label="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
                     </div>
-                    <input type="file" accept="image/*" id="${id}" class="hidden" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
+                    <input type="file" accept="image/*" id="${id}" class="sr-only photo-input-sr" onchange="handlePemorsianPhoto(this)" data-base64="${existingB64}">
                     ${imgHtml}${existingB64 ? `<button type="button" onclick="reviewPhoto('${id}')" class="btn-review-photo text-[9px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2 py-1.5 rounded-md shadow-sm">👁️ Review</button><button type="button" onclick="deletePemorsianPhoto('${id}')" class="text-[9px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1.5 rounded-md shadow-sm">🗑️ Hapus</button>` : ''}
                 </div>`;
     }
@@ -9633,7 +9644,7 @@ function renderSuhuTable() {
           <button type="button" onclick="openPhotoSourcePicker('${id}', 'camera')" title="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>
           <button type="button" onclick="openPhotoSourcePicker('${id}', 'gallery')" title="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>
         </div>
-        <input type="file" accept="image/*" id="${id}" class="hidden" data-kind="${kind}" data-base64="${pendEsc(b64 || '')}" onchange="handlePendinginanPhoto(this)">
+        <input type="file" accept="image/*" id="${id}" class="sr-only photo-input-sr" data-kind="${kind}" data-base64="${pendEsc(b64 || '')}" onchange="handlePendinginanPhoto(this)">
         ${img}${extra}
       </div>`;
     }
@@ -10424,7 +10435,7 @@ function renderSuhuTable() {
         + '<button type="button" onclick="openPhotoSourcePicker(\'' + id + '\', \'camera\')" title="Ambil foto dari kamera" class="text-[9px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1.5 rounded-md shadow-sm">📷 Kamera</button>'
         + '<button type="button" onclick="openPhotoSourcePicker(\'' + id + '\', \'gallery\')" title="Pilih foto dari galeri" class="text-[9px] bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold px-2 py-1.5 rounded-md shadow-sm">🖼️ Galeri</button>'
         + '</div>'
-        + '<input type="file" accept="image/*" id="' + id + '" class="hidden uji-foto-input" data-base64="' + ujiEsc(b64 || '') + '" onchange="handleUjiPhoto(this)">'
+        + '<input type="file" accept="image/*" id="' + id + '" class="sr-only photo-input-sr uji-foto-input" data-base64="' + ujiEsc(b64 || '') + '" onchange="handleUjiPhoto(this)">'
         + img + extra
         + '</div>';
     }
