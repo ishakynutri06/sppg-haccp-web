@@ -1782,6 +1782,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           }
         </style>
         <table id="ujiSigPrint" aria-hidden="true">
+          <colgroup>
+            <col style="width:18%"><col style="width:32%"><col style="width:18%"><col style="width:32%">
+          </colgroup>
           <thead>
             <tr>
               <th colspan="2">RELAWAN PENGOLAHAN</th>
@@ -10173,21 +10176,40 @@ function renderSuhuTable() {
           }
         }
 
-        // --- TANDA TANGAN (3 kotak, dibagi rata mulai kolom Nama Menu s/d kolom terakhir) ---
+        // --- TANDA TANGAN: 3 kolom (Koordinator Pemorsian | Ahli Gizi | Kepala SPPG) ---
+        // Dibagi proporsional selebar tabel (bukan per jumlah kolom) agar ketiga kotak
+        // sama lebar dan nama tidak menumpuk/terjepit.
         let sigRow = startRow + rows.length + 2;
-        const total = lastCol - 3, per = Math.floor(total / 3);
-        const g = [[4, 3 + per], [4 + per, 3 + 2 * per], [4 + 2 * per, lastCol]];
-        const names = ['Koordinator Pemorsian', 'Ahli Gizi', 'Kepala SPPG'];
-        const vals = [ttdKoor, ttdGizi, ttdKepala];
-        g.forEach((c, n) => { rptMerge(ws, sigRow, c[0], sigRow, c[1]); rptPut(ws, sigRow, c[0], names[n], { bold: true, h: 'center' }); });
-        rptBorder(ws, sigRow, 4, sigRow, lastCol, 'grid');
+        const sigCum = [0];
+        cols.forEach(c => sigCum.push(sigCum[sigCum.length - 1] + c.w));
+        const sigTotal = sigCum[lastCol];
+        let b1 = 1, b2 = 2, bestSplit = Infinity;
+        for (let i = 1; i < lastCol; i++) {
+          for (let j = i + 1; j < lastCol; j++) {
+            const err = Math.abs(sigCum[i] - sigTotal / 3) + Math.abs(sigCum[j] - 2 * sigTotal / 3);
+            if (err < bestSplit) { bestSplit = err; b1 = i; b2 = j; }
+          }
+        }
+        const sigGroups = [[1, b1], [b1 + 1, b2], [b2 + 1, lastCol]];
+        const sigNames = ['Koordinator Pemorsian', 'Ahli Gizi', 'Kepala SPPG'];
+        const sigVals = [ttdKoor, ttdGizi, ttdKepala];
+        const sigSize = inl ? 12 : 10;
+        // baris judul jabatan
+        sigGroups.forEach((g2, n) => {
+          rptMerge(ws, sigRow, g2[0], sigRow, g2[1]);
+          rptPut(ws, sigRow, g2[0], sigNames[n], { bold: true, h: 'center', size: sigSize });
+        });
+        rptFill(ws, sigRow, 1, sigRow, lastCol, RPT_GREY);
+        rptBorder(ws, sigRow, 1, sigRow, lastCol, 'grid');
+        ws.getRow(sigRow).height = 24;
+        // baris tanda tangan / nama (±2,2 cm)
         sigRow++;
         ws.getRow(sigRow).height = 70;
-        g.forEach(c => rptMerge(ws, sigRow, c[0], sigRow, c[1]));
-        rptBorder(ws, sigRow, 4, sigRow, lastCol, 'grid');
-        sigRow++;
-        g.forEach((c, n) => { rptMerge(ws, sigRow, c[0], sigRow, c[1]); rptPut(ws, sigRow, c[0], vals[n], { h: 'center' }); });
-        rptBorder(ws, sigRow, 4, sigRow, lastCol, 'grid');
+        sigGroups.forEach((g2, n) => {
+          rptMerge(ws, sigRow, g2[0], sigRow, g2[1]);
+          rptPut(ws, sigRow, g2[0], sigVals[n], { h: 'center', v: 'bottom', size: sigSize });
+        });
+        rptBorder(ws, sigRow, 1, sigRow, lastCol, 'grid');
 
         if (inl) rptPagePhoto(ws, 'A1:' + ws.getColumn(lastCol).letter + sigRow);
         else { rptPage(ws, true, 'A1:' + ws.getColumn(lastCol).letter + sigRow); ws.pageSetup.fitToHeight = 1; }
@@ -10246,11 +10268,17 @@ function renderSuhuTable() {
             ${infoRow('Petugas', petugas)}
           </table>
           ${clone.innerHTML}
-          <table style="width:100%;border:none;border-collapse:collapse;margin-top:18px; text-align:center;">
+          <table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-top:18px;">
+            <colgroup><col style="width:33.33%"><col style="width:33.33%"><col style="width:33.34%"></colgroup>
             <tr>
-              <td style="border:none;width:33%;">Koordinator Pemorsian<br><br><br><br><br><b>${pendEsc(ttdKoor)}</b></td>
-              <td style="border:none;width:33%;">Ahli Gizi<br><br><br><br><br><b>${pendEsc(ttdGizi)}</b></td>
-              <td style="border:none;width:33%;">Kepala SPPG<br><br><br><br><br><b>${pendEsc(ttdKepala)}</b></td>
+              <th style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:${photoLayout ? 12 : 10}pt;">Koordinator Pemorsian</th>
+              <th style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:${photoLayout ? 12 : 10}pt;">Ahli Gizi</th>
+              <th style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:${photoLayout ? 12 : 10}pt;">Kepala SPPG</th>
+            </tr>
+            <tr>
+              <td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">${pendEsc(ttdKoor)}</td>
+              <td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">${pendEsc(ttdGizi)}</td>
+              <td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">${pendEsc(ttdKepala)}</td>
             </tr>
           </table>
           </div>
@@ -11263,34 +11291,56 @@ function renderSuhuTable() {
           }
 
           r++;
-          // Tabel tanda tangan resmi 2 kolom berdampingan, membagi lebar tabel menjadi dua.
-          const sigMid = Math.ceil(lastCol / 2); // kiri: 1..sigMid, kanan: sigMid+1..lastCol
-          const sigL = 1, sigR = sigMid + 1;
+          // Tabel tanda tangan resmi: selebar tabel utama, dibagi 2 bagian berdampingan
+          // (RELAWAN PENGOLAHAN | PENGAWAS GIZI). Tiap bagian memakai 2 kolom logis:
+          // kolom label (Nama / Tanda Tangan / Tanggal) + kolom isian yang lebar.
+          // Pembagian memakai lebar kolom nyata agar kedua bagian seimbang dan label tidak
+          // menumpuk/terbungkus di kolom sempit (mis. kolom A yang hanya 5 karakter).
+          const colW = c => widths[c - 1] || 10;
+          const sigTotalW = widths.reduce((a, b) => a + b, 0);
+          let sigMid = 1, sigAcc = 0;
+          for (let c = 1; c <= lastCol; c++) { sigAcc += colW(c); if (sigAcc >= sigTotalW / 2) { sigMid = c; break; } }
+          if (sigMid >= lastCol) sigMid = lastCol - 1;
+          const sigR = sigMid + 1;
+          const labelEnd = (from, to) => {
+            let halfW = 0; for (let c = from; c <= to; c++) halfW += colW(c);
+            let acc = 0;
+            for (let c = from; c <= to; c++) {
+              acc += colW(c);
+              if (acc >= halfW * 0.26 && acc >= 16) return c;
+            }
+            return Math.min(from + 1, to);
+          };
+          const labL2 = labelEnd(1, sigMid);          // label kiri 1..labL2, nilai labL2+1..sigMid
+          const labR2 = labelEnd(sigR, lastCol);      // label kanan sigR..labR2, nilai labR2+1..lastCol
           const SFS = withPhoto ? 12 : 10;
-          rptMerge(ws, r, sigL, r, sigMid); rptPut(ws, r, sigL, 'RELAWAN PENGOLAHAN', { bold: true, h: 'center', size: SFS });
-          rptMerge(ws, r, sigR, r, lastCol); rptPut(ws, r, sigR, 'PENGAWAS GIZI', { bold: true, h: 'center', size: SFS });
+          const SHD = { bold: true, h: 'center', size: SFS };
+
+          rptMerge(ws, r, 1, r, sigMid); rptPut(ws, r, 1, 'RELAWAN PENGOLAHAN', SHD);
+          rptMerge(ws, r, sigR, r, lastCol); rptPut(ws, r, sigR, 'PENGAWAS GIZI', SHD);
           rptFill(ws, r, 1, r, lastCol, RPT_GREY);
           rptBorder(ws, r, 1, r, lastCol, 'grid');
+          ws.getRow(r).height = 22;
 
-          r++; ws.getRow(r).height = 20;
-          rptPut(ws, r, sigL, 'Nama', { size: SFS, bold: true });
-          rptMerge(ws, r, sigL + 1, r, sigMid); rptPut(ws, r, sigL + 1, meta.relawan_nama, { h: 'left', size: SFS });
-          rptPut(ws, r, sigR, 'Nama', { size: SFS, bold: true });
-          rptMerge(ws, r, sigR + 1, r, lastCol); rptPut(ws, r, sigR + 1, meta.pengawas_nama, { h: 'left', size: SFS });
+          r++; ws.getRow(r).height = 24;
+          rptMerge(ws, r, 1, r, labL2); rptPut(ws, r, 1, 'Nama', { size: SFS, bold: true });
+          rptMerge(ws, r, labL2 + 1, r, sigMid); rptPut(ws, r, labL2 + 1, meta.relawan_nama, { h: 'center', size: SFS });
+          rptMerge(ws, r, sigR, r, labR2); rptPut(ws, r, sigR, 'Nama', { size: SFS, bold: true });
+          rptMerge(ws, r, labR2 + 1, r, lastCol); rptPut(ws, r, labR2 + 1, meta.pengawas_nama, { h: 'center', size: SFS });
           rptBorder(ws, r, 1, r, lastCol, 'grid');
 
-          r++; ws.getRow(r).height = 55;
-          rptPut(ws, r, sigL, 'Tanda Tangan', { size: SFS, bold: true });
-          rptMerge(ws, r, sigL + 1, r, sigMid); rptPut(ws, r, sigL + 1, meta.relawan_ttd, { h: 'center', size: SFS });
-          rptPut(ws, r, sigR, 'Tanda Tangan', { size: SFS, bold: true });
-          rptMerge(ws, r, sigR + 1, r, lastCol); rptPut(ws, r, sigR + 1, meta.pengawas_ttd, { h: 'center', size: SFS });
+          r++; ws.getRow(r).height = 70;   // ±2,2 cm untuk ruang tanda tangan
+          rptMerge(ws, r, 1, r, labL2); rptPut(ws, r, 1, 'Tanda Tangan', { size: SFS, bold: true });
+          rptMerge(ws, r, labL2 + 1, r, sigMid); rptPut(ws, r, labL2 + 1, meta.relawan_ttd, { h: 'center', size: SFS });
+          rptMerge(ws, r, sigR, r, labR2); rptPut(ws, r, sigR, 'Tanda Tangan', { size: SFS, bold: true });
+          rptMerge(ws, r, labR2 + 1, r, lastCol); rptPut(ws, r, labR2 + 1, meta.pengawas_ttd, { h: 'center', size: SFS });
           rptBorder(ws, r, 1, r, lastCol, 'grid');
 
-          r++; ws.getRow(r).height = 20;
-          rptPut(ws, r, sigL, 'Tanggal', { size: SFS, bold: true });
-          rptMerge(ws, r, sigL + 1, r, sigMid); rptPut(ws, r, sigL + 1, rptLongDate(meta.relawan_tgl) || '', { h: 'left', size: SFS });
-          rptPut(ws, r, sigR, 'Tanggal', { size: SFS, bold: true });
-          rptMerge(ws, r, sigR + 1, r, lastCol); rptPut(ws, r, sigR + 1, rptLongDate(meta.pengawas_tgl) || '', { h: 'left', size: SFS });
+          r++; ws.getRow(r).height = 22;
+          rptMerge(ws, r, 1, r, labL2); rptPut(ws, r, 1, 'Tanggal', { size: SFS, bold: true });
+          rptMerge(ws, r, labL2 + 1, r, sigMid); rptPut(ws, r, labL2 + 1, rptLongDate(meta.relawan_tgl) || '', { h: 'center', size: SFS });
+          rptMerge(ws, r, sigR, r, labR2); rptPut(ws, r, sigR, 'Tanggal', { size: SFS, bold: true });
+          rptMerge(ws, r, labR2 + 1, r, lastCol); rptPut(ws, r, labR2 + 1, rptLongDate(meta.pengawas_tgl) || '', { h: 'center', size: SFS });
           rptBorder(ws, r, 1, r, lastCol, 'grid');
 
           if (withPhoto) { rptPagePhoto(ws, 'A1:' + ws.getColumn(lastCol).letter + r); ws.pageSetup.fitToHeight = 1; }
@@ -11330,15 +11380,16 @@ function renderSuhuTable() {
           return '<img src="' + docName + '_files/' + name + '" width="' + Math.round(w * 37.795) + '" height="' + Math.round(h * 37.795) + '" style="width:' + w + 'cm;height:' + h + 'cm;object-fit:cover;">';
         }
 
-        const sigHtml = () => '<table style="width:100%;border-collapse:collapse;margin-top:14px;">'
+        const sigHtml = () => '<table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-top:14px;">'
+          + '<colgroup><col style="width:14%"><col style="width:36%"><col style="width:14%"><col style="width:36%"></colgroup>'
           + '<tr><th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:' + (withPhoto ? 12 : 9) + 'pt;">RELAWAN PENGOLAHAN</th>'
           + '<th colspan="2" style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:' + (withPhoto ? 12 : 9) + 'pt;">PENGAWAS GIZI</th></tr>'
-          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;width:14%;">Nama</td><td style="border:1px solid black;padding:5px;width:36%;">' + ujiEsc(meta.relawan_nama) + '</td>'
-          + '<td style="border:1px solid black;padding:5px;font-weight:bold;width:14%;">Nama</td><td style="border:1px solid black;padding:5px;width:36%;">' + ujiEsc(meta.pengawas_nama) + '</td></tr>'
-          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.relawan_ttd) + '</td>'
-          + '<td style="border:1px solid black;padding:5px;font-weight:bold;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.pengawas_ttd) + '</td></tr>'
-          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;">Tanggal</td><td style="border:1px solid black;padding:5px;">' + (rptLongDate(meta.relawan_tgl) || '') + '</td>'
-          + '<td style="border:1px solid black;padding:5px;font-weight:bold;">Tanggal</td><td style="border:1px solid black;padding:5px;">' + (rptLongDate(meta.pengawas_tgl) || '') + '</td></tr>'
+          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Nama</td><td style="border:1px solid black;padding:5px;text-align:center;">' + ujiEsc(meta.relawan_nama) + '</td>'
+          + '<td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Nama</td><td style="border:1px solid black;padding:5px;text-align:center;">' + ujiEsc(meta.pengawas_nama) + '</td></tr>'
+          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.relawan_ttd) + '</td>'
+          + '<td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.pengawas_ttd) + '</td></tr>'
+          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanggal</td><td style="border:1px solid black;padding:5px;text-align:center;">' + (rptLongDate(meta.relawan_tgl) || '') + '</td>'
+          + '<td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanggal</td><td style="border:1px solid black;padding:5px;text-align:center;">' + (rptLongDate(meta.pengawas_tgl) || '') + '</td></tr>'
           + '</table>';
 
         const pages = [];
