@@ -3123,8 +3123,11 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     function exportWordKop(code, docName, files, judulOverride, revOverride, docValue, dateText) {
       const num = code.replace('FM-SGR-SPPG-', '');
       const judul = judulOverride || WORD_KOP_JUDUL[num] || '';
-      // Tanggal kop mengikuti input tanggal modul (kecuali 03.05 yang tetap tanggal baku)
-      const tglKop = dateText || (typeof kopDateTextForCode === 'function' ? kopDateTextForCode(code) : WORD_KOP_TGL);
+      // Tanggal kop: input TANGGAL modul; bila kosong pakai tanggal laporan bawaan.
+      const baseTglKop = dateText || (typeof kopDateTextForCode === 'function' ? kopDateTextForCode(code) : WORD_KOP_TGL);
+      const tglKop = (typeof kopTglResolve === 'function') ? kopTglResolve(code, baseTglKop) : baseTglKop;
+      // No. revisi: input NO. REVISI modul; bila kosong "00".
+      const revKop = (typeof kopRevResolve === 'function') ? kopRevResolve(code) : (revOverride || (num === '01.01' ? '01' : '00'));
       // docValue '' = kolom di samping "No. dokumen" sengaja dikosongkan (diisi manual oleh pengguna)
       const shownDoc = (docValue === undefined && typeof docNoResolve === 'function') ? docNoResolve(code)
         : (docValue === undefined ? code : docValue);
@@ -3141,7 +3144,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         '<tr style="' + trh + '"><td rowspan="3" style="' + b + 'width:18%;text-align:center;">' + logoHtml + '</td>' +
         '<td style="' + b + f + '">SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</td>' +
         '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">' + (shownDoc ? ': ' + shownDoc : '') + '</td></tr>' +
-        '<tr style="' + trh + '"><td style="' + b + f + '">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + (revOverride || (num === '01.01' ? '01' : '00')) + '</td></tr>' +
+        '<tr style="' + trh + '"><td style="' + b + f + '">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + revKop + '</td></tr>' +
         '<tr style="' + trh + '"><td style="' + b + f + '">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + tglKop + '</td></tr>' +
         '</table>' +
 '';
@@ -3682,8 +3685,16 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         let clean = null;
         try { clean = getCleanTableHtml(tmp.id, photoMode === 'none'); }
         finally { tmp.remove(); }
+        // Rentang tanggal pemantauan untuk blok "Rekap dan Verifikasi".
+        const dateKeys = list.map(pg => pg.date).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k || '')).sort();
+        const dateRangeText = dateKeys.length
+          ? (dateKeys[0] === dateKeys[dateKeys.length - 1]
+            ? suhuLongDateKey(dateKeys[0])
+            : suhuLongDateKey(dateKeys[0]) + ' – ' + suhuLongDateKey(dateKeys[dateKeys.length - 1]))
+          : '';
         out.push({
           date: list[0].date,
+          dateRangeText: dateRangeText,
           cfg: list[0].cfg,
           cat: list[0].cat,
           clone: clean && clean.clone ? clean.clone : null,
@@ -3691,6 +3702,118 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         });
       });
       return out;
+    }
+
+    // ---------- Blok "Rekap dan Verifikasi" (FM-SGR-SPPG-03.05) ----------
+    // Hitung status tiap baris pemantauan pada tabel hasil capture (satu sel status = satu baris).
+    function suhuRekapInfo(table) {
+      const info = { total: 0, filled: 0, sesuai: 0, tidak: 0, koreksi: '' };
+      if (!table) return info;
+      const notes = [];
+      const cells = table.querySelectorAll('tbody td[id^="suhu_status_"], tbody td[data-label="Status"]');
+      cells.forEach(td => {
+        const txt = String(td.textContent || '').replace(/\s+/g, ' ').trim();
+        if (/tidak\s*sesuai/i.test(txt)) {
+          info.tidak++;
+          info.filled++;
+          const tr = td.closest('tr');
+          const cat = tr ? tr.querySelector('input[id^="suhu_cat_"]') : null;
+          const note = cat ? String(cat.value || '').trim() : '';
+          if (note && notes.indexOf(note) === -1) notes.push(note);
+        } else if (/^sesuai$/i.test(txt)) {
+          info.sesuai++;
+          info.filled++;
+        }
+        info.total++;
+      });
+      info.koreksi = notes.join('; ');
+      return info;
+    }
+    function suhuRekapPemeriksa() {
+      // "Diperiksa Oleh (Kepala Dapur)" pada formulir = nama pada "Formulir di periksa oleh".
+      return String((document.getElementById('suhu_penyetuju') || {}).value || '').trim();
+    }
+    function suhuRekapEsc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    // HTML blok untuk Export Word. Satu baris kosong memisahkan dari tabel pemantauan.
+    function suhuRekapWordHtml(table, dateText) {
+      const info = suhuRekapInfo(table);
+      const pemeriksa = suhuRekapPemeriksa();
+      const b = 'border:1px solid #000;padding:4px 6px;font-family:Calibri,sans-serif;font-size:10.5pt;vertical-align:middle;';
+      const lab = b + 'text-align:left;';
+      const head = b + 'text-align:left;font-weight:bold;background-color:#f2f2f2;';
+      return '<p style="margin:0;line-height:12pt;font-size:11pt;">&nbsp;</p>' +
+        '<table style="width:100%;border-collapse:collapse;margin:0;table-layout:fixed;">' +
+        '<tr style="height:22pt;"><td colspan="4" style="' + head + '">Rekap dan Verifikasi</td></tr>' +
+        '<tr style="height:32pt;">' +
+        '<td style="' + lab + 'width:30%;">Jumlah Pemantauan Sesuai</td><td style="' + b + 'width:20%;">' + (info.filled ? info.sesuai : '') + '</td>' +
+        '<td style="' + lab + 'width:30%;">Jumlah Penyimpangan</td><td style="' + b + 'width:20%;">' + (info.filled ? info.tidak : '') + '</td></tr>' +
+        '<tr style="height:38pt;">' +
+        '<td style="' + lab + '">Tindakan Korektif dilakukan</td><td style="' + b + '">' + suhuRekapEsc(info.koreksi) + '</td>' +
+        '<td style="' + lab + '">Formulir di periksa oleh</td><td style="' + b + '">' + suhuRekapEsc(pemeriksa) + '</td></tr>' +
+        '<tr style="height:34pt;">' +
+        '<td style="' + lab + '">Tanggal Pemeriksaan</td><td style="' + b + '">' + suhuRekapEsc(dateText || '') + '</td>' +
+        '<td style="' + lab + '">Paraf Pemeriksa</td><td style="' + b + '">&nbsp;</td></tr>' +
+        '<tr style="height:38pt;">' +
+        '<td style="' + lab + '">Catatan Umum</td><td colspan="3" style="' + b + '">&nbsp;</td></tr>' +
+        '</table>';
+    }
+    // Bagi lebar tabel (maxCol) menjadi 4 kelompok kolom untuk blok rekap.
+    function suhuRekapSpans(maxCol) {
+      const base = Math.floor(maxCol / 4), rem = maxCol % 4;
+      const spans = [base, base, base, base];
+      const order = [0, 2, 1, 3];
+      for (let i = 0; i < rem; i++) spans[order[i]]++;
+      return spans;
+    }
+    // Tulis blok rekap 5 baris x 4 kolom pada worksheet (setelah tabel utama).
+    function suhuRekapWriteExcel(ws, top, maxCol, info, dateText) {
+      maxCol = Math.max(4, maxCol);
+      const spans = suhuRekapSpans(maxCol);
+      const starts = [1, 1 + spans[0], 1 + spans[0] + spans[1], 1 + spans[0] + spans[1] + spans[2]];
+      const ends = [spans[0], spans[0] + spans[1], spans[0] + spans[1] + spans[2], maxCol];
+      const put = (r, g, text, bold) => {
+        const c1 = starts[g], c2 = (r === top && g === 0) ? maxCol : ends[g];
+        if (c1 !== c2) ws.mergeCells(r, c1, r, c2);
+        const cell = ws.getCell(r, c1);
+        cell.value = text == null ? '' : text;
+        cell.font = { name: 'Calibri', size: 10, bold: !!bold };
+        cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+      };
+      put(top, 0, 'Rekap dan Verifikasi', true);
+      put(top + 1, 0, 'Jumlah Pemantauan Sesuai');
+      put(top + 1, 1, info.filled ? info.sesuai : '');
+      put(top + 1, 2, 'Jumlah Penyimpangan');
+      put(top + 1, 3, info.filled ? info.tidak : '');
+      put(top + 2, 0, 'Tindakan Korektif dilakukan');
+      put(top + 2, 1, info.koreksi || '');
+      put(top + 2, 2, 'Formulir di periksa oleh');
+      put(top + 2, 3, suhuRekapPemeriksa());
+      put(top + 3, 0, 'Tanggal Pemeriksaan');
+      put(top + 3, 1, dateText || '');
+      put(top + 3, 2, 'Paraf Pemeriksa');
+      put(top + 3, 3, '');
+      put(top + 4, 0, 'Catatan Umum');
+      const cc = starts[1];
+      if (cc <= maxCol) {
+        if (cc < maxCol) ws.mergeCells(top + 4, cc, top + 4, maxCol);
+        const cell = ws.getCell(top + 4, cc);
+        cell.value = '';
+        cell.font = { name: 'Calibri', size: 10 };
+        cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+      }
+      for (let r = top; r <= top + 4; r++) {
+        for (let c = 1; c <= maxCol; c++) {
+          const cell = ws.getCell(r, c);
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+          if (r === top) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+        }
+      }
+      const heights = [22, 32, 40, 34, 40];
+      for (let i = 0; i < 5; i++) ws.getRow(top + i).height = heights[i];
+      // Penanda untuk cetak: blok rekap tidak boleh terpotong antar halaman.
+      ws.__keepTogetherRows = [top, top + 4];
     }
 
     // Susun 1 halaman Word per objek (seluruh tanggal menyatu dalam satu tabel)
@@ -3711,8 +3834,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         // Kop lengkap di setiap halaman; file logo hanya didaftarkan sekali.
         const kopHtml = exportWordKop(kopCode, docName, pageIdx === 0 ? files : [], suhuKopJudul(pg.cat));
         const hdrHtml = suhuHeaderBlockHtml(suhuReportHeaderLines([pg.cfg.id], pg.cat));
+        const rekapHtml = suhuRekapWordHtml(pg.tableEl, pg.dateRangeText || (pg.date ? suhuLongDateKey(pg.date) : ''));
         const breakHtml = (pageIdx > 0) ? `<br clear="all" style="mso-special-character:line-break;page-break-before:always">` : '';
-        body += `${breakHtml}<div class="Section1">${kopHtml}${hdrHtml}${pg.clone.innerHTML}</div>`;
+        body += `${breakHtml}<div class="Section1">${kopHtml}${hdrHtml}${pg.clone.innerHTML}${rekapHtml}</div>`;
         pageIdx++;
       }
 
@@ -3748,7 +3872,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         headerLines: suhuReportHeaderLines([pg.cfg.id], pg.cat),
         kopJudul: suhuKopJudul(pg.cat),
         sheetName: suhuSheetShortName(pg.cfg),
-        dateText: suhuLongDateKey(pg.date)
+        dateText: pg.dateRangeText || suhuLongDateKey(pg.date)
       }));
       await exportGenericExcelLegacy('Pemantauan Suhu (FM-SGR-SPPG-03.05)', 'wrapper_suhu', photoMode, { sections: sections, fileName: fileName });
     }
@@ -4111,7 +4235,8 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             // Kop baku yang sama dengan modul lain; kolom "No. dokumen" diambil dari input modul
             // Master Bahan (default kosong, dapat diisi manual oleh pengguna).
             rptKop(wb, ws, { r: 1, rowH: 24, logo: [1, 1], title: [2, masterLastC - 2], lab: masterLastC - 1, val: masterLastC,
-              judul: 'MASTER BAHAN', noDoc: (typeof docNoGet === 'function' ? docNoGet('MASTER') : ''), tgl: kopDateTextForCode('FM-SGR-DST'), colon: false });
+              judul: 'MASTER BAHAN', noDoc: (typeof docNoGet === 'function' ? docNoGet('MASTER') : ''), kopKey: 'MASTER',
+              tgl: kopDateTextForCode('FM-SGR-DST'), colon: false });
             rptDateLine(ws, 4, 1, masterLastC);
           }
 
@@ -4160,6 +4285,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               judul: kopJudul, noDoc: 'FM-SGR-SPPG-03.05', tgl: KOP_TGL_BAKU, colon: false });
             ws.getRow(4).height = 20; rptMerge(ws, 4, 1, 4, lastC);
             ws.getCell(4, 1).alignment = { horizontal: 'left', vertical: 'middle', wrapText: false };
+            // Blok "Rekap dan Verifikasi" di bawah tabel, dipisah 1 baris kosong.
+            const maxRowTbl = cells.reduce((m, x) => Math.max(m, x.r + x.rs - 1), 1);
+            suhuRekapWriteExcel(ws, HDR_ROWS + maxRowTbl + 2, maxCol, suhuRekapInfo(table), dateText);
           } else if (!isMasterBahan) {
             ws.getCell('A1').font = { name: 'Calibri', bold: true, size: 13 };
             ws.getCell('A2').font = { name: 'Calibri', bold: true, size: photoExport ? 12 : 11 };
@@ -4343,9 +4471,13 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const pre = o.colon ? ': ' : '';
       const labW = widthOf(o.lab, o.lab), valW = widthOf(o.val, o.val);
       const noDocShown = (typeof docNoResolve === 'function') ? docNoResolve(o.noDoc) : o.noDoc;
-      // Tanggal kop = tanggal modul (tersinkron Siklus Menu). Pemantauan Suhu (03.05)
-      // tetap mengirim KOP_TGL_BAKU dari pemanggilnya sehingga tampilannya tidak berubah.
-      [['No. dokumen', noDocShown], ['No. revisi', o.rev || '00'], ['Tanggal', o.tgl || KOP_TGL_BAKU]].forEach((p, i) => {
+      // No. revisi & Tanggal mengikuti input bar kop modul (No. Revisi kosong -> "00",
+      // Tanggal kosong -> tanggal laporan bawaan pemanggil). Pemantauan Suhu tetap
+      // memakai KOP_TGL_BAKU bila input tanggal modul dikosongkan.
+      const kopKeySrc = o.kopKey || o.noDoc;
+      const revShown = (typeof kopRevResolve === 'function') ? kopRevResolve(kopKeySrc) : (o.rev || '00');
+      const tglShown = (typeof kopTglResolve === 'function') ? kopTglResolve(kopKeySrc, o.tgl || KOP_TGL_BAKU) : (o.tgl || KOP_TGL_BAKU);
+      [['No. dokumen', noDocShown], ['No. revisi', revShown], ['Tanggal', tglShown]].forEach((p, i) => {
         const lab = String(p[0]), val = String(pre + p[1]);
         rptPut(ws, r + i, o.lab, lab, { size: fitSize(lab, labW, false, 11, 9) });
         rptPut(ws, r + i, o.val, val, { size: fitSize(val, valW, false, 11, 9) });
@@ -13507,6 +13639,11 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         if (r > s.r) noBreak[r] = 1;     // tidak boleh potong halaman di tengah sel gabungan
       }
     });
+    // Blok yang ditandai worksheet (mis. Rekap dan Verifikasi) dicetak utuh dalam satu halaman.
+    var keepRows = ws.__keepTogetherRows;
+    if (keepRows && keepRows.length === 2) {
+      for (var kr = keepRows[0] + 1; kr <= keepRows[1]; kr++) noBreak[kr] = 1;
+    }
 
     // pembagian halaman (hanya bila isi lebih tinggi dari satu halaman)
     // baris judul tabel yang diulang di tiap halaman (ws.pageSetup.printTitlesRow = 'a:b')
@@ -14687,10 +14824,17 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
   };
   window.DOCNO_DEFAULTS = DOCNO_DEFAULTS;
 
+  // No. revisi awal per modul (modul lain otomatis "00").
+  var REV_DEFAULTS = { '01.01': '01' };
+  var KOP_META_PATH = 'sppg_kop_meta';   // Firebase RTDB: sppg_kop_meta/<kunci modul>
+
   function lsKey(k) { return 'sppg_docno_' + k; }
+  function revLsKey(k) { return 'sppg_rev_' + k; }
+  function tglLsKey(k) { return 'sppg_koptgl_' + k; }
+  function has(obj, k) { return Object.prototype.hasOwnProperty.call(obj, k); }
 
   window.docNoDefault = function (key) {
-    return Object.prototype.hasOwnProperty.call(DOCNO_DEFAULTS, key) ? DOCNO_DEFAULTS[key] : '';
+    return has(DOCNO_DEFAULTS, key) ? DOCNO_DEFAULTS[key] : '';
   };
 
   window.docNoGet = function (key) {
@@ -14711,39 +14855,197 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
   window.docNoResolve = function (staticCode) {
     if (!staticCode) return staticCode;
     var k = String(staticCode).replace(/^FM-SGR-SPPG-/, '');
-    if (!Object.prototype.hasOwnProperty.call(DOCNO_DEFAULTS, k)) return staticCode;
+    if (!has(DOCNO_DEFAULTS, k)) return staticCode;
     return window.docNoGet(k);
   };
 
-  window.docNoInput = function (el, key) {
-    window.docNoSet(key, el.value);
+  // ---------- NO. REVISI per modul ----------
+  window.kopRevDefault = function (key) {
+    return has(REV_DEFAULTS, key) ? REV_DEFAULTS[key] : '00';
   };
+  window.kopRevStored = function (key) {
+    try { return localStorage.getItem(revLsKey(key)); } catch (e) { return null; }
+  };
+  window.kopRevGet = function (key) {
+    var v = window.kopRevStored(key);
+    return v === null ? window.kopRevDefault(key) : v;
+  };
+  window.kopRevSet = function (key, val) {
+    try { localStorage.setItem(revLsKey(key), String(val == null ? '' : val)); } catch (e) {}
+  };
+
+  // ---------- TANGGAL KOP per modul ----------
+  window.kopTglGet = function (key) {
+    try { return localStorage.getItem(tglLsKey(key)) || ''; } catch (e) { return ''; }
+  };
+  window.kopTglSet = function (key, val) {
+    try { localStorage.setItem(tglLsKey(key), String(val == null ? '' : val)); } catch (e) {}
+  };
+
+  // Kode dokumen ("FM-SGR-SPPG-01.03" / "FM-SGR-DST") -> kunci modul.
+  window.kopKeyFromCode = function (code) {
+    var c = String(code == null ? '' : code).trim().toUpperCase();
+    if (c === 'MASTER' || c === 'FM-SGR-DST') return 'MASTER';
+    var m = c.match(/^FM-SGR-SPPG-([0-9]{2}\.[0-9]{2})$/);
+    if (m) return m[1];
+    return has(DOCNO_DEFAULTS, c) ? c : '';
+  };
+
+  // Nilai yang dipakai kop: revisi kosong -> "00"; tanggal kosong -> fallback pemanggil.
+  window.kopRevResolve = function (codeOrKey) {
+    var k = window.kopKeyFromCode(codeOrKey);
+    if (!k) return '00';
+    var raw = window.kopRevStored(k);
+    if (raw === null) return window.kopRevDefault(k) || '00';
+    raw = String(raw).trim();
+    return raw || '00';
+  };
+  window.kopTglResolve = function (codeOrKey, fallback) {
+    var k = window.kopKeyFromCode(codeOrKey);
+    var v = k ? String(window.kopTglGet(k) || '').trim() : '';
+    return v || String(fallback == null ? '' : fallback);
+  };
+
+  // ---------- Sinkronisasi Firebase (Realtime Database) ----------
+  // Tiap modul ditulis ke path terpisah agar antar-perangkat tidak saling menimpa.
+  var dirty = {};          // field yang baru diubah pengguna -> jangan ditimpa data cloud
+  var pendingPush = {};
+  var pushTimers = {};
+
+  // Titik (.) tidak diizinkan pada kunci Firebase RTDB.
+  function cloudKey(k) { return String(k).replace(/\./g, '-'); }
+  function inputId(prefix, k) { return prefix + k.replace(/[^A-Za-z0-9]/g, '_'); }
+
+  function pushMeta(k) {
+    if (!pendingPush[k] || typeof window.fbSet !== 'function') return;
+    pendingPush[k] = false;
+    try {
+      window.fbSet(KOP_META_PATH + '/' + cloudKey(k), {
+        docno: window.docNoGet(k), rev: window.kopRevGet(k), tgl: window.kopTglGet(k)
+      });
+    } catch (e) { pendingPush[k] = true; }
+  }
+
+  function schedulePush(k) {
+    pendingPush[k] = true;
+    clearTimeout(pushTimers[k]);
+    pushTimers[k] = setTimeout(function () { pushMeta(k); }, 700);
+  }
+  window.kopMetaPush = schedulePush;
+
+  function applyCloudMeta(remote) {
+    if (!remote || typeof remote !== 'object') return;
+    Object.keys(DOCNO_DEFAULTS).forEach(function (k) {
+      var rec = remote[cloudKey(k)];
+      if (!rec || typeof rec !== 'object') return;
+      var fields = [
+        ['docno', window.docNoSet, window.docNoGet, 'docno_inp_'],
+        ['rev', window.kopRevSet, window.kopRevGet, 'rev_inp_'],
+        ['tgl', window.kopTglSet, window.kopTglGet, 'tgl_inp_']
+      ];
+      fields.forEach(function (f) {
+        if (!has(rec, f[0]) || dirty[k + '|' + f[0]]) return;
+        var val = String(rec[f[0]] == null ? '' : rec[f[0]]);
+        f[1](k, val);
+        var el = document.getElementById(inputId(f[3], k));
+        if (el && el.value !== val) el.value = val;
+      });
+    });
+  }
+
+  function pullCloudMeta(attempt) {
+    if (typeof window.fbGet !== 'function' || typeof window.fbSet !== 'function') {
+      if (attempt < 80) setTimeout(function () { pullCloudMeta(attempt + 1); }, 250);
+      return;
+    }
+    try {
+      Promise.resolve(window.fbGet(KOP_META_PATH)).then(function (remote) {
+        applyCloudMeta(remote);
+        Object.keys(pendingPush).forEach(pushMeta);
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  var cloudPullStarted = false;
+
+  function fieldGroup(labelText) {
+    var g = document.createElement('div');
+    g.className = 'flex flex-col gap-1';
+    var l = document.createElement('span');
+    l.className = 'text-[10px] font-black uppercase tracking-widest text-slate-500';
+    l.textContent = labelText;
+    g.appendChild(l);
+    return g;
+  }
 
   window.docNoMount = function (key, sectionOrEl, label, opts) {
     opts = opts || {};
     var host = sectionOrEl;
+    var idKey = key.replace(/[^A-Za-z0-9]/g, '_');
     var bar = document.createElement('div');
-    bar.className = 'docno-bar hidden-print flex flex-wrap items-center gap-2 px-4 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm';
+    bar.className = 'docno-bar hidden-print flex flex-wrap items-end gap-3 px-4 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm';
     bar.setAttribute('data-docno-key', key);
 
-    var title = document.createElement('span');
-    title.className = 'text-[10px] font-black uppercase tracking-widest text-slate-500';
-    title.textContent = 'Nomor Dokumen';
-    bar.appendChild(title);
+    var inputCls = 'border-2 border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 bg-slate-50 focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all';
 
+    // 1) NOMOR DOKUMEN
+    var g1 = fieldGroup('Nomor Dokumen');
+    g1.className += ' flex-1 min-w-[200px]';
     var inp = document.createElement('input');
     inp.type = 'text';
-    inp.id = 'docno_inp_' + key.replace(/[^A-Za-z0-9]/g, '_');
+    inp.id = inputId('docno_inp_', key);
     inp.value = window.docNoGet(key);
     inp.placeholder = opts.placeholder || window.docNoDefault(key) || 'Isi nomor dokumen...';
-    inp.className = 'flex-1 min-w-[220px] border-2 border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 bg-slate-50 focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all';
+    inp.className = inputCls;
     inp.setAttribute('aria-label', 'Nomor Dokumen ' + (label || key));
-    inp.oninput = function () { window.docNoSet(key, inp.value); };
-    bar.appendChild(inp);
+    inp.oninput = function () {
+      window.docNoSet(key, inp.value);
+      dirty[key + '|docno'] = true;
+      schedulePush(key);
+    };
+    g1.appendChild(inp);
+    bar.appendChild(g1);
+
+    // 2) NO. REVISI (kompak)
+    var g2 = fieldGroup('No. Revisi');
+    g2.className += ' w-[96px] shrink-0';
+    var rev = document.createElement('input');
+    rev.type = 'text';
+    rev.id = inputId('rev_inp_', key);
+    rev.value = window.kopRevGet(key);
+    rev.placeholder = '00';
+    rev.maxLength = 8;
+    rev.className = inputCls + ' text-center';
+    rev.setAttribute('aria-label', 'No. Revisi ' + (label || key));
+    rev.oninput = function () {
+      window.kopRevSet(key, rev.value);
+      dirty[key + '|rev'] = true;
+      schedulePush(key);
+    };
+    g2.appendChild(rev);
+    bar.appendChild(g2);
+
+    // 3) TANGGAL (teks bebas; kosong = tanggal laporan otomatis)
+    var g3 = fieldGroup('Tanggal');
+    g3.className += ' w-[180px] shrink-0';
+    var tgl = document.createElement('input');
+    tgl.type = 'text';
+    tgl.id = inputId('tgl_inp_', key);
+    tgl.value = window.kopTglGet(key);
+    tgl.placeholder = 'Otomatis (tanggal laporan)';
+    tgl.className = inputCls;
+    tgl.setAttribute('aria-label', 'Tanggal Kop ' + (label || key));
+    tgl.oninput = function () {
+      window.kopTglSet(key, tgl.value);
+      dirty[key + '|tgl'] = true;
+      schedulePush(key);
+    };
+    g3.appendChild(tgl);
+    bar.appendChild(g3);
 
     if (opts.hint !== false) {
       var hint = document.createElement('span');
-      hint.className = 'text-[10px] text-slate-400 font-medium';
+      hint.className = 'text-[10px] text-slate-400 font-medium ml-auto pb-2';
       hint.textContent = 'Dipakai otomatis pada kop Excel, Word & Cetak.';
       bar.appendChild(hint);
     }
@@ -14787,6 +15089,8 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
     if (fw && !fw.value) {
       try { var v = localStorage.getItem('sppg_food_waste_docno'); if (v) fw.value = v; } catch (e) {}
     }
+    // Ambil No. Dokumen / No. Revisi / Tanggal dari Firebase sekali di awal.
+    if (!cloudPullStarted) { cloudPullStarted = true; pullCloudMeta(0); }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', window.docNoMountAll);
