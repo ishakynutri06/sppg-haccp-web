@@ -10027,9 +10027,108 @@ function renderSuhuTable() {
       return dk || ('idx_' + idx);
     }
 
+    // ---------- Nama penanda tangan Cooling Area: default global lintas tanggal ----------
+    // Disimpan di localStorage + Firebase RTDB; dipakai saat tanggal baru belum punya nama.
+    const PEND_TTD_LS = 'sppg_pend_ttd_defaults';
+    const PEND_TTD_PATH = 'sppg_pend_ttd_defaults';
+    const PEND_TTD_IDS = ['pend_ttd_koordinator', 'pend_ttd_ahli_gizi', 'pend_ttd_kepala_sppg'];
+    const PEND_TTD_KEYS = ['koordinator', 'ahli_gizi', 'kepala_sppg'];
+    const PEND_TTD_META_KEYS = ['ttd_koordinator', 'ttd_ahli_gizi', 'ttd_kepala_sppg'];
+    let pendTtdTimer = null;
+    window.pendTtdDefaults = { koordinator: '', ahli_gizi: '', kepala_sppg: '' };
+    window.pendTtdDirty = false;
+
+    function pendTtdLoadLocal() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(PEND_TTD_LS) || '{}');
+        if (raw && typeof raw === 'object') {
+          PEND_TTD_KEYS.forEach(k => { if (raw[k] != null) window.pendTtdDefaults[k] = String(raw[k]).trim(); });
+        }
+      } catch (e) {}
+    }
+    function pendTtdSaveLocal() {
+      try { localStorage.setItem(PEND_TTD_LS, JSON.stringify(window.pendTtdDefaults)); } catch (e) {}
+    }
+    function pendTtdValue(id, key) {
+      const el = document.getElementById(id);
+      const v = el ? String(el.value || '').trim() : '';
+      return v || (window.pendTtdDefaults && window.pendTtdDefaults[key]) || '';
+    }
+    function pendTtdFlush() {
+      clearTimeout(pendTtdTimer);
+      pendTtdTimer = null;
+      PEND_TTD_KEYS.forEach((k, i) => {
+        const el = document.getElementById(PEND_TTD_IDS[i]);
+        if (el) window.pendTtdDefaults[k] = String(el.value || '').trim();
+      });
+      window.pendTtdDirty = false;
+      pendTtdSaveLocal();
+      if (typeof window.fbSet === 'function') {
+        try { window.fbSet(PEND_TTD_PATH, Object.assign({}, window.pendTtdDefaults)); } catch (e) {}
+      }
+    }
+    function pendTtdInput(el) {
+      const i = PEND_TTD_IDS.indexOf(el.id);
+      if (i >= 0) window.pendTtdDefaults[PEND_TTD_KEYS[i]] = String(el.value || '').trim();
+      window.pendTtdDirty = true;
+      pendTtdSaveLocal();
+      clearTimeout(pendTtdTimer);
+      pendTtdTimer = setTimeout(pendTtdFlush, 700);
+    }
+    function pendTtdApplyDefaultsToEmpty() {
+      const sel = document.getElementById('selectSiklusPendinginan');
+      if (!sel) return;
+      const storeKey = pendStoreKey(parseInt(sel.value, 10) || 0);
+      const saved = (window.dbCache[PEND_PATH] || {})[storeKey];
+      const meta = (saved && !Array.isArray(saved) && saved.meta) ? saved.meta : {};
+      PEND_TTD_IDS.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const savedVal = meta[PEND_TTD_META_KEYS[i]] != null ? String(meta[PEND_TTD_META_KEYS[i]]).trim() : '';
+        const def = window.pendTtdDefaults[PEND_TTD_KEYS[i]] || '';
+        if (!String(el.value || '').trim() && !savedVal && def) el.value = def;
+      });
+    }
+    function pendTtdPull(attempt) {
+      if (typeof window.fbGet !== 'function') {
+        if (attempt < 80) setTimeout(function () { pendTtdPull(attempt + 1); }, 250);
+        return;
+      }
+      try {
+        Promise.resolve(window.fbGet(PEND_TTD_PATH)).then(function (v) {
+          if (v && typeof v === 'object') {
+            PEND_TTD_KEYS.forEach(k => {
+              const s = v[k] == null ? '' : String(v[k]).trim();
+              if (s) window.pendTtdDefaults[k] = s;   // nilai kosong di cloud tidak menghapus default lokal
+            });
+            pendTtdSaveLocal();
+            if (!window.pendTtdDirty) pendTtdApplyDefaultsToEmpty();
+          } else if (!window.pendTtdDirty) {
+            const has = PEND_TTD_KEYS.some(k => window.pendTtdDefaults[k]);
+            if (has && typeof window.fbSet === 'function') window.fbSet(PEND_TTD_PATH, Object.assign({}, window.pendTtdDefaults));
+          }
+        }).catch(function () {});
+      } catch (e) {}
+    }
+    function pendTtdInit() {
+      if (window.__pendTtdInit) return;
+      window.__pendTtdInit = true;
+      pendTtdLoadLocal();
+      PEND_TTD_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.ttdBound === '1') return;
+        el.dataset.ttdBound = '1';
+        el.addEventListener('input', function () { pendTtdInput(el); });
+        el.addEventListener('change', function () { pendTtdInput(el); });
+        el.addEventListener('blur', pendTtdFlush);
+      });
+      pendTtdPull(0);
+    }
+
     function initPendinginan() {
       const sel = document.getElementById('selectSiklusPendinginan');
       if (!sel) return;
+      pendTtdInit();
       const weeks = getSuhuWeeks();
       let html = '', n = 0;
       weeks.forEach(w => {
@@ -10085,9 +10184,11 @@ function renderSuhuTable() {
       }
       pendTglEl.value = pendTglVal;
       document.getElementById('pend_petugas').value = metaData.petugas || '';
-      document.getElementById('pend_ttd_koordinator').value = metaData.ttd_koordinator || '';
-      document.getElementById('pend_ttd_ahli_gizi').value = metaData.ttd_ahli_gizi || '';
-      document.getElementById('pend_ttd_kepala_sppg').value = metaData.ttd_kepala_sppg || '';
+      // Tanggal yang belum menyimpan nama penanda tangan memakai default global terakhir.
+      const pendDef = window.pendTtdDefaults || {};
+      document.getElementById('pend_ttd_koordinator').value = metaData.ttd_koordinator || pendDef.koordinator || '';
+      document.getElementById('pend_ttd_ahli_gizi').value = metaData.ttd_ahli_gizi || pendDef.ahli_gizi || '';
+      document.getElementById('pend_ttd_kepala_sppg').value = metaData.ttd_kepala_sppg || pendDef.kepala_sppg || '';
 
       // Jumlah batch: ikuti meta tersimpan; data lama tanpa meta -> panjang baris (12 baris = 3 batch), default 2.
       let nBatches = parseInt(metaData.batches, 10);
@@ -10443,9 +10544,9 @@ function renderSuhuTable() {
         const rows = pendReadRows();
         const tglProd = document.getElementById('pend_tanggal_produksi')?.value || '';
         const petugas = document.getElementById('pend_petugas')?.value || '';
-        const ttdKoor = document.getElementById('pend_ttd_koordinator')?.value || '';
-        const ttdGizi = document.getElementById('pend_ttd_ahli_gizi')?.value || '';
-        const ttdKepala = document.getElementById('pend_ttd_kepala_sppg')?.value || '';
+        const ttdKoor = pendTtdValue('pend_ttd_koordinator', 'koordinator');
+        const ttdGizi = pendTtdValue('pend_ttd_ahli_gizi', 'ahli_gizi');
+        const ttdKepala = pendTtdValue('pend_ttd_kepala_sppg', 'kepala_sppg');
 
         const cols = [
           { k: 'no', w: inl ? 5 : 6 }, { k: 'tahap', w: inl ? 6 : 8 }, { k: 'jenis', w: inl ? 12 : 16 }, { k: 'menu', w: inl ? 17 : 26 }, { k: 'jml', w: inl ? 9 : 14 },
@@ -10519,7 +10620,7 @@ function renderSuhuTable() {
         // --- TANDA TANGAN: 3 kolom (Koordinator Pemorsian | Ahli Gizi | Kepala SPPG) ---
         // Dibagi proporsional selebar tabel (bukan per jumlah kolom) agar ketiga kotak
         // sama lebar dan nama tidak menumpuk/terjepit.
-        let sigRow = startRow + rows.length + 2;
+        let sigRow = startRow + rows.length + 1;   // tepat 1 baris kosong di bawah tabel data
         const sigCum = [0];
         cols.forEach(c => sigCum.push(sigCum[sigCum.length - 1] + c.w));
         const sigTotal = sigCum[lastCol];
@@ -10573,9 +10674,9 @@ function renderSuhuTable() {
         }
         const tglProd = document.getElementById('pend_tanggal_produksi')?.value || '';
         const petugas = document.getElementById('pend_petugas')?.value || '';
-        const ttdKoor = document.getElementById('pend_ttd_koordinator')?.value || '';
-        const ttdGizi = document.getElementById('pend_ttd_ahli_gizi')?.value || '';
-        const ttdKepala = document.getElementById('pend_ttd_kepala_sppg')?.value || '';
+        const ttdKoor = pendTtdValue('pend_ttd_koordinator', 'koordinator');
+        const ttdGizi = pendTtdValue('pend_ttd_ahli_gizi', 'ahli_gizi');
+        const ttdKepala = pendTtdValue('pend_ttd_kepala_sppg', 'kepala_sppg');
         const docName = 'dokumen';
         const files = [];
 
@@ -10616,9 +10717,9 @@ function renderSuhuTable() {
               <th style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:${photoLayout ? 12 : 10}pt;">Kepala SPPG</th>
             </tr>
             <tr>
-              <td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">${pendEsc(ttdKoor)}</td>
-              <td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">${pendEsc(ttdGizi)}</td>
-              <td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">${pendEsc(ttdKepala)}</td>
+              <td style="border:1px solid black;padding:5px;height:70pt;vertical-align:bottom;text-align:center;">${pendEsc(ttdKoor)}</td>
+              <td style="border:1px solid black;padding:5px;height:70pt;vertical-align:bottom;text-align:center;">${pendEsc(ttdGizi)}</td>
+              <td style="border:1px solid black;padding:5px;height:70pt;vertical-align:bottom;text-align:center;">${pendEsc(ttdKepala)}</td>
             </tr>
           </table>
           </div>
@@ -10648,6 +10749,101 @@ function renderSuhuTable() {
     window.ujiSubscribedDate = null;
     window.ujiLoadedRecordKey = null;
     window.ujiInitialized = false;
+
+    // ---------- Nama penanda tangan Uji: default global lintas tanggal ----------
+    // Hanya NAMA (Relawan Pengolahan & Pengawas Gizi) yang dijadikan default; tanda tangan
+    // dan tanggal tetap mengikuti data harian / tanggal uji aktif.
+    const UJI_TTD_LS = 'sppg_uji_ttd_defaults';
+    const UJI_TTD_PATH = 'sppg_uji_ttd_defaults';
+    const UJI_TTD_IDS = ['uji_relawan_nama', 'uji_pengawas_nama'];
+    const UJI_TTD_KEYS = ['relawan_nama', 'pengawas_nama'];
+    let ujiTtdTimer = null;
+    window.ujiTtdDefaults = { relawan_nama: '', pengawas_nama: '' };
+    window.ujiTtdDirty = false;
+
+    function ujiTtdLoadLocal() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(UJI_TTD_LS) || '{}');
+        if (raw && typeof raw === 'object') {
+          UJI_TTD_KEYS.forEach(k => { if (raw[k] != null) window.ujiTtdDefaults[k] = String(raw[k]).trim(); });
+        }
+      } catch (e) {}
+    }
+    function ujiTtdSaveLocal() {
+      try { localStorage.setItem(UJI_TTD_LS, JSON.stringify(window.ujiTtdDefaults)); } catch (e) {}
+    }
+    function ujiTtdFlush() {
+      clearTimeout(ujiTtdTimer);
+      ujiTtdTimer = null;
+      UJI_TTD_KEYS.forEach((k, i) => {
+        const el = document.getElementById(UJI_TTD_IDS[i]);
+        if (el) window.ujiTtdDefaults[k] = String(el.value || '').trim();
+      });
+      window.ujiTtdDirty = false;
+      ujiTtdSaveLocal();
+      if (typeof window.fbSet === 'function') {
+        try { window.fbSet(UJI_TTD_PATH, Object.assign({}, window.ujiTtdDefaults)); } catch (e) {}
+      }
+    }
+    function ujiTtdInput(el) {
+      const i = UJI_TTD_IDS.indexOf(el.id);
+      if (i >= 0) window.ujiTtdDefaults[UJI_TTD_KEYS[i]] = String(el.value || '').trim();
+      window.ujiTtdDirty = true;
+      ujiTtdSaveLocal();
+      clearTimeout(ujiTtdTimer);
+      ujiTtdTimer = setTimeout(ujiTtdFlush, 700);
+    }
+    function ujiTtdApplyDefaultsToEmpty() {
+      if (window.ujiDirty) return;
+      const dateKey = document.getElementById('uji_tanggal') ? document.getElementById('uji_tanggal').value : '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey || '')) return;
+      const day = (window.dbCache[UJI_PATH] || {})[dateKey] || {};
+      const meta = (day.meta && typeof day.meta === 'object') ? day.meta : {};
+      [['uji_relawan_nama', 'uji_relawan_tgl', 'relawan_nama'], ['uji_pengawas_nama', 'uji_pengawas_tgl', 'pengawas_nama']].forEach(cfg => {
+        const nameEl = document.getElementById(cfg[0]);
+        const tglEl = document.getElementById(cfg[1]);
+        const saved = String(meta[cfg[2]] || '').trim();
+        const def = window.ujiTtdDefaults[cfg[2]] || '';
+        if (!saved && nameEl && !String(nameEl.value || '').trim() && document.activeElement !== nameEl && def) nameEl.value = def;
+        if (!saved && tglEl && !tglEl.value) tglEl.value = dateKey;
+      });
+      if (typeof ujiSyncSignature === 'function') ujiSyncSignature();
+    }
+    function ujiTtdPull(attempt) {
+      if (typeof window.fbGet !== 'function') {
+        if (attempt < 80) setTimeout(function () { ujiTtdPull(attempt + 1); }, 250);
+        return;
+      }
+      try {
+        Promise.resolve(window.fbGet(UJI_TTD_PATH)).then(function (v) {
+          if (v && typeof v === 'object') {
+            UJI_TTD_KEYS.forEach(k => {
+              const s = v[k] == null ? '' : String(v[k]).trim();
+              if (s) window.ujiTtdDefaults[k] = s;
+            });
+            ujiTtdSaveLocal();
+            if (!window.ujiTtdDirty) ujiTtdApplyDefaultsToEmpty();
+          } else if (!window.ujiTtdDirty) {
+            const has = UJI_TTD_KEYS.some(k => window.ujiTtdDefaults[k]);
+            if (has && typeof window.fbSet === 'function') window.fbSet(UJI_TTD_PATH, Object.assign({}, window.ujiTtdDefaults));
+          }
+        }).catch(function () {});
+      } catch (e) {}
+    }
+    function ujiTtdInit() {
+      if (window.__ujiTtdInit) return;
+      window.__ujiTtdInit = true;
+      ujiTtdLoadLocal();
+      UJI_TTD_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.ttdBound === '1') return;
+        el.dataset.ttdBound = '1';
+        el.addEventListener('input', function () { ujiTtdInput(el); });
+        el.addEventListener('change', function () { ujiTtdInput(el); });
+        el.addEventListener('blur', ujiTtdFlush);
+      });
+      ujiTtdPull(0);
+    }
 
     function ujiEsc(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -11288,10 +11484,12 @@ function renderSuhuTable() {
       ujiDistributeLegacyPhotos(menus, fotos);
 
       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-      setVal('uji_relawan_nama', meta.relawan_nama);
+      const ujiDef = window.ujiTtdDefaults || {};
+      // Nama: nilai tersimpan tanggal ini diutamakan; jika belum ada, pakai default global.
+      setVal('uji_relawan_nama', meta.relawan_nama || ujiDef.relawan_nama || '');
       setVal('uji_relawan_ttd', meta.relawan_ttd);
       setVal('uji_relawan_tgl', meta.relawan_tgl || dateKey);
-      setVal('uji_pengawas_nama', meta.pengawas_nama);
+      setVal('uji_pengawas_nama', meta.pengawas_nama || ujiDef.pengawas_nama || '');
       setVal('uji_pengawas_ttd', meta.pengawas_ttd);
       setVal('uji_pengawas_tgl', meta.pengawas_tgl || dateKey);
 
@@ -11320,12 +11518,16 @@ function renderSuhuTable() {
       const put = (key, v) => {
         document.querySelectorAll('[data-uji-sig="' + key + '"]').forEach(el => { el.textContent = v || ''; });
       };
+      const fmtTgl = id => {
+        const d = rptLongDate(val(id)) || val(id);
+        return d ? ': ' + d : '';
+      };
       put('relawan_nama', val('uji_relawan_nama'));
       put('relawan_ttd', val('uji_relawan_ttd'));
-      put('relawan_tgl', rptLongDate(val('uji_relawan_tgl')) || val('uji_relawan_tgl'));
+      put('relawan_tgl', fmtTgl('uji_relawan_tgl'));
       put('pengawas_nama', val('uji_pengawas_nama'));
       put('pengawas_ttd', val('uji_pengawas_ttd'));
-      put('pengawas_tgl', rptLongDate(val('uji_pengawas_tgl')) || val('uji_pengawas_tgl'));
+      put('pengawas_tgl', fmtTgl('uji_pengawas_tgl'));
     }
     if (!window.__ujiSigPrintBound) {
       window.__ujiSigPrintBound = true;
@@ -11471,6 +11673,7 @@ function renderSuhuTable() {
 
     // ---------- inisialisasi ----------
     function initUjiOrganoleptik() {
+      ujiTtdInit();
       if (!window.ujiInitialized) {
         window.ujiInitialized = true;
         const tgl = document.getElementById('uji_tanggal');
@@ -11547,6 +11750,7 @@ function renderSuhuTable() {
 
     async function exportUjiOrganoleptikExcel() {
       try {
+        if (typeof ujiSyncSignature === 'function') ujiSyncSignature();   // pastikan tabel cetak sinkron
         const mode = await askExportPhotoMode();
         if (!mode) return;
         const withPhoto = mode === 'inline';
@@ -11678,9 +11882,9 @@ function renderSuhuTable() {
 
           r++; ws.getRow(r).height = 22;
           rptMerge(ws, r, 1, r, labL2); rptPut(ws, r, 1, 'Tanggal', { size: SFS, bold: true });
-          rptMerge(ws, r, labL2 + 1, r, sigMid); rptPut(ws, r, labL2 + 1, rptLongDate(meta.relawan_tgl) || '', { h: 'center', size: SFS });
+          rptMerge(ws, r, labL2 + 1, r, sigMid); rptPut(ws, r, labL2 + 1, rptLongDate(meta.relawan_tgl) ? ': ' + rptLongDate(meta.relawan_tgl) : '', { h: 'center', size: SFS });
           rptMerge(ws, r, sigR, r, labR2); rptPut(ws, r, sigR, 'Tanggal', { size: SFS, bold: true });
-          rptMerge(ws, r, labR2 + 1, r, lastCol); rptPut(ws, r, labR2 + 1, rptLongDate(meta.pengawas_tgl) || '', { h: 'center', size: SFS });
+          rptMerge(ws, r, labR2 + 1, r, lastCol); rptPut(ws, r, labR2 + 1, rptLongDate(meta.pengawas_tgl) ? ': ' + rptLongDate(meta.pengawas_tgl) : '', { h: 'center', size: SFS });
           rptBorder(ws, r, 1, r, lastCol, 'grid');
 
           if (withPhoto) { rptPagePhoto(ws, 'A1:' + ws.getColumn(lastCol).letter + r); ws.pageSetup.fitToHeight = 1; }
@@ -11696,6 +11900,7 @@ function renderSuhuTable() {
 
     async function exportUjiOrganoleptikWord() {
       try {
+        if (typeof ujiSyncSignature === 'function') ujiSyncSignature();   // pastikan tabel cetak sinkron
         const mode = await askExportPhotoMode();
         if (!mode) return;
         const withPhoto = mode === 'inline';
@@ -11728,8 +11933,8 @@ function renderSuhuTable() {
           + '<td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Nama</td><td style="border:1px solid black;padding:5px;text-align:center;">' + ujiEsc(meta.pengawas_nama) + '</td></tr>'
           + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.relawan_ttd) + '</td>'
           + '<td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanda Tangan</td><td style="border:1px solid black;padding:5px;height:2.2cm;vertical-align:bottom;text-align:center;">' + ujiEsc(meta.pengawas_ttd) + '</td></tr>'
-          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanggal</td><td style="border:1px solid black;padding:5px;text-align:center;">' + (rptLongDate(meta.relawan_tgl) || '') + '</td>'
-          + '<td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanggal</td><td style="border:1px solid black;padding:5px;text-align:center;">' + (rptLongDate(meta.pengawas_tgl) || '') + '</td></tr>'
+          + '<tr><td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanggal</td><td style="border:1px solid black;padding:5px;text-align:center;">' + (rptLongDate(meta.relawan_tgl) ? ': ' + rptLongDate(meta.relawan_tgl) : '') + '</td>'
+          + '<td style="border:1px solid black;padding:5px;font-weight:bold;text-align:center;">Tanggal</td><td style="border:1px solid black;padding:5px;text-align:center;">' + (rptLongDate(meta.pengawas_tgl) ? ': ' + rptLongDate(meta.pengawas_tgl) : '') + '</td></tr>'
           + '</table>';
 
         const pages = [];
