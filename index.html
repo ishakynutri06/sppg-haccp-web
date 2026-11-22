@@ -1118,6 +1118,33 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             </table>
           </div>
 
+          <!-- PANEL TANDA TANGAN (FM-SGR-SPPG-21.01) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs bg-slate-50 p-5 rounded-2xl border border-slate-200">
+            <div class="space-y-3">
+              <div class="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Diperiksa Oleh</div>
+              <div>
+                <label class="block font-bold text-slate-600 mb-1">Jabatan</label>
+                <input type="text" id="ks_ttd_kiri_jabatan" value="Supervisor K3/QC" placeholder="Supervisor K3/QC" oninput="ksTtdInput(this)" onblur="ksTtdFlush()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-white text-slate-800 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-600 mb-1">Nama Pemeriksa</label>
+                <input type="text" id="ks_ttd_kiri_nama" placeholder="Kosongkan = ikut Pengawas / Auditor" oninput="ksTtdInput(this)" onblur="ksTtdFlush()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-white text-slate-800 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all">
+                <p class="text-[10px] text-slate-400 mt-1">Bila dikosongkan, otomatis mengikuti nama Pengawas / Auditor.</p>
+              </div>
+            </div>
+            <div class="space-y-3 md:border-l md:border-slate-200 md:pl-5">
+              <div class="font-extrabold text-slate-700 uppercase tracking-wider text-[10px]">Disetujui Oleh</div>
+              <div>
+                <label class="block font-bold text-slate-600 mb-1">Jabatan</label>
+                <input type="text" id="ks_ttd_kanan_jabatan" value="Kepala Dapur SPPG" placeholder="Kepala Dapur SPPG" oninput="ksTtdInput(this)" onblur="ksTtdFlush()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-white text-slate-800 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-600 mb-1">Nama Penyetuju</label>
+                <input type="text" id="ks_ttd_kanan_nama" placeholder="Nama penyetuju..." oninput="ksTtdInput(this)" onblur="ksTtdFlush()" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-sm font-bold bg-white text-slate-800 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all">
+              </div>
+            </div>
+          </div>
+
           <div class="flex justify-end items-center gap-4 pt-2">
             <button type="submit" class="w-full lg:w-auto bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg shadow-slate-800/40 hover:-translate-y-0.5 transition-all flex justify-center items-center gap-2"><span>💾</span> Simpan Log Inspeksi</button>
           </div>
@@ -4038,6 +4065,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         const built = getCleanTableHtml(wrapperId, photoMode === 'none');
         if (!built.clone) return alert('Data tidak ditemukan');
         const clone = built.clone;
+        // Khusus 21.01: lebar kolom proporsional + tampilan hasil (Ya/Tdk) untuk Word
+        const isSilang = wrapperId === 'wrapper_inspeksi_silang';
+        if (isSilang && typeof ksWordLayout === 'function') ksWordLayout(clone);
         const dateText = exportGetDocDateText(wrapperId);
         const docName = 'dokumen';
         const files = [];
@@ -4085,7 +4115,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             </tr>
           </table>` : ''}
           ${wrapperId === 'wrapper_suhu' ? `<table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">${suhuReportHeaderLines().map(l => `<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">${l[0]}</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">${l[1]}</td></tr>`).join('')}</table>` : ''}
+          ${isSilang && typeof ksWordMetaHtml === 'function' ? ksWordMetaHtml() : ''}
           ${clone.innerHTML}
+          ${isSilang && typeof ksWordSigHtml === 'function' ? ksWordSigHtml() : ''}
           ${isPemorsian ? `<table style="width:100%;border:none;border-collapse:collapse;margin:16px 0 0 0;">
             <tr>
               <td style="border:none;width:60%;padding:0;">&nbsp;</td>
@@ -4861,27 +4893,92 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       await rptDownload(wb, exportFileName(cfg.menuKey, 'xlsx'));
     }
 
-    function rptExportSilang() {
-      return rptExportChecklist({
-        sheet: 'FM-SGR-SPPG-21.01', noDoc: 'FM-SGR-SPPG-21.01', judul: ' INSPEKSI KONTAMINASI SILANG',
-        menuKey: 'wrapper_inspeksi_silang',
-        font: 'Quattrocento Sans', sz: 10, hdrFill: RPT_GREY, alt: null,
-        widths: [4.2, 16, 38.3, 18.2, 18.2, 18.3, 20.7],
-        auto: [3.5, 14, 46, 16, 14, 15, 14],   // proporsi kolom; ukuran huruf 11-12 pt & orientasi dipilih otomatis agar 1 halaman A4 terpakai maksimal
-        head: ['NO', 'AREA / ELEMEN PEMERIKSAAN', 'STANDAR OPERASIONAL (GHP/HACCP)', 'HASIL INSPEKSI\n(Ya / Tidak / NA)', 'CATATAN KETIDAKSESUAIAN', 'TINDAKAN KOREKSI LANGSUNG', 'PARAF SUPERVISOR'],
-        items: INSPEKSI_SILANG_ITEMS, areaKey: 'area', stdKey: 'std', prefix: 'ks_', dateId: 'ks_tanggal', nameId: 'ks_auditor',
-        sigLeft: 'Diperiksa Oleh (Supervisor K3/QC):',
-        isYa: v => v === 'Ya',
-        meta: (ws, m) => {
-          rptMerge(ws, 5, 1, 5, 2); m.put(5, 1, 'Tanggal ', { bold: true });
-          m.put(5, 3, ': ' + m.tgl);
-          m.put(5, 6, 'Shift :', { bold: true });
-          const pagi = m.val('ks_shift') !== 'Sore';
-          m.put(5, 7, pagi ? '[ ✓ ] Pagi   [     ] Sore' : '[     ] Pagi   [ ✓ ] Sore');
-          rptMerge(ws, 6, 1, 6, 2); m.put(6, 1, 'Auditor / Supervisor ', { bold: true });
-          m.put(6, 3, ': ' + m.val('ks_auditor'));
+    // ---------- FM-SGR-SPPG-21.01 INSPEKSI KONTAMINASI SILANG (layout khusus) ----------
+    // Lebar kolom baku, Calibri 11, A4 landscape, fitToWidth 1 / fitToHeight 0, margin 2cm/1cm.
+    async function rptExportSilang() {
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet('FM-SGR-SPPG-21.01');
+      const F = 'Calibri', SZ = 11, LINE = SZ * 1.3;
+      const widths = [6, 24, 48, 16, 28, 28, 14];
+      widths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+
+      // Baca HANYA nilai aktif <select>/<input> (bukan seluruh daftar option).
+      const val = id => {
+        const el = document.getElementById(id);
+        if (!el) return '';
+        if (el.tagName === 'SELECT') {
+          const o = el.selectedOptions && el.selectedOptions[0];
+          return o ? String(o.value) : String(el.value || '');
         }
+        return String(el.value || '');
+      };
+      const linesOf = (txt, u, f) => {
+        const per = Math.max(1, Math.floor((u * 7 - 8) / (f * 1.333 * 0.52)));
+        return String(txt == null ? '' : txt).split('\n').reduce((s, l) => s + Math.max(1, Math.ceil(l.length / per)), 0);
+      };
+
+      const dKey = val('ks_tanggal');
+      const tgl = rptLongDate(dKey) || rptToday();
+
+      rptKop(wb, ws, { r: 1, rowH: 19.5, logo: [1, 2], title: [3, 5], lab: 6, val: 7,
+        judul: 'INSPEKSI KONTAMINASI SILANG', noDoc: 'FM-SGR-SPPG-21.01', tgl: tgl, colon: true });
+      rptDateLine(ws, 4, 1, 7);
+
+      // Sub-kop: Tanggal + Shift (baris 5), Auditor / Supervisor (baris 6)
+      ws.getRow(5).height = 24; ws.getRow(6).height = 24; ws.getRow(7).height = 6;
+      rptMerge(ws, 5, 1, 5, 2); rptPut(ws, 5, 1, 'Tanggal', { font: F, size: SZ, bold: true });
+      rptMerge(ws, 5, 3, 5, 5); rptPut(ws, 5, 3, ': ' + tgl, { font: F, size: SZ });
+      rptMerge(ws, 5, 6, 5, 7);
+      const pagi = val('ks_shift') !== 'Sore';
+      rptPut(ws, 5, 6, 'Shift : ' + (pagi ? '[ ✓ ] Pagi    [   ] Sore' : '[   ] Pagi    [ ✓ ] Sore'), { font: F, size: SZ });
+      rptMerge(ws, 6, 1, 6, 2); rptPut(ws, 6, 1, 'Auditor / Supervisor', { font: F, size: SZ, bold: true });
+      rptMerge(ws, 6, 3, 6, 7); rptPut(ws, 6, 3, ': ' + val('ks_auditor'), { font: F, size: SZ });
+
+      // Header tabel
+      const head = ['NO', 'AREA / ELEMEN PEMERIKSAAN', 'STANDAR OPERASIONAL (GHP/HACCP)', 'HASIL INSPEKSI\n(Ya / Tidak / NA)', 'CATATAN KETIDAKSESUAIAN', 'TINDAKAN KOREKSI LANGSUNG', 'PARAF SUPERVISOR'];
+      const headLines = head.reduce((m, h, i) => Math.max(m, linesOf(h, widths[i], SZ)), 1);
+      ws.getRow(8).height = Math.max(30, headLines * LINE + 8);
+      head.forEach((h, i) => rptPut(ws, 8, i + 1, h, { font: F, size: SZ, bold: true, h: 'center' }));
+      rptFill(ws, 8, 1, 8, 7, RPT_GREY);
+      rptBorder(ws, 8, 1, 8, 7, 'grid');
+
+      let row = 9;
+      INSPEKSI_SILANG_ITEMS.forEach(it => {
+        const hasil = val(`ks_res_${it.id}`) === 'Ya' ? '[ ✓ ] Ya   [   ] Tdk' : '[   ] Ya   [ ✓ ] Tdk';
+        const cat = val(`ks_cat_${it.id}`), kor = val(`ks_kor_${it.id}`), paraf = val(`ks_paraf_${it.id}`);
+        const n = Math.max(linesOf(it.area, widths[1], SZ), linesOf(it.std, widths[2], SZ), linesOf(hasil, widths[3], SZ),
+                           linesOf(cat, widths[4], SZ), linesOf(kor, widths[5], SZ), linesOf(paraf, widths[6], SZ));
+        ws.getRow(row).height = Math.max(24, n * LINE + 8);
+        const o = { font: F, size: SZ };
+        rptPut(ws, row, 1, it.id, Object.assign({ h: 'center' }, o));
+        rptPut(ws, row, 2, it.area, o);
+        rptPut(ws, row, 3, it.std, o);
+        rptPut(ws, row, 4, hasil, Object.assign({ h: 'center' }, o));
+        rptPut(ws, row, 5, cat, o);
+        rptPut(ws, row, 6, kor, o);
+        rptPut(ws, row, 7, paraf, Object.assign({ h: 'center' }, o));
+        rptBorder(ws, row, 1, row, 7, 'grid');
+        row++;
       });
+
+      // Blok tanda tangan: jeda 2 baris, 2 kolom berdampingan, tanpa garis penuh
+      row += 2;
+      const sigRow = row, nameRow = row + 4;
+      [sigRow, sigRow + 1, sigRow + 2, sigRow + 3, nameRow].forEach((r, i) => { ws.getRow(r).height = i === 4 ? 22 : (i === 0 ? 22 : 18); });
+      const sj = s => (typeof ksTtdJabatan === 'function') ? ksTtdJabatan(s) : (s === 'kiri' ? 'Supervisor K3/QC' : 'Kepala Dapur SPPG');
+      const sn = s => (typeof ksTtdNama === 'function') ? ksTtdNama(s) : '';
+      rptMerge(ws, sigRow, 2, sigRow, 4);
+      rptPut(ws, sigRow, 2, 'Diperiksa Oleh (' + sj('kiri') + '):', { font: F, size: SZ, bold: true });
+      rptMerge(ws, sigRow, 5, sigRow, 7);
+      rptPut(ws, sigRow, 5, 'Disetujui Oleh (' + sj('kanan') + '):', { font: F, size: SZ, bold: true });
+      rptMerge(ws, nameRow, 2, nameRow, 4);
+      rptPut(ws, nameRow, 2, '( ' + (sn('kiri') || '________________________') + ' )', { font: F, size: SZ, bold: true, h: 'center' });
+      rptMerge(ws, nameRow, 5, nameRow, 7);
+      rptPut(ws, nameRow, 5, '( ' + (sn('kanan') || '________________________') + ' )', { font: F, size: SZ, bold: true, h: 'center' });
+
+      // A4 landscape, skala lebar 1 halaman, tinggi mengalir (fitToHeight 0)
+      rptPage(ws, true, 'A1:G' + nameRow);
+      await rptDownload(wb, exportFileName('wrapper_inspeksi_silang', 'xlsx'));
     }
 
     function rptExportAlergen() {
@@ -8587,8 +8684,235 @@ function renderSuhuTable() {
        }
     }
 
+    // =====================================================================
+    // TANDA TANGAN 21.01 (FM-SGR-SPPG-21.01) - pengaturan lintas tanggal
+    // - Default jabatan/nama: localStorage + Firebase config path
+    // - Nilai per tanggal tetap tersimpan di sppg_log_silang/{tanggal}
+    // =====================================================================
+    const KS_TTD_LS = 'sppg_silang_ttd_defaults';
+    const KS_TTD_PATH = 'sppg_silang_ttd_defaults';
+    const KS_TTD_IDS = ['ks_ttd_kiri_jabatan', 'ks_ttd_kiri_nama', 'ks_ttd_kanan_jabatan', 'ks_ttd_kanan_nama'];
+    const KS_TTD_KEYS = ['kiri_jabatan', 'kiri_nama', 'kanan_jabatan', 'kanan_nama'];
+    const KS_TTD_FALLBACK = { kiri_jabatan: 'Supervisor K3/QC', kiri_nama: '', kanan_jabatan: 'Kepala Dapur SPPG', kanan_nama: '' };
+    let ksTtdTimer = null;
+    window.ksTtdDefaults = Object.assign({}, KS_TTD_FALLBACK);
+    window.ksTtdDirty = false;
+
+    function ksTtdTrim(v) { return String(v == null ? '' : v).trim(); }
+    function ksTtdLoadLocal() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(KS_TTD_LS) || '{}');
+        if (raw && typeof raw === 'object') {
+          KS_TTD_KEYS.forEach(k => { if (raw[k] != null) window.ksTtdDefaults[k] = ksTtdTrim(raw[k]); });
+        }
+      } catch (e) {}
+      ['kiri_jabatan', 'kanan_jabatan'].forEach(k => {
+        if (!window.ksTtdDefaults[k]) window.ksTtdDefaults[k] = KS_TTD_FALLBACK[k];
+      });
+    }
+    function ksTtdSaveLocal() {
+      try { localStorage.setItem(KS_TTD_LS, JSON.stringify(window.ksTtdDefaults)); } catch (e) {}
+    }
+    function ksTtdField(side) {
+      const pre = side === 'kanan' ? 'ks_ttd_kanan_' : 'ks_ttd_kiri_';
+      return { jab: document.getElementById(pre + 'jabatan'), nama: document.getElementById(pre + 'nama') };
+    }
+    function ksTtdJabatan(side) {
+      const f = ksTtdField(side);
+      return ksTtdTrim(f.jab && f.jab.value) || KS_TTD_FALLBACK[side + '_jabatan'];
+    }
+    function ksTtdNama(side) {
+      const f = ksTtdField(side);
+      if (side === 'kiri') {
+        return ksTtdTrim(f.nama && f.nama.value) || ksTtdTrim((document.getElementById('ks_auditor') || {}).value);
+      }
+      return ksTtdTrim(f.nama && f.nama.value);
+    }
+    function ksTtdSyncAuditor(force) {
+      const aud = document.getElementById('ks_auditor');
+      const el = document.getElementById('ks_ttd_kiri_nama');
+      if (!aud || !el) return;
+      const a = ksTtdTrim(aud.value);
+      if (force || !ksTtdTrim(el.value) || el.dataset.ksAuto === '1') {
+        el.value = a;
+        el.dataset.ksAuto = a ? '1' : '0';
+      }
+    }
+    function ksTtdApply(dateKey, day) {
+      if (!dateKey) dateKey = (document.getElementById('ks_tanggal') || {}).value || '';
+      const saved = (day && typeof day === 'object') ? day : ((window.dbCache['sppg_log_silang'] || {})[dateKey] || {});
+      const audSaved = ksTtdTrim(saved.ks_auditor);
+      KS_TTD_IDS.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const k = KS_TTD_KEYS[i];
+        let v = (saved[id] != null) ? String(saved[id]) : '';
+        if (!ksTtdTrim(v)) v = window.ksTtdDefaults[k] || '';
+        if (!ksTtdTrim(v) && KS_TTD_FALLBACK[k]) v = KS_TTD_FALLBACK[k];
+        el.value = v;
+        if (id === 'ks_ttd_kiri_nama') {
+          el.dataset.ksAuto = (!ksTtdTrim(v) || (audSaved && ksTtdTrim(v) === audSaved)) ? '1' : '0';
+        }
+      });
+      // Nama kiri kosong -> otomatis mengikuti Pengawas/Auditor
+      ksTtdSyncAuditor(false);
+    }
+    function ksTtdCurrent() {
+      const out = {};
+      KS_TTD_IDS.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) out[KS_TTD_KEYS[i]] = ksTtdTrim(el.value);
+      });
+      return out;
+    }
+    function ksTtdPersistDay() {
+      const dateKey = (document.getElementById('ks_tanggal') || {}).value || '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return;
+      if (window.dbLoaded && !window.dbLoaded['sppg_log_silang/' + dateKey]) return;
+      const all = window.dbCache['sppg_log_silang'] || {};
+      const day = all[dateKey];
+      // Jangan membuat node harian setengah jadi bila tanggal ini belum pernah disimpan.
+      if (!day || typeof day !== 'object' || Array.isArray(day)) return;
+      const cur = {};
+      KS_TTD_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) cur[id] = ksTtdTrim(el.value);
+      });
+      const merged = Object.assign({}, day, cur);
+      all[dateKey] = merged;
+      window.dbCache['sppg_log_silang'] = all;
+      if (typeof window.fbSet === 'function') {
+        try { window.fbSet('sppg_log_silang/' + dateKey, merged); } catch (e) {}
+      }
+    }
+    function ksTtdFlush() {
+      clearTimeout(ksTtdTimer);
+      ksTtdTimer = null;
+      const cur = ksTtdCurrent();
+      KS_TTD_KEYS.forEach((k, i) => {
+        const el = document.getElementById(KS_TTD_IDS[i]);
+        // Nama kiri yang hanya salinan otomatis dari Auditor tidak disimpan sebagai default global.
+        if (i === 1 && el && el.dataset.ksAuto === '1') return;
+        window.ksTtdDefaults[k] = cur[k];
+      });
+      ['kiri_jabatan', 'kanan_jabatan'].forEach(k => {
+        if (!window.ksTtdDefaults[k]) window.ksTtdDefaults[k] = KS_TTD_FALLBACK[k];
+      });
+      window.ksTtdDirty = false;
+      ksTtdSaveLocal();
+      if (typeof window.fbSet === 'function') {
+        try { window.fbSet(KS_TTD_PATH, Object.assign({}, window.ksTtdDefaults)); } catch (e) {}
+      }
+      ksTtdPersistDay();
+    }
+    function ksTtdInput(el) {
+      if (!el) return;
+      const i = KS_TTD_IDS.indexOf(el.id);
+      if (i >= 0) window.ksTtdDefaults[KS_TTD_KEYS[i]] = ksTtdTrim(el.value);
+      if (el.id === 'ks_ttd_kiri_nama') {
+        el.dataset.ksAuto = ksTtdTrim(el.value) ? '0' : '1';
+        if (!ksTtdTrim(el.value)) ksTtdSyncAuditor(true);
+      }
+      window.ksTtdDirty = true;
+      ksTtdSaveLocal();
+      clearTimeout(ksTtdTimer);
+      ksTtdTimer = setTimeout(ksTtdFlush, 700);
+    }
+    function ksTtdPull(attempt) {
+      if (typeof window.fbGet !== 'function') {
+        if (attempt < 80) setTimeout(function () { ksTtdPull(attempt + 1); }, 250);
+        return;
+      }
+      try {
+        Promise.resolve(window.fbGet(KS_TTD_PATH)).then(function (v) {
+          if (v && typeof v === 'object') {
+            KS_TTD_KEYS.forEach(k => {
+              const s = ksTtdTrim(v[k]);
+              if (s) window.ksTtdDefaults[k] = s;   // nilai kosong di cloud tidak menghapus default lokal
+            });
+            ksTtdSaveLocal();
+            if (!window.ksTtdDirty) ksTtdApply();
+          }
+        }).catch(function () {});
+      } catch (e) {}
+    }
+    function ksTtdInit() {
+      if (window.__ksTtdInit) return;
+      window.__ksTtdInit = true;
+      ksTtdLoadLocal();
+      const aud = document.getElementById('ks_auditor');
+      if (aud && aud.dataset.ksAudBound !== '1') {
+        aud.dataset.ksAudBound = '1';
+        aud.addEventListener('input', function () { ksTtdSyncAuditor(false); });
+      }
+      ksTtdPull(0);
+    }
+
+    // ---------- Tata letak Word + sub-kop & blok tanda tangan 21.01 ----------
+    function ksWordLayout(clone) {
+      const table = clone && clone.querySelector('table');
+      if (!table) return;
+      clone.querySelectorAll('tbody tr').forEach(tr => {
+        const cells = tr.children;
+        if (cells.length < 4) return;
+        const txt = String(cells[3].textContent || '').trim();
+        if (txt === 'Ya' || txt === 'Tidak') {
+          cells[3].textContent = txt === 'Ya' ? '[ ✓ ] Ya   [   ] Tdk' : '[   ] Ya   [ ✓ ] Tdk';
+        }
+      });
+      const base = 'border:1px solid #000000;padding:4px 5px;font-family:Calibri,sans-serif;font-size:11pt;vertical-align:middle;word-wrap:break-word;';
+      table.setAttribute('style', 'width:100%;border-collapse:collapse;table-layout:fixed;');
+      const pct = [3.66, 14.63, 29.27, 9.76, 17.07, 17.07, 8.54];
+      const cg = document.createElement('colgroup');
+      pct.forEach(w => { const c = document.createElement('col'); c.setAttribute('style', 'width:' + w + '%'); cg.appendChild(c); });
+      table.insertBefore(cg, table.firstChild);
+      clone.querySelectorAll('thead th').forEach(th => {
+        th.setAttribute('style', base + 'background-color:#CCCCCC;text-align:center;font-weight:bold;');
+      });
+      clone.querySelectorAll('tbody tr').forEach(tr => {
+        Array.from(tr.children).forEach((cell, i) => {
+          const align = (i === 0 || i === 3 || i === 6) ? 'center' : 'left';
+          cell.setAttribute('style', base + 'text-align:' + align + ';' + (i === 1 ? 'font-weight:bold;' : ''));
+        });
+      });
+    }
+    function ksWordMetaHtml() {
+      const val = id => { const el = document.getElementById(id); return el ? String(el.value || '') : ''; };
+      const tgl = rptLongDate(val('ks_tanggal')) || rptToday();
+      const pagi = val('ks_shift') !== 'Sore';
+      const shift = pagi ? '[ ✓ ] Pagi&nbsp;&nbsp;&nbsp;[&nbsp;&nbsp;&nbsp;] Sore' : '[&nbsp;&nbsp;&nbsp;] Pagi&nbsp;&nbsp;&nbsp;[ ✓ ] Sore';
+      const tdb = 'border:none;padding:2px 4px;font-family:Calibri,sans-serif;font-size:11pt;';
+      return '<table style="width:100%;border:none;border-collapse:collapse;margin:0 0 6px 0;">'
+        + '<tr><td style="' + tdb + 'width:14%;font-weight:bold;">Tanggal</td>'
+        + '<td style="' + tdb + 'width:2%;">:</td>'
+        + '<td style="' + tdb + 'width:44%;">' + pmEscHtml(tgl) + '</td>'
+        + '<td style="' + tdb + 'width:12%;font-weight:bold;">Shift</td>'
+        + '<td style="' + tdb + 'width:2%;">:</td>'
+        + '<td style="' + tdb + 'width:26%;">' + shift + '</td></tr>'
+        + '<tr><td style="' + tdb + 'font-weight:bold;">Auditor / Supervisor</td>'
+        + '<td style="' + tdb + '">:</td>'
+        + '<td colspan="4" style="' + tdb + '">' + pmEscHtml(val('ks_auditor')) + '</td></tr>'
+        + '</table>';
+    }
+    function ksWordSigHtml() {
+      const sj = s => (typeof ksTtdJabatan === 'function') ? ksTtdJabatan(s) : (s === 'kiri' ? 'Supervisor K3/QC' : 'Kepala Dapur SPPG');
+      const sn = s => (typeof ksTtdNama === 'function') ? ksTtdNama(s) : '';
+      const nm = s => s ? '( ' + pmEscHtml(s) + ' )' : '(________________________)';
+      const cell = 'border:none;width:50%;padding:0 12px;text-align:center;font-family:Calibri,sans-serif;font-size:11pt;';
+      let blanks = '';
+      for (let i = 0; i < 3; i++) blanks += '<tr><td style="' + cell + 'height:16pt;">&nbsp;</td><td style="' + cell + 'height:16pt;">&nbsp;</td></tr>';
+      return '<table style="width:100%;border:none;border-collapse:collapse;margin:24px 0 0 0;table-layout:fixed;">'
+        + '<tr><td style="' + cell + 'font-weight:bold;">Diperiksa Oleh (' + pmEscHtml(sj('kiri')) + '):</td>'
+        + '<td style="' + cell + 'font-weight:bold;">Disetujui Oleh (' + pmEscHtml(sj('kanan')) + '):</td></tr>'
+        + blanks
+        + '<tr><td style="' + cell + 'font-weight:bold;vertical-align:bottom;">' + nm(sn('kiri')) + '</td>'
+        + '<td style="' + cell + 'font-weight:bold;vertical-align:bottom;">' + nm(sn('kanan')) + '</td></tr>'
+        + '</table>';
+    }
+
     // [BARU] Isi Shift & Auditor SESUAI tanggal yang dipilih (tanggal tanpa data = kosong)
     function applySilangDateFields() {
+      if (typeof ksTtdInit === 'function') ksTtdInit();
       const dateKey = document.getElementById('ks_tanggal')?.value;
       window.subscribeItem('sppg_log_silang', dateKey);
       const data = dateKey ? (window.dbCache['sppg_log_silang'] || {})[dateKey] : null;
@@ -8596,6 +8920,7 @@ function renderSuhuTable() {
       if (shift) shift.value = (data && data.ks_shift !== undefined) ? data.ks_shift : 'Pagi';
       const aud = document.getElementById('ks_auditor');
       if (aud) aud.value = (data && data.ks_auditor !== undefined) ? data.ks_auditor : '';
+      if (typeof ksTtdApply === 'function') ksTtdApply(dateKey, data);
     }
 
     function handleSilangDateChange() {
