@@ -2556,6 +2556,10 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         
         autoSaveCurrentSuhuToCache();
         renderSuhuTable();
+        // Sinkronisasi satu arah: nilai item ruang "Pendinginan" (id 5) -> kolom "Suhu Ruang" Cooling Area.
+        if (typeof window.pendSuhuSyncAfterSuhuPhoto === 'function') {
+            window.pendSuhuSyncAfterSuhuPhoto(pendingTempTargetId, photoId, tempVal);
+        }
         closeImageConfirmModal();
     }
 
@@ -10450,10 +10454,127 @@ function renderSuhuTable() {
       pendTtdPull(0);
     }
 
+    // =====================================================================
+    // SINKRONISASI SATU ARAH (One-Way Sync)
+    // Sumber: Modul Pemantauan Suhu (03.05) -> kategori "1. Suhu Ruangan" (ruang)
+    //         item "Pendinginan" (id "5", area "Suhu Ruang Pendinginan").
+    // Target: Modul Cooling Area (05.03) -> kolom "Suhu Ruang" (.pend-sr di #tbody_pendinginan).
+    // Arah balik (Cooling -> Suhu) TIDAK dilakukan; skema simpan tetap rows[].sr.
+    // =====================================================================
+    const PEND_SUHU_SYNC_ITEM_ID = '5';
+    const PEND_SUHU_SYNC_COL_LIMIT = 24;
+
+    function pendSuhuSyncNum(v) {
+      const s = String(v == null ? '' : v).trim().replace(',', '.');
+      if (s === '') return null;
+      return isFinite(parseFloat(s)) ? s : null;
+    }
+
+    // Nilai sesi terakhir yang terisi dari satu node sppg_log_suhu/{tanggal}.
+    function pendSuhuSyncLatestFromEntry(entry) {
+      if (!entry || typeof entry !== 'object') return null;
+      const cols = Math.max(parseInt(entry.suhuRuangColumns, 10) || 0, PEND_SUHU_SYNC_COL_LIMIT);
+      let latest = null;
+      for (let c = 1; c <= cols; c++) {
+        const val = pendSuhuSyncNum(entry['suhu_val_' + c + '_' + PEND_SUHU_SYNC_ITEM_ID]);
+        if (val !== null) latest = val;
+      }
+      return latest;
+    }
+
+    // Nilai dari form Suhu yang sedang tampil (termasuk isian yang belum tersimpan).
+    function pendSuhuSyncLatestFromDom(dateKey) {
+      if (!dateKey) return null;
+      const singleDate = String((document.getElementById('suhu_tanggal') || {}).value || '');
+      let latest = null;
+      document.querySelectorAll('input[id^="suhu_val_"]').forEach(inp => {
+        const m = /^suhu_val_(\d+)_5(?:__(\d{4}-\d{2}-\d{2}))?$/.exec(inp.id || '');
+        if (!m) return;
+        if (m[2]) { if (m[2] !== dateKey) return; }
+        else { if (window.suhuMultiRendered || singleDate !== dateKey) return; }
+        const val = pendSuhuSyncNum(inp.value);
+        if (val !== null) latest = val;
+      });
+      return latest;
+    }
+
+    function pendSuhuSyncValueForDate(dateKey) {
+      const d = String(dateKey || '').trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+      const dom = pendSuhuSyncLatestFromDom(d);
+      if (dom !== null) return dom;
+      const entry = ((window.dbCache || {})['sppg_log_suhu'] || {})[d];
+      return pendSuhuSyncLatestFromEntry(entry);
+    }
+
+    function pendSuhuSyncTargetDate() {
+      return String((document.getElementById('pend_tanggal_produksi') || {}).value || '').trim();
+    }
+
+    // Isi otomatis HANYA sel yang masih kosong (buka modul / ganti tanggal / ganti siklus / + batch).
+    function pendSuhuSyncFillEmpty() {
+      const tbody = document.getElementById('tbody_pendinginan');
+      if (!tbody) return;
+      const value = pendSuhuSyncValueForDate(pendSuhuSyncTargetDate());
+      if (value === null) return;
+      tbody.querySelectorAll('.pend-sr').forEach(inp => {
+        if (String(inp.value == null ? '' : inp.value).trim() !== '') return;
+        inp.value = value;
+      });
+    }
+
+    // Dorongan aktif dari modul Suhu (ketikan / modal foto) bila tanggal target sama.
+    function pendSuhuSyncLivePush(dateKey, value) {
+      const d = String(dateKey || '').trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+      if (pendSuhuSyncTargetDate() !== d) return;
+      const val = pendSuhuSyncNum(value);
+      if (val === null) return;
+      const tbody = document.getElementById('tbody_pendinginan');
+      if (!tbody) return;
+      tbody.querySelectorAll('.pend-sr').forEach(inp => { inp.value = val; });
+    }
+
+    // Dipanggil confirmImageConfirmation() setelah nilai dari modal foto diterapkan.
+    window.pendSuhuSyncAfterSuhuPhoto = function (targetId, photoId, modalTemp) {
+      const idStr = String(targetId || '');
+      if (!/^suhu_val_\d+_5(?:__\d{4}-\d{2}-\d{2})?$/.test(idStr)) return;
+      const m = /__(\d{4}-\d{2}-\d{2})$/.exec(idStr) || /__(\d{4}-\d{2}-\d{2})$/.exec(String(photoId || ''));
+      const dateKey = m ? m[1] : String((document.getElementById('suhu_tanggal') || {}).value || '');
+      const val = pendSuhuSyncNum(modalTemp);
+      pendSuhuSyncLivePush(dateKey, val !== null ? val : pendSuhuSyncValueForDate(dateKey));
+    };
+
+    // Ketikan langsung pada input suhu item Pendinginan (hanya event pengguna asli).
+    (function pendSuhuSyncBindInput() {
+      if (window.__pendSuhuSyncInputBound) return;
+      window.__pendSuhuSyncInputBound = true;
+      document.addEventListener('input', function (e) {
+        if (!e.isTrusted) return;
+        const el = e.target;
+        if (!el || !el.id) return;
+        const m = /^suhu_val_(\d+)_5(?:__(\d{4}-\d{2}-\d{2}))?$/.exec(el.id);
+        if (!m) return;
+        if (!m[2] && window.suhuMultiRendered) return;
+        const dateKey = m[2] || String((document.getElementById('suhu_tanggal') || {}).value || '');
+        pendSuhuSyncLivePush(dateKey, pendSuhuSyncValueForDate(dateKey));
+      }, true);
+    })();
+
+    // Perubahan #pend_tanggal_produksi: isi sel kosong memakai data Suhu tanggal yang baru.
+    function pendSuhuSyncBindDateField() {
+      const el = document.getElementById('pend_tanggal_produksi');
+      if (!el || el.dataset.suhuSyncBound === '1') return;
+      el.dataset.suhuSyncBound = '1';
+      el.addEventListener('change', function () { pendSuhuSyncFillEmpty(); });
+      el.addEventListener('input', function () { pendSuhuSyncFillEmpty(); });
+    }
+
     function initPendinginan() {
       const sel = document.getElementById('selectSiklusPendinginan');
       if (!sel) return;
       pendTtdInit();
+      pendSuhuSyncBindDateField();
       const weeks = getSuhuWeeks();
       let html = '', n = 0;
       weeks.forEach(w => {
@@ -10596,6 +10717,7 @@ function renderSuhuTable() {
       });
 
       tbody.querySelectorAll('tr').forEach(tr => pendCalcRow(tr));
+      pendSuhuSyncFillEmpty();
     }
 
     function pendAddBatch() {
