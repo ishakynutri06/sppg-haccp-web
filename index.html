@@ -1906,8 +1906,9 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         #sec-food-waste .fw-cat-4{border-top-color:#65a30d;background:linear-gradient(180deg,#ffffff,#f7fee7)}
         #sec-food-waste .fw-cat-5{border-top-color:#ea580c;background:linear-gradient(180deg,#ffffff,#fff7ed)}
         #sec-food-waste .fw-cat-6{border-top-color:#0284c7;background:linear-gradient(180deg,#ffffff,#f0f9ff)}
-        #sec-food-waste .fw-menu-badge{display:block;margin:.6rem 0 .5rem;font-size:10px;font-weight:800;line-height:1.3;color:#0f766e;background:#ecfdf5;border:1px dashed #6ee7b7;border-radius:.55rem;padding:.35rem .5rem;min-height:1.9rem}
-        #sec-food-waste .fw-menu-badge.is-empty{color:#94a3b8;background:#f8fafc;border-color:#e2e8f0;font-style:italic;font-weight:700}
+        #sec-food-waste .fw-menu-input{display:block;width:100%;margin:.6rem 0 .5rem;font-size:10px;font-weight:800;line-height:1.3;color:#0f766e;background:#ecfdf5;border:1px dashed #6ee7b7;border-radius:.55rem;padding:.35rem .5rem;min-height:1.9rem;outline:none}
+        #sec-food-waste .fw-menu-input::placeholder{color:#94a3b8;font-style:italic;font-weight:700}
+        #sec-food-waste .fw-menu-input:focus{border-color:#0d9488;background:#fff;box-shadow:0 0 0 2px rgba(13,148,136,.12)}
         #sec-food-waste .fw-livebar{position:relative;overflow:hidden;border-radius:1rem;padding:.85rem 1rem;border:1px solid #99f6e4;background:linear-gradient(120deg,#ecfdf5,#f0fdfa 55%,#eff6ff);box-shadow:0 10px 22px -20px rgba(13,148,136,.55)}
         #sec-food-waste .fw-livebar:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#0f766e,#34d399)}
         #sec-food-waste .fw-live-item{display:flex;flex-direction:column;gap:1px;min-width:7rem}
@@ -1961,6 +1962,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           </div>
           <div class="hidden-print flex flex-wrap gap-2 w-full lg:w-auto">
             <button type="button" data-print-added="1" onclick="fwExportExcel()" class="flex-1 lg:flex-none bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 transition-all flex justify-center gap-1.5 items-center"><span>📊</span> Export Excel</button>
+            <button type="button" onclick="exportFoodWasteWord()" class="flex-1 lg:flex-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-blue-500/30 transition-all flex justify-center gap-1.5 items-center"><span>📝</span> Export Word</button>
             <button type="button" onclick="printExport(function(){ return fwExportExcel(); })" class="flex-1 lg:flex-none bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-amber-500/30 transition-all flex justify-center gap-1.5 items-center"><span>🖨️</span> Cetak</button>
           </div>
         </div>
@@ -1983,6 +1985,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
               <div>
                 <label for="fw_tanggal" class="fw-label">Tanggal</label>
                 <input type="date" id="fw_tanggal" onchange="fwOnDateChange()" class="fw-input">
+                <div id="fw_siklus_badge" class="mt-2 text-[11px] leading-snug font-bold px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 transition-colors">Pilih tanggal untuk melihat Siklus Menu.</div>
               </div>
               <div>
                 <label for="fw_distribusi" class="fw-label">Total Berat Porsi Terdistribusi</label>
@@ -2015,32 +2018,32 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 text-xs">
               <div class="fw-cat fw-cat-1">
                 <div class="fw-cat-top"><span class="fw-cat-no">1</span><div><div class="fw-cat-name">Makanan Pokok</div><div class="fw-cat-desc">Nasi putih / pengganti</div></div></div>
-                <div id="fw_menu_pokok" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <input type="text" id="fw_menu_pokok" autocomplete="off" aria-label="Nama menu Makanan Pokok (dapat diedit)" placeholder="Menu belum diatur di Siklus Menu" class="fw-menu-input">
                 <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_pokok" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
               </div>
               <div class="fw-cat fw-cat-2">
                 <div class="fw-cat-top"><span class="fw-cat-no">2</span><div><div class="fw-cat-name">Lauk Hewani</div><div class="fw-cat-desc">Ayam, telur, ikan, udang</div></div></div>
-                <div id="fw_menu_hewan" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <input type="text" id="fw_menu_hewan" autocomplete="off" aria-label="Nama menu Lauk Hewani (dapat diedit)" placeholder="Menu belum diatur di Siklus Menu" class="fw-menu-input">
                 <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_hewan" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
               </div>
               <div class="fw-cat fw-cat-3">
                 <div class="fw-cat-top"><span class="fw-cat-no">3</span><div><div class="fw-cat-name">Lauk Nabati</div><div class="fw-cat-desc">Tahu, tempe, kacang</div></div></div>
-                <div id="fw_menu_nabati" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <input type="text" id="fw_menu_nabati" autocomplete="off" aria-label="Nama menu Lauk Nabati (dapat diedit)" placeholder="Menu belum diatur di Siklus Menu" class="fw-menu-input">
                 <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_nabati" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
               </div>
               <div class="fw-cat fw-cat-4">
                 <div class="fw-cat-top"><span class="fw-cat-no">4</span><div><div class="fw-cat-name">Sayur</div><div class="fw-cat-desc">Sayur segar / tumis</div></div></div>
-                <div id="fw_menu_sayur" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <input type="text" id="fw_menu_sayur" autocomplete="off" aria-label="Nama menu Sayur (dapat diedit)" placeholder="Menu belum diatur di Siklus Menu" class="fw-menu-input">
                 <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_sayur" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
               </div>
               <div class="fw-cat fw-cat-5">
                 <div class="fw-cat-top"><span class="fw-cat-no">5</span><div><div class="fw-cat-name">Buah</div><div class="fw-cat-desc">Buah potong / segar</div></div></div>
-                <div id="fw_menu_buah" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <input type="text" id="fw_menu_buah" autocomplete="off" aria-label="Nama menu Buah (dapat diedit)" placeholder="Menu belum diatur di Siklus Menu" class="fw-menu-input">
                 <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_buah" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
               </div>
               <div class="fw-cat fw-cat-6">
                 <div class="fw-cat-top"><span class="fw-cat-no">6</span><div><div class="fw-cat-name">Susu</div><div class="fw-cat-desc">Susu / minuman</div></div></div>
-                <div id="fw_menu_susu" class="fw-menu-badge is-empty">Menu belum diatur di Siklus Menu</div>
+                <input type="text" id="fw_menu_susu" autocomplete="off" aria-label="Nama menu Susu (dapat diedit)" placeholder="Menu belum diatur di Siklus Menu" class="fw-menu-input">
                 <div class="fw-field-wrap"><input type="number" min="0" step="0.01" id="fw_w_susu" oninput="fwUpdateLive()" placeholder="0" class="fw-input"><span class="fw-unit">gram</span></div>
               </div>
             </div>
@@ -2894,6 +2897,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       wrapper_pendinginan:         { nama: 'PEMANTAUAN COOLING AREA', foto: true, tgl: '#pend_tanggal_produksi' },
       wrapper_uji_organoleptik:    { nama: 'UJI ORGANOLEPTIK DAN SUHU MEMASAK', foto: true, tgl: '#uji_tanggal' },
       wrapper_inspeksi_silang:     { nama: 'KONTAMINASI SILANG',      tgl: '#ks_tanggal' },
+      wrapper_food_waste:          { nama: 'FOOD WASTE',              tgl: '#fw_tanggal' },
       'sec-inspeksi-alergen':      { nama: 'MANAJEMEN ALERGEN',       tgl: '#al_tanggal' },
       siklus_menu_tables_wrapper:  { nama: 'SIKLUS MENU',             tgl: '#siklus_tanggal' },
       master_bahan_tables_wrapper: { nama: 'MASTER BAHAN',            tgl: '#master_tanggal' },
@@ -13618,9 +13622,16 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         const o = {
           id: x.id || fwNewId(), tanggal: String(x.tanggal || ''),
           distribusi: fwNum(x.distribusi),
-          lanjut: String(x.lanjut || ''), catatan: String(x.catatan || '')
+          lanjut: String(x.lanjut || ''), catatan: String(x.catatan || ''),
+          siklusHari: parseInt(x.siklusHari, 10) || 0,
+          siklusMenu: String(x.siklusMenu || ''),
+          siklusDateKey: String(x.siklusDateKey || x.tanggal || ''),
+          menus: {}
         };
-        FW_CATS.forEach(c => { o[c.k] = fwNum(x[c.k]); });
+        FW_CATS.forEach(c => {
+          o[c.k] = fwNum(x[c.k]);
+          o.menus[c.k] = String((x.menus && x.menus[c.k]) || '');
+        });
         return o;
       }).filter(x => x.tanggal);
     }
@@ -13779,24 +13790,131 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       if (!s || s === '-' || s === '0') return '';
       return s.toLowerCase().replace(/(^|[\s\-\/\(])([a-z0-9])/g, (m, p, c) => p + c.toUpperCase());
     }
-    function fwMenuNameFor(dateKey, sk) {
-      if (!dateKey) return '';
+    function fwSiklusInfo(dateKey) {
+      const key = /^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || '')) ? String(dateKey) : '';
       try {
-        const weeks = getSuhuWeeks();
-        const idx = getSuhuDateKeyList(weeks).indexOf(dateKey);
-        if (idx < 0) return '';
-        return fwMenuLabel(getSuhuMenuName(weeks, sk, idx));
-      } catch (e) { return ''; }
+        if (typeof getSiklusByTanggal === 'function') return getSiklusByTanggal(key);
+      } catch (e) {}
+      return { tanggal: key, found: false, idx: -1, day: 0, absIdx: -1, dateKey: '', menus: {} };
+    }
+    function fwSiklusMenuSummary(info) {
+      if (!info || !info.found) return '';
+      try { if (typeof siklusMenuSummary === 'function') return siklusMenuSummary(info.menus); } catch (e) {}
+      return '';
+    }
+    function fwUpdateSiklusBadge(dateKey) {
+      const el = document.getElementById('fw_siklus_badge');
+      if (!el) return;
+      const key = /^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || '')) ? String(dateKey) : ((document.getElementById('fw_tanggal') || {}).value || '');
+      const info = fwSiklusInfo(key);
+      const base = 'mt-2 text-[11px] leading-snug font-bold px-3 py-2 rounded-lg border transition-colors';
+      if (info.found) {
+        const menu = fwSiklusMenuSummary(info);
+        el.className = base + ' bg-emerald-50 border-emerald-200 text-emerald-800';
+        el.textContent = '● Siklus Menu: Hari ke-' + info.day + ' — ' + (menu || 'menu belum diisi');
+      } else {
+        el.className = base + ' bg-slate-50 border-slate-200 text-slate-600';
+        el.textContent = '● Tanggal: ' + (key || '-') + ' (Belum ada jadwal siklus menu / Mode input manual)';
+      }
+    }
+    function fwCycleMenuMap(dateKey) {
+      const info = fwSiklusInfo(dateKey);
+      const out = {};
+      FW_CATS.forEach(c => {
+        const raw = info.found ? (info.menus || {})[c.sk] : '';
+        out[c.k] = fwMenuLabel(raw);
+      });
+      return out;
+    }
+    function fwMenuInputsSet(map) {
+      FW_CATS.forEach(c => {
+        const el = document.getElementById('fw_menu_' + c.k);
+        if (el) el.value = (map && map[c.k]) ? String(map[c.k]) : '';
+      });
+    }
+    function fwMenuInputsRead() {
+      const m = {};
+      FW_CATS.forEach(c => {
+        const el = document.getElementById('fw_menu_' + c.k);
+        m[c.k] = el ? String(el.value || '').trim() : '';
+      });
+      return m;
+    }
+    function fwMenuInputsSummary(map) {
+      const m = map || {};
+      return FW_CATS.map(c => m[c.k]).filter(v => v && v !== '-').join(' • ');
+    }
+    function fwMenuNameFor(dateKey, sk) {
+      const info = fwSiklusInfo(dateKey);
+      if (!info.found) return '';
+      return fwMenuLabel((info.menus || {})[sk]);
     }
     function fwRenderMenuBadges() {
       const date = (document.getElementById('fw_tanggal') || {}).value || '';
+      const map = fwCycleMenuMap(date);
       FW_CATS.forEach(c => {
         const el = document.getElementById('fw_menu_' + c.k);
-        if (!el) return;
-        const nm = date ? fwMenuNameFor(date, c.sk) : '';
-        if (nm) { el.textContent = 'Menu: ' + nm; el.classList.remove('is-empty'); }
-        else { el.textContent = 'Menu belum diatur di Siklus Menu'; el.classList.add('is-empty'); }
+        if (el && !String(el.value || '').trim()) el.value = map[c.k] || '';
       });
+      fwUpdateSiklusBadge(date);
+    }
+    function fwRecordsForDate(dateKey) {
+      if (!dateKey) return [];
+      return fwItems().filter(r => r.tanggal === dateKey)
+        .sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    }
+    function fwFormHasInput() {
+      if (fwEditId) return true;
+      const raw = id => { const el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; };
+      return !!raw('fw_distribusi') || FW_CATS.some(c => !!raw('fw_w_' + c.k)) || !!raw('fw_catatan');
+    }
+    // Muat tanggal: bila sudah ada log tersimpan -> muat record terbaru (tidak menimpa data);
+    // bila belum ada / forceNew -> kosongkan berat sisa & isi nama menu dari Siklus Menu.
+    function fwLoadDate(dateKey, opts) {
+      const o = opts || {};
+      let key = /^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || '')) ? String(dateKey) : '';
+      if (!key) key = getLocalDateKey();
+      const tgl = document.getElementById('fw_tanggal');
+      if (tgl && !o.keepDate && tgl.value !== key) tgl.value = key;
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      const recs = fwRecordsForDate(key);
+      const rec = (!o.forceNew && recs.length) ? recs[recs.length - 1] : null;
+      if (rec) {
+        fwEditId = rec.id;
+        set('fw_distribusi', rec.distribusi ? String(rec.distribusi) : '');
+        FW_CATS.forEach(c => set('fw_w_' + c.k, rec[c.k] ? String(rec[c.k]) : ''));
+        set('fw_lanjut', rec.lanjut || 'Pakan Ternak');
+        set('fw_catatan', rec.catatan || '');
+        const stored = rec.menus || {};
+        const merged = fwCycleMenuMap(key);
+        FW_CATS.forEach(c => { if (stored[c.k]) merged[c.k] = stored[c.k]; });
+        fwMenuInputsSet(merged);
+      } else {
+        fwEditId = null;
+        set('fw_distribusi', '');
+        FW_CATS.forEach(c => set('fw_w_' + c.k, ''));
+        set('fw_lanjut', 'Pakan Ternak');
+        set('fw_catatan', '');
+        fwMenuInputsSet(fwCycleMenuMap(key));
+      }
+      const title = document.getElementById('fw_form_title');
+      if (title) title.textContent = rec ? '✏️ Ubah Log Food Waste' : '✍️ Tambah Log Food Waste';
+      const btn = document.getElementById('fw_btn_cancel');
+      if (btn) btn.classList.toggle('hidden', !rec);
+      fwUpdateSiklusBadge(key);
+      fwUpdateLive();
+      if (o.render !== false) { try { fwExpandPeriod(key); fwRenderAll(); } catch (e) {} }
+    }
+    // Metadata Tanggal / Hari Siklus / Nama Menu untuk header laporan.
+    function fwReportMeta() {
+      const key = (document.getElementById('fw_tanggal') || {}).value || '';
+      const info = fwSiklusInfo(key);
+      const recs = key ? fwRecordsForDate(key) : [];
+      const rec = recs.length ? recs[recs.length - 1] : null;
+      const day = info.found ? info.day : (rec && rec.siklusHari ? rec.siklusHari : 0);
+      const menu = (info.found ? fwSiklusMenuSummary(info) : '') ||
+        (rec && rec.siklusMenu) || fwMenuInputsSummary(fwMenuInputsRead());
+      return { key: key, tanggalText: key ? fwDateLong(key) : '-', day: day, menu: menu };
     }
 
     // ---------- form ----------
@@ -13809,6 +13927,11 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         catatan: String(val('fw_catatan') || '').trim()
       };
       FW_CATS.forEach(c => { o[c.k] = fwNum(val('fw_w_' + c.k)); });
+      const info = fwSiklusInfo(o.tanggal);
+      o.menus = fwMenuInputsRead();
+      o.siklusHari = info.found ? info.day : 0;
+      o.siklusMenu = fwMenuInputsSummary(o.menus);
+      o.siklusDateKey = o.tanggal;
       return o;
     }
     function fwUpdateLive() {
@@ -13835,50 +13958,22 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
           FW_CATS.map(c => '<span class="px-1.5 py-0.5 rounded-md bg-white/70 border border-emerald-100">' + c.label + ' ' + (f.distribusi > 0 ? fwPct(f[c.k] * 100 / f.distribusi) : '0%') + '</span>').join('') +
         '</div>';
     }
-    // Reset form harian (hanya tampilan form, riwayat Firebase tidak disentuh)
-    function fwResetDailyInputs() {
-      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-      set('fw_distribusi', '0');
-      FW_CATS.forEach(c => set('fw_w_' + c.k, '0'));
-      set('fw_catatan', '');
-      fwEditId = null;
-      const title = document.getElementById('fw_form_title');
-      if (title) title.textContent = '✍️ Tambah Log Food Waste';
-      const btn = document.getElementById('fw_btn_cancel');
-      if (btn) btn.classList.add('hidden');
-    }
     function fwOnDateChange() {
-      fwResetDailyInputs();
-      fwRenderMenuBadges();
-      fwUpdateLive();
+      const el = document.getElementById('fw_tanggal');
+      fwLoadDate(el ? el.value : '');
     }
 
-    // Pengawas pergantian hari (tengah malam): reset form otomatis tanpa menghapus riwayat
+    // Pengawas pergantian hari (tengah malam): muat tanggal baru tanpa menghapus riwayat
     function fwCheckDayChange() {
       const today = getLocalDateKey();
       if (!fwDayKey) { fwDayKey = today; return; }
       if (today === fwDayKey) return;
       fwDayKey = today;
-      const tgl = document.getElementById('fw_tanggal');
-      if (tgl) tgl.value = today;
-      fwResetDailyInputs();
-      fwRenderMenuBadges();
-      fwUpdateLive();
-      try { fwRenderAll(); } catch (e) {}
+      fwLoadDate(today);
     }
 
     function fwResetForm(silent) {
-      fwEditId = null;
-      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-      set('fw_distribusi', '');
-      FW_CATS.forEach(c => set('fw_w_' + c.k, ''));
-      set('fw_catatan', ''); set('fw_lanjut', 'Pakan Ternak');
-      set('fw_tanggal', getLocalDateKey());
-      const title = document.getElementById('fw_form_title');
-      if (title) title.textContent = '✍️ Tambah Log Food Waste';
-      const btn = document.getElementById('fw_btn_cancel');
-      if (btn) btn.classList.add('hidden');
-      fwRenderMenuBadges(); fwUpdateLive();
+      fwLoadDate(getLocalDateKey(), { forceNew: true, render: false });
       if (silent !== true) {
         const f = document.getElementById('fw_form');
         if (f) { try { f.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
@@ -13894,11 +13989,15 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       FW_CATS.forEach(c => set('fw_w_' + c.k, r[c.k] ? String(r[c.k]) : ''));
       set('fw_lanjut', r.lanjut || 'Pakan Ternak');
       set('fw_catatan', r.catatan || '');
+      const stored = r.menus || {};
+      const merged = fwCycleMenuMap(r.tanggal);
+      FW_CATS.forEach(c => { if (stored[c.k]) merged[c.k] = stored[c.k]; });
+      fwMenuInputsSet(merged);
       const title = document.getElementById('fw_form_title');
       if (title) title.textContent = '✏️ Ubah Log Food Waste';
       const btn = document.getElementById('fw_btn_cancel');
       if (btn) btn.classList.remove('hidden');
-      fwRenderMenuBadges(); fwUpdateLive();
+      fwUpdateSiklusBadge(r.tanggal); fwUpdateLive();
       const f = document.getElementById('fw_form');
       if (f) { try { f.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
     }
@@ -14104,6 +14203,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         const isQty = fwMethod === 'qty';
         const tabName = fwTab === 'harian' ? 'REKAP HARIAN' : fwTab === 'pekanan' ? 'REKAP PEKANAN' : 'REKAP BULANAN';
         const methodName = isQty ? 'Kuantitas (Gram/Kg)' : 'Persentase (%)';
+        const meta = fwReportMeta();
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet('FOOD WASTE');
 
@@ -14154,8 +14254,11 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         rptMerge(ws, 5, 1, 5, lastCol);
         rptPut(ws, 5, 1, 'Jenis Rekapitulasi: ' + tabName, { size: 10, h: 'center' });
         rptBorder(ws, 5, 1, 5, lastCol, 'box');
+        rptMerge(ws, 6, 1, 6, lastCol);
+        rptPut(ws, 6, 1, 'Tanggal: ' + meta.tanggalText + '  ·  Hari Siklus: ' + (meta.day ? 'Ke-' + meta.day : '-') + '  ·  Nama Menu: ' + (meta.menu || '-'), { size: 10, bold: true, h: 'center' });
+        rptBorder(ws, 6, 1, 6, lastCol, 'box');
 
-        let r = 7;
+        let r = 8;
         heads.forEach((h, i) => rptPut(ws, r, i + 1, h, { size: 10, bold: true, h: 'center' }));
         rptFill(ws, r, 1, r, lastCol, 'FFE0E7FF');
         rptBorder(ws, r, 1, r, lastCol, 'grid');
@@ -14212,6 +14315,21 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
           r++;
         }
 
+        // Blok tanda tangan standar 2 kolom
+        r += 1;
+        const mid = Math.max(2, Math.ceil(lastCol / 2));
+        rptMerge(ws, r, 1, r, mid);
+        rptPut(ws, r, 1, 'Petugas Food Waste', { size: 10, bold: true, h: 'center' });
+        rptMerge(ws, r, mid + 1, r, lastCol);
+        rptPut(ws, r, mid + 1, 'Kepala SPPG', { size: 10, bold: true, h: 'center' });
+        r += 3;
+        ws.getRow(r).height = 42;
+        rptMerge(ws, r, 1, r, mid);
+        rptPut(ws, r, 1, '(____________________________)', { size: 10, h: 'center' });
+        rptMerge(ws, r, mid + 1, r, lastCol);
+        rptPut(ws, r, mid + 1, '(____________________________)', { size: 10, h: 'center' });
+        r += 1;
+
         const colL = ws.getColumn(lastCol).letter;
         rptPage(ws, true, 'A1:' + colL + (r - 1));
         const s = (document.getElementById('fw_start') || {}).value || '';
@@ -14221,6 +14339,73 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       } catch (err) {
         console.error('Export Food Waste gagal', err);
         alert('Export Excel Food Waste gagal: ' + (err && err.message ? err.message : err));
+      }
+    }
+
+    async function exportFoodWasteWord() {
+      try {
+        const tableEl = document.getElementById(fwMethod === 'pct' ? 'fw_pct_table' : 'fw_qty_table');
+        if (!tableEl) { alert('Data tidak ditemukan'); return; }
+        const clone = tableEl.cloneNode(true);
+        clone.querySelectorAll('.hidden-print').forEach(el => el.remove());
+        clone.querySelectorAll('button').forEach(el => el.remove());
+        const meta = fwReportMeta();
+        const rows = fwFilteredRows();
+        const agg = fwAgg(rows);
+        const isQty = fwMethod === 'qty';
+        const methodName = isQty ? 'Kuantitas (Gram/Kg)' : 'Persentase (%)';
+        const tabName = fwTab === 'harian' ? 'REKAP HARIAN' : fwTab === 'pekanan' ? 'REKAP PEKANAN' : 'REKAP BULANAN';
+        const infoRow = (a, b) => '<tr><td style="border:none;padding:2px 4px;width:22%;font-weight:bold;">' + a +
+          '</td><td style="border:none;padding:2px 4px;width:2%;">:</td><td style="border:none;padding:2px 4px;">' + fwEsc(b || '-') + '</td></tr>';
+        const ringkasan = 'Total sisa ' + fwG(agg.sisa) + ' g (' + fwKg(agg.sisa) + ' kg) · ' + fwPct(agg.pct) + ' · ' + fwIndText(agg.pct);
+        // Margin kertas seragam: atas 2 cm, kiri/kanan/bawah 1 cm
+        const pageCss = 'size: 29.7cm 21.0cm; mso-page-orientation: landscape; margin: 2cm 1cm 1cm 1cm;';
+        const html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Food Waste (FM-SGR-SPPG-07.01)</title>
+        <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+        <style>
+          @page Section1 { ${pageCss} }
+          div.Section1 { page: Section1; }
+          body { font-family: 'Calibri', sans-serif; font-size: 10pt; line-height: 1.15; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid black; padding: 5px; font-size: 9pt; text-align: center; vertical-align: middle; }
+          th { background-color: #e2e8f0; font-weight: bold; }
+        </style>
+        </head>
+        <body>
+          <div class="Section1">
+          ${exportWordKop('FM-SGR-SPPG-07.01', 'dokumen', [], 'FOOD WASTE (SISA MAKANAN OMPRENG)', '00')}
+          <table style="width:100%;border:none;border-collapse:collapse;margin:0 0 10px 0;">
+            ${infoRow('Tanggal', meta.tanggalText)}
+            ${infoRow('Hari Siklus', meta.day ? 'Ke-' + meta.day : '-')}
+            ${infoRow('Nama Menu', meta.menu || '-')}
+            ${infoRow('Periode', fwPeriodText())}
+            ${infoRow('Metode Rekapitulasi', methodName)}
+            ${infoRow('Jenis Rekapitulasi', tabName)}
+            ${infoRow('Ringkasan', ringkasan)}
+            ${infoRow('No. Dokumen', fwDocNo() || '-')}
+          </table>
+          ${clone.innerHTML}
+          <table style="width:100%;table-layout:fixed;border-collapse:collapse;margin-top:18px;">
+            <colgroup><col style="width:50%"><col style="width:50%"></colgroup>
+            <tr>
+              <th style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:10pt;">Petugas Food Waste</th>
+              <th style="border:1px solid black;padding:5px;background:#f1f5f9;text-align:center;font-size:10pt;">Kepala SPPG</th>
+            </tr>
+            <tr>
+              <td style="border:1px solid black;padding:5px;height:70pt;vertical-align:bottom;text-align:center;">(____________________________)</td>
+              <td style="border:1px solid black;padding:5px;height:70pt;vertical-align:bottom;text-align:center;">(____________________________)</td>
+            </tr>
+          </table>
+          </div>
+        </body></html>`;
+        const blob = new Blob([exportBuildMhtml(html, [], 'dokumen')], { type: 'application/msword' });
+        const fname = 'FOOD WASTE_' + tabName + '_' + (isQty ? 'KUANTITAS' : 'PERSENTASE') + '_' + (meta.key || getLocalDateKey()) + '.doc';
+        exportDownloadBlob(blob, fname);
+      } catch (e) {
+        console.error('Export Word Food Waste gagal', e);
+        alert('Export Word Food Waste gagal: ' + (e && e.message ? e.message : e));
       }
     }
 
@@ -14234,16 +14419,14 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       if (!fwInited) {
         fwInited = true;
         fwTab = 'harian';
-        const tgl = document.getElementById('fw_tanggal');
-        if (tgl && !tgl.value) tgl.value = getLocalDateKey();
-        fwDefaultPeriod();
-        fwResetForm(true);
+        // Default tanggal = hari ini (WITA), lalu muat log tersimpan hari ini bila ada.
+        fwLoadDate(getLocalDateKey(), { render: false });
       } else {
         fwDefaultPeriod();
+        fwRenderMenuBadges();
       }
       fwSetMethod(m);
       fwSetTab(fwTab);
-      fwRenderMenuBadges();
       fwRenderAll();
       fwDayKey = getLocalDateKey();
       if (!fwDayTimer) {
@@ -14253,7 +14436,16 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       if (!fwRemoteLoaded && typeof window.fbGet === 'function') {
         fwRemoteLoaded = true;
         window.fbGet(FW_PATH).then(function (v) {
-          if (v) { fwMergeRemote(v); fwDefaultPeriod(); fwRenderAll(); }
+          if (v) {
+            fwMergeRemote(v);
+            // Bila form masih kosong, tampilkan log tersimpan untuk tanggal yang sedang dibuka.
+            if (!fwFormHasInput()) {
+              const tgl = document.getElementById('fw_tanggal');
+              if (tgl && tgl.value) fwLoadDate(tgl.value, { render: false });
+            }
+            fwDefaultPeriod();
+            fwRenderAll();
+          }
         }).catch(function (e) { console.warn('Sinkron Food Waste gagal', e); });
       }
     }
@@ -15915,15 +16107,19 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
   function fillEmpty() {
     var key = activeKey();
     SYNC_IDS.forEach(function (id) {
+      if (id === 'fw_tanggal') return; // Food Waste memakai default hari ini (lihat di bawah)
       var el = document.getElementById(id);
       if (el && !el.value && el.dataset.tglManual !== '1') el.value = key;
     });
     // Cooling (05.03) TIDAK diisi dari Tanggal Aktif: default-nya tanggal lokal
     // hari ini saat modul dibuka (lihat initPendinginan).
+    // Food Waste (07.01) juga default tanggal lokal hari ini saat halaman dimuat.
+    var fw = document.getElementById('fw_tanggal');
+    if (fw && !fw.value && fw.dataset.tglManual !== '1') fw.value = todayKey();
     updateUjiLabel();
   }
 
-  // Saat tab Food Waste dibuka, tanggal kosong diisi Tanggal Aktif Siklus Menu.
+  // Saat tab modul dibuka, tanggal kosong diisi Tanggal Aktif Siklus Menu.
   function wrapDateInit(name, dateId) {
     var orig = window[name];
     if (typeof orig !== 'function' || orig.__tglWrapped) return;
@@ -15939,7 +16135,6 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
   }
 
   function init() {
-    wrapDateInit('initFoodWaste', 'fw_tanggal');
     document.querySelectorAll('input[type="date"]').forEach(function (el) {
       if (SYNC_IDS.indexOf(el.id) !== -1 && !el.dataset.tglModule) {
         el.dataset.tglModule = 'sync';
