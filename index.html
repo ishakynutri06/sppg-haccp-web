@@ -435,6 +435,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       </div>
 
       <nav class="space-y-1.5 text-xs font-semibold flex-1">
+        <button id="nav-profil-sppg" onclick="switchTab('profil-sppg')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🏢</span> <span>SPPG Profile &amp; Organizational Structure</span></button>
         <button id="nav-overview" onclick="switchTab('overview')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">📊</span> <span>Overview Dashboard</span></button>
         <button id="nav-sasaran-didik" onclick="switchTab('sasaran-didik')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🧒</span> <span>Pendataan Sasaran Peserta Didik (FM-SGR-SPPG-01.01)</span></button>
         <button id="nav-frekuensi-bahan" onclick="switchTab('frekuensi-bahan')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white hover:translate-x-1 transition-all duration-300"><span class="text-base drop-shadow-md">🥬</span> <span>Frekuensi Bahan (FM-SGR-SPPG-01.03)</span></button>
@@ -460,8 +461,85 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
   <!-- MAIN CONTENT AREA -->
   <main class="flex-1 h-[calc(100vh-60px)] md:h-screen overflow-y-auto p-4 md:p-8 space-y-8 relative z-10 w-full pb-24 md:pb-8">
 
+    <!-- SPPG PROFILE & ORGANIZATIONAL STRUCTURE -->
+    <section id="sec-profil-sppg" class="tab-content space-y-6">
+      <div class="bg-gradient-to-r from-[#0e5c4a] via-emerald-800 to-emerald-950 p-6 md:p-8 rounded-3xl shadow-xl shadow-emerald-900/20 text-white border border-emerald-700/40 relative overflow-hidden">
+        <div class="absolute -right-16 -top-20 w-72 h-72 bg-amber-400/10 rounded-full blur-2xl"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div>
+            <div class="inline-flex items-center gap-2 bg-amber-400/15 border border-amber-300/30 px-3 py-1.5 rounded-full text-amber-100 text-[10px] font-bold tracking-widest uppercase mb-3">Identitas &amp; Struktur Organisasi</div>
+            <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">SPPG PROFILE &amp; ORGANIZATIONAL STRUCTURE</h2>
+            <p class="text-sm text-emerald-100/85 mt-2 max-w-2xl leading-relaxed">Kelola identitas SPPG dan pejabat struktural. Nilai yang disimpan digunakan pada kop laporan, blok tanda tangan, dan pilihan petugas harian.</p>
+          </div>
+          <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3 text-xs text-emerald-50 backdrop-blur-sm shrink-0">
+            <div class="font-bold text-amber-200 mb-1">Offline-first &amp; Firebase</div>
+            <div>Logo maksimal 200 × 200 px · NIP/NIK opsional</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm p-5 md:p-6 xl:col-span-1">
+          <h3 class="text-base font-extrabold text-[#0e5c4a] flex items-center gap-2 mb-5"><span class="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center">🖼️</span> Logo &amp; Identitas SPPG</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2 gap-4">
+            <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+              <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-3">Logo Yayasan</label>
+              <div class="h-32 rounded-xl bg-white border-2 border-dashed border-emerald-200 flex items-center justify-center overflow-hidden p-3">
+                <img id="sppg_logo_yayasan_preview" alt="Pratinjau logo yayasan" class="hidden max-h-full max-w-full object-contain">
+                <span id="sppg_logo_yayasan_placeholder" class="text-xs text-slate-400 text-center font-semibold">Belum ada logo</span>
+              </div>
+              <input id="sppg_logo_yayasan_file" type="file" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="sppgCompressLogo(this, 'logoYayasan')">
+              <div class="flex gap-2 mt-3">
+                <button type="button" onclick="document.getElementById('sppg_logo_yayasan_file').click()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl px-3 py-2 text-xs font-bold transition">Unggah</button>
+                <button type="button" onclick="sppgRemoveLogo('logoYayasan')" class="px-3 py-2 rounded-xl border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 text-xs font-bold transition">Hapus</button>
+              </div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+              <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-3">Logo BGN</label>
+              <div class="h-32 rounded-xl bg-white border-2 border-dashed border-amber-200 flex items-center justify-center overflow-hidden p-3">
+                <img id="sppg_logo_bgn_preview" alt="Pratinjau logo BGN" class="hidden max-h-full max-w-full object-contain">
+                <span id="sppg_logo_bgn_placeholder" class="text-xs text-slate-400 text-center font-semibold">Belum ada logo</span>
+              </div>
+              <input id="sppg_logo_bgn_file" type="file" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="sppgCompressLogo(this, 'logoBGN')">
+              <div class="flex gap-2 mt-3">
+                <button type="button" onclick="document.getElementById('sppg_logo_bgn_file').click()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white rounded-xl px-3 py-2 text-xs font-bold transition">Unggah</button>
+                <button type="button" onclick="sppgRemoveLogo('logoBGN')" class="px-3 py-2 rounded-xl border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 text-xs font-bold transition">Hapus</button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 space-y-4">
+            <div>
+              <label for="sppg_nama" class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Nama SPPG</label>
+              <input id="sppg_nama" type="text" oninput="window.sppgProfileDirty = true" class="w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-3 text-sm font-bold text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="Nama lengkap SPPG">
+            </div>
+            <div>
+              <label for="sppg_alamat" class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Alamat Lengkap SPPG</label>
+              <textarea id="sppg_alamat" rows="4" oninput="window.sppgProfileDirty = true" class="w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-3 text-sm font-semibold text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition resize-y" placeholder="Jalan, nomor, kelurahan, kecamatan, kabupaten/kota, provinsi"></textarea>
+            </div>
+          </div>
+          <p id="sppg_profile_status" class="mt-4 text-xs font-semibold text-slate-500 min-h-[18px]" aria-live="polite"></p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-emerald-100 shadow-sm p-5 md:p-6 xl:col-span-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <h3 class="text-base font-extrabold text-[#0e5c4a] flex items-center gap-2"><span class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center">👥</span> Struktur Organisasi</h3>
+              <p class="text-xs text-slate-500 mt-1 ml-10">Nama dapat dipilih otomatis pada field petugas dan tanda tangan yang sesuai.</p>
+            </div>
+            <span class="w-fit rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[10px] font-extrabold text-emerald-700 uppercase tracking-wider">9 Posisi Struktural</span>
+          </div>
+          <div id="sppg_structure_grid" class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+
+      <div class="sticky bottom-4 z-20 bg-white/95 backdrop-blur border border-emerald-200 rounded-2xl shadow-lg shadow-emerald-900/10 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="text-xs text-slate-500 leading-relaxed"><span class="font-bold text-[#0e5c4a]">Penyimpanan terkonfirmasi.</span> Perubahan hanya tersimpan setelah konfirmasi dan tidak mengubah susunan modul HACCP.</div>
+        <button type="button" onclick="sppgSaveProfile()" class="bg-gradient-to-r from-[#0e5c4a] to-emerald-700 hover:from-emerald-800 hover:to-emerald-900 text-white font-extrabold px-6 py-3 rounded-xl text-xs shadow-lg shadow-emerald-900/20 transition shrink-0">Simpan Profil SPPG &amp; Struktur</button>
+      </div>
+    </section>
+
     <!-- OVERVIEW DASHBOARD -->
-    <section id="sec-overview" class="tab-content space-y-6">
+    <section id="sec-overview" class="tab-content space-y-6 hidden">
       <div class="bg-gradient-to-r from-slate-900 via-indigo-900 to-blue-900 p-6 md:p-8 rounded-3xl shadow-xl shadow-blue-900/20 text-white border-0 ring-1 ring-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div class="space-y-2 relative z-10 w-full md:w-auto">
@@ -1197,13 +1275,28 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
                 <label class="block font-extrabold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Tanggal Data:</label>
                 <input type="date" id="pmb_tanggal" onchange="pmbSetTanggal(this.value)" class="border-2 border-indigo-200 rounded-xl p-2 text-sm font-bold bg-white text-slate-800">
               </div>
-              <button type="button" onclick="pmbSeed()" class="bg-white hover:bg-indigo-100 border border-indigo-300 text-indigo-700 font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition-all">📥 Muat Data Awal (lampiran)</button>
-              <button type="button" onclick="pmbExportExcel()" class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-500/30 transition-all">📊 Export Excel</button>
+              <button type="button" onclick="pmbSeed()" class="bg-white hover:bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition-all">Muat Data Awal (lampiran)</button>
+              <button type="button" onclick="pmbSaveMasterCounts()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition-all">Simpan Angka ke Master</button>
+              <button type="button" onclick="pmbExportWord()" class="bg-white hover:bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition-all">Export Word</button>
+              <button type="button" onclick="printExport(pmbExportExcel)" class="bg-white hover:bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition-all">Cetak</button>
+              <button type="button" onclick="pmbExportExcel()" class="bg-gradient-to-r from-[#0e5c4a] to-[#164e3f] hover:from-[#164e3f] hover:to-black text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-lg shadow-emerald-900/20 transition-all">Export Excel</button>
             </div>
           </div>
 
+          <div id="pmb_loading" class="hidden rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-800">Memuat log tanggal terpilih. Jika tanggal belum memiliki log, angka baku master akan disalin otomatis.</div>
           <div id="pmb_stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs"></div>
           <div id="pmb_stats2" class="text-[11px] font-bold text-slate-600"></div>
+          <div class="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 space-y-3">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+              <div>
+                <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-900">Keterangan Umum Tanggal Ini</div>
+                <p class="text-[10px] font-semibold text-amber-800/80">Ringkasan libur per satuan, kelas, dan kategori dibuat otomatis. Keterangan ini hanya tersimpan pada tanggal terpilih.</p>
+              </div>
+              <button type="button" onclick="pmbSaveRemarks()" class="bg-[#e8a33d] hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-sm transition-all">Simpan Keterangan</button>
+            </div>
+            <textarea id="pmb_keterangan" rows="2" maxlength="2000" placeholder="Keterangan tambahan, misalnya jadwal kegiatan atau informasi pengiriman..." class="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none"></textarea>
+            <div id="pmb_holiday_summary" class="text-[11px] font-semibold leading-relaxed text-slate-700"></div>
+          </div>
 
           <form id="pmb_form" onsubmit="event.preventDefault(); pmbSubmit();" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
             <div id="pmb_form_title" class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">✍️ Tambah Sekolah / Posyandu</div>
@@ -1266,15 +1359,44 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           </form>
 
           <style>
-            .pmb-cell{width:100%;min-width:56px;border:1px solid #cbd5e1;border-radius:6px;padding:4px 6px;font-weight:700;font-size:12px;background:#fff;text-align:center;color:#1e293b}
+            .pmb-cell{width:100%;min-width:58px;border:1px solid #cbd5e1;border-radius:8px;padding:5px 6px;font-weight:700;font-size:12px;background:#fff;text-align:center;color:#1e293b;transition:border-color .15s,box-shadow .15s}
             .pmb-cell.t{text-align:left;min-width:150px}
-            .pmb-cell:focus{outline:2px solid #6366f1;background:#eef2ff}
-            .pmb-cell.warn{background:#fef3c7;border-color:#f59e0b}
-            #pmb_tables table{border-collapse:collapse}
-            #pmb_tables th,#pmb_tables td{border:1px solid #cbd5e1;padding:6px 8px;font-size:12px}
-            #pmb_tables th{background:#dbeafe;color:#1e293b;font-weight:800;text-align:center}
-            #pmb_tables td.pmb-calc{text-align:center;font-weight:900;background:#f8fafc}
-            #pmb_tables tr.pmb-total td{background:#e2e8f0;font-weight:900;text-align:center}
+            .pmb-cell:focus{outline:0;border-color:#0e5c4a;box-shadow:0 0 0 2px rgba(14,92,74,.12);background:#f0fdf4}
+            .pmb-cell.warn{background:#fef3c7;border-color:#e8a33d}
+            #pmb_tables{display:grid;gap:20px}
+            #pmb_tables .pmb-table-card{border:1px solid #dbe5e1;border-radius:20px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.06);overflow:hidden}
+            #pmb_tables .pmb-card-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:linear-gradient(100deg,#0e5c4a,#164e3f);color:#fff}
+            #pmb_tables .pmb-card-title{font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase}
+            #pmb_tables .pmb-card-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+            #pmb_tables table{border-collapse:separate;border-spacing:0;width:100%}
+            #pmb_tables th,#pmb_tables td{border:0;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:8px 9px;font-size:12px;background:#fff;transition:background .15s}
+            #pmb_tables th{background:#e7f1ed;color:#134e3f;font-weight:900;text-align:center;position:sticky;top:0;z-index:1}
+            #pmb_tables th:last-child,#pmb_tables td:last-child{border-right:0}
+            #pmb_tables tbody tr:not(.pmb-total):hover td{background:#f7fbf9}
+            #pmb_tables tbody tr:last-child td{border-bottom:0}
+            #pmb_tables td.pmb-calc{text-align:center;font-weight:900;background:#f1f6f3;color:#0e5c4a}
+            #pmb_tables tr.pmb-total td{background:#0e5c4a;color:#fff;font-weight:900;text-align:center}
+            #pmb_tables .pmb-unit-name{font-weight:900;color:#0f172a;line-height:1.25}
+            #pmb_tables .pmb-micro{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:9px;background:#f1f5f9;border:1px solid #e2e8f0;font-size:10px;font-weight:800;color:#475569}
+            #pmb_tables .pmb-grade-grid{display:grid;grid-template-columns:repeat(3,minmax(54px,1fr));gap:5px;min-width:180px}
+            #pmb_tables .pmb-grade-grid.paud{grid-template-columns:1fr}
+            #pmb_tables .pmb-grade{display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px;border:1px solid #dbe5e1;border-radius:10px;background:#f8faf9}
+            #pmb_tables .pmb-grade.is-off{border-color:#f2c27b;background:#fff7e8}
+            #pmb_tables .pmb-remark{min-width:210px;max-width:310px;text-align:left;white-space:pre-line;font-size:10px;font-weight:700;color:#92400e;line-height:1.35}
+            #pmb_tables .pmb-remark.is-empty{color:#94a3b8;font-weight:600}
+            #pmb_tables .pmb-holiday-pill{display:inline-flex;align-items:center;justify-content:center;gap:5px;border-radius:999px;padding:5px 9px;border:1px solid #bbd7ca;background:rgba(255,255,255,.12);color:#fff;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap}
+            #pmb_tables .pmb-holiday-pill:hover{background:rgba(255,255,255,.22)}
+            #pmb_tables .pmb-holiday-pill.is-off{background:#e8a33d;border-color:#f6cf92;color:#3b2608}
+            #pmb_tables .pmb-holiday-pill.small{border-color:#cbd5e1;background:#f8fafc;color:#475569;padding:3px 7px;font-size:9px}
+            #pmb_tables .pmb-holiday-pill.small.is-off{background:#fff1d6;border-color:#e8a33d;color:#92400e}
+            #pmb_tables .pmb-add-btn{border-radius:999px;padding:6px 11px;background:#e8a33d;color:#fff;font-size:11px;font-weight:900;box-shadow:0 3px 10px rgba(232,163,61,.2)}
+            #pmb_tables .pmb-add-btn:hover{background:#d99028}
+            #pmb_tables .pmb-icon-btn{padding:5px 8px;border:1px solid #e2e8f0;border-radius:9px;background:#fff;color:#b91c1c;font-weight:900}
+            #pmb_tables .pmb-icon-btn:hover{background:#fef2f2;border-color:#fecaca}
+            #pmb_tables .pmb-status-badge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 7px;font-size:9px;font-weight:900;background:#dcfce7;color:#166534}
+            #pmb_tables .pmb-status-badge.is-off{background:#fff1d6;color:#92400e}
+            @media(max-width:640px){#pmb_tables .pmb-card-head{padding:12px}#pmb_tables th,#pmb_tables td{padding:7px}#pmb_tables .pmb-remark{min-width:180px}}
+            @media print{#pmb_tables{display:block}#pmb_tables .pmb-table-card{break-inside:auto;box-shadow:none;border-color:#94a3b8;border-radius:0;margin-bottom:14px}#pmb_tables .pmb-card-head{background:#fff;color:#000;padding:8px;border-bottom:1px solid #000}#pmb_tables .pmb-card-actions{display:none}#pmb_tables th{position:static;background:#e2e8f0!important;color:#000}#pmb_tables td.pmb-calc{background:#f1f5f9!important;color:#000}#pmb_tables tr.pmb-total td{background:#e2e8f0!important;color:#000}#pmb_tables .pmb-holiday-pill{display:none}#pmb_tables tr{break-inside:avoid}}
           </style>
           <div class="flex flex-col md:flex-row md:items-center gap-3 text-xs">
             <input type="text" id="pmb_q" oninput="pmbRenderTable()" placeholder="🔎 Cari nama..." class="flex-1 border-2 border-slate-200 rounded-xl p-2.5 text-xs font-bold bg-white text-slate-800">
@@ -2302,7 +2424,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     const keys = [
       'sppg_master_bahan_weeks', 'sppg_siklus_menu_weeks', 'sppg_frequency_map',
       'sppg_frequency_details', 'sppg_allergens_found', 'sppg_siklus_menu_matrix', 'sppg_sasaran_didik', 'sppg_penerima_manfaat',
-      'sppg_organoleptik_ref', 'sppg_siklus_period'
+      'sppg_sasaran_master', 'sppg_profil_identitas', 'sppg_organoleptik_ref', 'sppg_siklus_period'
     ];
 
     let loadedCount = 0;
@@ -2373,7 +2495,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       if (dateKey) { window.suhuDirty[dateKey] = true; return; }
       if (window.suhuRenderedDate) window.suhuDirty[window.suhuRenderedDate] = true;
     }
-    window.currentActiveTab = 'overview';
+    window.currentActiveTab = 'profil-sppg';
 
     // FUNGSI MENDAPATKAN JAM REALTIME DALAM FORMAT HH:mm
     function getRealtimeTimeString() {
@@ -3161,17 +3283,25 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const shownDoc = (docValue === undefined && typeof docNoResolve === 'function') ? docNoResolve(code)
         : (docValue === undefined ? code : docValue);
       let logoHtml = '';
-      const logo = (typeof rptLogoSrc === 'function') ? rptLogoSrc() : null;
-      if (logo) {
-        files.push({ name: 'logo.png', type: 'image/png', dataUrl: logo });
-        logoHtml = '<img src="' + docName + '_files/logo.png" width="136" height="62" style="width:3.6cm;height:1.63cm;">';
+      const sources = (typeof rptLogoSources === 'function') ? rptLogoSources() : [];
+      if (sources.length) {
+        logoHtml = '<div style="text-align:center;white-space:nowrap;">' + sources.map((source, index) => {
+          const type = String(source.src).match(/^data:([^;]+)/);
+          const ext = type && type[1] === 'image/webp' ? 'webp' : 'png';
+          const name = sources.length > 1 ? 'logo_' + (index + 1) + '.' + ext : 'logo.' + ext;
+          files.push({ name, type: type ? type[1] : 'image/png', dataUrl: source.src });
+          return '<img src="' + docName + '_files/' + name + '" alt="Logo SPPG" style="height:1.35cm;width:auto;max-width:2.3cm;object-fit:contain;margin:0 2px;vertical-align:middle;">';
+        }).join('') + '</div>';
       }
+      const profileName = (typeof rptSppgName === 'function') ? rptSppgName() : 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI';
+      const profileAddress = (typeof rptSppgAddress === 'function') ? rptSppgAddress() : '';
+      const nameHtml = sppgEsc(profileName) + (profileAddress ? '<div style="font-weight:normal;font-size:8.5pt;line-height:1.05;">' + sppgEsc(profileAddress) + '</div>' : '');
       const b = 'border:1px solid black;padding:3px 4px;vertical-align:middle;';
       const trh = 'height:0.95cm;'; // tinggi tiap baris kop = 27 pt (sama dengan Excel)
       const f = 'text-align:center;font-weight:bold;font-size:12pt;';
       return '<table style="width:100%;border-collapse:collapse;margin:0 0 12px 0;">' +
         '<tr style="' + trh + '"><td rowspan="3" style="' + b + 'width:18%;text-align:center;">' + logoHtml + '</td>' +
-        '<td style="' + b + f + '">SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</td>' +
+        '<td style="' + b + f + '">' + nameHtml + '</td>' +
         '<td style="' + b + 'width:14%;">No. dokumen</td><td style="' + b + 'width:18%;">' + (shownDoc ? ': ' + shownDoc : '') + '</td></tr>' +
         '<tr style="' + trh + '"><td style="' + b + f + '">FORMULIR</td><td style="' + b + '">No. revisi</td><td style="' + b + '">: ' + revKop + '</td></tr>' +
         '<tr style="' + trh + '"><td style="' + b + f + '">' + judul + '</td><td style="' + b + '">Tanggal</td><td style="' + b + '">: ' + tglKop + '</td></tr>' +
@@ -4101,7 +4231,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           ${kopCode ? exportWordKop(kopCode, docName, files, wrapperId === 'wrapper_suhu' ? suhuKopJudul() : undefined)
             : isMasterBahan ? exportWordKop('FM-SGR-DST', docName, files, 'MASTER BAHAN', '00', (typeof docNoGet === 'function' ? docNoGet('MASTER') : ''))
             : `<div class="header">
-            <h2 style="margin:0;">NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI</h2>
+            <h2 style="margin:0;">NAMA SPPG: ${sppgEsc(rptSppgName())}${rptSppgAddress() ? '<br><span style="font-size:9pt;font-weight:normal;">' + sppgEsc(rptSppgAddress()) + '</span>' : ''}</h2>
             <h3 style="margin:5px 0;">TANGGAL: ${dateText}</h3>
             <h3 style="margin:5px 0;">${title}</h3>
           </div>`}
@@ -4193,7 +4323,11 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
           } else if (isMasterBahan) {
             ws.addRow([]); ws.addRow([]); ws.addRow([]); ws.addRow([]); // area kop baku (3 baris) + jarak
           } else {
-            ws.addRow(['NAMA SPPG: SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI']);
+            ws.addRow(['NAMA SPPG: ' + rptSppgKopText()]);
+            if (rptSppgAddress()) {
+              ws.getRow(1).height = 30;
+              ws.getCell(1, 1).alignment = { vertical: 'middle', wrapText: true };
+            }
             ws.addRow(['TANGGAL: ' + dateText]);
             ws.addRow([title]);
             ws.addRow([]);
@@ -4372,12 +4506,263 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
     // Dipakai oleh: FM-SGR-SPPG-01.03, 01.04, 06.01, 21.01, 22.01
     // (Pemantauan Suhu 03.05 sementara tetap memakai export lama - menunggu rincian format)
     // =====================================================================
-    const RPT_SPPG_NAME = 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI';
+    const SPPG_PROFILE_PATH = 'sppg_profil_identitas';
+    const SPPG_PROFILE_CACHE = 'sppg_profil_identitas_cache';
+    const SPPG_DEFAULT_NAME = 'SPPG PANGKAJENE DAN KEPULAUAN SEGERI SEGERI';
+    const SPPG_POSITIONS = [
+      { key: 'kepala_sppg', label: 'Kepala SPPG', en: 'Head of SPPG' },
+      { key: 'pengawas_gizi', label: 'Pengawas Gizi', en: 'Nutrition Supervisor' },
+      { key: 'pengawas_keuangan', label: 'Pengawas Keuangan', en: 'Financial Supervisor' },
+      { key: 'asisten_lapangan', label: 'Asisten Lapangan', en: 'Field Assistant' },
+      { key: 'jurutama_masak', label: 'Jurutama Masak / Chef', en: 'Head Cook / Chef' },
+      { key: 'koordinator_persiapan', label: 'Koordinator Persiapan', en: 'Preparation Coordinator' },
+      { key: 'koordinator_pengolahan', label: 'Koordinator Pengolahan', en: 'Processing Coordinator' },
+      { key: 'koordinator_pemorsian', label: 'Koordinator Pemorsian', en: 'Portioning Coordinator' },
+      { key: 'koordinator_pencucian_ompreng', label: 'Koordinator Pencucian Ompreng', en: 'Tray Washing Coordinator' }
+    ];
+    const SPPG_STAFF_FIELDS = {
+      pm_pemeriksa: 'pengawas_gizi',
+      suhu_pemeriksa: 'asisten_lapangan',
+      suhu_supervisor: 'pengawas_gizi',
+      suhu_penyetuju: 'kepala_sppg',
+      ks_ttd_kiri_nama: 'pengawas_gizi',
+      ks_ttd_kanan_nama: 'jurutama_masak',
+      pend_petugas: 'asisten_lapangan',
+      pend_ttd_koordinator: 'koordinator_pemorsian',
+      pend_ttd_ahli_gizi: 'pengawas_gizi',
+      pend_ttd_kepala_sppg: 'kepala_sppg',
+      uji_relawan_nama: 'jurutama_masak',
+      uji_pengawas_nama: 'pengawas_gizi'
+    };
+    window.sppgPendingLogos = {};
+    window.sppgPendingLogoSizes = {};
+    window.sppgProfileDirty = false;
+
+    function sppgEsc(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+
+    function getSppgProfile() {
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem(SPPG_PROFILE_CACHE) || 'null'); } catch (e) {}
+      const cloud = window.dbCache && window.dbCache[SPPG_PROFILE_PATH];
+      const raw = cloud && typeof cloud === 'object' ? cloud : (cached && typeof cached === 'object' ? cached : {});
+      const structure = {};
+      SPPG_POSITIONS.forEach(pos => {
+        const item = raw.struktur && raw.struktur[pos.key];
+        structure[pos.key] = { nama: String(item && item.nama || '').trim(), nip: String(item && item.nip || '').trim() };
+      });
+      return {
+        nama: String(raw.nama || SPPG_DEFAULT_NAME).trim() || SPPG_DEFAULT_NAME,
+        alamat: String(raw.alamat || '').trim(),
+        logoYayasan: String(raw.logoYayasan || ''),
+        logoBGN: String(raw.logoBGN || ''),
+        logoSizes: raw.logoSizes && typeof raw.logoSizes === 'object' ? raw.logoSizes : {},
+        struktur: structure
+      };
+    }
+
+    function sppgStaffName(role) {
+      const profile = getSppgProfile();
+      return profile.struktur[role] ? profile.struktur[role].nama : '';
+    }
+
+    function renderProfilSppg() {
+      const profile = getSppgProfile();
+      if (!window.sppgProfileDirty) {
+        const nama = document.getElementById('sppg_nama');
+        const alamat = document.getElementById('sppg_alamat');
+        if (nama) nama.value = profile.nama;
+        if (alamat) alamat.value = profile.alamat;
+        const grid = document.getElementById('sppg_structure_grid');
+        if (grid) grid.innerHTML = SPPG_POSITIONS.map((pos, index) => {
+          const item = profile.struktur[pos.key];
+          return '<article class="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50/80 p-4 shadow-sm hover:shadow-md hover:border-emerald-200 transition">' +
+            '<div class="flex items-start gap-3 mb-4">' +
+              '<span class="w-8 h-8 rounded-xl shrink-0 bg-[#0e5c4a] text-white text-xs font-extrabold flex items-center justify-center shadow-sm">' + String(index + 1).padStart(2, '0') + '</span>' +
+              '<div class="min-w-0"><h4 class="text-sm font-extrabold text-slate-800 leading-snug">' + sppgEsc(pos.label) + '</h4><p class="text-[10px] font-semibold text-slate-400 mt-0.5 leading-snug">' + sppgEsc(pos.en) + '</p></div>' +
+            '</div>' +
+            '<div class="space-y-3">' +
+              '<div><label for="sppg_staff_' + pos.key + '_nama" class="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">Nama Lengkap</label>' +
+              '<input id="sppg_staff_' + pos.key + '_nama" data-sppg-role="' + pos.key + '" type="text" value="' + sppgEsc(item.nama) + '" oninput="window.sppgProfileDirty = true" autocomplete="off" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition" placeholder="Ketik nama lengkap"></div>' +
+              '<div><label for="sppg_staff_' + pos.key + '_nip" class="block text-[10px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">NIP / NIK <span class="font-medium normal-case text-slate-400">(opsional)</span></label>' +
+              '<input id="sppg_staff_' + pos.key + '_nip" data-sppg-role="' + pos.key + '" type="text" inputmode="numeric" value="' + sppgEsc(item.nip) + '" oninput="window.sppgProfileDirty = true" autocomplete="off" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-700 focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition" placeholder="Nomor induk pegawai / kependudukan"></div>' +
+            '</div></article>';
+        }).join('');
+      }
+      sppgSyncLogoPreview();
+      sppgApplyStaffValues();
+    }
+
+    function sppgSyncLogoPreview() {
+      const profile = getSppgProfile();
+      [['logoYayasan', 'yayasan'], ['logoBGN', 'bgn']].forEach(([key, suffix]) => {
+        const pending = Object.prototype.hasOwnProperty.call(window.sppgPendingLogos, key);
+        const src = pending ? window.sppgPendingLogos[key] : profile[key];
+        const img = document.getElementById('sppg_logo_' + suffix + '_preview');
+        const placeholder = document.getElementById('sppg_logo_' + suffix + '_placeholder');
+        if (!img || !placeholder) return;
+        img.src = src || '';
+        img.classList.toggle('hidden', !src);
+        placeholder.classList.toggle('hidden', !!src);
+      });
+    }
+
+    function sppgCompressLogo(input, key) {
+      const file = input && input.files && input.files[0];
+      if (!file) return;
+      if (!/^image\/(png|jpeg|webp)$/.test(file.type || '')) {
+        input.value = '';
+        const status = document.getElementById('sppg_profile_status');
+        if (status) status.textContent = 'Format logo harus PNG, JPG, atau WebP.';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          const scale = Math.min(1, 200 / image.naturalWidth, 200 / image.naturalHeight);
+          const width = Math.max(1, Math.round(image.naturalWidth * scale));
+          const height = Math.max(1, Math.round(image.naturalHeight * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(image, 0, 0, width, height);
+          window.sppgPendingLogos[key] = canvas.toDataURL('image/png');
+          window.sppgPendingLogoSizes[key] = { width, height };
+          window.sppgProfileDirty = true;
+          sppgSyncLogoPreview();
+          const status = document.getElementById('sppg_profile_status');
+          if (status) status.textContent = 'Logo siap: ' + width + ' × ' + height + ' px. Klik simpan untuk menyimpan perubahan.';
+          input.value = '';
+        };
+        image.onerror = () => {
+          input.value = '';
+          const status = document.getElementById('sppg_profile_status');
+          if (status) status.textContent = 'Logo tidak dapat dibaca. Silakan pilih file gambar lain.';
+        };
+        image.src = String(reader.result || '');
+      };
+      reader.onerror = () => { input.value = ''; };
+      reader.readAsDataURL(file);
+    }
+
+    function sppgRemoveLogo(key) {
+      window.sppgPendingLogos[key] = '';
+      delete window.sppgPendingLogoSizes[key];
+      window.sppgProfileDirty = true;
+      sppgSyncLogoPreview();
+      const status = document.getElementById('sppg_profile_status');
+      if (status) status.textContent = 'Logo akan dihapus setelah profil disimpan.';
+    }
+
+    function sppgCollectProfile() {
+      const current = getSppgProfile();
+      const struktur = {};
+      SPPG_POSITIONS.forEach(pos => {
+        const nama = document.getElementById('sppg_staff_' + pos.key + '_nama');
+        const nip = document.getElementById('sppg_staff_' + pos.key + '_nip');
+        struktur[pos.key] = { nama: String(nama ? nama.value : current.struktur[pos.key].nama).trim(), nip: String(nip ? nip.value : current.struktur[pos.key].nip).trim() };
+      });
+      const logoSizes = Object.assign({}, current.logoSizes);
+      Object.keys(window.sppgPendingLogoSizes).forEach(key => { logoSizes[key] = window.sppgPendingLogoSizes[key]; });
+      Object.keys(window.sppgPendingLogos).forEach(key => { if (!window.sppgPendingLogos[key]) delete logoSizes[key]; });
+      return {
+        nama: String((document.getElementById('sppg_nama') || {}).value || '').trim(),
+        alamat: String((document.getElementById('sppg_alamat') || {}).value || '').trim(),
+        logoYayasan: Object.prototype.hasOwnProperty.call(window.sppgPendingLogos, 'logoYayasan') ? window.sppgPendingLogos.logoYayasan : current.logoYayasan,
+        logoBGN: Object.prototype.hasOwnProperty.call(window.sppgPendingLogos, 'logoBGN') ? window.sppgPendingLogos.logoBGN : current.logoBGN,
+        logoSizes,
+        struktur
+      };
+    }
+
+    async function sppgSaveProfile() {
+      const data = sppgCollectProfile();
+      const status = document.getElementById('sppg_profile_status');
+      if (!data.nama) {
+        if (status) status.textContent = 'Nama SPPG wajib diisi sebelum menyimpan.';
+        const nama = document.getElementById('sppg_nama');
+        if (nama) nama.focus();
+        return;
+      }
+      if (typeof pmbConfirm !== 'function') return;
+      const ok = await pmbConfirm({
+        title: 'Konfirmasi Simpan Profil SPPG',
+        html: '<p>Simpan identitas dan <strong>' + SPPG_POSITIONS.filter(pos => data.struktur[pos.key].nama).length + ' nama struktural</strong>?</p><p class="text-xs text-slate-500">Data tersimpan di perangkat dan dikirim ke Firebase node <strong>sppg_profil_identitas</strong>. Field tanda tangan yang sudah diisi manual tidak akan ditimpa.</p>',
+        ok: 'Ya, Simpan Profil'
+      });
+      if (!ok) return;
+      try {
+        localStorage.setItem(SPPG_PROFILE_CACHE, JSON.stringify(data));
+        window.dbCache[SPPG_PROFILE_PATH] = JSON.parse(JSON.stringify(data));
+        window.sppgPendingLogos = {};
+        window.sppgPendingLogoSizes = {};
+        window.sppgProfileDirty = false;
+        renderProfilSppg();
+        if (status) status.textContent = 'Profil tersimpan di perangkat.';
+        if (typeof window.fbSet === 'function') {
+          await window.fbSet(SPPG_PROFILE_PATH, data);
+          if (status) status.textContent = 'Profil berhasil disimpan dan tersinkronisasi dengan Firebase.';
+        } else if (status) status.textContent = 'Profil tersimpan offline. Firebase akan disinkronkan setelah koneksi tersedia.';
+      } catch (error) {
+        console.error('Simpan profil SPPG gagal', error);
+        if (status) status.textContent = 'Profil tersimpan di perangkat, tetapi sinkronisasi Firebase belum berhasil.';
+      }
+    }
+
+    function sppgApplyStaffValues() {
+      const list = document.getElementById('sppg_staff_list');
+      if (list) {
+        const profile = getSppgProfile();
+        list.innerHTML = SPPG_POSITIONS.filter(pos => profile.struktur[pos.key].nama).map(pos => '<option value="' + sppgEsc(profile.struktur[pos.key].nama) + '">' + sppgEsc(pos.label) + '</option>').join('');
+      }
+      Object.keys(SPPG_STAFF_FIELDS).forEach(id => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.setAttribute('list', 'sppg_staff_list');
+        if (input.dataset.sppgTouched !== '1' && (!input.value || input.dataset.sppgAuto === '1')) {
+          const name = sppgStaffName(SPPG_STAFF_FIELDS[id]);
+          if (name) { input.value = name; input.dataset.sppgAuto = '1'; }
+          else if (input.dataset.sppgAuto === '1') { input.value = ''; delete input.dataset.sppgAuto; }
+        }
+      });
+    }
+
+    function rptSppgName() { return getSppgProfile().nama || SPPG_DEFAULT_NAME; }
+    function rptSppgAddress() { return getSppgProfile().alamat || ''; }
+    function rptSppgKopText() { return rptSppgName() + (rptSppgAddress() ? '\n' + rptSppgAddress() : ''); }
+    function rptBgnLogoSrc() { return getSppgProfile().logoBGN || ''; }
+    function rptLogoSources() {
+      const profile = getSppgProfile();
+      const sources = [];
+      if (profile.logoYayasan) sources.push({ src: profile.logoYayasan, ratio: profile.logoSizes.logoYayasan ? profile.logoSizes.logoYayasan.width / profile.logoSizes.logoYayasan.height : 1 });
+      if (profile.logoBGN) sources.push({ src: profile.logoBGN, ratio: profile.logoSizes.logoBGN ? profile.logoSizes.logoBGN.width / profile.logoSizes.logoBGN.height : 1 });
+      if (!sources.length) {
+        const fallback = document.querySelector('img[alt^="Logo Berkah"]');
+        if (fallback && fallback.src && fallback.src.indexOf('data:image') === 0) sources.push({ src: fallback.src, ratio: 269 / 122 });
+      }
+      return sources;
+    }
+
+    document.addEventListener('focusin', event => { if (SPPG_STAFF_FIELDS[event.target.id]) sppgApplyStaffValues(); });
+    document.addEventListener('input', event => { if (SPPG_STAFF_FIELDS[event.target.id]) event.target.dataset.sppgTouched = '1'; });
+    document.addEventListener('click', () => sppgApplyStaffValues(), true);
+    if (!document.getElementById('sppg_staff_list')) {
+      const datalist = document.createElement('datalist');
+      datalist.id = 'sppg_staff_list';
+      document.body.appendChild(datalist);
+    }
+
+    const RPT_SPPG_NAME = SPPG_DEFAULT_NAME;
     const RPT_GREY = 'FFCCCCCC';
 
     function rptLogoSrc() {
-      const el = document.querySelector('img[alt^="Logo Berkah"]');
-      return (el && el.src && el.src.indexOf('data:image') === 0) ? el.src : null;
+      const sources = rptLogoSources();
+      return sources.length ? sources[0].src : null;
     }
     function rptLongDate(key) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(key || '')) return '';
@@ -4484,19 +4869,35 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       });
     }
 
-    // Logo (dari Dashboard) di tengah sel logo pada kop
+    // Logo profil ditempatkan berdampingan di dalam area kop yang sudah ada.
     function rptLogo(wb, ws, r1, c1, r2, c2) {
-      const src = rptLogoSrc();
-      if (!src) return;
+      const sources = rptLogoSources();
+      if (!sources.length) return;
       let wPx = 0, hPx = 0;
       for (let c = c1; c <= c2; c++) wPx += rptColPx(ws, c);
       for (let r = r1; r <= r2; r++) hPx += rptRowPx(ws, r);
-      const nat = 269 / 122;               // rasio asli logo (tidak boleh gepeng)
-      let w = wPx - 10, h = w / nat;
-      if (h > hPx - 10) { h = hPx - 10; w = h * nat; }
-      w = Math.round(w); h = Math.round(h);
-      const id = wb.addImage({ base64: src.split(',')[1], extension: 'png' });
-      rptPlaceImage(ws, id, r1, c1, r2, c2, w, h);
+      const slotW = sources.length > 1 ? (wPx - 14) / sources.length : wPx;
+      sources.forEach((source, index) => {
+        const ratio = source.ratio > 0 ? source.ratio : 1;
+        let w = slotW - 8, h = w / ratio;
+        if (h > hPx - 10) { h = hPx - 10; w = h * ratio; }
+        w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h));
+        const id = wb.addImage({ base64: source.src.split(',')[1], extension: 'png' });
+        if (sources.length === 1) {
+          rptPlaceImage(ws, id, r1, c1, r2, c2, w, h);
+          return;
+        }
+        const centerX = 7 + slotW * index + slotW / 2;
+        let remX = Math.max(0, Math.round(centerX - w / 2));
+        let remY = Math.max(0, Math.round((hPx - h) / 2));
+        let col = c1, row = r1;
+        while (col < c2 && remX >= rptColPx(ws, col)) { remX -= rptColPx(ws, col); col++; }
+        while (row < r2 && remY >= rptRowPx(ws, row)) { remY -= rptRowPx(ws, row); row++; }
+        ws.addImage(id, {
+          tl: { nativeCol: col - 1, nativeColOff: Math.round(remX * 9525), nativeRow: row - 1, nativeRowOff: Math.round(remY * 9525) },
+          ext: { width: w, height: h }, editAs: 'oneCell'
+        });
+      });
     }
 
     // Kop surat baku: logo | nama SPPG + FORMULIR + judul | No. dokumen, No. revisi, Tanggal
@@ -4518,7 +4919,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
         return minPt;
       };
       const tw = widthOf(o.title[0], o.title[1]);
-      [RPT_SPPG_NAME, 'FORMULIR', o.judul].forEach((t, i) => {
+      [rptSppgKopText(), 'FORMULIR', o.judul].forEach((t, i) => {
         rptMerge(ws, r + i, o.title[0], r + i, o.title[1]);
         rptPut(ws, r + i, o.title[0], t, { size: fitSize(t, tw, true, 16, 9), bold: true, h: 'center' });
       });
@@ -5706,6 +6107,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       const activeSec = document.getElementById('sec-' + tabId);
       if (activeSec) {
         activeSec.classList.remove('hidden');
+        if (tabId === 'profil-sppg') renderProfilSppg();
         if (tabId === 'overview') updateDashboardSummary();
         if (tabId === 'frekuensi-bahan') renderFrekuensiBahanTable();
         if (tabId === 'master-bahan-20') renderMasterBahan20Table();
@@ -5722,6 +6124,7 @@ html body #imageConfirmModal > div,html body #photoReviewModal > div{
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('nav-active', b.id === 'nav-' + tabId));
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.scrollTop = 0;
       if(window.innerWidth < 768) closeSidebar();
+      if (typeof sppgApplyStaffValues === 'function') sppgApplyStaffValues();
     }
 
     // ==== Auto Save Cache & Firebase Cloud untuk form Suhu ====
@@ -10170,6 +10573,7 @@ function renderSuhuTable() {
       applySilangDateFields();
       renderInspeksiSilangTable();
       initAlergenModule();
+      if (typeof renderProfilSppg === 'function') renderProfilSppg();
       updateDashboardSummary();
     };
 
@@ -10184,11 +10588,14 @@ function renderSuhuTable() {
          if (document.getElementById('al_tanggal')?.value === itemKey) { applyAlergenDateFields(); if (tabId === 'inspeksi-alergen') renderAlergenMenuAndTable(); }
        } else if (path === 'sppg_pemorsian_data') {
          if (tabId === 'pemorsian') loadPemorsianFromMenu(true);
+       } else if (path === 'sppg_sasaran_harian' && window.currentActiveTab === 'sasaran-didik') {
+         if (typeof pmbOnDailyFirstLoad === 'function') pmbOnDailyFirstLoad(itemKey);
        }
     };
 
     window.reRenderActiveTab = function() {
        const tabId = window.currentActiveTab;
+       if (tabId === 'profil-sppg') renderProfilSppg();
        if (tabId === 'overview') updateDashboardSummary();
        if (tabId === 'frekuensi-bahan') renderFrekuensiBahanTable();
        if (tabId === 'master-bahan-20') renderMasterBahan20Table();
@@ -10247,7 +10654,7 @@ function renderSuhuTable() {
         var s = b.querySelectorAll('span');
         if (s[1]) b.title = s[1].textContent.trim();
       });
-      var first = document.getElementById('nav-overview'); if (first) first.classList.add('nav-active');
+      var first = document.getElementById('nav-profil-sppg'); if (first) first.classList.add('nav-active');
 
       function labelTables() {
         document.querySelectorAll('main table').forEach(function (t) {
@@ -12447,18 +12854,16 @@ function renderSuhuTable() {
   </script>
 
 <script>
-    // =====================================================================
-    // DATABASE PENERIMA MANFAAT (sekolah & posyandu) -- bagian dari modul Pendataan Sasaran (01.01)
-    // Firebase: 'sppg_penerima_manfaat' = { tanggal: 'YYYY-MM-DD', items: [ {id,jenis,nama,kl,kp,bl,bp,tl,tp,org,bumil,busui} ] }
-    // kl/kp = siswa/balita PORSI KECIL (L/P) | bl/bp = siswa PORSI BESAR (L/P) | tl/tp = tendik | org = uji organoleptik
-    // Porsi kecil = kl+kp | Porsi besar = bl+bp+tl+tp+org+bumil+busui
-    // Terhubung ke: data alergi per anak (kolom Anak Alergi, daftar sekolah, panel Inspeksi Alergen 22.01, ringkasan laporan 01.01)
-    // =====================================================================
+    // Master menyimpan angka baku; log harian disimpan terpisah per tanggal.
     const PMB_PATH = 'sppg_penerima_manfaat';
+    const PMB_MASTER_PATH = 'sppg_sasaran_master';
+    const PMB_DAILY_PATH = 'sppg_sasaran_harian';
+    const PMB_MASTER_CACHE = 'sppg_sasaran_master_cache';
+    const PMB_DAILY_CACHE = 'sppg_sasaran_harian_cache';
     const PMB_RANK = { PAUD: 0, SD: 1, SMP: 2, SMA: 3, POSYANDU: 4 };
     const PMB_LABEL = { PAUD: 'PAUD/TK', SD: 'SD/MI', SMP: 'SMP/MTs', SMA: 'SMA/MA', POSYANDU: 'Posyandu' };
     const PMB_FIELDS = ['kl', 'kp', 'bl', 'bp', 'tl', 'tp', 'org', 'bumil', 'busui'];
-    const PMB_JM = ['kj', 'bj'];   // Jumlah PM (opsional) porsi kecil / besar siswa; kosong = pakai L+P
+    const PMB_JM = ['kj', 'bj'];
     const PMB_GROUPS = { kecil: ['kl', 'kp'], besar: ['bl', 'bp'], td: ['tl', 'tp'], org: ['org'], ibu: ['bumil', 'busui'] };
     const PMB_CFG = {
       PAUD:     { kecil: 'Siswa — Porsi Kecil',     besar: null,                        td: 1, org: 1, ibu: 0 },
@@ -12467,66 +12872,546 @@ function renderSuhuTable() {
       SMA:      { kecil: null,                      besar: 'Kelas 10–12 — Porsi Besar', td: 1, org: 1, ibu: 0 },
       POSYANDU: { kecil: 'Balita — Porsi Kecil',    besar: null,                        td: 0, org: 1, ibu: 1 }
     };
+    const PMB_HOLIDAY_REASONS = ['Libur Nasional', 'Kegiatan Luar Sekolah', 'Ujian Sekolah', 'Kegiatan Internal', 'Jadwal Posyandu Libur'];
+    const PMB_SMP_N = 4;
     let pmbEditId = null;
+    let pmbSelectedDate = null;
 
     const pmbN = v => { const n = parseInt(v, 10); return isNaN(n) || n < 0 ? 0 : n; };
     const pmbEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const pmbKey = nama => String(nama || '').trim().replace(/\s+/g, ' ').toUpperCase();
     const pmbNorm = s => String(s == null ? '' : s).trim().replace(/\s+/g, ' ').toUpperCase();
-    // Sampel Bahan Makanan = tabel ke-3 (4 sampel, porsi besar) — disimpan di d.sampel pada path yang sama
-    const PMB_SMP_N = 4;
-    function pmbSampel() {
-      const v = window.dbCache && window.dbCache[PMB_PATH];
-      const hasKey = !!(v && v.sampel !== undefined && v.sampel !== null);
-      const raw = hasKey ? (Array.isArray(v.sampel) ? v.sampel : Object.values(v.sampel)) : [];
-      const out = [];
-      const n = hasKey ? raw.length : PMB_SMP_N;   // data lama tanpa key = 4 baris bawaan
-      for (let i = 0; i < n; i++) {
-        const r = raw[i];
-        if (r) {
-          out.push({ id: r.id || ('smp' + (i + 1)), nama: String(r.nama == null ? '' : r.nama), jumlah: (r.jumlah !== undefined && r.jumlah !== null && r.jumlah !== '') ? pmbN(r.jumlah) : 0 });
-        } else {
-          out.push({ id: 'smp' + (i + 1), nama: 'Sampel Bahan Makanan ' + (i + 1), jumlah: 1 });
+    const pmbClone = value => JSON.parse(JSON.stringify(value == null ? null : value));
+    const pmbArray = value => Array.isArray(value) ? value : (value && typeof value === 'object' ? Object.values(value) : []);
+    const pmbDateValid = value => /^\d{4}-\d{2}-\d{2}$/.test(String(value || ''));
+
+    function pmbCacheGet(key) {
+      try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; }
+    }
+    function pmbCacheSet(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+    }
+    function pmbDefaultSampel() {
+      return Array.from({ length: PMB_SMP_N }, (_, i) => ({ id: 'smp' + (i + 1), nama: 'Sampel Bahan Makanan ' + (i + 1), jumlah: 1 }));
+    }
+    function pmbSampelFrom(raw) {
+      const hasKey = !!(raw && raw.sampel !== undefined && raw.sampel !== null);
+      const list = hasKey ? pmbArray(raw.sampel) : pmbDefaultSampel();
+      return list.map((r, i) => r ? ({
+        id: r.id || ('smp' + (i + 1)),
+        nama: String(r.nama == null ? '' : r.nama),
+        jumlah: (r.jumlah !== undefined && r.jumlah !== null && r.jumlah !== '') ? pmbN(r.jumlah) : 0
+      }) : { id: 'smp' + (i + 1), nama: 'Sampel Bahan Makanan ' + (i + 1), jumlah: 1 });
+    }
+    function pmbNormalizeDataset(raw, date) {
+      const value = raw && typeof raw === 'object' ? raw : {};
+      return {
+        tanggal: pmbDateValid(value.tanggal) ? value.tanggal : (date || ''),
+        items: pmbArray(value.items).filter(x => x && (x.id || String(x.nama || '').trim())).map(pmbClone),
+        sampel: pmbSampelFrom(value),
+        liburTabel: value.liburTabel && typeof value.liburTabel === 'object' ? value.liburTabel : {},
+        keterangan: String(value.keterangan || '')
+      };
+    }
+    function pmbLegacyRaw() {
+      const cloud = window.dbCache && window.dbCache[PMB_PATH];
+      return cloud && typeof cloud === 'object' ? cloud : pmbCacheGet('sppg_penerima_manfaat_cache');
+    }
+    function pmbMasterRaw() {
+      const cloud = window.dbCache && window.dbCache[PMB_MASTER_PATH];
+      if (cloud && typeof cloud === 'object') return cloud;
+      return pmbCacheGet(PMB_MASTER_CACHE);
+    }
+    function pmbWriteMaster(data) {
+      const value = { items: pmbClone(data.items || []), sampel: pmbClone(data.sampel || pmbDefaultSampel()) };
+      window.dbCache[PMB_MASTER_PATH] = value;
+      pmbCacheSet(PMB_MASTER_CACHE, value);
+      if (typeof window.fbSet === 'function') window.fbSet(PMB_MASTER_PATH, value);
+      return value;
+    }
+    function pmbWriteDaily(data) {
+      const date = data.tanggal;
+      if (!pmbDateValid(date)) return false;
+      const value = pmbNormalizeDataset(data, date);
+      if (!window.dbCache[PMB_DAILY_PATH] || typeof window.dbCache[PMB_DAILY_PATH] !== 'object') window.dbCache[PMB_DAILY_PATH] = {};
+      window.dbCache[PMB_DAILY_PATH][date] = value;
+      const cache = pmbCacheGet(PMB_DAILY_CACHE) || {};
+      cache[date] = value;
+      pmbCacheSet(PMB_DAILY_CACHE, cache);
+      if (typeof window.fbSet === 'function') window.fbSet(PMB_DAILY_PATH + '/' + date, value);
+      return true;
+    }
+    function pmbEnsureStorage() {
+      let master = pmbMasterRaw();
+      if (!master) {
+        const legacy = pmbLegacyRaw();
+        master = {
+          items: pmbClone(pmbArray(legacy && legacy.items).filter(x => x && (x.id || String(x.nama || '').trim()))),
+          sampel: pmbSampelFrom(legacy)
+        };
+        pmbWriteMaster(master);
+        if (legacy && pmbDateValid(legacy.tanggal)) {
+          pmbWriteDaily(pmbNormalizeDataset(legacy, legacy.tanggal));
         }
       }
-      return out;
+      if (!master.sampel) master.sampel = pmbDefaultSampel();
+      return master;
     }
-    const pmbSampelTotal = () => pmbSampel().reduce((n, x) => n + x.jumlah, 0);
-    function pmbSampelSave(list) { const d = pmbData(); pmbSave({ tanggal: d.tanggal, items: d.items, sampel: list }); }
+    function pmbCloneMasterToDate(master, date) {
+      const items = pmbArray(master && master.items).map(it => {
+        const copy = pmbClone(it);
+        delete copy.liburInstitusi;
+        delete copy.liburSel;
+        return copy;
+      });
+      return { tanggal: date, items, sampel: pmbClone(master && master.sampel ? master.sampel : pmbDefaultSampel()), liburTabel: {}, keterangan: '' };
+    }
+    function pmbActivateDate(date) {
+      if (!pmbDateValid(date)) return false;
+      pmbSelectedDate = date;
+      if (!window.dbLoaded || !window.dbLoaded[PMB_DAILY_PATH + '/' + date]) return false;
+      const current = window.dbCache[PMB_DAILY_PATH] && window.dbCache[PMB_DAILY_PATH][date];
+      if (!current) {
+        const cached = (pmbCacheGet(PMB_DAILY_CACHE) || {})[date];
+        pmbWriteDaily(cached && cached.tanggal === date ? cached : pmbCloneMasterToDate(pmbEnsureStorage(), date));
+      }
+      return true;
+    }
+    function pmbEnsureSelectedDate() {
+      if (!pmbDateValid(pmbSelectedDate)) pmbSelectedDate = (typeof getLocalDateKey === 'function' ? getLocalDateKey() : new Date().toISOString().slice(0, 10));
+      const input = document.getElementById('pmb_tanggal');
+      if (input && document.activeElement !== input) input.value = pmbSelectedDate;
+      if (!window.dbLoaded || !window.dbLoaded[PMB_DAILY_PATH + '/' + pmbSelectedDate]) {
+        if (typeof window.subscribeItem === 'function') window.subscribeItem(PMB_DAILY_PATH, pmbSelectedDate);
+        return false;
+      }
+      return pmbActivateDate(pmbSelectedDate);
+    }
+    function pmbData() {
+      const date = pmbDateValid(pmbSelectedDate) ? pmbSelectedDate : (typeof getLocalDateKey === 'function' ? getLocalDateKey() : new Date().toISOString().slice(0, 10));
+      pmbSelectedDate = date;
+      const master = pmbEnsureStorage();
+      if (!window.dbLoaded || !window.dbLoaded[PMB_DAILY_PATH + '/' + date]) {
+        return { tanggal: date, items: [], sampel: [], liburTabel: {}, keterangan: '', loading: true };
+      }
+      let current = window.dbCache[PMB_DAILY_PATH] && window.dbCache[PMB_DAILY_PATH][date];
+      if (!current) {
+        pmbActivateDate(date);
+        current = window.dbCache[PMB_DAILY_PATH] && window.dbCache[PMB_DAILY_PATH][date];
+      }
+      return pmbNormalizeDataset(current || pmbCloneMasterToDate(master, date), date);
+    }
+    function pmbEmptyMasterItem(it) {
+      const value = { id: it.id, jenis: it.jenis, nama: it.nama };
+      PMB_FIELDS.forEach(k => { value[k] = 0; });
+      PMB_JM.forEach(k => { value[k] = null; });
+      return value;
+    }
+    function pmbMergeMasterStructure(items, sampel) {
+      const master = pmbEnsureStorage();
+      const byId = {};
+      pmbArray(master.items).forEach(it => { if (it && it.id) byId[it.id] = it; });
+      const next = items.map(it => {
+        if (byId[it.id]) {
+          const old = byId[it.id];
+          old.jenis = it.jenis;
+          old.nama = it.nama;
+          return old;
+        }
+        return pmbEmptyMasterItem(it);
+      });
+      const sampleById = {};
+      pmbArray(master.sampel).forEach(it => { if (it && it.id) sampleById[it.id] = it; });
+      const nextSamples = sampel.map(it => {
+        if (sampleById[it.id]) {
+          sampleById[it.id].nama = it.nama;
+          return sampleById[it.id];
+        }
+        return { id: it.id, nama: it.nama, jumlah: 0 };
+      });
+      pmbWriteMaster({ items: next, sampel: nextSamples });
+    }
+    function pmbSave(d, options) {
+      const date = pmbDateValid(d && d.tanggal) ? d.tanggal : pmbSelectedDate;
+      if (!pmbDateValid(date) || !window.dbLoaded || !window.dbLoaded[PMB_DAILY_PATH + '/' + date]) return false;
+      const current = pmbData();
+      const value = pmbNormalizeDataset(Object.assign({}, current, d || {}, { tanggal: date }), date);
+      pmbSelectedDate = date;
+      pmbWriteDaily(value);
+      if (options && options.masterStructure) pmbMergeMasterStructure(value.items, value.sampel);
+      pmbPublishDailyTotals();
+      return true;
+    }
+    async function pmbSaveMasterCounts() {
+      const d = pmbData();
+      if (d.loading || !d.items.length) { alert('Data harian belum siap.'); return; }
+      const ok = await pmbConfirm({
+        title: 'Konfirmasi Angka Baku Master',
+        html: '<p>Salin angka peserta, tendik, organoleptik, 3B, sampel, dan rincian kelas tanggal <strong>' + pmbEsc(d.tanggal) + '</strong> ke master?</p><p class="text-xs text-slate-500">Status dan alasan libur TIDAK disalin. Tanggal lain yang sudah tersimpan tidak berubah.</p>',
+        ok: 'Ya, Simpan ke Master'
+      });
+      if (!ok) return;
+      const items = d.items.map(it => {
+        const copy = pmbClone(it);
+        delete copy.liburInstitusi;
+        delete copy.liburSel;
+        return copy;
+      });
+      pmbWriteMaster({ items, sampel: pmbClone(d.sampel) });
+      alert('Angka baku master berhasil disimpan.');
+    }
+    function pmbSetTanggal(value) {
+      if (!pmbDateValid(value)) return;
+      pmbSelectedDate = value;
+      pmbEditId = null;
+      const input = document.getElementById('pmb_tanggal');
+      if (input) input.value = value;
+      const reportDate = document.getElementById('sd_tanggal');
+      if (reportDate) reportDate.value = value;
+      if (typeof window.subscribeItem === 'function') window.subscribeItem(PMB_DAILY_PATH, value);
+      pmbRender(true);
+    }
+    window.pmbOnDailyFirstLoad = function (date) {
+      if (date !== pmbSelectedDate) return;
+      pmbActivateDate(date);
+      if (window.currentActiveTab === 'sasaran-didik' && typeof window.renderSasaran === 'function') {
+        window.renderSasaran();
+      } else if (window.currentActiveTab === 'sasaran-didik') {
+        pmbRender(true);
+        pmbPublishDailyTotals();
+      }
+    };
+    function pmbHolidayActive(state) { return !!(state && state.aktif); }
+    function pmbHolidayReason(state) { return String(state && state.alasan || '').trim(); }
+    function pmbGradeLabel(key) {
+      return ({ paud: 'PAUD/TK', tendik: 'Guru/Tendik', balita: 'Balita', bumil: 'Ibu Hamil', busui: 'Ibu Menyusui' })[key] || ('Kelas ' + key);
+    }
+    function pmbBandForGrade(it, grade) {
+      return pmbBands(it).find(band => band.grades.indexOf(grade) !== -1);
+    }
+    function pmbHolidaySummary(it) {
+      const d = pmbData();
+      const tableKey = it.jenis === 'POSYANDU' ? 'posyandu' : 'sekolah';
+      const table = d.liburTabel && d.liburTabel[tableKey];
+      if (pmbHolidayActive(table)) return 'LIBUR (0) — seluruh ' + (tableKey === 'sekolah' ? 'tabel Peserta Didik/Guru/Tendik' : 'tabel Posyandu') + (pmbHolidayReason(table) ? ': ' + pmbHolidayReason(table) : '');
+      if (pmbHolidayActive(it.liburInstitusi)) return 'LIBUR (0) — seluruh satuan' + (pmbHolidayReason(it.liburInstitusi) ? ': ' + pmbHolidayReason(it.liburInstitusi) : '');
+      const out = [], off = it.liburSel || {};
+      pmbBands(it).forEach(band => {
+        const grades = band.grades.filter(g => pmbHolidayActive(off[g]));
+        if (!grades.length) return;
+        if (grades.length === band.grades.length) {
+          const reasons = grades.map(g => pmbHolidayReason(off[g]));
+          const sameReason = reasons.every(reason => reason === reasons[0]);
+          if (sameReason) out.push(band.label + ' LIBUR (0)' + (reasons[0] ? ': ' + reasons[0] : ''));
+          else grades.forEach((g, i) => out.push(pmbGradeLabel(g) + ' LIBUR (0)' + (reasons[i] ? ': ' + reasons[i] : '')));
+        } else {
+          grades.forEach(g => out.push(pmbGradeLabel(g) + ' LIBUR (0)' + (pmbHolidayReason(off[g]) ? ': ' + pmbHolidayReason(off[g]) : '')));
+        }
+      });
+      ['tendik', 'balita', 'bumil', 'busui'].forEach(key => {
+        if (pmbHolidayActive(off[key])) out.push(pmbGradeLabel(key) + ' LIBUR (0)' + (pmbHolidayReason(off[key]) ? ': ' + pmbHolidayReason(off[key]) : ''));
+      });
+      return out.join('\n');
+    }
+    function pmbTableRemarksText(key) {
+      const d = pmbData(), state = d.liburTabel && d.liburTabel[key];
+      return pmbHolidayActive(state) ? 'LIBUR (0)' + (pmbHolidayReason(state) ? ': ' + pmbHolidayReason(state) : '') : '';
+    }
+    function pmbHolidayPill(scope, id, key, label, state, small) {
+      const active = pmbHolidayActive(state);
+      return '<button type="button" class="pmb-holiday-pill' + (small ? ' small' : '') + (active ? ' is-off' : '') + '" onclick="pmbHolidayEdit(\'' + pmbEsc(scope) + '\',\'' + pmbEsc(id || '') + '\',\'' + pmbEsc(key || '') + '\')" title="Atur status dan alasan libur"><span>' + pmbEsc(label) + '</span><span>' + (active ? 'LIBUR (0)' : 'Aktif') + '</span></button>';
+    }
+    function pmbCloseDialog(id) {
+      const dialog = document.getElementById(id);
+      if (dialog) dialog.remove();
+    }
+    function pmbHolidayEdit(scope, id, key) {
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      let state = null, title = '';
+      if (scope === 'tabel') {
+        state = d.liburTabel && d.liburTabel[key];
+        title = 'Status Libur Tabel ' + (key === 'sekolah' ? 'Peserta Didik/Guru/Tendik' : key === 'posyandu' ? 'Posyandu' : 'Sampel');
+      } else {
+        const it = d.items.find(x => x.id === id);
+        if (!it) return;
+        state = scope === 'institusi' ? it.liburInstitusi : (it.liburSel && it.liburSel[key]);
+        title = scope === 'institusi' ? 'Status Libur Satuan' : 'Status Libur ' + pmbGradeLabel(key);
+      }
+      const active = pmbHolidayActive(state), reason = pmbHolidayReason(state), dialogId = 'pmbHolidayDialog';
+      pmbCloseDialog(dialogId);
+      const wrap = document.createElement('div');
+      wrap.id = dialogId;
+      wrap.className = 'fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm';
+      wrap.innerHTML = '<div class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl" role="dialog" aria-modal="true">' +
+        '<div class="bg-gradient-to-r from-[#0e5c4a] to-[#164e3f] px-5 py-4 text-sm font-black text-white">' + pmbEsc(title) + '</div>' +
+        '<div class="space-y-4 p-5 text-xs text-slate-700">' +
+          '<label class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 font-extrabold text-amber-900"><input id="pmb_holiday_aktif" type="checkbox" ' + (active ? 'checked' : '') + ' class="h-4 w-4 accent-amber-600"> Satuan/kelompok ini LIBUR (0)</label>' +
+          '<div><label for="pmb_holiday_alasan" class="mb-1 block font-extrabold uppercase tracking-wider text-slate-500">Alasan Cepat</label><select id="pmb_holiday_alasan" class="w-full rounded-xl border-2 border-slate-200 bg-white p-2.5 font-bold outline-none focus:border-emerald-500"><option value="">— Pilih alasan —</option>' + PMB_HOLIDAY_REASONS.map(x => '<option value="' + pmbEsc(x) + '">' + pmbEsc(x) + '</option>').join('') + '</select></div>' +
+          '<div><label for="pmb_holiday_bebas" class="mb-1 block font-extrabold uppercase tracking-wider text-slate-500">Keterangan / Alasan Bebas</label><input id="pmb_holiday_bebas" type="text" maxlength="500" value="' + pmbEsc(reason) + '" placeholder="Ketik alasan lain..." class="w-full rounded-xl border-2 border-slate-200 bg-white p-2.5 font-bold outline-none focus:border-emerald-500"></div>' +
+          '<p class="rounded-xl bg-slate-50 p-3 font-semibold leading-relaxed text-slate-500">Perubahan hanya berlaku pada <strong>' + pmbEsc(d.tanggal) + '</strong>. Tanggal sebelumnya tidak berubah.</p>' +
+        '</div>' +
+        '<div class="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3"><button type="button" data-pmb-dialog="cancel" class="rounded-xl bg-slate-200 px-5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-300">Batal</button><button type="button" data-pmb-dialog="save" class="rounded-xl bg-[#0e5c4a] px-5 py-2 text-xs font-bold text-white shadow-lg hover:bg-[#164e3f]">Simpan Status Libur</button></div></div>';
+      const close = () => { document.removeEventListener('keydown', pmbEscapeHolidayDialog, true); pmbCloseDialog(dialogId); };
+      wrap.querySelector('#pmb_holiday_alasan').addEventListener('change', event => { wrap.querySelector('#pmb_holiday_bebas').value = event.target.value; });
+      wrap.addEventListener('click', async e => {
+        const action = e.target.closest('[data-pmb-dialog]');
+        if (!action) { if (e.target === wrap) close(); return; }
+        if (action.dataset.pmbDialog === 'cancel') { close(); return; }
+        const isActive = wrap.querySelector('#pmb_holiday_aktif').checked;
+        const picked = wrap.querySelector('#pmb_holiday_alasan').value;
+        const free = wrap.querySelector('#pmb_holiday_bebas').value.trim();
+        const nextReason = free || picked;
+        if (isActive && !nextReason) { alert('Alasan libur wajib diisi.'); return; }
+        const next = { aktif: isActive, alasan: isActive ? nextReason : '' };
+        close();
+        if (scope === 'sel' && isActive) {
+          const it = pmbData().items.find(x => x.id === id);
+          const band = it && pmbBandForGrade(it, key);
+          if (band) {
+            const simulated = pmbClone(it);
+            simulated.liburSel = simulated.liburSel || {};
+            simulated.liburSel[key] = next;
+            const off = band.grades.filter(g => pmbHolidayActive(simulated.liburSel[g]));
+            if (off.length && off.length < band.grades.length && !pmbDetailComplete(simulated, band)) {
+              pmbGradeDetailEdit(id, band.key, { holiday: { key: key, state: next } });
+              return;
+            }
+          }
+        }
+        pmbApplyHoliday(scope, id, key, next, null);
+      });
+      document.addEventListener('keydown', pmbEscapeHolidayDialog, true);
+      document.body.appendChild(wrap);
+      wrap.querySelector('#pmb_holiday_bebas').focus();
+    }
+    function pmbEscapeHolidayDialog(e) {
+      if (e.key === 'Escape') {
+        pmbCloseDialog('pmbHolidayDialog');
+        document.removeEventListener('keydown', pmbEscapeHolidayDialog, true);
+      }
+    }
+    async function pmbApplyHoliday(scope, id, key, state, detail) {
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return false; }
+      const items = pmbClone(d.items);
+      let target = null, summary = '';
+      if (scope === 'tabel') {
+        const liburTabel = pmbClone(d.liburTabel || {});
+        liburTabel[key] = state;
+        target = { items: items, liburTabel: liburTabel };
+        summary = (key === 'sekolah' ? 'Tabel Peserta Didik/Guru/Tendik' : key === 'posyandu' ? 'Tabel Posyandu' : 'Tabel Sampel') + ': ' + (state.aktif ? 'LIBUR (0)' : 'Aktif') + (state.alasan ? ' — ' + state.alasan : '');
+      } else {
+        const it = items.find(x => x.id === id);
+        if (!it) return false;
+        if (scope === 'institusi') it.liburInstitusi = state;
+        else {
+          it.liburSel = it.liburSel || {};
+          it.liburSel[key] = state;
+        }
+        if (detail && detail.bandKey) {
+          it.kelasDetail = it.kelasDetail || {};
+          it.kelasDetail[detail.bandKey] = detail.rows;
+        }
+        const band = scope === 'sel' && pmbBandForGrade(it, key);
+        if (band && band.grades.some(g => pmbHolidayActive(it.liburSel[g])) && band.grades.some(g => !pmbHolidayActive(it.liburSel[g])) && !pmbDetailComplete(it, band)) {
+          alert('Rincian kelas belum lengkap. Status libur belum disimpan.');
+          return false;
+        }
+        target = { items: items };
+        summary = it.nama + ': ' + pmbHolidaySummary(it);
+      }
+      const ok = await pmbConfirm({
+        title: 'Konfirmasi Status Libur Harian',
+        html: '<p>Simpan perubahan libur pada <strong>' + pmbEsc(d.tanggal) + '</strong>?</p><div class="rounded-xl border border-amber-200 bg-amber-50 p-3 font-bold text-amber-900">' + pmbEsc(summary || 'Status kembali aktif') + '</div><p class="text-xs text-slate-500">Log tanggal lain dan angka baku master tidak diubah.</p>',
+        ok: 'Ya, Simpan Libur'
+      });
+      if (!ok) return false;
+      if (!pmbSave(Object.assign({ tanggal: d.tanggal }, target))) { alert('Log tanggal ini belum siap. Perubahan belum disimpan.'); return false; }
+      pmbRender(true);
+      return true;
+    }
+    function pmbGradeDetailEdit(id, bandKey, options) {
+      const d = pmbData(), it = d.items.find(x => x.id === id);
+      const band = it && pmbBands(it).find(x => x.key === bandKey);
+      if (!it || !band) return;
+      options = options || {};
+      const oldDetail = it.kelasDetail && it.kelasDetail[band.key];
+      const rawL = pmbN(it[band.l]), rawP = pmbN(it[band.p]);
+      const rawJ = pmbHas(it[band.j]) ? pmbN(it[band.j]) : rawL + rawP;
+      const dialogId = 'pmbGradeDialog';
+      pmbCloseDialog(dialogId);
+      const wrap = document.createElement('div');
+      wrap.id = dialogId;
+      wrap.className = 'fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm';
+      wrap.innerHTML = '<div class="max-h-[92vh] w-full max-w-2xl overflow-auto rounded-2xl border border-slate-200 bg-white shadow-2xl" role="dialog" aria-modal="true">' +
+        '<div class="bg-gradient-to-r from-[#0e5c4a] to-[#164e3f] px-5 py-4 text-white"><div class="text-sm font-black">Rincian ' + pmbEsc(band.label) + '</div><div class="mt-1 text-[11px] font-semibold text-emerald-100">' + pmbEsc(it.nama) + ' · ' + pmbEsc(d.tanggal) + '</div></div>' +
+        '<div class="space-y-4 p-5 text-xs text-slate-700"><p class="rounded-xl border border-amber-200 bg-amber-50 p-3 font-semibold leading-relaxed text-amber-900">Isi distribusi nyata per kelas. Total harus sama dengan data lama: <strong>L ' + rawL + ' · P ' + rawP + ' · Jumlah PM ' + rawJ + '</strong>. Aplikasi tidak membagi angka secara otomatis.</p>' +
+        '<div class="overflow-x-auto rounded-xl border border-slate-200"><table class="w-full text-xs"><thead><tr class="bg-slate-100"><th class="p-2">Kelas/Kelompok</th><th class="p-2">Laki-Laki</th><th class="p-2">Perempuan</th><th class="p-2">Jumlah PM</th></tr></thead><tbody>' +
+        band.grades.map(g => {
+          const row = oldDetail && oldDetail[g] || {};
+          return '<tr><td class="p-2 font-black">' + pmbEsc(pmbGradeLabel(g)) + '</td><td class="p-2"><input data-pmb-grade="' + pmbEsc(g) + '" data-pmb-detail="l" type="number" min="0" value="' + pmbEsc(row.l == null ? '' : row.l) + '" class="pmb-cell"></td><td class="p-2"><input data-pmb-grade="' + pmbEsc(g) + '" data-pmb-detail="p" type="number" min="0" value="' + pmbEsc(row.p == null ? '' : row.p) + '" class="pmb-cell"></td><td class="p-2"><input data-pmb-grade="' + pmbEsc(g) + '" data-pmb-detail="j" type="number" min="0" value="' + pmbEsc(row.j == null ? '' : row.j) + '" placeholder="L+P" class="pmb-cell"></td></tr>';
+        }).join('') + '</tbody></table></div>' +
+        '<p id="pmb_grade_error" class="hidden rounded-xl border border-rose-200 bg-rose-50 p-3 font-bold text-rose-700"></p></div>' +
+        '<div class="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3"><button type="button" data-pmb-dialog="cancel" class="rounded-xl bg-slate-200 px-5 py-2 text-xs font-bold text-slate-700">Batal</button><button type="button" data-pmb-dialog="save" class="rounded-xl bg-[#0e5c4a] px-5 py-2 text-xs font-bold text-white shadow-lg">Simpan Rincian Kelas</button></div></div>';
+      const close = () => { document.removeEventListener('keydown', pmbEscapeGradeDialog, true); pmbCloseDialog(dialogId); };
+      wrap.addEventListener('click', async e => {
+        const action = e.target.closest('[data-pmb-dialog]');
+        if (!action) { if (e.target === wrap) close(); return; }
+        if (action.dataset.pmbDialog === 'cancel') { close(); return; }
+        const rows = {};
+        let sumL = 0, sumP = 0, sumJ = 0, anyJ = false, valid = true;
+        band.grades.forEach(g => {
+          const val = f => {
+            const input = wrap.querySelector('input[data-pmb-grade="' + g + '"][data-pmb-detail="' + f + '"]');
+            return input ? input.value.trim() : '';
+          };
+          const lRaw = val('l'), pRaw = val('p'), jRaw = val('j');
+          if (lRaw === '' || pRaw === '') valid = false;
+          const l = pmbN(lRaw), p = pmbN(pRaw), j = jRaw === '' ? null : pmbN(jRaw);
+          if (jRaw !== '') anyJ = true;
+          rows[g] = { l: l, p: p, j: j };
+          sumL += l; sumP += p; if (j !== null) sumJ += j;
+        });
+        const requireJ = pmbHas(it[band.j]) || anyJ;
+        let error = '';
+        if (!valid) error = 'Laki-laki dan perempuan wajib diisi untuk setiap kelas (isi 0 bila tidak ada).';
+        else if (sumL !== rawL || sumP !== rawP) error = 'Total rincian harus L ' + rawL + ' dan P ' + rawP + '. Saat ini L ' + sumL + ' dan P ' + sumP + '.';
+        else if (requireJ && (band.grades.some(g => rows[g].j === null) || sumJ !== rawJ)) error = 'Jumlah PM per kelas wajib diisi dan totalnya harus ' + rawJ + '.';
+        if (error) {
+          const box = wrap.querySelector('#pmb_grade_error'); box.textContent = error; box.classList.remove('hidden'); return;
+        }
+        close();
+        if (options.holiday) {
+          await pmbApplyHoliday('sel', id, options.holiday.key, options.holiday.state, { bandKey: band.key, rows: rows });
+        } else {
+          const ok = await pmbConfirm({ title: 'Konfirmasi Rincian Kelas', html: '<p>Simpan rincian <strong>' + pmbEsc(band.label) + '</strong> pada tanggal ' + pmbEsc(d.tanggal) + '?</p><p class="text-xs text-slate-500">Total peserta tidak berubah; tanggal lain tidak diubah.</p>', ok: 'Ya, Simpan Rincian' });
+          if (!ok) return;
+          const items = pmbClone(pmbData().items), current = items.find(x => x.id === id);
+          current.kelasDetail = current.kelasDetail || {};
+          current.kelasDetail[band.key] = rows;
+          if (!pmbSave({ tanggal: d.tanggal, items: items })) { alert('Log tanggal ini belum siap.'); return; }
+          pmbRender(true);
+        }
+      });
+      document.addEventListener('keydown', pmbEscapeGradeDialog, true);
+      document.body.appendChild(wrap);
+      const first = wrap.querySelector('input[data-pmb-detail="l"]'); if (first) first.focus();
+    }
+    function pmbEscapeGradeDialog(e) {
+      if (e.key === 'Escape') {
+        pmbCloseDialog('pmbGradeDialog');
+        document.removeEventListener('keydown', pmbEscapeGradeDialog, true);
+      }
+    }
+    async function pmbSaveRemarks() {
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      const value = String((document.getElementById('pmb_keterangan') || {}).value || '').trim();
+      const ok = await pmbConfirm({ title: 'Konfirmasi Keterangan Harian', html: '<p>Simpan keterangan umum untuk <strong>' + pmbEsc(d.tanggal) + '</strong>?</p><p class="text-xs text-slate-500">Ringkasan libur tetap dibuat otomatis dan tanggal lain tidak berubah.</p>', ok: 'Ya, Simpan Keterangan' });
+      if (!ok) return;
+      if (!pmbSave({ tanggal: d.tanggal, keterangan: value })) { alert('Log tanggal ini belum siap.'); return; }
+      pmbRender(true);
+    }
+    function pmbSampel() {
+      const d = pmbData();
+      return d.loading ? [] : pmbSampelFrom(d);
+    }
+    function pmbTableHoliday(key) {
+      const d = pmbData();
+      return !!(d.liburTabel && d.liburTabel[key] && d.liburTabel[key].aktif);
+    }
+    const pmbSampelTotal = () => pmbTableHoliday('sampel') ? 0 : pmbSampel().reduce((n, x) => n + x.jumlah, 0);
+    function pmbSampelSave(list, options) { const d = pmbData(); return pmbSave({ tanggal: d.tanggal, items: d.items, sampel: list }, options); }
     function pmbSampelAlg(nama) {
       if (typeof sdGetAll !== 'function' || typeof sdTokens !== 'function') return 0;
       const n = pmbNorm(nama);
       return sdGetAll().filter(s => sdTokens(s.alergi).some(t => n.indexOf(t) !== -1)).length;
     }
 
-    function pmbData() {
-      const v = window.dbCache && window.dbCache[PMB_PATH];
-      if (!v) return { tanggal: '', items: [] };
-      const items = v.items ? (Array.isArray(v.items) ? v.items : Object.values(v.items)) : [];
-      return { tanggal: v.tanggal || '', items: items.filter(x => x && (x.id || String(x.nama || '').trim())) };
+    function pmbBands(it) {
+      if (it.jenis === 'PAUD') return [{ key: 'kecil', label: 'PAUD/TK', grades: ['paud'], l: 'kl', p: 'kp', j: 'kj' }];
+      if (it.jenis === 'SD') return [
+        { key: 'kecil', label: 'Kelas 1–3', grades: ['1', '2', '3'], l: 'kl', p: 'kp', j: 'kj' },
+        { key: 'besar', label: 'Kelas 4–6', grades: ['4', '5', '6'], l: 'bl', p: 'bp', j: 'bj' }
+      ];
+      if (it.jenis === 'SMP' || it.jenis === 'SMA') return [{ key: 'besar', label: it.jenis === 'SMA' ? 'Kelas 10–12' : 'Kelas 7–9', grades: it.jenis === 'SMA' ? ['10', '11', '12'] : ['7', '8', '9'], l: 'bl', p: 'bp', j: 'bj' }];
+      return [];
     }
-    function pmbSave(d) {
-      const keep = window.dbCache[PMB_PATH];
-      if (d.sampel === undefined && keep && keep.sampel) d.sampel = keep.sampel;   // jangan hilangkan data sampel
-      window.dbCache[PMB_PATH] = d;
-      try { localStorage.setItem('sppg_penerima_manfaat_cache', JSON.stringify(d)); } catch (e) {}
-      if (typeof window.fbSet === 'function') window.fbSet(PMB_PATH, (d.items.length || d.tanggal || d.sampel) ? d : null);
+    function pmbDetailComplete(it, band) {
+      const detail = it.kelasDetail && it.kelasDetail[band.key];
+      if (!detail) return false;
+      return band.grades.every(g => detail[g] && detail[g].l !== undefined && detail[g].l !== null && detail[g].p !== undefined && detail[g].p !== null);
     }
-    function pmbCalc(it) {
+    function pmbBandCalc(it, band) {
+      const rawL = pmbN(it[band.l]), rawP = pmbN(it[band.p]);
+      const rawJ = (it.jenis !== 'POSYANDU' && it[band.j] !== undefined && it[band.j] !== null && it[band.j] !== '') ? pmbN(it[band.j]) : rawL + rawP;
+      const holidays = it.liburSel || {};
+      const off = band.grades.filter(g => holidays[g] && holidays[g].aktif);
+      if (!off.length) return { l: rawL, p: rawP, j: rawJ, lp: rawL + rawP };
+      if (off.length === band.grades.length || !pmbDetailComplete(it, band)) return { l: 0, p: 0, j: 0, lp: 0 };
+      const detail = it.kelasDetail[band.key];
+      const active = band.grades.filter(g => !holidays[g] || !holidays[g].aktif);
+      const l = active.reduce((n, g) => n + pmbN(detail[g].l), 0);
+      const p = active.reduce((n, g) => n + pmbN(detail[g].p), 0);
+      const hasJ = band.grades.every(g => detail[g].j !== undefined && detail[g].j !== null && detail[g].j !== '');
+      return { l, p, j: hasJ ? active.reduce((n, g) => n + pmbN(detail[g].j), 0) : l + p, lp: l + p };
+    }
+    function pmbCalcBase(it) {
       const kl = pmbN(it.kl), kp = pmbN(it.kp), bl = pmbN(it.bl), bp = pmbN(it.bp), tl = pmbN(it.tl), tp = pmbN(it.tp);
       const org = pmbN(it.org), bumil = pmbN(it.bumil), busui = pmbN(it.busui);
       const pos = it.jenis === 'POSYANDU';
       const has = v => v !== undefined && v !== null && v !== '';
-      const kecil = (!pos && has(it.kj)) ? pmbN(it.kj) : kl + kp;     // Jumlah PM porsi kecil (bila diisi) menggantikan L+P
-      const bs = (!pos && has(it.bj)) ? pmbN(it.bj) : bl + bp;        // Jumlah PM porsi besar (siswa)
+      const kecil = (!pos && has(it.kj)) ? pmbN(it.kj) : kl + kp;
+      const bs = (!pos && has(it.bj)) ? pmbN(it.bj) : bl + bp;
       const td = tl + tp;
+      return { kl, kp, bl, bp, tl, tp, org, bumil, busui, td, kecil, bs, lpKecil: kl + kp, lpBesar: bl + bp, siswa: pos ? 0 : kecil + bs, siswaL: pos ? 0 : kl + bl, siswaP: pos ? 0 : kp + bp, balita: pos ? kecil : 0, porsiKecil: kecil, porsiBesar: bs + td + org + bumil + busui, total: kecil + bs + td + org + bumil + busui };
+    }
+    function pmbCalc(it) {
+      const raw = pmbCalcBase(it);
+      const tableOff = it.jenis === 'POSYANDU' ? pmbTableHoliday('posyandu') : pmbTableHoliday('sekolah');
+      const institutionOff = !!(it.liburInstitusi && it.liburInstitusi.aktif);
+      if (tableOff || institutionOff) {
+        return Object.assign({}, raw, { kl: 0, kp: 0, bl: 0, bp: 0, tl: 0, tp: 0, org: 0, bumil: 0, busui: 0, td: 0, kecil: 0, bs: 0, lpKecil: 0, lpBesar: 0, siswa: 0, siswaL: 0, siswaP: 0, balita: 0, porsiKecil: 0, porsiBesar: 0, total: 0 });
+      }
+      const bands = {};
+      pmbBands(it).forEach(band => { bands[band.key] = pmbBandCalc(it, band); });
+      const pos = it.jenis === 'POSYANDU';
+      const small = pos
+        ? ((it.liburSel && it.liburSel.balita && it.liburSel.balita.aktif) ? { l: 0, p: 0, j: 0, lp: 0 } : { l: raw.kl, p: raw.kp, j: raw.kecil, lp: raw.lpKecil })
+        : (bands.kecil || { l: raw.kl, p: raw.kp, j: raw.kecil, lp: raw.lpKecil });
+      const large = bands.besar || { l: raw.bl, p: raw.bp, j: raw.bs, lp: raw.lpBesar };
+      const teacherOff = !!(it.liburSel && it.liburSel.tendik && it.liburSel.tendik.aktif);
+      const bumilOff = !!(it.liburSel && it.liburSel.bumil && it.liburSel.bumil.aktif);
+      const busuiOff = !!(it.liburSel && it.liburSel.busui && it.liburSel.busui.aktif);
+      const tl = teacherOff ? 0 : raw.tl, tp = teacherOff ? 0 : raw.tp, td = tl + tp;
+      const bumil = bumilOff ? 0 : raw.bumil, busui = busuiOff ? 0 : raw.busui;
+      const kecil = pos ? small.j : small.j, bs = pos ? 0 : large.j;
       return {
-        kl, kp, bl, bp, tl, tp, org, bumil, busui, td, kecil, bs, lpKecil: kl + kp, lpBesar: bl + bp,
-        siswa: pos ? 0 : kecil + bs, siswaL: pos ? 0 : kl + bl, siswaP: pos ? 0 : kp + bp,
+        kl: pos ? small.l : small.l, kp: pos ? small.p : small.p,
+        bl: pos ? 0 : large.l, bp: pos ? 0 : large.p,
+        tl, tp, org: raw.org, bumil, busui, td,
+        kecil, bs, lpKecil: small.lp, lpBesar: pos ? 0 : large.lp,
+        siswa: pos ? 0 : kecil + bs, siswaL: pos ? 0 : small.l + large.l, siswaP: pos ? 0 : small.p + large.p,
         balita: pos ? kecil : 0,
-        porsiKecil: kecil, porsiBesar: bs + td + org + bumil + busui,
-        total: kecil + bs + td + org + bumil + busui
+        porsiKecil: kecil, porsiBesar: bs + td + raw.org + bumil + busui,
+        total: kecil + bs + td + raw.org + bumil + busui
       };
+    }
+    function pmbPublishDailyTotals() {
+      const d = pmbData();
+      if (d.loading) return;
+      const totals = pmbTotals(d.items);
+      const detail = { tanggal: d.tanggal, porsiKecil: totals.kecil, porsiBesar: totals.besar, total: totals.total };
+      window.dailySmallPortions = totals.kecil;
+      window.dailyLargePortions = totals.besar;
+      window.dailyPorsiKecil = totals.kecil;
+      window.dailyPorsiBesar = totals.besar;
+      window.dailyPortionTotals = detail;
+      window.sasaranHarian = detail;
+      window.pmbDailyTotals = detail;
+      pmbCacheSet('sppg_sasaran_harian_ref', detail);
+      document.dispatchEvent(new CustomEvent('sasaran:harian:update', { detail }));
     }
     function pmbDetail(it) {
   const c = pmbCalc(it);
@@ -12734,105 +13619,140 @@ function renderSuhuTable() {
     // ---------- tampilan ----------
     function pmbRender(force) {
       if (!document.getElementById('pmb_box')) return;
+      pmbEnsureSelectedDate();
       const d = pmbData();
       const tg = document.getElementById('pmb_tanggal');
       if (tg && document.activeElement !== tg) tg.value = d.tanggal || '';
+      const reportDate = document.getElementById('sd_tanggal');
+      if (reportDate && document.activeElement !== reportDate) reportDate.value = d.tanggal || '';
+      const loading = document.getElementById('pmb_loading');
+      if (loading) loading.classList.toggle('hidden', !d.loading);
+      const remarks = document.getElementById('pmb_keterangan');
+      if (remarks && document.activeElement !== remarks) remarks.value = d.keterangan || '';
       pmbRenderStats();
       pmbRenderTable(force);
       pmbRenderRincian();
       pmbRenderLaporan();
+      pmbPublishDailyTotals();
     }
     function pmbRenderStats() {
       if (!document.getElementById('pmb_stats')) return;
       const d = pmbData();
+      if (d.loading) {
+        document.getElementById('pmb_stats').innerHTML = '';
+        document.getElementById('pmb_stats2').textContent = 'Menunggu data tanggal ' + d.tanggal + '...';
+        return;
+      }
       const t = pmbTotals(d.items);
       const card = (lab, val, cls) => `<div class="p-4 rounded-2xl border ${cls} shadow-sm"><div class="text-[10px] font-extrabold uppercase tracking-wider opacity-70">${lab}</div><div class="text-2xl font-black mt-1">${val}</div></div>`;
       document.getElementById('pmb_stats').innerHTML =
-        card('Total Porsi', t.total, 'bg-slate-50 border-slate-200 text-slate-800') +
+        card('Total Porsi Aktif', t.total, 'bg-white border-emerald-200 text-[#0e5c4a]') +
         card('Porsi Kecil', t.kecil, 'bg-emerald-50 border-emerald-200 text-emerald-800') +
-        card('Porsi Besar', t.besar, 'bg-orange-50 border-orange-200 text-orange-800') +
-        card('Satuan Terdata', t.sekolah + ' sekolah · ' + t.posyandu + ' posyandu', 'bg-indigo-50 border-indigo-200 text-indigo-800').replace('text-2xl', 'text-base');
+        card('Porsi Besar', t.besar, 'bg-amber-50 border-amber-200 text-amber-800') +
+        card('Satuan Terdata', t.sekolah + ' sekolah · ' + t.posyandu + ' posyandu', 'bg-slate-50 border-slate-200 text-slate-800').replace('text-2xl', 'text-base');
       document.getElementById('pmb_stats2').textContent = 'Siswa ' + t.siswa + ' · Tendik ' + t.tendik + ' · Uji organoleptik ' + t.org + ' · Balita ' + t.balita + ' · Ibu hamil ' + t.bumil + ' · Ibu menyusui ' + t.busui + ' · Sampel bahan makanan ' + t.smp + ' · Anak/ibu alergi ' + (() => { const am = pmbAlergiMap(); return d.items.reduce((n, i) => n + ((am[pmbNorm(i.nama)] || { n: 0 }).n), 0); })();
+      const summary = document.getElementById('pmb_holiday_summary');
+      if (summary) {
+        const lines = [];
+        ['sekolah', 'posyandu', 'sampel'].forEach(key => { const text = pmbTableRemarksText(key); if (text) lines.push((key === 'sekolah' ? 'Peserta Didik/Guru/Tendik' : key === 'posyandu' ? 'Posyandu' : 'Sampel') + ': ' + text); });
+        d.items.forEach(it => {
+          const tableKey = it.jenis === 'POSYANDU' ? 'posyandu' : 'sekolah';
+          if (pmbHolidayActive(d.liburTabel && d.liburTabel[tableKey])) return;
+          const text = pmbHolidaySummary(it);
+          if (text) lines.push(it.nama + ': ' + text);
+        });
+        summary.innerHTML = lines.length ? '<div class="font-extrabold text-amber-900">Ringkasan otomatis:</div><div class="mt-1 whitespace-pre-line">' + pmbEsc(lines.join('\n')) + '</div>' : '<span class="text-emerald-700">Tidak ada status libur pada tanggal ini; seluruh penerima manfaat dihitung aktif.</span>';
+      }
     }
     const PMB_CALC_KEYS = { siswa: 'siswa', td: 'td', total: 'total', pk: 'porsiKecil', pb: 'porsiBesar', sl: 'siswaL', sp: 'siswaP', tl: 'tl', tp: 'tp', org: 'org', bumil: 'bumil', busui: 'busui', kl: 'kl', kp: 'kp' };
     function pmbRenderTable(force) {
       const host = document.getElementById('pmb_tables');
       if (!host) return;
       const ae = document.activeElement;
-      if (!force && ae && ae.tagName === 'INPUT' && host.contains(ae)) { pmbRefreshComputed(); return; }   // jangan bangun ulang saat sedang mengetik
+      if (!force && ae && ae.tagName === 'INPUT' && host.contains(ae)) { pmbRefreshComputed(); return; }
       const d = pmbData();
+      if (d.loading) {
+        host.innerHTML = '<div class="pmb-table-card p-8 text-center text-xs font-bold text-slate-500">Memuat data harian...</div>';
+        return;
+      }
       const q = (document.getElementById('pmb_q')?.value || '').trim().toUpperCase();
       const ok = it => !q || pmbNorm(it.nama).includes(q);
       const sorted = pmbSorted(d.items);
       const sk = sorted.filter(i => i.jenis !== 'POSYANDU' && ok(i)), po = sorted.filter(i => i.jenis === 'POSYANDU' && ok(i));
-      const inp = (id, f, v, type, ph, cls) => `<input type="${type}" ${type === 'number' ? 'min="0"' : ''} data-id="${id}" data-f="${f}" value="${pmbEsc(v)}" placeholder="${pmbEsc(ph || '')}" class="pmb-cell ${cls || ''}">`;
-      const calc = (id, k, v, rs) => `<td class="pmb-calc" ${rs > 1 ? 'rowspan="' + rs + '"' : ''} data-id="${id}" data-calc="${k}">${v}</td>`;
+      const inp = (id, f, v, type, ph, cls) => `<input type="${type}" ${type === 'number' ? 'min="0"' : ''} data-id="${pmbEsc(id)}" data-f="${f}" value="${pmbEsc(v)}" placeholder="${pmbEsc(ph || '')}" class="pmb-cell ${cls || ''}">`;
+      const calc = (id, k, v, rs) => `<td class="pmb-calc" ${rs > 1 ? 'rowspan="' + rs + '"' : ''} data-id="${pmbEsc(id)}" data-calc="${k}">${v}</td>`;
       const T = (k, id) => `<td data-id="${id}" data-calc="${k}"></td>`;
       const hasV = v => v !== undefined && v !== null && v !== '';
+      const remark = text => '<td class="pmb-remark' + (text ? '' : ' is-empty') + '">' + (text ? pmbEsc(text) : '-') + '</td>';
+      const removeBtn = id => '<button type="button" title="Hapus" onclick="pmbDeleteRow(\'' + pmbEsc(id) + '\')" class="pmb-icon-btn">Hapus</button>';
       const AM = pmbAlergiMap();
+      const schoolHoliday = d.liburTabel && d.liburTabel.sekolah;
+      const posyanduHoliday = d.liburTabel && d.liburTabel.posyandu;
+      const sampleHoliday = d.liburTabel && d.liburTabel.sampel;
 
-      // ---- tabel sekolah ----
-      let h = '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🏫 Peserta Didik dan Guru/Tendik</div>' +
-        '<div class="hidden-print flex flex-wrap items-center gap-1.5">' +
-        '<select id="pmb_add_group" title="Pilih kelompok untuk baris baru" class="border-2 border-slate-200 rounded-lg px-2 py-1.5 text-[11px] font-bold bg-white text-slate-700 cursor-pointer">' +
-        '<option value="PAUD">PAUD/TK</option><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option></select>' +
-        '<button type="button" onclick="pmbAddRowSk(document.getElementById(\'pmb_add_group\').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button>' +
-        '</div></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1950px]"><thead><tr>' +
-        ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Tendik Laki-Laki', 'Tendik Perempuan', 'Total Tendik', 'Uji Organoleptik', 'Jumlah Siswa, Guru/Tendik & Organoleptik', 'Porsi Kecil', 'Porsi Besar', 'Anak Alergi', 'Aksi'].map((x, i) => '<th' + (i === 15 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
+      let h = '<div class="pmb-table-card"><div class="pmb-card-head"><div class="pmb-card-title">Peserta Didik dan Guru/Tendik</div><div class="pmb-card-actions hidden-print">' +
+        pmbHolidayPill('tabel', '', 'sekolah', 'Libur Tabel', schoolHoliday, false) +
+        '<select id="pmb_add_group" title="Pilih kelompok untuk baris baru" class="rounded-full border border-white/30 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-700"><option value="PAUD">PAUD/TK</option><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option></select>' +
+        '<button type="button" onclick="pmbAddRowSk(document.getElementById(\'pmb_add_group\').value)" class="pmb-add-btn">+ Tambah Baris</button></div></div>' +
+        '<div class="overflow-x-auto"><table class="min-w-[2180px]"><thead><tr>' +
+        ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Tendik Laki-Laki', 'Tendik Perempuan', 'Total Tendik', 'Uji Organoleptik', 'Jumlah Siswa, Guru/Tendik & Organoleptik', 'Porsi Kecil', 'Porsi Besar', 'Anak Alergi', 'Aksi', 'Remarks / Keterangan'].map((x, i) => '<th' + (i === 15 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
       sk.forEach((it, idx) => {
-        const c = pmbCalc(it), id = it.id;
-        const lines = it.jenis === 'SD'
-          ? [['1,2,3', 'kl', 'kp', 'kj', c.lpKecil], ['4,5,6', 'bl', 'bp', 'bj', c.lpBesar]]
-          : (it.jenis === 'SMP' || it.jenis === 'SMA')
-            ? [[it.jenis === 'SMA' ? '10,11,12' : '7,8,9', 'bl', 'bp', 'bj', c.lpBesar]]
-            : [['PAUD', 'kl', 'kp', 'kj', c.lpKecil]];
-        const rs = lines.length;
+        const c = pmbCalc(it), id = it.id, bands = pmbBands(it);
+        const lines = bands.map(band => ({ band: band, l: band.l, p: band.p, j: band.j, lp: band.key === 'kecil' ? c.lpKecil : c.lpBesar }));
+        const rs = lines.length, holidayText = pmbHolidaySummary(it), institutionOff = pmbHolidayActive(it.liburInstitusi) || pmbHolidayActive(schoolHoliday);
         lines.forEach((ln, k) => {
-          const pmVal = hasV(it[ln[3]]) ? it[ln[3]] : '';
-          const warn = hasV(it[ln[3]]) && pmbN(it[ln[3]]) !== ln[4] ? 'warn' : '';
+          const pmVal = hasV(it[ln.j]) ? it[ln.j] : '';
+          const warn = hasV(it[ln.j]) && pmbN(it[ln.j]) !== ln.lp ? 'warn' : '';
           h += '<tr>';
-          if (k === 0) h += `<td rowspan="${rs}" class="text-center font-bold text-slate-500">${idx + 1}</td><td rowspan="${rs}">${inp(id, 'nama', it.nama, 'text', '', 't')}<div class="text-[10px] font-bold text-slate-400 mt-0.5">${PMB_LABEL[it.jenis] || ''}</div></td>`;
-          h += `<td class="text-center font-bold">${ln[0]}</td>`;
-          h += `<td>${inp(id, ln[3], pmVal, 'number', String(ln[4]), warn)}</td><td>${inp(id, ln[1], it[ln[1]] || '', 'number', '0')}</td><td>${inp(id, ln[2], it[ln[2]] || '', 'number', '0')}</td>`;
           if (k === 0) {
-            h += calc(id, 'siswa', c.siswa, rs) + `<td rowspan="${rs}">${inp(id, 'tl', it.tl || '', 'number', '0')}</td><td rowspan="${rs}">${inp(id, 'tp', it.tp || '', 'number', '0')}</td>` +
-              calc(id, 'td', c.td, rs) + `<td rowspan="${rs}">${inp(id, 'org', it.org || '', 'number', '0')}</td>` + calc(id, 'total', c.total, rs) + calc(id, 'pk', c.porsiKecil, rs) + calc(id, 'pb', c.porsiBesar, rs) + `<td rowspan="${rs}" class="pmb-calc" data-id="${id}" data-alg="1">${pmbAlgHtml(it, AM)}</td>` +
-              `<td rowspan="${rs}" class="text-center hidden-print"><button type="button" title="Hapus" onclick="pmbDeleteRow('${id}')" class="hidden-print px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td>`;
+            h += `<td rowspan="${rs}" class="text-center font-bold text-slate-500">${idx + 1}</td><td rowspan="${rs}"><div class="pmb-unit-name">${inp(id, 'nama', it.nama, 'text', '', 't')}</div><div class="mt-1 flex flex-wrap items-center gap-1.5"><span class="pmb-micro">${PMB_LABEL[it.jenis] || ''}</span><span class="pmb-status-badge${institutionOff ? ' is-off' : ''}">${institutionOff ? 'LIBUR (0)' : 'Aktif'}</span></div><div class="mt-2">${pmbHolidayPill('institusi', id, '', 'Libur Satuan', it.liburInstitusi, true)}</div></td>`;
+          }
+          const off = it.liburSel || {};
+          h += '<td><div class="pmb-grade-grid' + (ln.band.grades.length === 1 ? ' paud' : '') + '">' + ln.band.grades.map(g =>
+            '<div class="pmb-grade' + (pmbHolidayActive(off[g]) ? ' is-off' : '') + '"><span class="text-[9px] font-black text-slate-500">' + pmbEsc(pmbGradeLabel(g)) + '</span>' + pmbHolidayPill('sel', id, g, 'Status', off[g], true) + '</div>'
+          ).join('') + '</div>';
+          if (ln.band.grades.length > 1) h += '<button type="button" onclick="pmbGradeDetailEdit(\'' + pmbEsc(id) + '\',\'' + ln.band.key + '\')" class="mt-1 text-[9px] font-black text-[#0e5c4a] underline">Rincian angka per kelas</button>';
+          h += '</td>';
+          h += `<td>${inp(id, ln.j, pmVal, 'number', String(ln.lp), warn)}</td><td>${inp(id, ln.l, it[ln.l] || '', 'number', '0')}</td><td>${inp(id, ln.p, it[ln.p] || '', 'number', '0')}</td>`;
+          if (k === 0) {
+            h += calc(id, 'siswa', c.siswa, rs) + `<td rowspan="${rs}">${inp(id, 'tl', it.tl || '', 'number', '0')}<div class="mt-1">${pmbHolidayPill('sel', id, 'tendik', 'Tendik', off.tendik, true)}</div></td><td rowspan="${rs}">${inp(id, 'tp', it.tp || '', 'number', '0')}</td>` +
+              calc(id, 'td', c.td, rs) + `<td rowspan="${rs}">${inp(id, 'org', it.org || '', 'number', '0')}</td>` + calc(id, 'total', c.total, rs) + calc(id, 'pk', c.porsiKecil, rs) + calc(id, 'pb', c.porsiBesar, rs) + `<td rowspan="${rs}" class="pmb-calc" data-id="${pmbEsc(id)}" data-alg="1">${pmbAlgHtml(it, AM)}</td>` +
+              `<td rowspan="${rs}" class="text-center hidden-print">${removeBtn(id)}</td>`;
+            h += '<td rowspan="' + rs + '" class="pmb-remark' + (holidayText ? '' : ' is-empty') + '">' + (holidayText ? pmbEsc(holidayText) : '-') + '</td>';
           }
           h += '</tr>';
         });
       });
-      if (!sk.length) h += `<tr><td colspan="16" class="text-center text-slate-400 p-6">${d.items.length ? 'Tidak ada data yang cocok.' : 'Database masih kosong. Tambahkan lewat form di atas atau klik "Muat Data Awal".'}</td></tr>`;
-      else h += `<tr class="pmb-total"><td colspan="3">TOTAL</td>${T('siswa', 'T-sk')}${T('sl', 'T-sk')}${T('sp', 'T-sk')}${T('siswa', 'T-sk')}${T('tl', 'T-sk')}${T('tp', 'T-sk')}${T('td', 'T-sk')}${T('org', 'T-sk')}${T('total', 'T-sk')}${T('pk', 'T-sk')}${T('pb', 'T-sk')}<td data-id="T-sk" data-alg="1"></td><td></td></tr>`;
+      if (!sk.length) h += `<tr><td colspan="17" class="text-center text-slate-400 p-6">${d.items.length ? 'Tidak ada data yang cocok.' : 'Database masih kosong. Tambahkan lewat form di atas atau klik "Muat Data Awal".'}</td></tr>`;
+      else h += `<tr class="pmb-total"><td colspan="3">TOTAL</td>${T('siswa', 'T-sk')}${T('sl', 'T-sk')}${T('sp', 'T-sk')}${T('siswa', 'T-sk')}${T('tl', 'T-sk')}${T('tp', 'T-sk')}${T('td', 'T-sk')}${T('org', 'T-sk')}${T('total', 'T-sk')}${T('pk', 'T-sk')}${T('pb', 'T-sk')}<td data-id="T-sk" data-alg="1"></td><td class="hidden-print"></td><td class="pmb-remark">${pmbEsc(d.keterangan || '-')}</td></tr>`;
       h += '</tbody></table></div></div>';
 
-      // ---- tabel posyandu ----
-      // ---- tabel posyandu ----
-h += '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🤱 Non Peserta Didik (3B) — Posyandu</div><button type="button" onclick="pmbAddRowPo()" class="hidden-print bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[1450px]"><thead><tr>' +
-  ['No.', 'Nama Posyandu', 'Ibu Hamil', 'Ibu Menyusui', 'Balita Laki-Laki', 'Balita Perempuan', 'Uji Organoleptik', 'Total Jumlah Peserta 3B', 'Porsi Kecil', 'Porsi Besar', 'Ibu/Balita Alergi', 'Aksi'].map((x, i) => '<th' + (i === 11 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
-po.forEach((it, idx) => {
-  const c = pmbCalc(it), id = it.id;
-  h += `<tr><td class="text-center font-bold text-slate-500">${idx + 1}</td><td>${inp(id, 'nama', it.nama, 'text', '', 't')}</td>` +
-    `<td>${inp(id, 'bumil', it.bumil || '', 'number', '0')}</td><td>${inp(id, 'busui', it.busui || '', 'number', '0')}</td><td>${inp(id, 'kl', it.kl || '', 'number', '0')}</td><td>${inp(id, 'kp', it.kp || '', 'number', '0')}</td>` +
-    `<td>${inp(id, 'org', it.org || '', 'number', '0')}</td>` +
-    calc(id, 'total', c.total, 1) + calc(id, 'pk', c.porsiKecil, 1) + calc(id, 'pb', c.porsiBesar, 1) + `<td class="pmb-calc" data-id="${id}" data-alg="1">${pmbAlgHtml(it, AM)}</td>` +
-    `<td class="text-center hidden-print"><button type="button" title="Hapus" onclick="pmbDeleteRow('${id}')" class="hidden-print px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td></tr>`;
-});
-if (!po.length) h += `<tr><td colspan="11" class="text-center text-slate-400 p-6">${d.items.length ? 'Tidak ada data yang cocok.' : 'Belum ada posyandu.'}</td></tr>`;
-else h += `<tr class="pmb-total"><td colspan="2">TOTAL</td>${T('bumil', 'T-po')}${T('busui', 'T-po')}${T('kl', 'T-po')}${T('kp', 'T-po')}${T('org', 'T-po')}${T('total', 'T-po')}${T('pk', 'T-po')}${T('pb', 'T-po')}<td data-id="T-po" data-alg="1"></td><td></td></tr>`;
-h += '</tbody></table></div></div>';
-      // ---- tabel 3: sampel bahan makanan ----
-      const SM = pmbSampel();
-      h += '<div><div class="flex flex-wrap items-center justify-between gap-2 mb-2"><div class="font-extrabold text-slate-800 text-xs uppercase tracking-wider">🧪 Sampel Bahan Makanan (Porsi Besar)</div><button type="button" onclick="pmbAddRowSmp()" class="hidden-print bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-[11px] shadow-sm transition-all">+ Tambah Baris</button></div><div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white"><table class="w-full min-w-[850px]"><thead><tr>' +
-        ['No.', 'Nama Sampel Bahan Makanan', 'Jumlah Porsi', 'Jenis Porsi', 'Anak/Ibu Alergi Bahan Ini', 'Aksi'].map((x, i) => '<th' + (i === 5 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
-      if (!SM.length) h += '<tr><td colspan="6" class="text-center text-slate-400 p-6">Belum ada baris sampel. Klik "+ Tambah Baris" untuk menambahkan.</td></tr>';
-      SM.forEach((r, i) => {
-        h += `<tr><td class="text-center font-bold text-slate-500">${i + 1}</td><td><input type="text" data-sid="${r.id}" data-sf="nama" value="${pmbEsc(r.nama)}" class="pmb-cell t"></td>` +
-          `<td><input type="number" min="0" data-sid="${r.id}" data-sf="jumlah" value="${r.jumlah}" placeholder="0" class="pmb-cell"></td><td class="pmb-calc">Porsi Besar</td>` +
-          `<td class="pmb-calc" data-salg="${r.id}">${pmbSampelAlg(r.nama)}</td>` +
-          `<td class="text-center hidden-print"><button type="button" title="Hapus" onclick="pmbDeleteRowSmp('${r.id}')" class="hidden-print px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-red-50 border border-slate-200 text-red-600 font-bold">🗑️</button></td></tr>`;
+      h += '<div class="pmb-table-card"><div class="pmb-card-head"><div class="pmb-card-title">Non Peserta Didik (3B) — Posyandu</div><div class="pmb-card-actions hidden-print">' + pmbHolidayPill('tabel', '', 'posyandu', 'Libur Tabel', posyanduHoliday, false) + '<button type="button" onclick="pmbAddRowPo()" class="pmb-add-btn">+ Tambah Baris</button></div></div>' +
+        '<div class="overflow-x-auto"><table class="min-w-[1750px]"><thead><tr>' +
+        ['No.', 'Nama Posyandu', 'Ibu Hamil', 'Ibu Menyusui', 'Balita Laki-Laki', 'Balita Perempuan', 'Uji Organoleptik', 'Total Jumlah Peserta 3B', 'Porsi Kecil', 'Porsi Besar', 'Ibu/Balita Alergi', 'Aksi', 'Remarks / Keterangan'].map((x, i) => '<th' + (i === 11 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
+      po.forEach((it, idx) => {
+        const c = pmbCalc(it), id = it.id, off = it.liburSel || {}, holidayText = pmbHolidaySummary(it), institutionOff = pmbHolidayActive(it.liburInstitusi) || pmbHolidayActive(posyanduHoliday);
+        const cell = (field, key, label) => '<div>' + inp(id, field, it[field] || '', 'number', '0') + '<div class="mt-1">' + pmbHolidayPill('sel', id, key, label, off[key], true) + '</div></div>';
+        h += `<tr><td class="text-center font-bold text-slate-500">${idx + 1}</td><td><div class="pmb-unit-name">${inp(id, 'nama', it.nama, 'text', '', 't')}</div><div class="mt-1 flex flex-wrap items-center gap-1.5"><span class="pmb-micro">Posyandu (3B)</span><span class="pmb-status-badge${institutionOff ? ' is-off' : ''}">${institutionOff ? 'LIBUR (0)' : 'Aktif'}</span></div><div class="mt-2">${pmbHolidayPill('institusi', id, '', 'Libur Satuan', it.liburInstitusi, true)}</div></td>` +
+          '<td>' + cell('bumil', 'bumil', 'Bumil') + '</td><td>' + cell('busui', 'busui', 'Busui') + '</td><td>' + inp(id, 'kl', it.kl || '', 'number', '0') + '<div class="mt-1">' + pmbHolidayPill('sel', id, 'balita', 'Balita L', off.balita, true) + '</div></td><td>' + inp(id, 'kp', it.kp || '', 'number', '0') + '<div class="mt-1 text-[9px] font-bold text-slate-400">Status balita bersama kolom L</div></td>' +
+          `<td>${inp(id, 'org', it.org || '', 'number', '0')}</td>` + calc(id, 'total', c.total, 1) + calc(id, 'pk', c.porsiKecil, 1) + calc(id, 'pb', c.porsiBesar, 1) + `<td class="pmb-calc" data-id="${pmbEsc(id)}" data-alg="1">${pmbAlgHtml(it, AM)}</td>` +
+          `<td class="text-center hidden-print">${removeBtn(id)}</td>` + remark(holidayText) + '</tr>';
       });
-      h += `<tr class="pmb-total"><td colspan="2">TOTAL (${SM.length} sampel)</td><td data-smptotal="1">${pmbSampelTotal()}</td><td>Porsi Besar</td><td></td><td class="hidden-print"></td></tr></tbody></table></div></div>`;
+      if (!po.length) h += `<tr><td colspan="13" class="text-center text-slate-400 p-6">${d.items.length ? 'Tidak ada data yang cocok.' : 'Belum ada posyandu.'}</td></tr>`;
+      else h += `<tr class="pmb-total"><td colspan="2">TOTAL</td>${T('bumil', 'T-po')}${T('busui', 'T-po')}${T('kl', 'T-po')}${T('kp', 'T-po')}${T('org', 'T-po')}${T('total', 'T-po')}${T('pk', 'T-po')}${T('pb', 'T-po')}<td data-id="T-po" data-alg="1"></td><td class="hidden-print"></td><td class="pmb-remark">${pmbEsc(d.keterangan || '-')}</td></tr>`;
+      h += '</tbody></table></div></div>';
+      const SM = pmbSampel(), sampleRemark = pmbTableRemarksText('sampel');
+      h += '<div class="pmb-table-card"><div class="pmb-card-head"><div class="pmb-card-title">Sampel Bahan Makanan (Porsi Besar)</div><div class="pmb-card-actions hidden-print">' + pmbHolidayPill('tabel', '', 'sampel', 'Libur Tabel', sampleHoliday, false) + '<button type="button" onclick="pmbAddRowSmp()" class="pmb-add-btn">+ Tambah Baris</button></div></div>' +
+        '<div class="overflow-x-auto"><table class="min-w-[1050px]"><thead><tr>' +
+        ['No.', 'Nama Sampel Bahan Makanan', 'Jumlah Porsi', 'Jenis Porsi', 'Anak/Ibu Alergi Bahan Ini', 'Aksi', 'Remarks / Keterangan'].map((x, i) => '<th' + (i === 5 ? ' class="hidden-print"' : '') + '>' + x + '</th>').join('') + '</tr></thead><tbody>';
+      if (!SM.length) h += '<tr><td colspan="7" class="text-center text-slate-400 p-6">Belum ada baris sampel. Klik "+ Tambah Baris" untuk menambahkan.</td></tr>';
+      SM.forEach((r, i) => {
+        h += `<tr><td class="text-center font-bold text-slate-500">${i + 1}</td><td><input type="text" data-sid="${pmbEsc(r.id)}" data-sf="nama" value="${pmbEsc(r.nama)}" class="pmb-cell t"></td>` +
+          `<td><input type="number" min="0" data-sid="${pmbEsc(r.id)}" data-sf="jumlah" value="${r.jumlah}" placeholder="0" class="pmb-cell"></td><td class="pmb-calc">Porsi Besar</td>` +
+          `<td class="pmb-calc" data-salg="${pmbEsc(r.id)}">${pmbSampelAlg(r.nama)}</td>` +
+          `<td class="text-center hidden-print"><button type="button" title="Hapus" onclick="pmbDeleteRowSmp('${pmbEsc(r.id)}')" class="pmb-icon-btn">Hapus</button></td>` + remark(sampleRemark) + '</tr>';
+      });
+      h += `<tr class="pmb-total"><td colspan="2">TOTAL (${SM.length} sampel)</td><td data-smptotal="1">${pmbSampelTotal()}</td><td>Porsi Besar</td><td></td><td class="hidden-print"></td><td class="pmb-remark">${pmbEsc(d.keterangan || '-')}</td></tr></tbody></table></div></div>`;
       h += pmbOrphanNote(d.items);
       host.innerHTML = h;
       const agSel = document.getElementById('pmb_add_group');
@@ -12866,7 +13786,7 @@ h += '</tbody></table></div></div>';
       });
       host.querySelectorAll('input[data-f="kj"],input[data-f="bj"]').forEach(el => {
         const it = byId[el.dataset.id]; if (!it) return;
-        const c = pmbCalc(it), lp = el.dataset.f === 'kj' ? c.lpKecil : c.lpBesar;
+        const c = pmbCalcBase(it), lp = el.dataset.f === 'kj' ? c.lpKecil : c.lpBesar;
         el.placeholder = String(lp);
         el.classList.toggle('warn', el.value !== '' && pmbN(el.value) !== lp);
       });
@@ -12888,21 +13808,25 @@ h += '</tbody></table></div></div>';
       const label = PMB_LABEL[j] || j;
       if (!confirm('Apakah Anda yakin ingin menambahkan baris baru pada tabel Peserta Didik dan Guru/Tendik (kelompok ' + label + ')?')) return;
       window.__pmbAddGroup = j;
-      const d = pmbData(), it = { id: pmbNewId(), jenis: j, nama: '' };
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      const it = { id: pmbNewId(), jenis: j, nama: '' };
       PMB_FIELDS.forEach(k => { it[k] = 0; });
       PMB_JM.forEach(k => { it[k] = null; });
       const list = d.items.slice(); list.push(it);
-      pmbSave({ tanggal: d.tanggal, items: list });
+      if (!pmbSave({ tanggal: d.tanggal, items: list }, { masterStructure: true })) { alert('Log tanggal ini belum siap.'); return; }
       pmbRender(true);
       pmbFocusCell(it.id, null);
     }
     function pmbAddRowPo() {
       if (!confirm('Apakah Anda yakin ingin menambahkan baris baru pada tabel Non Peserta Didik (3B) — Posyandu?')) return;
-      const d = pmbData(), it = { id: pmbNewId(), jenis: 'POSYANDU', nama: '' };
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      const it = { id: pmbNewId(), jenis: 'POSYANDU', nama: '' };
       PMB_FIELDS.forEach(k => { it[k] = 0; });
       PMB_JM.forEach(k => { it[k] = null; });
       const list = d.items.slice(); list.push(it);
-      pmbSave({ tanggal: d.tanggal, items: list });
+      if (!pmbSave({ tanggal: d.tanggal, items: list }, { masterStructure: true })) { alert('Log tanggal ini belum siap.'); return; }
       pmbRender(true);
       pmbFocusCell(it.id, null);
     }
@@ -12911,12 +13835,14 @@ h += '</tbody></table></div></div>';
       const list = pmbSampel();
       const id = 'smp' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
       list.push({ id: id, nama: '', jumlah: 0 });
-      pmbSampelSave(list);
+      if (!pmbSampelSave(list, { masterStructure: true })) { alert('Log tanggal ini belum siap.'); return; }
       pmbRender(true);
       pmbFocusCell(null, id);
     }
     function pmbDeleteRow(id) {
-      const d = pmbData(), it = d.items.find(x => x.id === id);
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      const it = d.items.find(x => x.id === id);
       if (!it) return;
       const isPo = it.jenis === 'POSYANDU';
       const tName = isPo ? 'Non Peserta Didik (3B) — Posyandu' : 'Peserta Didik dan Guru/Tendik';
@@ -12926,7 +13852,7 @@ h += '</tbody></table></div></div>';
       let msg = 'Apakah Anda yakin ingin menghapus baris ke-' + no + ' (' + (it.nama || '(tanpa nama)') + ') dari tabel ' + tName + '?';
       if (linked.length) msg += '\n\nCatatan: ' + linked.length + ' data alergi dengan asal "' + it.nama + '" akan ikut dihapus agar tetap sinkron.';
       if (!confirm(msg)) return;
-      pmbSave({ tanggal: d.tanggal, items: d.items.filter(x => x.id !== id) });
+      if (!pmbSave({ tanggal: d.tanggal, items: d.items.filter(x => x.id !== id) }, { masterStructure: true })) { alert('Log tanggal ini belum siap. Penghapusan belum disimpan.'); return; }
       if (linked.length && typeof sdSave === 'function') sdSave(sdGetAll().filter(s => pmbNorm(s.sekolah) !== pmbNorm(it.nama)));
       if (pmbEditId === id) pmbReset();
       pmbRender(true);
@@ -12940,7 +13866,7 @@ h += '</tbody></table></div></div>';
       const r = list[i];
       if (!confirm('Apakah Anda yakin ingin menghapus baris ke-' + (i + 1) + ' (' + (r.nama || '(tanpa nama)') + ') dari tabel Sampel Bahan Makanan (Porsi Besar)?')) return;
       list.splice(i, 1);
-      pmbSampelSave(list);
+      if (!pmbSampelSave(list, { masterStructure: true })) { alert('Log tanggal ini belum siap. Penghapusan belum disimpan.'); return; }
       pmbRender(true);
     }
 
@@ -12978,17 +13904,30 @@ h += '</tbody></table></div></div>';
     }
     function pmbShow(it, f) { if (f === 'nama') return it.nama; if (f === 'kj' || f === 'bj') return pmbHas(it[f]) ? pmbN(it[f]) : 'otomatis (L+P)'; return pmbN(it[f]); }
     function pmbInputVal(it, f) { if (f === 'nama') return it.nama; if (f === 'kj' || f === 'bj') return pmbHas(it[f]) ? it[f] : ''; return pmbN(it[f]) || ''; }
+    function pmbFieldBand(it, field) {
+      return pmbBands(it).find(band => field === band.l || field === band.p || field === band.j);
+    }
+    function pmbPartialHoliday(it, band) {
+      if (!band) return false;
+      const off = it.liburSel || {};
+      const active = band.grades.filter(g => pmbHolidayActive(off[g])).length;
+      return active > 0 && active < band.grades.length;
+    }
+    function pmbBandChanged(a, b, band) {
+      return band && (pmbN(a[band.l]) !== pmbN(b[band.l]) || pmbN(a[band.p]) !== pmbN(b[band.p]) || (pmbHas(a[band.j]) ? pmbN(a[band.j]) : pmbN(a[band.l]) + pmbN(a[band.p])) !== (pmbHas(b[band.j]) ? pmbN(b[band.j]) : pmbN(b[band.l]) + pmbN(b[band.p])));
+    }
     function pmbMutate(it, f, raw) {
-      if (f === 'nama') { it.nama = String(raw).trim().replace(/\s+/g, ' '); }
-      else if (f === 'kj' || f === 'bj') { it[f] = String(raw).trim() === '' ? null : pmbN(raw); }
+      if (f === 'nama') { it.nama = String(raw).trim().replace(/\s+/g, ' '); return; }
+      const before = pmbCalcBase(it);
+      if (f === 'kj' || f === 'bj') it[f] = String(raw).trim() === '' ? null : pmbN(raw);
       else {
-        const before = pmbCalc(it);
         it[f] = pmbN(raw);
-        // bila Jumlah PM semula sama dengan L+P, ikut diperbarui agar total langsung berubah
         [['kl', 'kp', 'kj', before.lpKecil], ['bl', 'bp', 'bj', before.lpBesar]].forEach(g => {
           if (it.jenis !== 'POSYANDU' && (f === g[0] || f === g[1]) && pmbHas(it[g[2]]) && pmbN(it[g[2]]) === g[3]) it[g[2]] = pmbN(it[g[0]]) + pmbN(it[g[1]]);
         });
       }
+      const band = pmbFieldBand(it, f);
+      if (band && it.kelasDetail) delete it.kelasDetail[band.key];
     }
     // ubah tabel Sampel Bahan Makanan — dengan konfirmasi
     async function pmbSampelEdit(t) {
@@ -13008,7 +13947,8 @@ h += '</tbody></table></div></div>';
       if (before !== after) msg += '\nTotal porsi sampel: ' + before + ' → ' + after;
       if (!confirm(msg)) { revert(); return; }
       const list = pmbSampel(), r2 = list.find(x => x.id === sid); if (!r2) return;
-      r2[f] = newV; pmbSampelSave(list);
+      r2[f] = newV;
+      if (!pmbSampelSave(list, { masterStructure: f === 'nama' })) { alert('Log tanggal ini belum siap. Perubahan belum disimpan.'); pmbRender(true); return; }
       const e = el(); if (e) e.value = newV;
       pmbRenderStats(); pmbRefreshComputed(); pmbRenderRincian(); pmbRenderLaporan();
     }
@@ -13027,6 +13967,12 @@ h += '</tbody></table></div></div>';
         const v = raw.trim().replace(/\s+/g, ' ');
         if (!v) { alert('Nama tidak boleh kosong.'); revert(); return; }
         if (d.items.some(x => x.id !== id && pmbKey(x.nama) === pmbKey(v))) { alert('"' + v + '" sudah ada di database.'); revert(); return; }
+      }
+      const affectedBand = pmbFieldBand(it, f);
+      if (pmbPartialHoliday(it, affectedBand)) {
+        alert('Nonaktifkan libur per kelas terlebih dahulu sebelum mengubah angka agregat, lalu perbarui rincian kelas.');
+        revert();
+        return;
       }
       const clone = JSON.parse(JSON.stringify(it)); pmbMutate(clone, f, raw);
       const oldD = pmbShow(it, f), newD = pmbShow(clone, f);
@@ -13052,12 +13998,16 @@ h += '</tbody></table></div></div>';
       if (!it2) return;
       const oldName = it2.nama;
       pmbMutate(it2, f, raw);
+      if (!pmbSave({ tanggal: d2.tanggal, items: d2.items }, { masterStructure: f === 'nama' })) {
+        alert('Log tanggal ini belum siap. Perubahan belum disimpan.');
+        pmbRender(true);
+        return;
+      }
       if (f === 'nama' && typeof sdGetAll === 'function' && typeof sdSave === 'function') {
         const all = sdGetAll(); let ch = false;
         all.forEach(s => { if (pmbNorm(s.sekolah) === pmbNorm(oldName)) { s.sekolah = it2.nama; ch = true; } });
         if (ch) sdSave(all);
       }
-      pmbSave({ tanggal: d2.tanggal, items: d2.items });
       const el = inputEl(); if (el) el.value = pmbInputVal(it2, f);
       ['kj', 'bj'].forEach(k => { const e2 = document.querySelector('#pmb_tables input[data-id="' + id + '"][data-f="' + k + '"]'); if (e2) e2.value = pmbInputVal(it2, k); });
       pmbRenderStats(); pmbRefreshComputed(); pmbRenderRincian(); pmbRenderLaporan();
@@ -13166,11 +14116,13 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       document.getElementById('pmb_btn_cancel').classList.add('hidden');
       pmbOnJenis();
     }
-    function pmbSubmit() {
+    async function pmbSubmit() {
       const jenis = document.getElementById('pmb_f_jenis').value, cfg = PMB_CFG[jenis];
       const nama = document.getElementById('pmb_f_nama').value.trim().replace(/\s+/g, ' ');
       if (!nama) { alert('Nama wajib diisi.'); return; }
-      const d = pmbData(), list = d.items.slice();
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      const list = d.items.slice();
       const it = { id: pmbEditId || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7)), jenis: jenis, nama: nama };
       PMB_FIELDS.forEach(k => { it[k] = 0; });
       Object.keys(PMB_GROUPS).forEach(g => { if (cfg[g]) PMB_GROUPS[g].forEach(k => { it[k] = pmbN(document.getElementById('pmb_f_' + k).value); }); });
@@ -13180,9 +14132,29 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       const i = list.findIndex(x => x.id === it.id);
       const wasEdit = !!pmbEditId && i !== -1;
       const old = wasEdit ? list[i] : null;
+      if (old) {
+        if (old.jenis !== jenis && (pmbHolidayActive(old.liburInstitusi) || Object.keys(old.liburSel || {}).some(k => pmbHolidayActive(old.liburSel[k])))) {
+          alert('Nonaktifkan seluruh status libur sebelum mengubah jenis satuan.');
+          return;
+        }
+        if (old.jenis === jenis) {
+          it.liburInstitusi = pmbClone(old.liburInstitusi || { aktif: false, alasan: '' });
+          it.liburSel = pmbClone(old.liburSel || {});
+          it.kelasDetail = pmbClone(old.kelasDetail || {});
+          pmbBands(old).forEach(band => {
+            if (pmbPartialHoliday(old, band) && pmbBandChanged(old, it, band)) return;
+            if (pmbBandChanged(old, it, band) && it.kelasDetail) delete it.kelasDetail[band.key];
+          });
+          if (pmbBands(old).some(band => pmbPartialHoliday(old, band) && pmbBandChanged(old, it, band))) {
+            alert('Nonaktifkan libur per kelas sebelum mengubah angka agregat.');
+            return;
+          }
+        }
+      }
       if (i !== -1) list[i] = it; else list.push(it);
-      pmbSave({ tanggal: d.tanggal, items: list });
-      // sinkronisasi wajib: nama dan jenjang pada Data Alergi mengikuti satuan ini
+      const ok = await pmbConfirm({ title: 'Konfirmasi Simpan Data Harian', html: '<p>Simpan <strong>' + pmbEsc(nama) + '</strong> pada tanggal <strong>' + pmbEsc(d.tanggal) + '</strong>?</p><p class="text-xs text-slate-500">Angka hanya mengubah log tanggal ini. Nama/jenis satuan diperbarui di master; angka baku master hanya berubah lewat tombol Simpan Angka ke Master.</p>', ok: 'Ya, Simpan Data' });
+      if (!ok) return;
+      if (!pmbSave({ tanggal: d.tanggal, items: list }, { masterStructure: true })) { alert('Log tanggal ini belum siap. Data belum disimpan.'); return; }
       if (old && typeof sdGetAll === 'function' && typeof sdSave === 'function') {
         const jenjangMap = { PAUD: 'PAUD', SD: 'SD', SMP: 'SMP', SMA: 'SMA', POSYANDU: 'BALITA' };
         const all = sdGetAll(); let ch = false;
@@ -13194,11 +14166,11 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         if (ch) sdSave(all);
       }
       pmbReset();
-      pmbRender();
+      pmbRender(true);
       if (typeof renderSasaran === 'function') {
         try { sdRenderLists(sdGetAll()); sdRenderStats(sdGetAll()); sdRenderTable(); } catch (e) {}
       }
-      if (wasEdit) alert('Data berhasil diperbarui!');
+      alert(wasEdit ? 'Data berhasil diperbarui.' : 'Data berhasil ditambahkan.');
     }
     function pmbEdit(id) {
       const it = pmbData().items.find(x => x.id === id);
@@ -13214,12 +14186,14 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       document.getElementById('pmb_form').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     async function pmbDelete(id) {
-      const d = pmbData(), it = d.items.find(x => x.id === id);
+      const d = pmbData();
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      const it = d.items.find(x => x.id === id);
       if (!it) return;
       const linked = (typeof sdGetAll === 'function') ? sdGetAll().filter(s => pmbNorm(s.sekolah) === pmbNorm(it.nama)) : [];
       const okDel = await pmbConfirm({ danger: true, ok: '🗑️ Ya, Hapus', title: '⚠️ Konfirmasi Hapus Data', html: '<div class="font-black text-slate-800">' + pmbEsc(it.nama) + '</div><div class="text-xs text-slate-600">' + pmbEsc(pmbDetail(it)) + '</div>' + (linked.length ? '<div class="text-xs text-rose-700 font-semibold">🛡️ ' + linked.length + ' data alergi memakai satuan ini. Data alergi tersebut akan IKUT DIHAPUS agar tetap sinkron.</div>' : '') + '<div class="text-xs text-slate-500">Hapus dari database?</div>' });
       if (!okDel) return;
-      pmbSave({ tanggal: d.tanggal, items: d.items.filter(x => x.id !== id) });
+      if (!pmbSave({ tanggal: d.tanggal, items: d.items.filter(x => x.id !== id) }, { masterStructure: true })) { alert('Log tanggal ini belum siap. Penghapusan belum disimpan.'); return; }
       if (linked.length && typeof sdSave === 'function') sdSave(sdGetAll().filter(s => pmbNorm(s.sekolah) !== pmbNorm(it.nama)));
       if (pmbEditId === id) pmbReset();
       pmbRender();
@@ -13227,12 +14201,11 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         try { sdRenderLists(sdGetAll()); sdRenderStats(sdGetAll()); sdRenderTable(); } catch (e) {}
       }
     }
-    function pmbSetTanggal(v) { const d = pmbData(); pmbSave({ tanggal: v, items: d.items }); }
-
     // ---------- data awal dari file PENERIMA MANFAAT TANGGAL 12 OCT 2026 ----------
     function pmbSeed() {
       const d = pmbData();
-      if (d.items.length && !confirm('Database sudah berisi ' + d.items.length + ' data.\n\nMuat data awal akan MENGGANTI seluruh isi database. Lanjutkan?')) return;
+      if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+      if (d.items.length && !confirm('Log tanggal ' + d.tanggal + ' sudah berisi ' + d.items.length + ' data.\n\nMuat data awal akan MENGGANTI log tanggal ini DAN angka baku master. Tanggal lain tidak berubah. Lanjutkan?')) return;
       // Sumber: PENERIMA MANFAAT TANGGAL 12 OCT 2026.xlsx (alamat tidak dipakai) (sheet sekolah & posyandu); kj/bj = kolom "Jumlah Siswa yang Mendapat MBG"
       const raw = [{"jenis": "PAUD", "nama": "KB AN NUR", "tl": 0, "tp": 5, "org": 2, "kl": 13, "kp": 16, "kj": 29}, {"jenis": "PAUD", "nama": "KB NUR SUCI", "tl": 0, "tp": 4, "org": 2, "kl": 20, "kp": 20, "kj": 40}, {"jenis": "PAUD", "nama": "KB JIRANA", "tl": 0, "tp": 4, "org": 2, "kl": 7, "kp": 8, "kj": 15}, {"jenis": "PAUD", "nama": "KB AL IKHLAS I", "tl": 1, "tp": 4, "org": 2, "kl": 9, "kp": 16, "kj": 25}, {"jenis": "PAUD", "nama": "KB AL MUKHLISIN", "tl": 0, "tp": 3, "org": 2, "kl": 12, "kp": 19, "kj": 31}, {"jenis": "PAUD", "nama": "KB BERSATU", "tl": 1, "tp": 2, "org": 2, "kl": 11, "kp": 3, "kj": 14}, {"jenis": "PAUD", "nama": "KB AL IKHLAS II", "tl": 1, "tp": 3, "org": 2, "kl": 5, "kp": 12, "kj": 17}, {"jenis": "PAUD", "nama": "KB AL AMIN", "tl": 0, "tp": 4, "org": 2, "kl": 11, "kp": 8, "kj": 19}, {"jenis": "PAUD", "nama": "KB SAHABAT CERIA", "tl": 0, "tp": 4, "org": 2, "kl": 11, "kp": 9, "kj": 20}, {"jenis": "PAUD", "nama": "KB NURUL AMIRULLAH", "tl": 1, "tp": 3, "org": 2, "kl": 0, "kp": 10, "kj": 10}, {"jenis": "PAUD", "nama": "RA AL DJIBRAN", "tl": 0, "tp": 0, "org": 0, "kl": 0, "kp": 0, "kj": 0}, {"jenis": "SD", "nama": "UPT SDN 34 CITTA", "tl": 2, "tp": 7, "org": 2, "kl": 31, "kp": 27, "kj": 60, "bl": 23, "bp": 25, "bj": 46}, {"jenis": "SD", "nama": "SD NEGERI 26 MANGKACA", "tl": 3, "tp": 9, "org": 2, "kl": 32, "kp": 33, "kj": 65, "bl": 33, "bp": 31, "bj": 64}, {"jenis": "SD", "nama": "UPT SDN 25 PARENRENG", "tl": 3, "tp": 10, "org": 2, "kl": 45, "kp": 41, "kj": 86, "bl": 42, "bp": 43, "bj": 85}, {"jenis": "SD", "nama": "SD NEGERI 36 PARENRENG", "tl": 3, "tp": 10, "org": 2, "kl": 13, "kp": 16, "kj": 29, "bl": 26, "bp": 19, "bj": 45}, {"jenis": "SD", "nama": "UPT SDN 5 AMPUTTANG", "tl": 2, "tp": 8, "org": 2, "kl": 18, "kp": 13, "kj": 31, "bl": 20, "bp": 14, "bj": 34}, {"jenis": "SD", "nama": "SDN 1 SEGERI", "tl": 2, "tp": 10, "org": 2, "kl": 27, "kp": 27, "kj": 54, "bl": 28, "bp": 33, "bj": 61}, {"jenis": "SD", "nama": "MI AL DJIBRAN", "tl": 0, "tp": 0, "org": 0, "kl": 0, "kp": 0, "kj": 0, "bl": 0, "bp": 0, "bj": 0}, {"jenis": "SMP", "nama": "SMPN 2 SEGERI", "tl": 10, "tp": 8, "org": 2, "bl": 66, "bp": 59, "bj": 125}, {"jenis": "SMP", "nama": "SMP NEGERI 1 SEGERI", "tl": 13, "tp": 24, "org": 2, "bl": 199, "bp": 245, "bj": 444}, {"jenis": "POSYANDU", "nama": "KAMBOJA", "bumil": 4, "busui": 20, "kl": 23, "kp": 28}, {"jenis": "POSYANDU", "nama": "TERATAI", "bumil": 5, "busui": 24, "kl": 12, "kp": 14}, {"jenis": "POSYANDU", "nama": "MAWAR", "bumil": 8, "busui": 32, "kl": 20, "kp": 18}, {"jenis": "POSYANDU", "nama": "MELATI", "bumil": 2, "busui": 20, "kl": 8, "kp": 6}, {"jenis": "POSYANDU", "nama": "ANGGREK", "bumil": 3, "busui": 23, "kl": 29, "kp": 20}, {"jenis": "POSYANDU", "nama": "TULIP", "bumil": 2, "busui": 12, "kl": 7, "kp": 9}, {"jenis": "POSYANDU", "nama": "MELATI 1", "bumil": 1, "busui": 8, "kl": 18, "kp": 4}, {"jenis": "POSYANDU", "nama": "MELATI 2", "bumil": 6, "busui": 20, "kl": 21, "kp": 17}, {"jenis": "POSYANDU", "nama": "MELATI 3", "bumil": 4, "busui": 13, "kl": 10, "kp": 14}, {"jenis": "POSYANDU", "nama": "MELATI 4", "bumil": 2, "busui": 19, "kl": 15, "kp": 11}, {"jenis": "POSYANDU", "nama": "MELATI 5", "bumil": 1, "busui": 3, "kl": 7, "kp": 5}, {"jenis": "POSYANDU", "nama": "MELATI 6", "bumil": 2, "busui": 5, "kl": 8, "kp": 4}];
       const items = raw.map((r, i) => {
@@ -13243,41 +14216,53 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         if (it.bj === (it.bl || 0) + (it.bp || 0)) delete it.bj;
         return it;
       });
-      pmbSave({ tanggal: '2026-10-12', items: items });
-      pmbRender();
+      pmbWriteMaster({ items: pmbClone(items), sampel: pmbClone(d.sampel) });
+      if (!pmbSave({ tanggal: d.tanggal, items: items })) { alert('Log tanggal ini belum siap. Data awal belum disimpan.'); return; }
+      pmbRender(true);
       try { sdRenderLists(sdGetAll()); } catch (e) {}
-      alert('Data dimuat dari file PENERIMA MANFAAT (12 Okt 2026): ' + items.length + ' satuan (20 sekolah/PAUD + 12 posyandu).');
+      alert('Data awal dimuat ke tanggal ' + d.tanggal + ' dan master: ' + items.length + ' satuan (20 sekolah/PAUD + 12 posyandu).');
     }
 
-    // ---------- export Excel (format seperti lampiran + kolom porsi) ----------
+    function pmbExportKop(wb, ws, cols, judul, dateText) {
+      const logoEnd = cols >= 17 ? 3 : cols >= 13 ? 2 : 1;
+      const titleEnd = cols >= 17 ? 12 : cols >= 13 ? 8 : 3;
+      const lab = titleEnd + 1, val = titleEnd + 2;
+      rptKop(wb, ws, { r: 1, rowH: 20.25, logo: [1, logoEnd], title: [logoEnd + 1, titleEnd], lab: lab, val: val, judul: judul, noDoc: '', rev: '00', tgl: dateText, colon: false });
+      for (let row = 1; row <= 3; row++) {
+        rptMerge(ws, row, val, row, cols);
+        rptBorder(ws, row, val, row, cols, 'grid');
+      }
+    }
     async function pmbExportExcel() {
       try {
         if (typeof ExcelJS === 'undefined') { alert('Library Excel belum termuat. Tunggu beberapa detik lalu coba lagi.'); return; }
         const d = pmbData();
+        if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
         if (!d.items.length) { alert('Database masih kosong.'); return; }
-        const tgl = (rptLongDate(d.tanggal) || rptToday()).toUpperCase();
+        const dateText = rptLongDate(d.tanggal) || rptToday();
+        const tgl = dateText.toUpperCase();
         const sorted = pmbSorted(d.items);
-        const HDR = 'FFDDEBF7', YEL = 'FFFFFF00';
+        const HDR = 'FFDDEFE7', YEL = 'FFE8A33D';
         const wb = new ExcelJS.Workbook();
-        const C = { h: 'center', size: 11 }, CB = { h: 'center', size: 11, bold: true }, L = { h: 'left', size: 11 };
-
+        const C = { h: 'center', size: 11 }, CB = { h: 'center', size: 11, bold: true }, L = { h: 'left', size: 11 }, R = { h: 'left', size: 9 };
         const AM = pmbAlergiMap();
         const algN = it => (AM[pmbNorm(it.nama)] || { n: 0 }).n;
-        // ----- Sheet 1: satuan pendidikan -----
+
         const sk = sorted.filter(i => i.jenis !== 'POSYANDU');
         const ws = wb.addWorksheet('Satuan Pendidikan');
-        const NC = 16;
-        [5, 30, 10, 14, 11, 12, 13, 13, 10, 12, 10, 11, 15, 10, 10, 11].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
-        rptMerge(ws, 1, 1, 1, NC); rptPut(ws, 1, 1, 'PESERTA DIDIK DAN GURU/TENDIK (' + tgl + ')', { h: 'center', size: 13, bold: true });
-        rptFill(ws, 1, 1, 1, NC, YEL); ws.getRow(1).height = 24;
-        const heads = ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Jumlah Pendidik dan Tenaga', 'Jumlah Laki-Laki', 'Jumlah Perempuan', 'Total Jumlah', 'Uji Organoleptik', 'Jumlah Siswa, Guru/Tendik & Organoleptik', 'Porsi Kecil', 'Porsi Besar', 'Anak Alergi'];
-        heads.forEach((h, i) => rptPut(ws, 2, i + 1, h, { h: 'center', bold: true, size: 11 }));
-        rptFill(ws, 2, 1, 2, NC, HDR); rptBorder(ws, 2, 1, 2, NC, 'grid'); ws.getRow(2).height = 70;
-        let r = 3; const T = new Array(NC + 1).fill(0);
+        const NC = 17;
+        [5, 30, 10, 14, 11, 12, 13, 13, 10, 12, 10, 11, 15, 10, 10, 11, 42].forEach((w, i) => { ws.getColumn(i + 1).width = w; });
+        pmbExportKop(wb, ws, NC, 'PESERTA DIDIK DAN GURU/TENDIK', dateText);
+        rptMerge(ws, 4, 1, 4, NC); rptPut(ws, 4, 1, 'PESERTA DIDIK DAN GURU/TENDIK (' + tgl + ')', { h: 'center', size: 13, bold: true });
+        rptFill(ws, 4, 1, 4, NC, YEL); ws.getRow(4).height = 24;
+        const heads = ['No.', 'Nama Satuan Pendidikan', 'Kelas', 'Jumlah Siswa yang Mendapat MBG', 'Jumlah Siswa Laki-Laki', 'Jumlah Siswa Perempuan', 'Total Jumlah Peserta', 'Jumlah Pendidik dan Tenaga', 'Jumlah Laki-Laki', 'Jumlah Perempuan', 'Total Jumlah', 'Uji Organoleptik', 'Jumlah Siswa, Guru/Tendik & Organoleptik', 'Porsi Kecil', 'Porsi Besar', 'Anak Alergi', 'Remarks / Keterangan'];
+        heads.forEach((h, i) => rptPut(ws, 5, i + 1, h, { h: 'center', bold: true, size: 11 }));
+        rptFill(ws, 5, 1, 5, NC, HDR); rptBorder(ws, 5, 1, 5, NC, 'grid'); ws.getRow(5).height = 70;
+        let r = 6; const T = new Array(NC + 1).fill(0);
         sk.forEach((it, idx) => {
           const c = pmbCalc(it);
-          const lines = it.jenis === 'SD' ? [['1,2,3', c.kl, c.kp, c.kecil], ['4,5,6', c.bl, c.bp, c.bs]] : (it.jenis === 'SMP' || it.jenis === 'SMA') ? [[it.jenis === 'SMA' ? '10,11,12' : '7,8,9', c.bl, c.bp, c.bs]] : [['', c.kl, c.kp, c.kecil]];
-          const r2 = r + lines.length - 1;
+          const lines = it.jenis === 'SD' ? [['1,2,3', c.kl, c.kp, c.kecil], ['4,5,6', c.bl, c.bp, c.bs]] : (it.jenis === 'SMP' || it.jenis === 'SMA') ? [[it.jenis === 'SMA' ? '10,11,12' : '7,8,9', c.bl, c.bp, c.bs]] : [['PAUD/TK', c.kl, c.kp, c.kecil]];
+          const r2 = r + lines.length - 1, notes = pmbHolidaySummary(it);
           lines.forEach((ln, k) => {
             rptPut(ws, r + k, 3, ln[0], C); rptPut(ws, r + k, 4, ln[3], C); rptPut(ws, r + k, 5, ln[1], C); rptPut(ws, r + k, 6, ln[2], C);
             ws.getRow(r + k).height = 24;
@@ -13286,61 +14271,67 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
           rptPut(ws, r, 1, idx + 1, C); rptPut(ws, r, 2, it.nama, L);
           rptPut(ws, r, 7, c.siswa, CB); rptPut(ws, r, 8, c.td, C); rptPut(ws, r, 9, c.tl, C); rptPut(ws, r, 10, c.tp, C);
           rptPut(ws, r, 11, c.td, CB); rptPut(ws, r, 12, c.org, C); rptPut(ws, r, 13, jum, CB);
-          rptPut(ws, r, 14, c.porsiKecil, C); rptPut(ws, r, 15, c.porsiBesar, C); rptPut(ws, r, 16, al, C);
-          [1, 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].forEach(col => rptMerge(ws, r, col, r2, col));
+          rptPut(ws, r, 14, c.porsiKecil, C); rptPut(ws, r, 15, c.porsiBesar, C); rptPut(ws, r, 16, al, C); rptPut(ws, r, 17, notes || '-', R);
+          [1, 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].forEach(col => rptMerge(ws, r, col, r2, col));
           rptBorder(ws, r, 1, r2, NC, 'grid');
           T[4] += c.siswa; T[5] += c.siswaL; T[6] += c.siswaP; T[7] += c.siswa; T[8] += c.td; T[9] += c.tl; T[10] += c.tp; T[11] += c.td; T[12] += c.org; T[13] += jum; T[14] += c.porsiKecil; T[15] += c.porsiBesar; T[16] += al;
+          ws.getRow(r).height = Math.max(ws.getRow(r).height || 24, rptLines(notes || '-', 42, 9) * 12 + 6);
           r = r2 + 1;
         });
         rptMerge(ws, r, 1, r, 3); rptPut(ws, r, 1, 'TOTAL', CB);
-        for (let col = 4; col <= NC; col++) rptPut(ws, r, col, T[col], CB);
-        rptBorder(ws, r, 1, r, NC, 'grid'); ws.getRow(r).height = 24;
-        rptPage(ws, true, null); ws.pageSetup.fitToHeight = 1;
+        for (let col = 4; col <= 16; col++) rptPut(ws, r, col, T[col], CB);
+        rptPut(ws, r, 17, d.keterangan || '-', R);
+        rptBorder(ws, r, 1, r, NC, 'grid'); ws.getRow(r).height = Math.max(24, rptLines(d.keterangan || '-', 42, 9) * 12 + 6);
+        rptPage(ws, true, 'A1:Q' + r);
 
-        // ----- Sheet 2: posyandu 3B -----
         const po = sorted.filter(i => i.jenis === 'POSYANDU');
         const w2 = wb.addWorksheet('Posyandu 3B');
-        const NP = 11;
-        [5, 24, 12, 14, 16, 16, 14, 18, 11, 11, 12].forEach((w, i) => { w2.getColumn(i + 1).width = w; });
-        rptMerge(w2, 1, 1, 1, NP); rptPut(w2, 1, 1, 'NON PESERTA DIDIK (3B), (' + tgl + ')', { h: 'center', size: 13, bold: true });
-        rptFill(w2, 1, 1, 1, NP, YEL); w2.getRow(1).height = 24;
-        [[1, 'No.'], [2, 'Nama Posyandu'], [3, 'Ibu Hamil'], [4, 'Ibu Menyusui'], [7, 'Uji Organoleptik'], [8, 'Total Jumlah Peserta 3B'], [9, 'Porsi Kecil'], [10, 'Porsi Besar'], [11, 'Ibu/Balita Alergi']].forEach(h => {
-          rptMerge(w2, 2, h[0], 3, h[0]); rptPut(w2, 2, h[0], h[1], { h: 'center', bold: true, size: 11 });
+        const NP = 12;
+        [5, 24, 12, 14, 16, 16, 14, 18, 11, 11, 12, 42].forEach((w, i) => { w2.getColumn(i + 1).width = w; });
+        pmbExportKop(wb, w2, NP, 'NON PESERTA DIDIK (3B)', dateText);
+        rptMerge(w2, 4, 1, 4, NP); rptPut(w2, 4, 1, 'NON PESERTA DIDIK (3B), (' + tgl + ')', { h: 'center', size: 13, bold: true });
+        rptFill(w2, 4, 1, 4, NP, YEL); w2.getRow(4).height = 24;
+        [[1, 'No.'], [2, 'Nama Posyandu'], [3, 'Ibu Hamil'], [4, 'Ibu Menyusui'], [7, 'Uji Organoleptik'], [8, 'Total Jumlah Peserta 3B'], [9, 'Porsi Kecil'], [10, 'Porsi Besar'], [11, 'Ibu/Balita Alergi'], [12, 'Remarks / Keterangan']].forEach(h => {
+          rptMerge(w2, 5, h[0], 6, h[0]); rptPut(w2, 5, h[0], h[1], { h: 'center', bold: true, size: 11 });
         });
-        rptMerge(w2, 2, 5, 2, 6); rptPut(w2, 2, 5, 'Anak dibawah 5 Tahun mulai Usia 6 Bulan', { h: 'center', bold: true, size: 11 });
-        rptPut(w2, 3, 5, 'Jumlah Laki-Laki', { h: 'center', bold: true, size: 11 }); rptPut(w2, 3, 6, 'Jumlah Perempuan', { h: 'center', bold: true, size: 11 });
-        rptFill(w2, 2, 1, 3, NP, HDR); rptBorder(w2, 2, 1, 3, NP, 'grid'); w2.getRow(2).height = 36; w2.getRow(3).height = 32;
-        let r3 = 4; const T2 = new Array(NP + 1).fill(0);
+        rptMerge(w2, 5, 5, 5, 6); rptPut(w2, 5, 5, 'Anak dibawah 5 Tahun mulai Usia 6 Bulan', { h: 'center', bold: true, size: 11 });
+        rptPut(w2, 6, 5, 'Jumlah Laki-Laki', { h: 'center', bold: true, size: 11 }); rptPut(w2, 6, 6, 'Jumlah Perempuan', { h: 'center', bold: true, size: 11 });
+        rptFill(w2, 5, 1, 6, NP, HDR); rptBorder(w2, 5, 1, 6, NP, 'grid'); w2.getRow(5).height = 36; w2.getRow(6).height = 32;
+        let r3 = 7; const T2 = new Array(NP + 1).fill(0);
         po.forEach((it, idx) => {
-          const c = pmbCalc(it), al = algN(it);
+          const c = pmbCalc(it), al = algN(it), notes = pmbHolidaySummary(it);
           const vals = [idx + 1, it.nama, c.bumil, c.busui, c.kl, c.kp, c.org, c.total, c.porsiKecil, c.porsiBesar, al];
           vals.forEach((v, k) => rptPut(w2, r3, k + 1, v, k === 1 ? L : (k === 7 ? CB : C)));
-          rptBorder(w2, r3, 1, r3, NP, 'grid'); w2.getRow(r3).height = 22;
+          rptPut(w2, r3, 12, notes || '-', R);
+          rptBorder(w2, r3, 1, r3, NP, 'grid'); w2.getRow(r3).height = Math.max(22, rptLines(notes || '-', 42, 9) * 12 + 6);
           T2[3] += c.bumil; T2[4] += c.busui; T2[5] += c.kl; T2[6] += c.kp; T2[7] += c.org; T2[8] += c.total; T2[9] += c.porsiKecil; T2[10] += c.porsiBesar; T2[11] += al;
           r3++;
         });
         rptMerge(w2, r3, 1, r3, 2); rptPut(w2, r3, 1, 'TOTAL', CB);
-        for (let col = 3; col <= NP; col++) rptPut(w2, r3, col, T2[col], CB);
-        rptBorder(w2, r3, 1, r3, NP, 'grid'); w2.getRow(r3).height = 24;
-        rptPage(w2, true, null); w2.pageSetup.fitToHeight = 1;
+        for (let col = 3; col <= 11; col++) rptPut(w2, r3, col, T2[col], CB);
+        rptPut(w2, r3, 12, d.keterangan || '-', R);
+        rptBorder(w2, r3, 1, r3, NP, 'grid'); w2.getRow(r3).height = Math.max(24, rptLines(d.keterangan || '-', 42, 9) * 12 + 6);
+        rptPage(w2, true, 'A1:L' + r3);
 
-        // ----- Sheet 3: sampel bahan makanan -----
         const w3 = wb.addWorksheet('Sampel Bahan Makanan');
-        const NS = 5;
-        [5, 40, 14, 14, 18].forEach((w, i) => { w3.getColumn(i + 1).width = w; });
-        rptMerge(w3, 1, 1, 1, NS); rptPut(w3, 1, 1, 'SAMPEL BAHAN MAKANAN (' + tgl + ')', { h: 'center', size: 13, bold: true });
-        rptFill(w3, 1, 1, 1, NS, YEL); w3.getRow(1).height = 24;
-        ['No.', 'Nama Sampel Bahan Makanan', 'Jumlah Porsi', 'Jenis Porsi', 'Anak/Ibu Alergi Bahan Ini'].forEach((h, i) => rptPut(w3, 2, i + 1, h, { h: 'center', bold: true, size: 11 }));
-        rptFill(w3, 2, 1, 2, NS, HDR); rptBorder(w3, 2, 1, 2, NS, 'grid'); w3.getRow(2).height = 36;
-        let r4 = 3, tS = 0, tA = 0;
+        const NS = 6;
+        [5, 40, 14, 14, 18, 42].forEach((w, i) => { w3.getColumn(i + 1).width = w; });
+        pmbExportKop(wb, w3, NS, 'SAMPEL BAHAN MAKANAN', dateText);
+        rptMerge(w3, 4, 1, 4, NS); rptPut(w3, 4, 1, 'SAMPEL BAHAN MAKANAN (' + tgl + ')', { h: 'center', size: 13, bold: true });
+        rptFill(w3, 4, 1, 4, NS, YEL); w3.getRow(4).height = 24;
+        ['No.', 'Nama Sampel Bahan Makanan', 'Jumlah Porsi', 'Jenis Porsi', 'Anak/Ibu Alergi Bahan Ini', 'Remarks / Keterangan'].forEach((h, i) => rptPut(w3, 5, i + 1, h, { h: 'center', bold: true, size: 11 }));
+        rptFill(w3, 5, 1, 5, NS, HDR); rptBorder(w3, 5, 1, 5, NS, 'grid'); w3.getRow(5).height = 36;
+        let r4 = 6, tS = 0, tA = 0;
+        const sampleNotes = pmbTableRemarksText('sampel');
         pmbSampel().forEach((x, i) => {
-          const al = pmbSampelAlg(x.nama); tS += x.jumlah; tA += al;
-          [i + 1, x.nama, x.jumlah, 'Porsi Besar', al].forEach((v, k) => rptPut(w3, r4, k + 1, v, k === 1 ? L : C));
-          rptBorder(w3, r4, 1, r4, NS, 'grid'); w3.getRow(r4).height = 22; r4++;
+          const al = pmbSampelAlg(x.nama), active = pmbHolidayActive(sampleHolidayState()) ? 0 : x.jumlah;
+          tS += active; tA += al;
+          [i + 1, x.nama, active, 'Porsi Besar', al, sampleNotes || '-'].forEach((v, k) => rptPut(w3, r4, k + 1, v, k === 1 || k === 5 ? (k === 5 ? R : L) : C));
+          rptBorder(w3, r4, 1, r4, NS, 'grid'); w3.getRow(r4).height = Math.max(22, rptLines(sampleNotes || '-', 42, 9) * 12 + 6); r4++;
         });
-        rptMerge(w3, r4, 1, r4, 2); rptPut(w3, r4, 1, 'TOTAL', CB); rptPut(w3, r4, 3, tS, CB); rptPut(w3, r4, 4, 'Porsi Besar', CB); rptPut(w3, r4, 5, tA, CB);
-        rptBorder(w3, r4, 1, r4, NS, 'grid'); w3.getRow(r4).height = 24;
-        rptPage(w3, true, null); w3.pageSetup.fitToHeight = 1;
+        rptMerge(w3, r4, 1, r4, 2); rptPut(w3, r4, 1, 'TOTAL', CB); rptPut(w3, r4, 3, tS, CB); rptPut(w3, r4, 4, 'Porsi Besar', CB); rptPut(w3, r4, 5, tA, CB); rptPut(w3, r4, 6, d.keterangan || '-', R);
+        rptBorder(w3, r4, 1, r4, NS, 'grid'); w3.getRow(r4).height = Math.max(24, rptLines(d.keterangan || '-', 42, 9) * 12 + 6);
+        rptPage(w3, true, 'A1:F' + r4);
 
         await rptDownload(wb, 'DATABASE PENERIMA MANFAAT_' + (d.tanggal || getLocalDateKey()) + '.xlsx');
       } catch (e) {
@@ -13348,6 +14339,51 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
         alert('Export Excel gagal: ' + (e && e.message ? e.message : e));
       }
     }
+    function sampleHolidayState() { const d = pmbData(); return d.liburTabel && d.liburTabel.sampel; }
+    function pmbExportWord() {
+      try {
+        const d = pmbData();
+        if (d.loading) { alert('Log tanggal ini belum siap.'); return; }
+        if (!d.items.length) { alert('Database masih kosong.'); return; }
+        const files = [], kop = exportWordKop('FM-SGR-SPPG-01.01', 'dokumen', files, 'DATABASE PENERIMA MANFAAT', '00', '', rptLongDate(d.tanggal) || rptToday());
+        const sorted = pmbSorted(d.items), sk = sorted.filter(i => i.jenis !== 'POSYANDU'), po = sorted.filter(i => i.jenis === 'POSYANDU');
+        const AM = pmbAlergiMap(), algN = it => (AM[pmbNorm(it.nama)] || { n: 0 }).n;
+        const esc = value => pmbEsc(value == null ? '' : value).replace(/\n/g, '<br>');
+        const schoolHeads = ['No.', 'Nama Satuan', 'Kelas', 'Jumlah MBG', 'L', 'P', 'Total Peserta', 'Tendik', 'L', 'P', 'Total', 'Organo', 'Total Peserta, Tendik & Organo', 'Porsi Kecil', 'Porsi Besar', 'Alergi', 'Remarks / Keterangan'];
+        let schoolRows = '';
+        sk.forEach((it, idx) => {
+          const c = pmbCalc(it), bands = pmbBands(it), rs = bands.length, notes = pmbHolidaySummary(it);
+          bands.forEach((band, k) => {
+            const small = band.key === 'kecil', count = small ? c.kecil : c.bs, l = small ? c.kl : c.bl, p = small ? c.kp : c.bp;
+            schoolRows += '<tr>';
+            if (k === 0) {
+              schoolRows += `<td rowspan="${rs}" class="c">${idx + 1}</td><td rowspan="${rs}" class="l b">${esc(it.nama)}</td>`;
+            }
+            schoolRows += `<td class="c">${esc(band.grades.map(g => pmbGradeLabel(g)).join(', '))}</td><td class="c">${count}</td><td class="c">${l}</td><td class="c">${p}</td>`;
+            if (k === 0) {
+              schoolRows += `<td rowspan="${rs}" class="c b">${c.siswa}</td><td rowspan="${rs}" class="c">${c.td}</td><td rowspan="${rs}" class="c">${c.tl}</td><td rowspan="${rs}" class="c">${c.tp}</td><td rowspan="${rs}" class="c b">${c.td}</td><td rowspan="${rs}" class="c">${c.org}</td><td rowspan="${rs}" class="c b">${c.siswa + c.td + c.org}</td><td rowspan="${rs}" class="c">${c.porsiKecil}</td><td rowspan="${rs}" class="c">${c.porsiBesar}</td><td rowspan="${rs}" class="c">${algN(it)}</td><td rowspan="${rs}" class="l rem">${esc(notes || '-')}</td>`;
+            }
+            schoolRows += '</tr>';
+          });
+        });
+        const posyHeads = ['No.', 'Nama Posyandu', 'Ibu Hamil', 'Ibu Menyusui', 'Balita L', 'Balita P', 'Organo', 'Total 3B', 'Porsi Kecil', 'Porsi Besar', 'Alergi', 'Remarks / Keterangan'];
+        const posyRows = po.map((it, idx) => {
+          const c = pmbCalc(it);
+          return `<tr><td class="c">${idx + 1}</td><td class="l b">${esc(it.nama)}</td><td class="c">${c.bumil}</td><td class="c">${c.busui}</td><td class="c">${c.kl}</td><td class="c">${c.kp}</td><td class="c">${c.org}</td><td class="c b">${c.total}</td><td class="c">${c.porsiKecil}</td><td class="c">${c.porsiBesar}</td><td class="c">${algN(it)}</td><td class="l rem">${esc(pmbHolidaySummary(it) || '-')}</td></tr>`;
+        }).join('');
+        const sampleNotes = pmbTableRemarksText('sampel'), sampleOff = pmbHolidayActive(sampleHolidayState());
+        const sampleRows = pmbSampel().map((x, i) => `<tr><td class="c">${i + 1}</td><td class="l b">${esc(x.nama)}</td><td class="c">${sampleOff ? 0 : x.jumlah}</td><td class="c">Porsi Besar</td><td class="c">${pmbSampelAlg(x.nama)}</td><td class="l rem">${esc(sampleNotes || '-')}</td></tr>`).join('');
+        const table = (heads, rows, widths) => '<table class="data"><colgroup>' + widths.map(w => '<col style="width:' + w + '%">').join('') + '</colgroup><thead><tr>' + heads.map(x => '<th>' + esc(x) + '</th>').join('') + '</tr></thead><tbody>' + rows + '</tbody></table>';
+        const general = d.keterangan ? '<p class="note"><strong>Keterangan umum:</strong> ' + esc(d.keterangan) + '</p>' : '';
+        const content = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Database Penerima Manfaat ${esc(d.tanggal)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>90</w:Zoom></w:WordDocument></xml><![endif]--><style>@page Section1{size:29.7cm 21cm;mso-page-orientation:landscape;margin:1.5cm 1cm 1cm 1cm}div.Section1{page:Section1}body{font-family:'Calibri',sans-serif;font-size:8pt;line-height:1.1}table.data{width:100%;border-collapse:collapse;margin:8px 0 14px}table.data th,table.data td{border:1px solid #000;padding:3px;font-size:7.5pt;vertical-align:middle}table.data th{background:#ddefe7;text-align:center;font-weight:bold}td.c{text-align:center}td.l{text-align:left}td.b,th.b{font-weight:bold}td.rem{font-size:7pt;color:#7c4a00}p.note{font-size:8pt;margin:5px 0 12px}.page{page-break-before:always}</style></head><body><div class="Section1">${kop}<h3>PESERTA DIDIK DAN GURU/TENDIK — ${esc(dateTextForPmb(d))}</h3>${table(schoolHeads, schoolRows, [3,12,6,6,4,4,6,5,4,4,5,5,8,5,5,5,17])}${general}<div class="page">${kop}<h3>NON PESERTA DIDIK (3B) — POSYANDU</h3>${table(posyHeads, posyRows, [3,14,7,7,7,7,7,8,7,7,7,22])}${general}</div><div class="page">${kop}<h3>SAMPEL BAHAN MAKANAN</h3>${table(['No.', 'Nama Sampel Bahan Makanan', 'Jumlah Porsi', 'Jenis Porsi', 'Alergi Bahan Ini', 'Remarks / Keterangan'], sampleRows, [4,30,10,12,14,30])}${general}</div></div></body></html>`;
+        const blob = new Blob([exportBuildMhtml(content, files, 'dokumen')], { type: 'application/msword' });
+        exportDownloadBlob(blob, 'DATABASE PENERIMA MANFAAT_' + d.tanggal + '.doc');
+      } catch (e) {
+        console.error('Export Word database penerima manfaat gagal', e);
+        alert('Export Word gagal: ' + (e && e.message ? e.message : e));
+      }
+    }
+    function dateTextForPmb(d) { return (rptLongDate(d.tanggal) || rptToday()).toUpperCase(); }
 
     // ---------- integrasi dengan data alergi (modul 01.01) & Inspeksi Alergen (22.01) ----------
     (function () {
@@ -13377,6 +14413,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
       }
       function sdEnsureUnits(list) {
         const d = pmbData();
+        if (d.loading) return [];
         const have = {};
         d.items.forEach(i => { have[pmbNorm(i.nama)] = 1; });
         const items = d.items.slice(), created = [];
@@ -13390,7 +14427,7 @@ if (it.jenis !== 'POSYANDU') { add('td', c.tl, c.tp, c.td); if (c.kecil !== c.lp
           items.push(it);
           created.push({ nama: nama, jenis: jenis });
         });
-        if (created.length) pmbSave({ tanggal: d.tanggal, items: items });
+        if (created.length && !pmbSave({ tanggal: d.tanggal, items: items }, { masterStructure: true })) return [];
         return created;
       }
       window.sdEnsureUnits = sdEnsureUnits;
